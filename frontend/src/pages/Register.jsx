@@ -44,8 +44,15 @@ export default function Register() {
   }
 
   return (
-    <main className="auth-page">
+    <main className="auth-page page-enter">
       <section className="auth-card">
+        <div className="auth-card__brand">
+          <div className="auth-card__logo" aria-hidden="true">
+            VQ
+          </div>
+          <span className="auth-card__brand-name">VendorIQ</span>
+        </div>
+
         <h1>Create account</h1>
         <p className="auth-subtitle">Join the Vendor Reliability Platform</p>
 
@@ -58,9 +65,9 @@ export default function Register() {
             </p>
           )}
 
-          <label>
-            Name
+          <div className="auth-field auth-field-floating">
             <input
+              id="register-name"
               type="text"
               value={name}
               onChange={(event) => {
@@ -69,12 +76,14 @@ export default function Register() {
               }}
               required
               autoComplete="name"
+              placeholder=" "
             />
-          </label>
+            <label htmlFor="register-name">Full name</label>
+          </div>
 
-          <label>
-            Email
+          <div className="auth-field auth-field-floating">
             <input
+              id="register-email"
               type="email"
               value={email}
               onChange={(event) => {
@@ -83,17 +92,19 @@ export default function Register() {
               }}
               required
               autoComplete="email"
+              placeholder=" "
               aria-invalid={emailError}
               className={emailError ? 'input-error' : undefined}
             />
+            <label htmlFor="register-email">Email</label>
             {emailError && (
               <span className="field-error">This email address is already in use.</span>
             )}
-          </label>
+          </div>
 
-          <label>
-            Password
+          <div className="auth-field auth-field-floating">
             <input
+              id="register-password"
               type="password"
               value={password}
               onChange={(event) => {
@@ -103,12 +114,17 @@ export default function Register() {
               required
               minLength={8}
               autoComplete="new-password"
+              placeholder=" "
             />
-          </label>
+            <label htmlFor="register-password">Password</label>
+          </div>
 
-          <label>
-            Role
+          <div className="auth-field">
+            <label className="auth-label-top" htmlFor="register-role">
+              Role
+            </label>
             <select
+              id="register-role"
               value={role}
               onChange={(event) => {
                 setRole(event.target.value)
@@ -121,10 +137,11 @@ export default function Register() {
                 </option>
               ))}
             </select>
-          </label>
+          </div>
 
-          <button type="submit" disabled={submitting}>
-            {submitting ? 'Creating account…' : 'Register'}
+          <button type="submit" disabled={submitting} className={submitting ? 'is-loading' : undefined}>
+            <span className="btn-spinner" aria-hidden="true" />
+            <span>{submitting ? 'Creating account…' : 'Register'}</span>
           </button>
         </form>
 

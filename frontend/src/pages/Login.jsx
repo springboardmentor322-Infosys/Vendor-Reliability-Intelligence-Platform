@@ -42,17 +42,24 @@ export default function Login() {
   }
 
   return (
-    <main className="auth-page">
+    <main className="auth-page page-enter">
       <section className="auth-card">
+        <div className="auth-card__brand">
+          <div className="auth-card__logo" aria-hidden="true">
+            VQ
+          </div>
+          <span className="auth-card__brand-name">VendorIQ</span>
+        </div>
+
         <h1>Sign in</h1>
         <p className="auth-subtitle">Vendor Reliability Platform</p>
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <AuthAlert message={error} />
 
-          <label>
-            Email
+          <div className="auth-field auth-field-floating">
             <input
+              id="login-email"
               type="email"
               value={email}
               onChange={(event) => {
@@ -61,14 +68,19 @@ export default function Login() {
               }}
               required
               autoComplete="email"
+              placeholder=" "
               aria-invalid={fieldErrors.email}
               className={fieldErrors.email ? 'input-error' : undefined}
             />
-          </label>
+            <label htmlFor="login-email">Email</label>
+            {fieldErrors.email && (
+              <span className="field-error">Please check your email address.</span>
+            )}
+          </div>
 
-          <label>
-            Password
+          <div className="auth-field auth-field-floating">
             <input
+              id="login-password"
               type="password"
               value={password}
               onChange={(event) => {
@@ -77,13 +89,19 @@ export default function Login() {
               }}
               required
               autoComplete="current-password"
+              placeholder=" "
               aria-invalid={fieldErrors.password}
               className={fieldErrors.password ? 'input-error' : undefined}
             />
-          </label>
+            <label htmlFor="login-password">Password</label>
+            {fieldErrors.password && (
+              <span className="field-error">Please check your password.</span>
+            )}
+          </div>
 
-          <button type="submit" disabled={submitting}>
-            {submitting ? 'Signing in…' : 'Sign in'}
+          <button type="submit" disabled={submitting} className={submitting ? 'is-loading' : undefined}>
+            <span className="btn-spinner" aria-hidden="true" />
+            <span>{submitting ? 'Signing in…' : 'Sign in'}</span>
           </button>
         </form>
 

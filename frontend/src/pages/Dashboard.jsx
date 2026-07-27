@@ -12,25 +12,36 @@ export default function Dashboard() {
   }
 
   return (
-    <main className="auth-page">
+    <main className="auth-page auth-page--dashboard page-enter">
       <section className="auth-card dashboard-card">
-        <h1>Dashboard</h1>
-        <p className="auth-subtitle">Welcome back</p>
+        <div className="dashboard-header">
+          <div className="dashboard-greeting">
+            Welcome back
+            <strong>{user?.name}</strong>
+          </div>
+          {user?.role && (
+            <span className="role-badge" data-role={user.role}>
+              {user.role}
+            </span>
+          )}
+        </div>
 
         <div className="dashboard-profile">
-          <p>
+          <p className="dashboard-stat">
             <span>Name</span>
             <strong>{user?.name}</strong>
           </p>
-          <p>
+          <p className="dashboard-stat">
             <span>Role</span>
             <strong>{user?.role}</strong>
           </p>
         </div>
 
-        <button type="button" className="secondary" onClick={handleLogout}>
-          Sign out
-        </button>
+        <div className="dashboard-actions">
+          <button type="button" className="secondary" onClick={handleLogout}>
+            Sign out
+          </button>
+        </div>
       </section>
     </main>
   )
