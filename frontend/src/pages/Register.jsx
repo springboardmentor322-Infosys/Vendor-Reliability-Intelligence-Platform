@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import AuthAlert from '../components/AuthAlert'
 import { useAuth } from '../context/AuthContext'
-import { ROLES, getRegisterErrorMessage, isDuplicateEmailError } from '../utils/auth'
+import { REGISTER_ROLES, getRegisterErrorMessage, isDuplicateEmailError } from '../utils/auth'
 import '../auth.css'
 
 export default function Register() {
@@ -131,7 +131,7 @@ export default function Register() {
                 if (error) clearErrors()
               }}
             >
-              {ROLES.map((option) => (
+              {REGISTER_ROLES.map((option) => (
                 <option key={option} value={option}>
                   {option}
                 </option>

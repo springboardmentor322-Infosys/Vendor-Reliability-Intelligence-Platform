@@ -1,5 +1,4 @@
-export const ROLES = [
-  'Administrator',
+export const REGISTER_ROLES = [
   'Procurement Manager',
   'Vendor',
   'Finance Officer',

@@ -15,6 +15,16 @@ class Role(str, enum.Enum):
     AUDITOR = "Auditor"
 
 
+REGISTERABLE_ROLES = frozenset(
+    {
+        Role.PROCUREMENT_MANAGER,
+        Role.VENDOR,
+        Role.FINANCE_OFFICER,
+        Role.AUDITOR,
+    }
+)
+
+
 class User(Base):
     __tablename__ = "users"
 
