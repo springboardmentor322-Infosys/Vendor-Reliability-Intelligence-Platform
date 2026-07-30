@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import OperationalError
 
 from app.db.base import Base
-from app.db.session import engine
+from app.db.seed_admin import ensure_admin_account
+from app.db.session import SessionLocal, engine
 from app.routers import admin, auth
 
 app = FastAPI(title="Vendor Reliability Platform")
@@ -31,6 +32,12 @@ def initialize_database() -> None:
         Base.metadata.create_all(bind=engine)
     except OperationalError as exc:
         print(f"Database startup warning: {exc}")
+
+    db = SessionLocal()
+    try:
+        ensure_admin_account(db)
+    finally:
+        db.close()
 
 
 @app.get("/")
