@@ -20,12 +20,13 @@ export function AuthProvider({ children }) {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
     setUser(data)
+    return data
   }
 
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password })
     setToken(data.access_token)
-    await fetchMe(data.access_token)
+    return fetchMe(data.access_token)
   }
 
   const register = async (payload) => {

@@ -66,7 +66,7 @@ export default function LandingPage() {
         </nav>
 
         <Link to="/login" className="landing-login-btn">
-          Company Access
+          Login
         </Link>
       </header>
 
@@ -86,9 +86,9 @@ export default function LandingPage() {
               <Link to="/register" className="primary-btn">
                 Request a Demo
               </Link>
-              <a href="#platform" className="secondary-btn">
-                Explore Platform
-              </a>
+              <Link to="/login" className="secondary-btn">
+                Sign In
+              </Link>
             </div>
 
             <div className="hero-highlights" aria-label="Core capabilities">

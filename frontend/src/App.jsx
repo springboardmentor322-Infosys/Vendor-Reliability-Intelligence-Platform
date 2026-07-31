@@ -8,6 +8,7 @@ import Login from './pages/Login'
 import Profile from './pages/Profile'
 import Register from './pages/Register'
 import ResetPassword from './pages/ResetPassword'
+import VendorDashboard from './pages/VendorDashboard'
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/vendor-dashboard" element={<VendorDashboard />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/reset-password" element={<ResetPassword />} />
             </Route>

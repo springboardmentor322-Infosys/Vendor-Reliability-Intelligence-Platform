@@ -7,7 +7,7 @@ import '../auth.css'
 
 export default function Login() {
   const navigate = useNavigate()
-  const { login, isAuthenticated } = useAuth()
+  const { login, isAuthenticated, user } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -15,6 +15,9 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false)
 
   if (isAuthenticated) {
+    if (user?.role === 'Vendor') {
+      return <Navigate to="/vendor-dashboard" replace />
+    }
     return <Navigate to="/dashboard" replace />
   }
 
@@ -29,8 +32,12 @@ export default function Login() {
     setSubmitting(true)
 
     try {
-      await login(email, password)
-      navigate('/dashboard')
+      const currentUser = await login(email, password)
+      if (currentUser?.role === 'Vendor') {
+        navigate('/vendor-dashboard')
+      } else {
+        navigate('/dashboard')
+      }
     } catch (err) {
       setError(getLoginErrorMessage(err))
       if (isInvalidLoginError(err)) {
