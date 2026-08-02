@@ -18,6 +18,7 @@ import ReportsDashboard from './pages/ReportsDashboard'
 import Notifications from './pages/Notifications'
 import FinanceDashboard from './pages/FinanceDashboard'
 import AuditorDashboard from './pages/AuditorDashboard'
+import SupplyChainDashboard from './pages/SupplyChainDashboard'
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
               <Route path="/analytics" element={<AnalyticsDashboard />} />
               <Route path="/reports" element={<ReportsDashboard />} />
               <Route path="/notifications" element={<Notifications />} />
+              <Route path="/supply-chain" element={<SupplyChainDashboard />} />
               <Route path="/auditor-dashboard" element={<AuditorDashboard />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/reset-password" element={<ResetPassword />} />
