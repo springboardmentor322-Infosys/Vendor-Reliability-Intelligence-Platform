@@ -10,6 +10,7 @@ from app.db.base import Base
 class Role(str, enum.Enum):
     ADMINISTRATOR = "Administrator"
     PROCUREMENT_MANAGER = "Procurement Manager"
+    SUPPLY_CHAIN_MANAGER = "Supply Chain Manager"
     VENDOR = "Vendor"
     FINANCE_OFFICER = "Finance Officer"
     AUDITOR = "Auditor"
@@ -18,6 +19,7 @@ class Role(str, enum.Enum):
 REGISTERABLE_ROLES = frozenset(
     {
         Role.PROCUREMENT_MANAGER,
+        Role.SUPPLY_CHAIN_MANAGER,
         Role.VENDOR,
         Role.FINANCE_OFFICER,
         Role.AUDITOR,

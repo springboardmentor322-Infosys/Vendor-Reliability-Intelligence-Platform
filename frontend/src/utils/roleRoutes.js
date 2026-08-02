@@ -3,6 +3,7 @@ export const ROLE_HOME_ROUTES = {
   Vendor: '/vendor-dashboard',
   'Finance Officer': '/finance-dashboard',
   'Procurement Manager': '/procurement',
+  'Supply Chain Manager': '/supply-chain',
   Auditor: '/auditor-dashboard',
 }
 
@@ -41,6 +42,18 @@ export const ROLE_ALLOWED_ROUTES = {
     '/vendor-management',
     '/purchase-orders',
     '/vendor-performance',
+    '/reports',
+    '/notifications',
+    '/profile',
+    '/reset-password',
+  ],
+  'Supply Chain Manager': [
+    '/supply-chain',
+    '/procurement',
+    '/purchase-orders',
+    '/vendor-management',
+    '/vendor-performance',
+    '/analytics',
     '/reports',
     '/notifications',
     '/profile',
@@ -89,6 +102,15 @@ export const ROLE_NAV_CONFIG = {
     { to: '/reports', label: 'Reports' },
     { to: '/notifications', label: 'Notifications' },
   ],
+  'Supply Chain Manager': [
+    { to: '/supply-chain', label: 'Supply Chain Dashboard' },
+    { to: '/procurement', label: 'Procurement Overview' },
+    { to: '/purchase-orders', label: 'Purchase Orders' },
+    { to: '/vendor-management', label: 'Vendor Management' },
+    { to: '/analytics', label: 'Supply Chain Analytics' },
+    { to: '/reports', label: 'Reports' },
+    { to: '/notifications', label: 'Notifications' },
+  ],
   Auditor: [
     { to: '/auditor-dashboard', label: 'Auditor Dashboard' },
     { to: '/analytics', label: 'Compliance Overview' },
@@ -128,6 +150,19 @@ export const ROLE_SIDEBAR_CONFIG = {
         { to: '/vendor-performance', label: 'Vendor Performance' },
         { to: '#', label: 'Contracts & Compliance' },
         { to: '#', label: 'Communication' },
+        { to: '/reports', label: 'Reports' },
+      ],
+    },
+  ],
+  'Supply Chain Manager': [
+    {
+      title: 'Supply Chain',
+      items: [
+        { to: '/supply-chain', label: 'Supply Chain Dashboard' },
+        { to: '/procurement', label: 'Procurement Overview' },
+        { to: '/vendor-management', label: 'Vendor Management' },
+        { to: '/purchase-orders', label: 'Purchase Orders' },
+        { to: '/analytics', label: 'Supply Chain Analytics' },
         { to: '/reports', label: 'Reports' },
       ],
     },
@@ -197,6 +232,12 @@ export const DASHBOARD_SUMMARY_CARDS = {
     { label: 'Vendors Assigned', value: '18' },
     { label: 'Avg Order Completion', value: '7.4 days' },
   ],
+  'Supply Chain Manager': [
+    { label: 'On-Time Delivery', value: '92%' },
+    { label: 'Inventory Coverage', value: '78%' },
+    { label: 'Lead Time', value: '12 days' },
+    { label: 'Shipment Variance', value: '-2%' },
+  ],
   Vendor: [
     { label: 'My Reliability Score', value: '4.7 / 5' },
     { label: 'My Purchase Orders', value: '28' },
@@ -222,6 +263,7 @@ const ROLE_DASHBOARD_LABEL = {
   Vendor: 'Vendor Dashboard',
   'Finance Officer': 'Finance Dashboard',
   'Procurement Manager': 'Procurement Dashboard',
+  'Supply Chain Manager': 'Supply Chain Dashboard',
   Auditor: 'Auditor Dashboard',
 }
 

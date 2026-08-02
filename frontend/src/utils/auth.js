@@ -1,5 +1,6 @@
 export const REGISTER_ROLES = [
   'Procurement Manager',
+  'Supply Chain Manager',
   'Vendor',
   'Finance Officer',
   'Auditor',
