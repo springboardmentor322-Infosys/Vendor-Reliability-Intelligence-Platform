@@ -3,75 +3,11 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import DateTime, ForeignKey, Numeric, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.models.user import User
-
-
-class VendorCategory(Base):
-    __tablename__ = "vendor_categories"
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-    )
-
-    vendors: Mapped[list["Vendor"]] = relationship(back_populates="vendor_category")
-
-
-class Vendor(Base):
-    __tablename__ = "vendors"
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    vendor_name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    vendor_code: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, unique=True, index=True)
-    category_id: Mapped[int] = mapped_column(
-        ForeignKey("vendor_categories.id"),
-        nullable=False,
-        index=True,
-    )
-    contact_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    contact_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    contact_phone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
-    address: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    status: Mapped[str] = mapped_column(String(50), nullable=False, default="active")
-    created_by_user_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("users.id"),
-        nullable=True,
-        index=True,
-    )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-    )
-
-    vendor_category: Mapped["VendorCategory"] = relationship(back_populates="vendors")
-    reliability_scores: Mapped[list["ReliabilityScore"]] = relationship(
-        back_populates="vendor",
-        cascade="all, delete-orphan",
-    )
-    performance_records: Mapped[list["PerformanceRecord"]] = relationship(
-        back_populates="vendor",
-        cascade="all, delete-orphan",
-    )
-    purchase_orders: Mapped[list["PurchaseOrder"]] = relationship(back_populates="vendor")
-    procurement_requests: Mapped[list["ProcurementRequest"]] = relationship(back_populates="vendor")
-    contracts: Mapped[list["Contract"]] = relationship(back_populates="vendor")
-    compliance_documents: Mapped[list["ComplianceDocument"]] = relationship(
-        back_populates="vendor",
-        cascade="all, delete-orphan",
-    )
-    communications: Mapped[list["Communication"]] = relationship(back_populates="vendor")
-    reports: Mapped[list["Report"]] = relationship(back_populates="vendor")
-
-    created_by_user: Mapped[Optional[User]] = relationship(foreign_keys=[created_by_user_id])
 
 
 class ReliabilityScore(Base):

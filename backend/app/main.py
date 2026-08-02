@@ -5,7 +5,7 @@ from sqlalchemy.exc import OperationalError
 from app.db.base import Base
 from app.db.seed_admin import ensure_admin_account
 from app.db.session import SessionLocal, engine
-from app.routers import admin, auth
+from app.routers import admin, auth, vendors
 
 app = FastAPI(title="Vendor Reliability Platform")
 
@@ -24,6 +24,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(admin.router)
+app.include_router(vendors.router)
 
 
 @app.on_event("startup")
