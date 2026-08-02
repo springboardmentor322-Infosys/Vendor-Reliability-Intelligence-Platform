@@ -49,35 +49,7 @@ export default function VendorDashboard() {
   }
 
   return (
-    <main className="dashboard-admin-shell page-enter">
-      <aside className="dashboard-admin-sidebar">
-        <div className="dashboard-admin-sidebar__brand">
-          <span className="brand-mark__logo">VQ</span>
-          <strong>VendorIQ</strong>
-        </div>
-
-        <div className="dashboard-admin-nav-group">
-          <h4>Workspace</h4>
-          <a href="#" className="dashboard-admin-nav-item is-active">Dashboard</a>
-          <a href="#" className="dashboard-admin-nav-item">Vendor Profile</a>
-          <a href="#" className="dashboard-admin-nav-item">Performance Overview</a>
-          <a href="#" className="dashboard-admin-nav-item">Purchase Orders</a>
-          <a href="#" className="dashboard-admin-nav-item">Contracts & Compliance</a>
-          <a href="#" className="dashboard-admin-nav-item">Invoices & Payments</a>
-          <a href="#" className="dashboard-admin-nav-item">Communication</a>
-          <a href="#" className="dashboard-admin-nav-item">Documents</a>
-          <a href="#" className="dashboard-admin-nav-item">Notifications</a>
-        </div>
-
-        <div className="dashboard-admin-nav-group">
-          <h4>Support</h4>
-          <a href="#" className="dashboard-admin-nav-item">Settings</a>
-          <a href="#" className="dashboard-admin-nav-item">Help</a>
-          <a href="#" className="dashboard-admin-nav-item">Logout</a>
-        </div>
-      </aside>
-
-      <section className="dashboard-admin-main">
+      <section className="dashboard-admin-main page-enter">
         <header className="dashboard-admin-header">
           <div>
             <h1>Vendor Dashboard</h1>
@@ -256,6 +228,5 @@ export default function VendorDashboard() {
           </section>
         </div>
       </section>
-    </main>
   )
 }

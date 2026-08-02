@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getDashboardRouteForRole, getAllowedRoutesForRole } from '../utils/roleRoutes'
 
 export default function ProtectedRoute() {
   const { isAuthenticated, user } = useAuth()
@@ -9,20 +10,9 @@ export default function ProtectedRoute() {
     return <Navigate to="/login" replace />
   }
 
-  if (location.pathname === '/dashboard' || location.pathname === '/vendor-dashboard') {
-    if (user?.role === 'Vendor') {
-      if (location.pathname !== '/vendor-dashboard') {
-        return <Navigate to="/vendor-dashboard" replace />
-      }
-      return <Outlet />
-    }
-
-    if (user?.role === 'Administrator') {
-      if (location.pathname !== '/dashboard') {
-        return <Navigate to="/dashboard" replace />
-      }
-      return <Outlet />
-    }
+  const allowedRoutes = getAllowedRoutesForRole(user?.role)
+  if (!allowedRoutes.includes(location.pathname)) {
+    return <Navigate to={getDashboardRouteForRole(user?.role)} replace />
   }
 
   return <Outlet />

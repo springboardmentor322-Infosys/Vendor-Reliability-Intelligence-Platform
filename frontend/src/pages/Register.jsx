@@ -3,11 +3,12 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import AuthAlert from '../components/AuthAlert'
 import { useAuth } from '../context/AuthContext'
 import { REGISTER_ROLES, getRegisterErrorMessage, isDuplicateEmailError } from '../utils/auth'
+import { getDashboardRouteForRole } from '../utils/roleRoutes'
 import '../auth.css'
 
 export default function Register() {
   const navigate = useNavigate()
-  const { register, isAuthenticated } = useAuth()
+  const { register, isAuthenticated, user } = useAuth()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -17,7 +18,7 @@ export default function Register() {
   const [submitting, setSubmitting] = useState(false)
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to={getDashboardRouteForRole(user?.role)} replace />
   }
 
   const clearErrors = () => {
@@ -32,7 +33,7 @@ export default function Register() {
 
     try {
       await register({ name, email, password, role })
-      navigate('/dashboard')
+      navigate(getDashboardRouteForRole(role))
     } catch (err) {
       setError(getRegisterErrorMessage(err))
       if (isDuplicateEmailError(err)) {

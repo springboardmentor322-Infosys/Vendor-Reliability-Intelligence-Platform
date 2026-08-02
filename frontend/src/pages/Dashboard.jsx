@@ -74,47 +74,7 @@ export default function Dashboard() {
   )
 
   return (
-    <main className="dashboard-admin-shell page-enter">
-      <aside className="dashboard-admin-sidebar">
-        <div className="dashboard-admin-sidebar__brand">
-          <span className="brand-mark__logo">VQ</span>
-          <strong>VendorIQ</strong>
-        </div>
-
-        <div className="dashboard-admin-nav-group">
-          <h4>Platform</h4>
-          {sidebarItems.map(([label, active]) => (
-            <a
-              key={label}
-              href="#"
-              className={`dashboard-admin-nav-item ${active ? 'is-active' : ''}`}
-            >
-              {label}
-            </a>
-          ))}
-        </div>
-
-        <div className="dashboard-admin-nav-group">
-          <h4>Administration</h4>
-          <a href="#" className="dashboard-admin-nav-item">
-            Role & Permissions
-          </a>
-          <a href="#" className="dashboard-admin-nav-item">
-            System Settings
-          </a>
-          <a href="#" className="dashboard-admin-nav-item">
-            Audit Logs
-          </a>
-          <a href="#" className="dashboard-admin-nav-item">
-            Data Management
-          </a>
-          <a href="#" className="dashboard-admin-nav-item">
-            System Health
-          </a>
-        </div>
-      </aside>
-
-      <section className="dashboard-admin-main">
+      <section className="dashboard-admin-main page-enter">
         <header className="dashboard-admin-header">
           <div>
             <h1>Administration Dashboard</h1>
@@ -338,6 +298,5 @@ export default function Dashboard() {
           ))}
         </div>
       </section>
-    </main>
   )
 }

@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import AuthAlert from '../components/AuthAlert'
 import { useAuth } from '../context/AuthContext'
 import { getLoginErrorMessage, isInvalidLoginError } from '../utils/auth'
+import { getDashboardRouteForRole } from '../utils/roleRoutes'
 import '../auth.css'
 
 export default function Login() {
@@ -15,10 +16,7 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false)
 
   if (isAuthenticated) {
-    if (user?.role === 'Vendor') {
-      return <Navigate to="/vendor-dashboard" replace />
-    }
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to={getDashboardRouteForRole(user?.role)} replace />
   }
 
   const clearErrors = () => {
@@ -33,11 +31,7 @@ export default function Login() {
 
     try {
       const currentUser = await login(email, password)
-      if (currentUser?.role === 'Vendor') {
-        navigate('/vendor-dashboard')
-      } else {
-        navigate('/dashboard')
-      }
+      navigate(getDashboardRouteForRole(currentUser?.role))
     } catch (err) {
       setError(getLoginErrorMessage(err))
       if (isInvalidLoginError(err)) {
