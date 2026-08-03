@@ -1,0 +1,78 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { AuthService } from '../../core/services/auth.service';
+import { roles, pages } from './dashboard-data';
+import { Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './dashboard.component.html'
+})
+export class DashboardComponent implements OnInit, OnDestroy {
+  userEmail = '';
+  currentRoleKey = '';
+  roleConfig: any = null;
+  currentPage = 'dashboard';
+  pageContent: SafeHtml = '';
+  authSub?: Subscription;
+
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private sanitizer: DomSanitizer
+  ) {}
+
+  ngOnInit() {
+    this.authSub = this.authService.currentUser$.subscribe((user: any) => {
+      if (user) {
+        this.userEmail = user.email;
+        this.currentRoleKey = user.role?.name || 'admin';
+        // Normalize role key if it comes back different from backend (e.g. 'vendor' instead of 'vendor')
+        this.roleConfig = (roles as any)[this.currentRoleKey] || (roles as any)['admin'];
+        this.renderPage();
+      }
+    });
+  }
+  
+  ngOnDestroy() {
+    if (this.authSub) this.authSub.unsubscribe();
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  goTo(pageId: string) {
+    this.currentPage = pageId;
+    this.renderPage();
+  }
+
+  getPageLabel(id: string): string {
+    if (!this.roleConfig) return id;
+    for (const g of this.roleConfig.groups) {
+      for (const it of g.items) {
+        if (it.id === id) return it.label;
+      }
+    }
+    return id;
+  }
+
+  renderPage() {
+    if (!this.roleConfig) return;
+    
+    // Inject global state for the renderer functions
+    (window as any).currentRole = this.currentRoleKey;
+    (window as any).currentPage = this.currentPage;
+
+    const fn = pages[this.currentPage] || pages['dashboard'];
+    if (fn) {
+      const htmlStr = fn();
+      this.pageContent = this.sanitizer.bypassSecurityTrustHtml(htmlStr);
+    }
+  }
+}

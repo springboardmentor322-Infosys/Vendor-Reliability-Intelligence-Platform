@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   // We'll assume the token is stored in localStorage for now
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem('token');
   
   if (token) {
     req = req.clone({

@@ -1,0 +1,37 @@
+<div id="view-app" class="flex min-h-screen">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>VendorIQ<small id="sb-role-label">{{ roleConfig?.label || 'Workspace' }}</small></div>
+    </div>
+    
+    <div class="nav-scroll">
+      <ng-container *ngFor="let g of roleConfig?.groups">
+        <div class="nav-group-label">{{ g.label }}</div>
+        <a *ngFor="let it of g.items" class="nav-item cursor-pointer" [class.active]="it.id === currentPage" (click)="goTo(it.id)">
+          <span class="ic"></span>{{ it.label }}
+        </a>
+      </ng-container>
+    </div>
+
+    <div class="sidebar-foot">
+      <div class="avatar">{{ roleConfig?.initials }}</div>
+      <div class="who">{{ roleConfig?.name }}<span>{{ roleConfig?.label }}</span></div>
+      <a class="logout cursor-pointer" (click)="logout()">Sign out</a>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb">Home <span class="mx-2 text-[var(--slate-2)]">›</span> <b>{{ getPageLabel(currentPage) }}</b></div>
+      <div class="top-actions">
+        <div class="searchbox">Search anything…</div>
+        <div class="icon-btn">🔔<span class="pip">7</span></div>
+        <div class="icon-btn">✉️<span class="pip">3</span></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px;">{{ roleConfig?.initials }}</div>
+      </div>
+    </div>
+    
+    <div class="page" [innerHTML]="pageContent"></div>
+  </div>
+</div>
