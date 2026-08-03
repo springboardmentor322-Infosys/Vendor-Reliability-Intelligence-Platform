@@ -1,5 +1,5 @@
 from app.models.user import Role, User
-from app.models.vendor import Vendor, VendorCategory, VendorContact, VendorStatus
+from app.models.vendor import Vendor, VendorCategory, VendorContact, VendorDocument, VendorStatus, VendorStatusHistory
 from app.models.vendoriq import (
     Communication,
     ComplianceDocument,
@@ -19,7 +19,9 @@ __all__ = [
     "VendorCategory",
     "Vendor",
     "VendorContact",
+    "VendorDocument",
     "VendorStatus",
+    "VendorStatusHistory",
     "ReliabilityScore",
     "PerformanceRecord",
     "ProcurementRequest",

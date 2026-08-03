@@ -42,6 +42,8 @@ class Vendor(Base):
     status: Mapped[VendorStatus] = mapped_column(
         SQLEnum(VendorStatus, name="vendor_status"), nullable=False, default=VendorStatus.PENDING
     )
+    rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
     created_by: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
@@ -67,9 +69,51 @@ class Vendor(Base):
         back_populates="vendor",
         cascade="all, delete-orphan",
     )
+    status_history: Mapped[list["VendorStatusHistory"]] = relationship(
+        back_populates="vendor",
+        cascade="all, delete-orphan",
+        order_by="VendorStatusHistory.changed_at",
+    )
+    documents: Mapped[list["VendorDocument"]] = relationship(
+        back_populates="vendor",
+        cascade="all, delete-orphan",
+        order_by="VendorDocument.uploaded_at",
+    )
     communications: Mapped[list["Communication"]] = relationship(back_populates="vendor")
     reports: Mapped[list["Report"]] = relationship(back_populates="vendor")
+    owner: Mapped[Optional[User]] = relationship(foreign_keys=[user_id])
     creator: Mapped[Optional[User]] = relationship(foreign_keys=[created_by])
+
+
+class VendorDocument(Base):
+    __tablename__ = "vendor_documents"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    vendor_id: Mapped[int] = mapped_column(ForeignKey("vendors.id"), nullable=False, index=True)
+    doc_type: Mapped[str] = mapped_column(String(100), nullable=False)
+    file_url: Mapped[str] = mapped_column(String(500), nullable=False)
+    uploaded_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+    vendor: Mapped[Vendor] = relationship(back_populates="documents")
+
+
+class VendorStatusHistory(Base):
+    __tablename__ = "vendor_status_history"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    vendor_id: Mapped[int] = mapped_column(ForeignKey("vendors.id"), nullable=False, index=True)
+    from_status: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    to_status: Mapped[str] = mapped_column(String(50), nullable=False)
+    changed_by: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    changed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+    vendor: Mapped[Vendor] = relationship(back_populates="status_history")
+    changed_by_user: Mapped[Optional[User]] = relationship(foreign_keys=[changed_by])
 
 
 class VendorContact(Base):

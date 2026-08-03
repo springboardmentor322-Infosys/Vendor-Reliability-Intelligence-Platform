@@ -22,6 +22,7 @@ export const ROLE_ALLOWED_ROUTES = {
   ],
   Vendor: [
     '/vendor-dashboard',
+    '/my-vendor-profile',
     '/vendor-performance',
     '/purchase-orders',
     '/notifications',
@@ -82,7 +83,8 @@ export const ROLE_NAV_CONFIG = {
   ],
   Vendor: [
     { to: '/vendor-dashboard', label: 'Vendor Dashboard' },
-    { to: '/profile', label: 'My Profile' },
+    { to: '/my-vendor-profile', label: 'My Vendor Profile' },
+    { to: '/profile', label: 'Account Profile' },
     { to: '/vendor-performance', label: 'My Performance' },
     { to: '/purchase-orders', label: 'My Purchase Orders' },
     { to: '/notifications', label: 'Notifications' },
@@ -172,7 +174,8 @@ export const ROLE_SIDEBAR_CONFIG = {
       title: 'Supplier',
       items: [
         { to: '/vendor-dashboard', label: 'Vendor Dashboard' },
-        { to: '/profile', label: 'My Profile' },
+        { to: '/my-vendor-profile', label: 'My Vendor Profile' },
+        { to: '/profile', label: 'Account Profile' },
         { to: '/vendor-performance', label: 'My Performance' },
         { to: '/purchase-orders', label: 'My Purchase Orders' },
         { to: '#', label: 'My Contracts & Compliance' },

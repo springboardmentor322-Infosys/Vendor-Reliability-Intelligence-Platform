@@ -1,40 +1,66 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
+from pathlib import Path
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.security import get_current_user, get_current_user_with_role
 from app.db.session import get_db
 from app.models.user import Role, User
-from app.models.vendor import Vendor, VendorCategory, VendorContact, VendorStatus
+from app.models.vendor import (
+    Vendor,
+    VendorCategory,
+    VendorContact,
+    VendorDocument,
+    VendorStatus,
+    VendorStatusHistory,
+)
 from app.schemas.vendor import (
+    VendorCategoryResponse,
     VendorCreate,
+    VendorDetailResponse,
+    VendorDocumentResponse,
     VendorResponse,
     VendorStatusUpdate,
     VendorUpdate,
 )
+from app.services.vendor_documents import save_vendor_document
 
 router = APIRouter(prefix="/vendors", tags=["vendors"])
+categories_router = APIRouter(prefix="/vendor-categories", tags=["vendor-categories"])
 
 
-def _get_vendor_or_404(vendor_id: int, db: Session) -> Vendor:
-    vendor = db.scalar(
-        select(Vendor)
-        .options(selectinload(Vendor.category), selectinload(Vendor.contacts))
-        .where(Vendor.id == vendor_id)
-    )
+def _vendor_owner_id(vendor: Vendor) -> int | None:
+    return vendor.user_id if vendor.user_id is not None else vendor.created_by
+
+
+def _get_vendor_or_404(vendor_id: int, db: Session, *, detailed: bool = False) -> Vendor:
+    options = [selectinload(Vendor.category), selectinload(Vendor.contacts)]
+    if detailed:
+        options.extend(
+            [
+                selectinload(Vendor.status_history),
+                selectinload(Vendor.documents),
+            ]
+        )
+
+    vendor = db.scalar(select(Vendor).options(*options).where(Vendor.id == vendor_id))
     if vendor is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vendor not found")
     return vendor
 
 
 def _ensure_owned_vendor(vendor: Vendor, user: User) -> None:
-    if user.role == Role.VENDOR and vendor.created_by != user.id:
+    if user.role == Role.VENDOR and _vendor_owner_id(vendor) != user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
 
 
-def _ensure_manage_vendor(user: User) -> None:
-    if user.role not in {Role.ADMINISTRATOR, Role.PROCUREMENT_MANAGER}:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
+def _ensure_can_upload_documents(vendor: Vendor, user: User) -> None:
+    if user.role in {Role.ADMINISTRATOR, Role.PROCUREMENT_MANAGER}:
+        return
+    if user.role == Role.VENDOR and _vendor_owner_id(vendor) == user.id:
+        return
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
 
 
 def _validate_status_transition(current_status: VendorStatus, new_status: VendorStatus) -> None:
@@ -51,16 +77,46 @@ def _validate_status_transition(current_status: VendorStatus, new_status: Vendor
         )
 
 
+def _record_status_change(
+    vendor: Vendor,
+    *,
+    from_status: VendorStatus | None,
+    to_status: VendorStatus,
+    changed_by: int,
+    rejection_reason: str | None = None,
+) -> None:
+    vendor.status_history.append(
+        VendorStatusHistory(
+            from_status=from_status.value if from_status else None,
+            to_status=to_status.value,
+            changed_by=changed_by,
+            rejection_reason=rejection_reason,
+        )
+    )
+
+
+@categories_router.get("", response_model=list[VendorCategoryResponse])
+def list_vendor_categories(
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+) -> list[VendorCategory]:
+    return list(db.scalars(select(VendorCategory).order_by(VendorCategory.name)))
+
+
 @router.post("", response_model=VendorResponse, status_code=status.HTTP_201_CREATED)
 def create_vendor(
     payload: VendorCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(
-        get_current_user_with_role(
-            [Role.ADMINISTRATOR, Role.PROCUREMENT_MANAGER, Role.VENDOR]
-        )
+        get_current_user_with_role([Role.VENDOR])
     ),
 ) -> Vendor:
+    """Vendor self-registration endpoint.
+
+    Only users with the VENDOR role may create a vendor profile.
+    Admin and Procurement Manager roles manage vendor status (approve/reject)
+    but never create vendor records directly.
+    """
     category = db.get(VendorCategory, payload.category_id)
     if category is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vendor category not found")
@@ -72,6 +128,7 @@ def create_vendor(
         contact_phone=payload.contact_phone,
         address=payload.address,
         status=VendorStatus.PENDING,
+        user_id=current_user.id,
         created_by=current_user.id,
     )
 
@@ -85,6 +142,13 @@ def create_vendor(
             )
             for contact in payload.contacts
         ]
+
+    _record_status_change(
+        vendor,
+        from_status=None,
+        to_status=VendorStatus.PENDING,
+        changed_by=current_user.id,
+    )
 
     db.add(vendor)
     db.commit()
@@ -100,6 +164,9 @@ def list_vendors(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> list[Vendor]:
+    if current_user.role == Role.VENDOR:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
+
     query = select(Vendor).options(selectinload(Vendor.category), selectinload(Vendor.contacts))
 
     if category_id is not None:
@@ -111,17 +178,96 @@ def list_vendors(
     if search:
         query = query.where(Vendor.name.ilike(f"%{search}%"))
 
-    if current_user.role == Role.VENDOR:
-        query = query.where(Vendor.created_by == current_user.id)
-
     return list(db.scalars(query.order_by(Vendor.id)))
 
 
-@router.get("/{vendor_id}", response_model=VendorResponse)
-def get_vendor(vendor_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)) -> Vendor:
-    vendor = _get_vendor_or_404(vendor_id, db)
+@router.get("/me", response_model=VendorDetailResponse)
+def get_my_vendor(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user_with_role([Role.VENDOR])),
+) -> Vendor:
+    vendor = db.scalar(
+        select(Vendor)
+        .options(
+            selectinload(Vendor.category),
+            selectinload(Vendor.contacts),
+            selectinload(Vendor.status_history),
+            selectinload(Vendor.documents),
+        )
+        .where(
+            or_(
+                Vendor.user_id == current_user.id,
+                Vendor.created_by == current_user.id,
+            )
+        )
+        .order_by(Vendor.id.desc())
+    )
+    if vendor is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vendor profile not found")
+    return vendor
+
+
+@router.get("/{vendor_id}", response_model=VendorDetailResponse)
+def get_vendor(
+    vendor_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Vendor:
+    vendor = _get_vendor_or_404(vendor_id, db, detailed=True)
     _ensure_owned_vendor(vendor, current_user)
     return vendor
+
+
+@router.get("/{vendor_id}/documents", response_model=list[VendorDocumentResponse])
+def list_vendor_documents(
+    vendor_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> list[VendorDocument]:
+    vendor = _get_vendor_or_404(vendor_id, db)
+    _ensure_owned_vendor(vendor, current_user)
+    return list(
+        db.scalars(
+            select(VendorDocument)
+            .where(VendorDocument.vendor_id == vendor_id)
+            .order_by(VendorDocument.uploaded_at.desc())
+        )
+    )
+
+
+@router.post(
+    "/{vendor_id}/documents",
+    response_model=VendorDocumentResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def upload_vendor_document(
+    vendor_id: int,
+    doc_type: str = Form(...),
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> VendorDocument:
+    vendor = _get_vendor_or_404(vendor_id, db)
+    _ensure_can_upload_documents(vendor, current_user)
+
+    doc_type = doc_type.strip()
+    if not doc_type:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Document type is required")
+
+    try:
+        file_url = await save_vendor_document(vendor_id, file)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+    document = VendorDocument(
+        vendor_id=vendor_id,
+        doc_type=doc_type,
+        file_url=file_url,
+    )
+    db.add(document)
+    db.commit()
+    db.refresh(document)
+    return document
 
 
 @router.put("/{vendor_id}", response_model=VendorResponse)
@@ -134,7 +280,7 @@ def update_vendor(
     vendor = _get_vendor_or_404(vendor_id, db)
 
     if current_user.role == Role.VENDOR:
-        if vendor.created_by != current_user.id:
+        if _vendor_owner_id(vendor) != current_user.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
     elif current_user.role not in {Role.ADMINISTRATOR, Role.PROCUREMENT_MANAGER}:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
@@ -179,8 +325,25 @@ def update_vendor_status(
     ),
 ) -> Vendor:
     vendor = _get_vendor_or_404(vendor_id, db)
-    _validate_status_transition(vendor.status, payload.status)
-    vendor.status = payload.status
+    new_status = VendorStatus(payload.status)
+    _validate_status_transition(vendor.status, new_status)
+
+    previous_status = vendor.status
+    vendor.status = new_status
+
+    if new_status == VendorStatus.REJECTED:
+        vendor.rejection_reason = payload.rejection_reason
+    else:
+        vendor.rejection_reason = None
+
+    _record_status_change(
+        vendor,
+        from_status=previous_status,
+        to_status=new_status,
+        changed_by=current_user.id,
+        rejection_reason=payload.rejection_reason if new_status == VendorStatus.REJECTED else None,
+    )
+
     db.commit()
     db.refresh(vendor)
     return vendor

@@ -10,6 +10,7 @@ import Register from './pages/Register'
 import ResetPassword from './pages/ResetPassword'
 import VendorDashboard from './pages/VendorDashboard'
 import VendorManagement from './pages/VendorManagement'
+import VendorProfile from './pages/VendorProfile'
 import ProcurementDashboard from './pages/ProcurementDashboard'
 import PurchaseOrders from './pages/PurchaseOrders'
 import VendorPerformance from './pages/VendorPerformance'
@@ -33,6 +34,7 @@ export default function App() {
               <Route path="/vendor-dashboard" element={<VendorDashboard />} />
               <Route path="/finance-dashboard" element={<FinanceDashboard />} />
               <Route path="/vendor-management" element={<VendorManagement />} />
+              <Route path="/my-vendor-profile" element={<VendorProfile />} />
               <Route path="/procurement" element={<ProcurementDashboard />} />
               <Route path="/purchase-orders" element={<PurchaseOrders />} />
               <Route path="/vendor-performance" element={<VendorPerformance />} />
