@@ -24,3 +24,12 @@ def create_vendor(vendor: schemas.VendorCreate):
         "message": "Vendor added successfully",
         "data": new_vendor
     }
+@router.get("/vendors")
+def get_vendors():
+    db: Session = SessionLocal()
+
+    vendors = db.query(models.Vendor).all()
+
+    db.close()
+
+    return vendors
