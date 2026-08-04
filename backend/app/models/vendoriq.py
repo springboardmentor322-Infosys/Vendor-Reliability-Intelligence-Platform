@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
+from enum import Enum as PyEnum
+
 from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -49,26 +51,52 @@ class PerformanceRecord(Base):
     vendor: Mapped["Vendor"] = relationship(back_populates="performance_records")
 
 
+class ProcurementRequestStatus(str, PyEnum):
+    PENDING = "Pending"
+    APPROVED = "Approved"
+    ORDERED = "Ordered"
+    DELIVERED = "Delivered"
+    COMPLETED = "Completed"
+    CANCELLED = "Cancelled"
+
+
 class ProcurementRequest(Base):
     __tablename__ = "procurement_requests"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    request_number: Mapped[str] = mapped_column(String(100), nullable=False, unique=True, index=True)
-    title: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    requested_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
-    vendor_id: Mapped[Optional[int]] = mapped_column(ForeignKey("vendors.id"), nullable=True, index=True)
-    status: Mapped[str] = mapped_column(String(50), nullable=False, default="draft")
-    requested_at: Mapped[datetime] = mapped_column(
+    requested_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    department: Mapped[str] = mapped_column(String(255), nullable=False)
+    status: Mapped[ProcurementRequestStatus] = mapped_column(
+        String(50), nullable=False, default=ProcurementRequestStatus.PENDING
+    )
+    total_estimated_cost: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False, default=0)
+    rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )
-    due_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    requester: Mapped[User] = relationship(foreign_keys=[requested_by_user_id])
-    vendor: Mapped[Optional["Vendor"]] = relationship(back_populates="procurement_requests")
+    requester: Mapped[User] = relationship(foreign_keys=[requested_by])
+    items: Mapped[list["ProcurementRequestItem"]] = relationship(
+        back_populates="procurement_request",
+        cascade="all, delete-orphan",
+    )
     purchase_orders: Mapped[list["PurchaseOrder"]] = relationship(back_populates="procurement_request")
+
+
+class ProcurementRequestItem(Base):
+    __tablename__ = "procurement_request_items"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    procurement_request_id: Mapped[int] = mapped_column(
+        ForeignKey("procurement_requests.id"), nullable=False, index=True
+    )
+    item_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    quantity: Mapped[int] = mapped_column(Integer, nullable=False)
+    estimated_unit_cost: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
+
+    procurement_request: Mapped["ProcurementRequest"] = relationship(back_populates="items")
 
 
 class PurchaseOrder(Base):

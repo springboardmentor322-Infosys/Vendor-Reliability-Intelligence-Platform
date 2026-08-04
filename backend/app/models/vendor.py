@@ -63,7 +63,6 @@ class Vendor(Base):
         cascade="all, delete-orphan",
     )
     purchase_orders: Mapped[list["PurchaseOrder"]] = relationship(back_populates="vendor")
-    procurement_requests: Mapped[list["ProcurementRequest"]] = relationship(back_populates="vendor")
     contracts: Mapped[list["Contract"]] = relationship(back_populates="vendor")
     compliance_documents: Mapped[list["ComplianceDocument"]] = relationship(
         back_populates="vendor",
