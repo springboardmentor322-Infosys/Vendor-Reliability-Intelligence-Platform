@@ -31,6 +31,7 @@ export const ROLE_ALLOWED_ROUTES = {
   ],
   'Finance Officer': [
     '/finance-dashboard',
+    '/procurement-requests',
     '/purchase-orders',
     '/analytics',
     '/reports',
@@ -40,6 +41,7 @@ export const ROLE_ALLOWED_ROUTES = {
   ],
   'Procurement Manager': [
     '/procurement',
+    '/procurement-requests',
     '/vendor-management',
     '/purchase-orders',
     '/vendor-performance',
@@ -50,6 +52,7 @@ export const ROLE_ALLOWED_ROUTES = {
   ],
   'Supply Chain Manager': [
     '/supply-chain',
+    '/procurement-requests',
     '/procurement',
     '/purchase-orders',
     '/vendor-management',
@@ -91,6 +94,7 @@ export const ROLE_NAV_CONFIG = {
   ],
   'Finance Officer': [
     { to: '/finance-dashboard', label: 'Finance Dashboard' },
+    { to: '/procurement-requests', label: 'Procurement Requests' },
     { to: '/purchase-orders', label: 'Invoices & Payments' },
     { to: '/analytics', label: 'Procurement Cost Analysis' },
     { to: '/reports', label: 'Spend Reports' },
@@ -98,6 +102,7 @@ export const ROLE_NAV_CONFIG = {
   ],
   'Procurement Manager': [
     { to: '/procurement', label: 'Procurement Dashboard' },
+    { to: '/procurement-requests', label: 'Procurement Requests' },
     { to: '/vendor-management', label: 'Vendor Management' },
     { to: '/purchase-orders', label: 'Purchase Orders' },
     { to: '/vendor-performance', label: 'Vendor Performance' },
@@ -106,6 +111,7 @@ export const ROLE_NAV_CONFIG = {
   ],
   'Supply Chain Manager': [
     { to: '/supply-chain', label: 'Supply Chain Dashboard' },
+    { to: '/procurement-requests', label: 'Procurement Requests' },
     { to: '/procurement', label: 'Procurement Overview' },
     { to: '/purchase-orders', label: 'Purchase Orders' },
     { to: '/vendor-management', label: 'Vendor Management' },
@@ -147,7 +153,7 @@ export const ROLE_SIDEBAR_CONFIG = {
       items: [
         { to: '/procurement', label: 'Procurement Dashboard' },
         { to: '/vendor-management', label: 'Vendor Management' },
-        { to: '#', label: 'Procurement Requests' },
+        { to: '/procurement-requests', label: 'Procurement Requests' },
         { to: '/purchase-orders', label: 'Purchase Orders' },
         { to: '/vendor-performance', label: 'Vendor Performance' },
         { to: '#', label: 'Contracts & Compliance' },
@@ -161,6 +167,7 @@ export const ROLE_SIDEBAR_CONFIG = {
       title: 'Supply Chain',
       items: [
         { to: '/supply-chain', label: 'Supply Chain Dashboard' },
+        { to: '/procurement-requests', label: 'Procurement Requests' },
         { to: '/procurement', label: 'Procurement Overview' },
         { to: '/vendor-management', label: 'Vendor Management' },
         { to: '/purchase-orders', label: 'Purchase Orders' },
@@ -190,6 +197,7 @@ export const ROLE_SIDEBAR_CONFIG = {
       title: 'Finance',
       items: [
         { to: '/finance-dashboard', label: 'Finance Dashboard' },
+        { to: '/procurement-requests', label: 'Procurement Requests' },
         { to: '/purchase-orders', label: 'Invoices & Payments' },
         { to: '/analytics', label: 'Procurement Cost Analysis' },
         { to: '/reports', label: 'Spend Reports' },
