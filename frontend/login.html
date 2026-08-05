@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html class="light" lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -191,6 +191,42 @@
         .status-dot {
             box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15);
         }
+
+        /* Premium Light Theme Override */
+        .light body { 
+            background-color: #f8fafc; /* Soft slate-50 */
+            color: #0f172a; 
+        }
+        .light .glass-panel, .light .glass-widget {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border-top: 1px solid rgba(255, 255, 255, 1) !important;
+            border-left: 1px solid rgba(255, 255, 255, 1) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.4) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 20px 40px -12px rgba(100, 116, 139, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.8) !important;
+        }
+        .light h1, .light h2, .light h3, .light .text-white { color: #0f172a !important; }
+        .light p, .light .text-tertiary-fixed-dim { color: #475569 !important; }
+        .light .bg-\[\#1e293b\] { 
+            background-color: #ffffff !important; 
+            color: #0f172a !important; 
+            border-color: #cbd5e1 !important;
+        }
+        .light table th, .light table td {
+            border-color: #e2e8f0 !important;
+        }
+        .light .border-white\/5, .light .border-white\/10, .light .border-white\/20 {
+            border-color: #cbd5e1 !important;
+        }
+        .light .bg-white\/5 {
+            background-color: rgba(241, 245, 249, 0.8) !important;
+        }
+        .light .text-slate-400 {
+            color: #64748b !important;
+        }
+
 </style>
 </head>
 <body class="bg-on-tertiary-fixed text-white font-sans selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen flex flex-col justify-between overflow-x-hidden">
@@ -305,18 +341,22 @@
             <form action="#" class="space-y-4" method="POST" id="loginForm" onsubmit="handleFormSubmit(event)">
                 
                 <!-- PROFILE SELECTOR -->
-                <div class="grid grid-cols-3 gap-3 mb-2">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2">
                     <button type="button" onclick="selectProfile('admin')" id="profile-admin" class="flex flex-col items-center justify-center p-3 rounded-xl border border-blue-500 bg-blue-500/20 text-blue-400 light:text-blue-700 transition-all shadow-md">
                         <span class="material-symbols-outlined mb-1 text-xl">admin_panel_settings</span>
                         <span class="text-[10px] font-bold font-mono-data uppercase">Admin</span>
                     </button>
-                    <button type="button" onclick="selectProfile('manager')" id="profile-manager" class="flex flex-col items-center justify-center p-3 rounded-xl border border-white/10 light:border-slate-300 bg-white/5 light:bg-slate-100 text-tertiary-fixed-dim light:text-slate-500 transition-all hover:bg-white/10 light:hover:bg-slate-200">
+                    <button type="button" onclick="selectProfile('procumentor')" id="profile-procumentor" class="flex flex-col items-center justify-center p-3 rounded-xl border border-white/10 light:border-slate-300 bg-white/5 light:bg-slate-100 text-tertiary-fixed-dim light:text-slate-500 transition-all hover:bg-white/10 light:hover:bg-slate-200">
                         <span class="material-symbols-outlined mb-1 text-xl">manage_accounts</span>
-                        <span class="text-[10px] font-bold font-mono-data uppercase">Manager</span>
+                        <span class="text-[10px] font-bold font-mono-data uppercase">Procurement</span>
                     </button>
                     <button type="button" onclick="selectProfile('vendor')" id="profile-vendor" class="flex flex-col items-center justify-center p-3 rounded-xl border border-white/10 light:border-slate-300 bg-white/5 light:bg-slate-100 text-tertiary-fixed-dim light:text-slate-500 transition-all hover:bg-white/10 light:hover:bg-slate-200">
                         <span class="material-symbols-outlined mb-1 text-xl">storefront</span>
                         <span class="text-[10px] font-bold font-mono-data uppercase">Vendor</span>
+                    </button>
+                    <button type="button" onclick="selectProfile('auditor')" id="profile-auditor" class="flex flex-col items-center justify-center p-3 rounded-xl border border-white/10 light:border-slate-300 bg-white/5 light:bg-slate-100 text-tertiary-fixed-dim light:text-slate-500 transition-all hover:bg-white/10 light:hover:bg-slate-200">
+                        <span class="material-symbols-outlined mb-1 text-xl">policy</span>
+                        <span class="text-[10px] font-bold font-mono-data uppercase">Auditor</span>
                     </button>
                 </div>
 
@@ -333,11 +373,11 @@
                 <div class="space-y-1 group">
                     <div class="flex justify-between items-center">
                         <label class="font-mono-data text-[11px] font-bold text-tertiary-fixed-dim light:text-slate-700 group-focus-within:text-blue-500 transition-colors" for="password">Security Key</label>
-                        <a class="text-xs text-blue-400 light:text-blue-600 hover:underline transition-all font-semibold" href="#">Forgot key?</a>
+                        <a class="text-xs text-blue-400 light:text-blue-600 hover:underline transition-all font-semibold" href="forgot_password.html">Forgot key?</a>
                     </div>
                     <div class="relative">
                         <span class="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-tertiary-fixed-dim light:text-slate-400 text-[18px]">lock</span>
-                        <input class="w-full pl-10 pr-10 py-2.5 bg-white/5 light:bg-slate-100 border border-white/10 light:border-slate-300 rounded-xl text-xs text-white dark:text-white light:text-slate-900 placeholder:text-white/20 light:placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all font-sans" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+                        <input class="w-full pl-10 pr-10 py-2.5 bg-white/5 light:bg-slate-100 border border-white/10 light:border-slate-300 rounded-xl text-xs text-white dark:text-white light:text-slate-900 placeholder:text-white/20 light:placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all font-sans" id="password" name="password" placeholder="••••••••" required="" type="password" value="1234"/>
                         <button class="absolute right-3.5 top-1/2 -translate-y-1/2 text-tertiary-fixed-dim light:text-slate-400 hover:text-white light:hover:text-slate-900 transition-colors" type="button" id="togglePassword">
                             <span class="material-symbols-outlined text-[18px]" id="passwordIcon">visibility</span>
                         </button>
@@ -383,7 +423,10 @@
                     </div>
                 </div>
             </form>
-
+            <div class="mt-6 text-center text-xs text-tertiary-fixed-dim light:text-slate-500">
+                Are you a vendor wanting to join the network? 
+                <a href="vendor_register.html" class="text-primary hover:text-blue-400 font-bold transition-colors">Apply here</a>
+            </div>
             <footer class="mt-6 pt-4 border-t border-white/10 light:border-slate-200 flex justify-between items-center text-xs">
                 <div class="flex gap-4 font-semibold text-tertiary-fixed-dim light:text-slate-600">
                     <a class="hover:text-blue-500 transition-colors" href="dashboard.html">Dashboard</a>
@@ -590,49 +633,78 @@
     // Profile Selection Logic
     function selectProfile(profile) {
         const adminBtn = document.getElementById('profile-admin');
-        const managerBtn = document.getElementById('profile-manager');
+        const procumentorBtn = document.getElementById('profile-procumentor');
         const vendorBtn = document.getElementById('profile-vendor');
+        const auditorBtn = document.getElementById('profile-auditor');
         const emailInput = document.getElementById('email');
 
         const defaultClass = "flex flex-col items-center justify-center p-3 rounded-xl border border-white/10 light:border-slate-300 bg-white/5 light:bg-slate-100 text-tertiary-fixed-dim light:text-slate-500 transition-all hover:bg-white/10 light:hover:bg-slate-200";
         adminBtn.className = defaultClass;
-        managerBtn.className = defaultClass;
+        procumentorBtn.className = defaultClass;
         vendorBtn.className = defaultClass;
+        auditorBtn.className = defaultClass;
 
         if (profile === 'admin') {
             adminBtn.className = "flex flex-col items-center justify-center p-3 rounded-xl border border-blue-500 bg-blue-500/20 text-blue-400 light:text-blue-700 transition-all shadow-md";
             emailInput.value = "admin@vendorintel.com";
-        } else if (profile === 'manager') {
-            managerBtn.className = "flex flex-col items-center justify-center p-3 rounded-xl border border-indigo-500 bg-indigo-500/20 text-indigo-400 light:text-indigo-700 transition-all shadow-md";
-            emailInput.value = "manager@vendorintel.com";
+        } else if (profile === 'procumentor') {
+            procumentorBtn.className = "flex flex-col items-center justify-center p-3 rounded-xl border border-indigo-500 bg-indigo-500/20 text-indigo-400 light:text-indigo-700 transition-all shadow-md";
+            emailInput.value = "procumentor@vendorintel.com";
         } else if (profile === 'vendor') {
             vendorBtn.className = "flex flex-col items-center justify-center p-3 rounded-xl border border-emerald-500 bg-emerald-500/20 text-emerald-400 light:text-emerald-700 transition-all shadow-md";
             emailInput.value = "vendor@vendorintel.com";
+        } else if (profile === 'auditor') {
+            auditorBtn.className = "flex flex-col items-center justify-center p-3 rounded-xl border border-rose-500 bg-rose-500/20 text-rose-400 light:text-rose-700 transition-all shadow-md";
+            emailInput.value = "auditor@vendorintel.com";
         }
     }
 
-    function handleFormSubmit(e) {
+    async function handleFormSubmit(e) {
         e.preventDefault();
         const submitBtn = document.getElementById('submitBtn');
         const emailInput = document.getElementById('email').value.toLowerCase();
+        const passwordInput = document.getElementById('password').value;
 
         submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">refresh</span> <span>Authenticating...</span>';
         submitBtn.disabled = true;
 
-        // Determine role
-        let role = 'vendor';
-        if (emailInput.includes('admin') || emailInput.includes('exec')) role = 'admin';
-        if (emailInput.includes('manager') || emailInput.includes('procure')) role = 'manager';
-        localStorage.setItem('userRole', role);
-        
-        // Format a display name from email
-        let name = emailInput.split('@')[0];
-        name = name.charAt(0).toUpperCase() + name.slice(1);
-        localStorage.setItem('userName', name);
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: emailInput, password: passwordInput })
+            });
 
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 1000);
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.detail || 'Authentication failed');
+            }
+
+            const data = await response.json();
+            
+            // Save token and user details
+            localStorage.setItem('accessToken', data.access_token);
+            localStorage.setItem('userId', data.user.id);
+            localStorage.setItem('userRole', data.user.role);
+            localStorage.setItem('userName', data.user.name);
+
+            // Redirect based on role
+            if (data.user.role === 'vendor') {
+                window.location.href = 'vendor_dashboard.html';
+            } else if (data.user.role === 'procumentor') {
+                window.location.href = 'procurement_dashboard.html';
+            } else if (data.user.role === 'auditor') {
+                window.location.href = 'auditor_dashboard.html';
+            } else {
+                window.location.href = 'dashboard.html'; // Admin
+            }
+        } catch (error) {
+            alert(error.message);
+            submitBtn.innerHTML = '<span>Authorized Access</span><span class="material-symbols-outlined text-[18px]">arrow_forward</span>';
+            submitBtn.disabled = false;
+        }
     }
 
     // Google SSO -> Route to Dashboard

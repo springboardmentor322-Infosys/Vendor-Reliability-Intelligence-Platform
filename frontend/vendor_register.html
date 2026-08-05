@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vendor Registration | VendorIntel Platform</title>
+
+<!-- Google Fonts: Inter & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+<!-- Three.js for 3D Globe -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+                    "surface-container-highest": "#e0e3e5",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "background": "#f7f9fb",
+                    "outline": "#737686",
+                    "on-error": "#ffffff",
+                    "surface": "#f7f9fb",
+                    "primary-fixed": "#dbe1ff",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "tertiary-container": "#5e6e85",
+                    "on-primary-fixed": "#00174b",
+                    "tertiary": "#46566c",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "tertiary-fixed": "#d3e4fe",
+                    "on-primary-container": "#eeefff",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-background": "#191c1e",
+                    "surface-variant": "#e0e3e5",
+                    "on-surface": "#191c1e",
+                    "surface-container": "#eceef0",
+                    "secondary": "#565e74",
+                    "secondary-fixed": "#dae2fd",
+                    "surface-dim": "#d8dadc",
+                    "surface-bright": "#f7f9fb",
+                    "secondary-container": "#dae2fd",
+                    "inverse-primary": "#b4c5ff",
+                    "primary-container": "#2563eb",
+                    "inverse-surface": "#2d3133",
+                    "on-secondary-container": "#5c647a",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f2f4f6",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-tertiary-container": "#e9f0ff",
+                    "outline-variant": "#c3c6d7",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "surface-tint": "#0053db",
+                    "surface-container-high": "#e6e8ea",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "on-secondary-fixed": "#131b2e",
+                    "primary": "#004ac6",
+                    "on-surface-variant": "#434655"
+            },
+            fontFamily: {
+                    "sans": ["Inter", "sans-serif"],
+                    "mono-data": ["JetBrains Mono", "monospace"]
+            },
+            keyframes: {
+                    float: {
+                      '0%, 100%': { transform: 'translateY(0px)' },
+                      '50%': { transform: 'translateY(-6px)' }
+                    }
+            },
+            animation: {
+                    float: 'float 6s ease-in-out infinite'
+            }
+          },
+        },
+        plugins: [
+          ({ addVariant }) => addVariant('light', ':is(.light &)')
+        ]
+      }
+    </script>
+
+<style>
+        html { scroll-behavior: smooth; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* Base Body styling */
+        body { margin: 0; padding: 0; }
+
+        /* Dark Theme Styling */
+        .dark body { background-color: #0b1c30; color: #ffffff; }
+        .dark .glass-panel {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), inset 0 2px 4px rgba(255, 255, 255, 0.05);
+        }
+
+        /* Light Theme Styling */
+        .light body { background-color: #f0f4f8; color: #1e293b; }
+        .light .glass-panel {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6));
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 1);
+            border-left: 1px solid rgba(255, 255, 255, 1);
+            border-right: 1px solid rgba(255, 255, 255, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 40px -12px rgba(100, 116, 139, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+        }
+        
+        .light h1, .light h2, .light h3, .light .text-white { color: #0f172a !important; }
+        .light p, .light .text-tertiary-fixed-dim { color: #475569 !important; }
+
+        #bg-canvas {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0; pointer-events: none;
+        }
+
+        .auth-container { min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+
+        /* Premium Light Theme Override */
+        .light body { 
+            background-color: #f8fafc; /* Soft slate-50 */
+            color: #0f172a; 
+        }
+        .light .glass-panel, .light .glass-widget {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border-top: 1px solid rgba(255, 255, 255, 1) !important;
+            border-left: 1px solid rgba(255, 255, 255, 1) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.4) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 20px 40px -12px rgba(100, 116, 139, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.8) !important;
+        }
+        .light h1, .light h2, .light h3, .light .text-white { color: #0f172a !important; }
+        .light p, .light .text-tertiary-fixed-dim { color: #475569 !important; }
+        .light .bg-\[\#1e293b\] { 
+            background-color: #ffffff !important; 
+            color: #0f172a !important; 
+            border-color: #cbd5e1 !important;
+        }
+        .light table th, .light table td {
+            border-color: #e2e8f0 !important;
+        }
+        .light .border-white\/5, .light .border-white\/10, .light .border-white\/20 {
+            border-color: #cbd5e1 !important;
+        }
+        .light .bg-white\/5 {
+            background-color: rgba(241, 245, 249, 0.8) !important;
+        }
+        .light .text-slate-400 {
+            color: #64748b !important;
+        }
+
+</style>
+</head>
+<body class="font-sans selection:bg-primary selection:text-white">
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="auth-container">
+    <header class="w-full px-6 py-4 flex items-center justify-between relative z-10 border-b border-white/5 light:border-slate-200">
+        <div class="flex items-center gap-3 group cursor-pointer">
+            <span class="text-2xl font-black tracking-tight text-white group-hover:text-primary transition-colors">Vendor<span class="text-primary group-hover:text-blue-400 transition-colors">Intel</span></span>
+        </div>
+        <div class="flex gap-4 items-center">
+            <button id="themeToggle" class="text-tertiary-fixed-dim hover:text-white light:text-slate-600 light:hover:text-slate-900 transition-colors p-2 rounded-full hover:bg-white/5 light:hover:bg-slate-200">
+                <span id="themeIcon" class="material-symbols-outlined text-[20px]">light_mode</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-6 relative z-10">
+        <section class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            <!-- Branding / 3D Side -->
+            <div class="hidden lg:flex flex-col items-center justify-center relative p-8">
+                <div class="absolute inset-0 bg-primary/20 blur-[100px] rounded-full w-[400px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                
+                <div class="relative z-10 text-center animate-float">
+                    <div id="globe-container" class="w-[450px] h-[450px] mx-auto opacity-90 drop-shadow-2xl"></div>
+                </div>
+                
+                <div class="mt-8 text-center relative z-10 space-y-3">
+                    <h2 class="text-3xl font-black text-white tracking-tight">Join the Network</h2>
+                    <p class="text-tertiary-fixed-dim light:text-slate-500 max-w-md mx-auto text-sm leading-relaxed">
+                        Become an approved vendor in the VendorIntel ecosystem and streamline your procurement channels.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Registration Form Side -->
+            <div class="flex justify-center w-full">
+                <div class="glass-panel w-full max-w-md rounded-[2rem] p-8 lg:p-10 relative overflow-hidden">
+                    <!-- Subtle accents -->
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-primary/30 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/30 blur-[60px] rounded-full translate-y-1/2 -translate-x-1/2"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="mb-8">
+                            <h1 class="text-2xl font-black text-white mb-2 tracking-tight">Vendor Registration</h1>
+                            <p class="text-xs text-tertiary-fixed-dim light:text-slate-500">Fill out your company details to apply for the network.</p>
+                        </div>
+
+                        <!-- Registration Form -->
+                        <form id="registerForm" class="space-y-5">
+                            <div>
+                                <label class="block text-[11px] font-bold text-tertiary-fixed-dim light:text-slate-500 uppercase tracking-wider mb-1.5">Company Name</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-tertiary-fixed-dim text-[18px]">domain</span>
+                                    <input type="text" id="company_name" required
+                                           class="w-full bg-[#1e293b] light:bg-white border border-white/10 light:border-slate-300 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white light:text-slate-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-inner placeholder:text-tertiary-fixed-dim/50"
+                                           placeholder="e.g., Alpha Technologies Ltd.">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[11px] font-bold text-tertiary-fixed-dim light:text-slate-500 uppercase tracking-wider mb-1.5">Email Address</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-tertiary-fixed-dim text-[18px]">mail</span>
+                                    <input type="email" id="email" required
+                                           class="w-full bg-[#1e293b] light:bg-white border border-white/10 light:border-slate-300 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white light:text-slate-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-inner placeholder:text-tertiary-fixed-dim/50"
+                                           placeholder="vendor@company.com">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-[11px] font-bold text-tertiary-fixed-dim light:text-slate-500 uppercase tracking-wider mb-1.5">Business Category</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-tertiary-fixed-dim text-[18px]">category</span>
+                                    <select id="category" class="w-full bg-[#1e293b] light:bg-white border border-white/10 light:border-slate-300 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white light:text-slate-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-inner">
+                                        <option value="IT & Software">IT & Software</option>
+                                        <option value="Logistics">Logistics & Freight</option>
+                                        <option value="Manufacturing">Manufacturing</option>
+                                        <option value="Consulting">Consulting & Services</option>
+                                        <option value="Hardware">Hardware & Electronics</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between items-center mb-1.5">
+                                    <label class="block text-[11px] font-bold text-tertiary-fixed-dim light:text-slate-500 uppercase tracking-wider">Password</label>
+                                </div>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-tertiary-fixed-dim text-[18px]">lock</span>
+                                    <input type="password" id="password" required minlength="6"
+                                           class="w-full bg-[#1e293b] light:bg-white border border-white/10 light:border-slate-300 rounded-xl py-2.5 pl-10 pr-10 text-sm text-white light:text-slate-900 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-inner placeholder:text-tertiary-fixed-dim/50"
+                                           placeholder="••••••••">
+                                    <button type="button" id="togglePassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-tertiary-fixed-dim hover:text-white light:hover:text-slate-900 transition-colors flex items-center">
+                                        <span id="passwordIcon" class="material-symbols-outlined text-[18px]">visibility</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)] transform hover:-translate-y-0.5 mt-4 flex items-center justify-center gap-2">
+                                Submit Registration <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                            </button>
+                        </form>
+                        
+                        <div class="mt-6 text-center text-xs text-tertiary-fixed-dim light:text-slate-500">
+                            Already registered? <a href="login.html" class="text-primary hover:text-blue-400 font-bold transition-colors">Sign in here</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="w-full px-6 py-4 text-center border-t border-white/10 light:border-slate-200 relative z-10">
+        <p class="text-xs text-tertiary-fixed-dim light:text-slate-500 font-mono-data">
+            © 2026 VendorIntel. Infosys Springboard Internship Project.
+        </p>
+    </footer>
+</div>
+
+<script>
+    // Background Shader Logic
+    const canvas = document.getElementById('bg-canvas');
+    const gl = canvas.getContext('webgl');
+    const vertexShaderSrc = `
+        attribute vec2 position;
+        varying vec2 v_texCoord;
+        void main() {
+            v_texCoord = (position + 1.0) / 2.0;
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    `;
+    const fragmentShaderSrc = `
+        precision highp float;
+        varying vec2 v_texCoord;
+        uniform float u_time;
+        uniform vec2 u_resolution;
+        uniform vec2 u_mouse;
+        uniform float u_isLight;
+        void main() {
+            vec2 uv = v_texCoord;
+            vec2 mouse = u_mouse / u_resolution;
+            vec3 darkColor1 = vec3(0.01, 0.04, 0.12);
+            vec3 darkColor2 = vec3(0.03, 0.08, 0.22);
+            vec3 lightColor1 = vec3(0.94, 0.96, 0.99);
+            vec3 lightColor2 = vec3(0.90, 0.93, 0.98);
+            vec3 color1 = mix(darkColor1, lightColor1, u_isLight);
+            vec3 color2 = mix(darkColor2, lightColor2, u_isLight);
+            float pulse = sin(u_time * 0.5) * 0.1 + 0.9;
+            float dist = distance(uv, vec2(0.5) + (mouse - 0.5) * 0.1);
+            vec3 finalColor = mix(color2, color1, smoothstep(0.2, 0.8, dist * pulse));
+            float noise = fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);
+            finalColor += noise * 0.006;
+            gl_FragColor = vec4(finalColor, 1.0);
+        }
+    `;
+    function createShader(gl, type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        return shader;
+    }
+    const program = gl.createProgram();
+    gl.attachShader(program, createShader(gl, gl.VERTEX_SHADER, vertexShaderSrc));
+    gl.attachShader(program, createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSrc));
+    gl.linkProgram(program);
+    gl.useProgram(program);
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+    const positionLoc = gl.getAttribLocation(program, 'position');
+    gl.enableVertexAttribArray(positionLoc);
+    gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
+    const timeLoc = gl.getUniformLocation(program, 'u_time');
+    const resLoc = gl.getUniformLocation(program, 'u_resolution');
+    const mouseLoc = gl.getUniformLocation(program, 'u_mouse');
+    const isLightLoc = gl.getUniformLocation(program, 'u_isLight');
+    let mouseX = 0, mouseY = 0;
+    window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX; mouseY = canvas.height - e.clientY;
+    });
+    function renderBg(time) {
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        const isLight = document.documentElement.classList.contains('light') ? 1.0 : 0.0;
+        gl.uniform1f(timeLoc, time * 0.001);
+        gl.uniform2f(resLoc, canvas.width, canvas.height);
+        gl.uniform2f(mouseLoc, mouseX, mouseY);
+        gl.uniform1f(isLightLoc, isLight);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        requestAnimationFrame(renderBg);
+    }
+    requestAnimationFrame(renderBg);
+
+    // Three.js Globe
+    const container = document.getElementById('globe-container');
+    (function() {
+      if(!container) return;
+      const width = container.clientWidth || 500;
+      const height = container.clientHeight || 500;
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      camera.position.z = 5;
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      container.appendChild(renderer.domElement);
+      const globeGroup = new THREE.Group();
+      scene.add(globeGroup);
+      const sphereGeo = new THREE.SphereGeometry(2, 64, 64);
+      const sphereMat = new THREE.MeshPhongMaterial({
+        color: 0x3b82f6, wireframe: true, transparent: true, opacity: 0.18, emissive: 0x1d4ed8, emissiveIntensity: 0.25
+      });
+      globeGroup.add(new THREE.Mesh(sphereGeo, sphereMat));
+      const pointsCount = 650;
+      const positions = new Float32Array(pointsCount * 3);
+      for (let i = 0; i < pointsCount; i++) {
+        const phi = Math.acos(-1 + (2 * i) / pointsCount);
+        const theta = Math.sqrt(pointsCount * Math.PI) * phi;
+        positions[i * 3] = 2 * Math.cos(theta) * Math.sin(phi);
+        positions[i * 3 + 1] = 2 * Math.sin(theta) * Math.sin(phi);
+        positions[i * 3 + 2] = 2 * Math.cos(phi);
+      }
+      const pointsGeo = new THREE.BufferGeometry();
+      pointsGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const pointsMat = new THREE.PointsMaterial({
+        color: 0x60a5fa, size: 0.03, transparent: true, opacity: 0.85, sizeAttenuation: true
+      });
+      globeGroup.add(new THREE.Points(pointsGeo, pointsMat));
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      function animate() {
+        requestAnimationFrame(animate);
+        globeGroup.rotation.y += 0.0015;
+        renderer.render(scene, camera);
+      }
+      animate();
+    })();
+
+    // Password Toggle
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const passwordIcon = document.getElementById('passwordIcon');
+    togglePassword.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        passwordIcon.textContent = isPassword ? 'visibility_off' : 'visibility';
+    });
+
+    // Theme Switch
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+    themeToggle.addEventListener('click', () => {
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark'); html.classList.add('light'); themeIcon.textContent = 'light_mode';
+        } else {
+            html.classList.remove('light'); html.classList.add('dark'); themeIcon.textContent = 'dark_mode';
+        }
+    });
+
+    // Form Submission
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const company_name = document.getElementById('company_name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const category = document.getElementById('category').value;
+        
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/auth/register_vendor', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ company_name, email, password, category })
+            });
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert(result.message);
+                window.location.href = 'login.html';
+            } else {
+                alert(result.detail || 'Registration failed');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Failed to connect to the server');
+        }
+    });
+</script>
+</body>
+</html>

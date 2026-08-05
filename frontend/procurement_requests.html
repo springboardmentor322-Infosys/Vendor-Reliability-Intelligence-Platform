@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Procurement Dashboard | VendorIntel</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+                    "surface-container-highest": "#e0e3e5",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "background": "#f7f9fb",
+                    "outline": "#737686",
+                    "on-error": "#ffffff",
+                    "surface": "#f7f9fb",
+                    "primary-fixed": "#dbe1ff",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "tertiary-container": "#5e6e85",
+                    "on-primary-fixed": "#00174b",
+                    "tertiary": "#46566c",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "tertiary-fixed": "#d3e4fe",
+                    "on-primary-container": "#eeefff",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-background": "#191c1e",
+                    "surface-variant": "#e0e3e5",
+                    "on-surface": "#191c1e",
+                    "surface-container": "#eceef0",
+                    "secondary": "#565e74",
+                    "secondary-fixed": "#dae2fd",
+                    "surface-dim": "#d8dadc",
+                    "surface-bright": "#f7f9fb",
+                    "secondary-container": "#dae2fd",
+                    "inverse-primary": "#b4c5ff",
+                    "primary-container": "#2563eb",
+                    "inverse-surface": "#2d3133",
+                    "on-secondary-container": "#5c647a",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f2f4f6",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-tertiary-container": "#e9f0ff",
+                    "outline-variant": "#c3c6d7",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "surface-tint": "#0053db",
+                    "surface-container-high": "#e6e8ea",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "on-secondary-fixed": "#131b2e",
+                    "primary": "#004ac6",
+                    "on-surface-variant": "#434655"
+            },
+            fontFamily: {
+                    "sans": ["Inter", "sans-serif"],
+                    "mono-data": ["JetBrains Mono", "monospace"]
+            }
+          }
+        },
+        plugins: [
+          ({ addVariant }) => addVariant('light', ':is(.light &)')
+        ]
+      }
+    </script>
+<style>
+        html { scroll-behavior: smooth; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        /* Dark Theme Styling */
+        .dark body { 
+            background-color: #0b1c30; 
+            color: #ffffff; 
+        }
+
+        .dark .glass-panel {
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01));
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+        }
+
+        .dark .glass-widget {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            border-right: 1px solid rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .dark .glass-widget:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Light Theme Styling */
+        .light body {
+            background-color: #f0f4f8; /* Soft blue-gray */
+            color: #1e293b; /* slate-800 */
+        }
+        
+        .light .glass-panel {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.5));
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 1);
+            border-left: 1px solid rgba(255, 255, 255, 1);
+            border-right: 1px solid rgba(255, 255, 255, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 40px -12px rgba(100, 116, 139, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+        }
+
+        .light .glass-widget {
+            background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(255, 255, 255, 0.9);
+            border-left: 1px solid rgba(255, 255, 255, 0.9);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 25px -10px rgba(100, 116, 139, 0.1), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+        
+        .light .glass-widget:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -10px rgba(100, 116, 139, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.9);
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.6));
+        }
+
+        /* Global typography overrides for light mode */
+        .light h1, .light h2, .light h3, .light h4, .light h5, .light h6, .light .text-white { 
+            color: #0f172a !important; 
+        }
+        .light p, .light .text-tertiary-fixed-dim { 
+            color: #475569 !important; 
+        }
+        .light .border-white\\/10 {
+            border-color: rgba(100, 116, 139, 0.1) !important;
+        }
+        .light .group:hover .group-hover\\:text-white {
+            color: #0f172a !important;
+        }
+
+        /* Premium Light Theme Override */
+        .light body { 
+            background-color: #f8fafc; /* Soft slate-50 */
+            color: #0f172a; 
+        }
+        .light .glass-panel, .light .glass-widget {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border-top: 1px solid rgba(255, 255, 255, 1) !important;
+            border-left: 1px solid rgba(255, 255, 255, 1) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.4) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 20px 40px -12px rgba(100, 116, 139, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.8) !important;
+        }
+        .light h1, .light h2, .light h3, .light .text-white { color: #0f172a !important; }
+        .light p, .light .text-tertiary-fixed-dim { color: #475569 !important; }
+        .light .bg-\[\#1e293b\] { 
+            background-color: #ffffff !important; 
+            color: #0f172a !important; 
+            border-color: #cbd5e1 !important;
+        }
+        .light table th, .light table td {
+            border-color: #e2e8f0 !important;
+        }
+        .light .border-white\/5, .light .border-white\/10, .light .border-white\/20 {
+            border-color: #cbd5e1 !important;
+        }
+        .light .bg-white\/5 {
+            background-color: rgba(241, 245, 249, 0.8) !important;
+        }
+        .light .text-slate-400 {
+            color: #64748b !important;
+        }
+
+</style>
+</head>
+<body class="font-sans selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen flex flex-col overflow-hidden">
+<script>
+    if (localStorage.getItem('userRole') !== 'procumentor') {
+        window.location.href = 'login.html';
+    }
+</script>
+<header class="sticky top-0 z-40 glass-panel border-b border-white/10 px-6 py-3.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between relative z-10">
+        <div class="flex items-center gap-3">
+            <span class="text-xl font-black tracking-tight">Vendor<span class="text-indigo-500">Intel</span></span>
+            <span class="text-[9px] font-mono-data text-indigo-300 tracking-wider uppercase font-bold">Procurement Console</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="login.html" onclick="localStorage.clear()" class="bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 px-3.5 py-2 rounded-xl text-xs font-bold font-mono-data border border-rose-500/30">Logout</a>
+        </div>
+    </div>
+</header>
+<main class="flex-grow relative z-10 max-w-7xl mx-auto px-6 py-8 space-y-8 w-full">
+    <!-- PR Engine Header -->
+    <section class="glass-panel p-6 lg:p-8 rounded-2xl border border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 relative overflow-hidden">
+        <div>
+            <h1 class="text-3xl font-black text-white tracking-tight">Procurement Requests</h1>
+            <p class="text-sm text-tertiary-fixed-dim mt-2 max-w-xl">Create, review, and approve internal procurement requisitions before converting them to Purchase Orders.</p>
+        </div>
+        <button onclick="openCreatePRModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-3 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-2">
+            <span class="material-symbols-outlined">add_shopping_cart</span> Create New PR
+        </button>
+    </section>
+
+    <!-- PR Data Table -->
+    <section class="glass-panel p-6 rounded-2xl border border-white/10">
+        <div class="overflow-x-auto rounded-xl border border-white/10">
+            <table class="w-full text-left text-xs font-sans">
+                <thead class="bg-white/5 text-tertiary-fixed-dim uppercase font-mono-data text-[10px] border-b border-white/10">
+                    <tr>
+                        <th class="p-3.5">PR Number</th>
+                        <th class="p-3.5">Department</th>
+                        <th class="p-3.5">Estimated Cost</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5">Date Created</th>
+                        <th class="p-3.5">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pr-table-body" class="divide-y divide-white/5 text-tertiary-fixed-dim">
+                    <!-- Populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<!-- Create PR Modal -->
+<div id="create-pr-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl p-6 relative">
+        <button onclick="closeCreatePRModal()" class="absolute top-4 right-4 text-tertiary-fixed-dim hover:text-white transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-white"><span class="material-symbols-outlined text-emerald-500">receipt_long</span> New Procurement Request</h2>
+        
+        <form onsubmit="submitCreatePR(event)" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Department</label>
+                    <select id="pr-department" required class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        <option value="IT">IT & Infrastructure</option>
+                        <option value="Operations">Operations</option>
+                        <option value="HR">Human Resources</option>
+                        <option value="Marketing">Marketing</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Line Items Section -->
+            <div class="border border-white/10 rounded-xl p-4 bg-white/5">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-sm text-white">Line Items</h3>
+                    <button type="button" onclick="addPRLineItem()" class="text-xs text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">add</span> Add Item
+                    </button>
+                </div>
+                
+                <div id="pr-items-container" class="space-y-3">
+                    <!-- Initial Item -->
+                    <div class="flex gap-2 items-center pr-item-row">
+                        <input type="text" placeholder="Item Description" required class="flex-1 bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-emerald-500 item-desc">
+                        <input type="number" placeholder="Qty" min="1" value="1" required class="w-20 bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-emerald-500 item-qty" oninput="calculateTotal()">
+                        <input type="number" placeholder="Est. Cost ($)" min="0" step="0.01" required class="w-32 bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-emerald-500 item-cost" oninput="calculateTotal()">
+                        <button type="button" onclick="this.parentElement.remove(); calculateTotal()" class="text-rose-500 hover:text-rose-400 p-1"><span class="material-symbols-outlined">delete</span></button>
+                    </div>
+                </div>
+                
+                <div class="mt-4 text-right">
+                    <p class="text-xs text-tertiary-fixed-dim">Total Estimated Cost: <span id="pr-total-cost" class="text-lg font-bold text-emerald-400">$0.00</span></p>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-emerald-500/25">
+                Submit Request
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadPRs();
+    });
+
+    async function loadPRs() {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch('http://127.0.0.1:8000/api/procurement_requests', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const prs = await response.json();
+            const tbody = document.getElementById('pr-table-body');
+            tbody.innerHTML = '';
+
+            prs.forEach(pr => {
+                let statusBadge = '';
+                if(pr.approval_status === 'Pending') statusBadge = '<span class="bg-amber-500/20 text-amber-400 px-2 py-1 rounded text-[10px] font-bold border border-amber-500/20">PENDING</span>';
+                else if(pr.approval_status === 'Approved') statusBadge = '<span class="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded text-[10px] font-bold border border-emerald-500/20">APPROVED</span>';
+                else if(pr.approval_status === 'Rejected') statusBadge = '<span class="bg-rose-500/20 text-rose-400 px-2 py-1 rounded text-[10px] font-bold border border-rose-500/20">REJECTED</span>';
+                else if(pr.approval_status === 'Ordered') statusBadge = '<span class="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-[10px] font-bold border border-blue-500/20">ORDERED</span>';
+                else if(pr.approval_status === 'Delivered') statusBadge = '<span class="bg-indigo-500/20 text-indigo-400 px-2 py-1 rounded text-[10px] font-bold border border-indigo-500/20">DELIVERED</span>';
+                else if(pr.approval_status === 'Completed') statusBadge = '<span class="bg-teal-500/20 text-teal-400 px-2 py-1 rounded text-[10px] font-bold border border-teal-500/20">COMPLETED</span>';
+                else if(pr.approval_status === 'Cancelled') statusBadge = '<span class="bg-slate-500/20 text-slate-400 px-2 py-1 rounded text-[10px] font-bold border border-slate-500/20">CANCELLED</span>';
+                else statusBadge = `<span class="bg-slate-500/20 text-slate-400 px-2 py-1 rounded text-[10px] font-bold border border-slate-500/20">${pr.approval_status.toUpperCase()}</span>`;
+
+                const actions = pr.approval_status === 'Pending' 
+                    ? `<div class="flex items-center gap-2">
+                           <button onclick="updatePRStatus(${pr.id}, 'Approved')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shadow-lg shadow-emerald-500/30 transform hover:-translate-y-0.5">
+                               <span class="material-symbols-outlined text-[16px]">check_circle</span> <span class="font-bold text-[11px] uppercase tracking-wider">Approve</span>
+                           </button>
+                           <button onclick="updatePRStatus(${pr.id}, 'Rejected')" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all shadow-lg shadow-rose-500/30 transform hover:-translate-y-0.5">
+                               <span class="material-symbols-outlined text-[16px]">cancel</span> <span class="font-bold text-[11px] uppercase tracking-wider">Reject</span>
+                           </button>
+                       </div>`
+                    : (pr.approval_status === 'Approved' 
+                        ? `<button onclick="openGeneratePOModal(${pr.id})" class="bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all">
+                               <span class="material-symbols-outlined text-[14px]">receipt_long</span> <span class="font-bold">Generate PO</span>
+                           </button>` 
+                        : '<span class="text-slate-500 text-xs italic font-bold">No actions</span>');
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors text-sm border-b border-white/5">
+                        <td class="p-3 font-bold text-white">${pr.request_number}</td>
+                        <td class="p-3">${pr.department}</td>
+                        <td class="p-3 text-emerald-400 font-mono-data">$${pr.total_cost.toFixed(2)}</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 font-mono-data text-xs">${new Date(pr.created_at).toLocaleDateString()}</td>
+                        <td class="p-3 text-xs">${actions}</td>
+                    </tr>
+                `;
+            });
+        } catch(e) {
+            console.error("Failed to load PRs:", e);
+        }
+    }
+
+    async function updatePRStatus(prId, status) {
+        if(!confirm(`Are you sure you want to ${status.toLowerCase()} this PR?`)) return;
+        
+        const token = localStorage.getItem('accessToken');
+        try {
+            await fetch(`http://127.0.0.1:8000/api/procurement_requests/${prId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ approval_status: status })
+            });
+            loadPRs();
+        } catch(e) {
+            alert("Error updating status");
+        }
+    }
+
+    function openCreatePRModal() { document.getElementById('create-pr-modal').classList.remove('hidden'); }
+    function closeCreatePRModal() { document.getElementById('create-pr-modal').classList.add('hidden'); }
+
+    function addPRLineItem() {
+        const container = document.getElementById('pr-items-container');
+        const div = document.createElement('div');
+        div.className = "flex gap-2 items-center pr-item-row";
+        div.innerHTML = `
+            <input type="text" placeholder="Item Description" required class="flex-1 bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-emerald-500 item-desc">
+            <input type="number" placeholder="Qty" min="1" value="1" required class="w-20 bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-emerald-500 item-qty" oninput="calculateTotal()">
+            <input type="number" placeholder="Est. Cost ($)" min="0" step="0.01" required class="w-32 bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-emerald-500 item-cost" oninput="calculateTotal()">
+            <button type="button" onclick="this.parentElement.remove(); calculateTotal()" class="text-rose-500 hover:text-rose-400 p-1"><span class="material-symbols-outlined">delete</span></button>
+        `;
+        container.appendChild(div);
+    }
+
+    function calculateTotal() {
+        let total = 0;
+        document.querySelectorAll('.pr-item-row').forEach(row => {
+            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+            const cost = parseFloat(row.querySelector('.item-cost').value) || 0;
+            total += qty * cost;
+        });
+        document.getElementById('pr-total-cost').innerText = '$' + total.toFixed(2);
+    }
+
+    async function submitCreatePR(event) {
+        event.preventDefault();
+        const reqNum = "PR-" + Math.floor(100000 + Math.random() * 900000);
+        const dept = document.getElementById('pr-department').value;
+        const totalCostStr = document.getElementById('pr-total-cost').innerText.replace('$', '');
+        const totalCost = parseFloat(totalCostStr) || 0;
+        
+        const token = localStorage.getItem('accessToken');
+
+        try {
+            const prRes = await fetch('http://127.0.0.1:8000/api/procurement_requests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    request_number: reqNum,
+                    department: dept,
+                    total_cost: totalCost,
+                    estimated_cost: totalCost
+                })
+            });
+
+            if(!prRes.ok) {
+                alert("Failed to create PR.");
+                return;
+            }
+
+            const pr = await prRes.json();
+            const rows = document.querySelectorAll('.pr-item-row');
+            
+            for (const row of rows) {
+                const desc = row.querySelector('.item-desc').value;
+                const qty = parseInt(row.querySelector('.item-qty').value, 10);
+                const cost = parseFloat(row.querySelector('.item-cost').value);
+                
+                await fetch(`http://127.0.0.1:8000/api/procurement_requests/${pr.id}/items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ item_details: desc, quantity: qty, estimated_cost: cost })
+                });
+            }
+
+            closeCreatePRModal();
+            loadPRs();
+            event.target.reset();
+            document.getElementById('pr-items-container').innerHTML = `
+                <div class="flex gap-2 items-center pr-item-row">
+                    <input type="text" placeholder="Item Description" required class="flex-1 bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-emerald-500 item-desc">
+                    <input type="number" placeholder="Qty" min="1" value="1" required class="w-20 bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-emerald-500 item-qty" oninput="calculateTotal()">
+                    <input type="number" placeholder="Est. Cost ($)" min="0" step="0.01" required class="w-32 bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-emerald-500 item-cost" oninput="calculateTotal()">
+                    <button type="button" onclick="this.parentElement.remove(); calculateTotal()" class="text-rose-500 hover:text-rose-400 p-1"><span class="material-symbols-outlined">delete</span></button>
+                </div>
+            `;
+            calculateTotal();
+        } catch(e) {
+            console.error(e);
+            alert("Error creating PR");
+        }
+    }
+    async function openGeneratePOModal(prId) {
+        document.getElementById('generate-po-pr-id').value = prId;
+        
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch('http://127.0.0.1:8000/api/vendors', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const vendors = await response.json();
+            const select = document.getElementById('generate-po-vendor');
+            select.innerHTML = '<option value="">Select an Approved Vendor...</option>';
+            
+            vendors.forEach(v => {
+                if (v.approval_status === 'Approved' || v.approval_status === 'Active') {
+                    select.innerHTML += `<option value="${v.id}">${v.company_name} (${v.category || 'General'})</option>`;
+                }
+            });
+            
+            document.getElementById('generate-po-modal').classList.remove('hidden');
+        } catch(e) {
+            console.error(e);
+            alert("Error loading vendors");
+        }
+    }
+
+    function closeGeneratePOModal() {
+        document.getElementById('generate-po-modal').classList.add('hidden');
+    }
+
+    async function submitGeneratePO(event) {
+        event.preventDefault();
+        const prId = document.getElementById('generate-po-pr-id').value;
+        const vendorId = document.getElementById('generate-po-vendor').value;
+        if (!vendorId) {
+            alert("Please select a vendor.");
+            return;
+        }
+
+        const poNum = "PO-" + Math.floor(100000 + Math.random() * 900000);
+        const token = localStorage.getItem('accessToken');
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/purchase_orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({
+                    pr_id: parseInt(prId),
+                    vendor_id: parseInt(vendorId),
+                    po_number: poNum
+                })
+            });
+
+            if(response.ok) {
+                closeGeneratePOModal();
+                alert(`Purchase Order ${poNum} successfully generated and assigned to the vendor!`);
+                loadPRs(); // refresh if we want, or just stay
+            } else {
+                alert("Failed to generate Purchase Order.");
+            }
+        } catch(e) {
+            console.error(e);
+            alert("Error communicating with server.");
+        }
+    }
+</script>
+
+<!-- Generate PO Modal -->
+<div id="generate-po-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative">
+        <button onclick="closeGeneratePOModal()" class="absolute top-4 right-4 text-tertiary-fixed-dim hover:text-white transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-white"><span class="material-symbols-outlined text-blue-500">receipt_long</span> Generate Purchase Order</h2>
+        
+        <form onsubmit="submitGeneratePO(event)" class="space-y-4">
+            <input type="hidden" id="generate-po-pr-id">
+            
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Assign to Vendor</label>
+                <select id="generate-po-vendor" required class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                    <option value="">Loading vendors...</option>
+                </select>
+            </div>
+
+            <div class="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                <p class="text-xs text-blue-300 font-bold mb-1 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">info</span> Notice</p>
+                <p class="text-[11px] text-blue-400/80 leading-relaxed">Once generated, this Purchase Order will immediately appear in the selected Vendor's portal for fulfillment processing.</p>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-blue-500/25 mt-2">
+                Create & Assign PO
+            </button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

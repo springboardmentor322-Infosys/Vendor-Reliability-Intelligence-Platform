@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Contracts | VendorIntel Enterprise</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+        colors: {
+            "surface-container-highest": "#e0e3e5",
+            "on-tertiary-fixed-variant": "#38485d",
+            "error-container": "#ffdad6",
+            "error": "#ba1a1a",
+            "background": "#f7f9fb",
+            "outline": "#737686",
+            "on-error": "#ffffff",
+            "surface": "#f7f9fb",
+            "primary-fixed": "#dbe1ff",
+            "inverse-on-surface": "#eff1f3",
+            "on-tertiary-fixed": "#0b1c30",
+            "on-secondary": "#ffffff",
+            "tertiary-fixed-dim": "#b7c8e1",
+            "tertiary-container": "#5e6e85",
+            "on-primary-fixed": "#00174b",
+            "tertiary": "#46566c",
+            "on-primary-fixed-variant": "#003ea8",
+            "tertiary-fixed": "#d3e4fe",
+            "on-primary-container": "#eeefff",
+            "on-tertiary": "#ffffff",
+            "on-error-container": "#93000a",
+            "on-background": "#191c1e",
+            "surface-variant": "#e0e3e5",
+            "on-surface": "#191c1e",
+            "surface-container": "#eceef0",
+            "secondary": "#565e74",
+            "secondary-fixed": "#dae2fd",
+            "surface-dim": "#d8dadc",
+            "surface-bright": "#f7f9fb",
+            "secondary-container": "#dae2fd",
+            "inverse-primary": "#b4c5ff",
+            "primary-container": "#2563eb",
+            "inverse-surface": "#2d3133",
+            "on-secondary-container": "#5c647a",
+            "on-primary": "#ffffff",
+            "surface-container-low": "#f2f4f6",
+            "on-secondary-fixed-variant": "#3f465c",
+            "on-tertiary-container": "#e9f0ff",
+            "outline-variant": "#c3c6d7",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed-dim": "#b4c5ff",
+            "surface-tint": "#0053db",
+            "surface-container-high": "#e6e8ea",
+            "secondary-fixed-dim": "#bec6e0",
+            "on-secondary-fixed": "#131b2e",
+            "primary": "#004ac6",
+            "on-surface-variant": "#434655"
+        },
+        fontFamily: {
+            "sans": ["Inter", "sans-serif"],
+            "mono-data": ["JetBrains Mono", "monospace"]
+        }
+        },
+    },
+    plugins: [
+        ({ addVariant }) => addVariant('light', ':is(.light &)')
+    ]
+    }
+</script>
+<style>
+    body, header, div, section, footer, button, p, h1, h2, h3, h4, table {
+        transition: background-color 0.35s ease, border-color 0.35s ease, color 0.25s ease, box-shadow 0.3s ease;
+    }
+    .dark body { background-color: #0b1c30; color: #ffffff; }
+    .dark .glass-panel {
+        background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.01));
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-left: 1px solid rgba(255, 255, 255, 0.2);
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .light body { background-color: #f1f5f9 !important; color: #0f172a; }
+    .light .glass-panel {
+        background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.8));
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid #ffffff;
+        border-left: 1px solid #ffffff;
+        border-right: 1px solid #cbd5e1;
+        border-bottom: 1px solid #cbd5e1;
+    }
+
+        /* Premium Light Theme Override */
+        .light body { 
+            background-color: #f8fafc; /* Soft slate-50 */
+            color: #0f172a; 
+        }
+        .light .glass-panel, .light .glass-widget {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border-top: 1px solid rgba(255, 255, 255, 1) !important;
+            border-left: 1px solid rgba(255, 255, 255, 1) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.4) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 20px 40px -12px rgba(100, 116, 139, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.8) !important;
+        }
+        .light h1, .light h2, .light h3, .light .text-white { color: #0f172a !important; }
+        .light p, .light .text-tertiary-fixed-dim { color: #475569 !important; }
+        .light .bg-\[\#1e293b\] { 
+            background-color: #ffffff !important; 
+            color: #0f172a !important; 
+            border-color: #cbd5e1 !important;
+        }
+        .light table th, .light table td {
+            border-color: #e2e8f0 !important;
+        }
+        .light .border-white\/5, .light .border-white\/10, .light .border-white\/20 {
+            border-color: #cbd5e1 !important;
+        }
+        .light .bg-white\/5 {
+            background-color: rgba(241, 245, 249, 0.8) !important;
+        }
+        .light .text-slate-400 {
+            color: #64748b !important;
+        }
+
+</style>
+</head>
+<body class="bg-on-tertiary-fixed text-white font-sans selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen flex flex-col">
+<script>
+    if (!localStorage.getItem('userRole')) {
+        window.location.href = 'login.html';
+    }
+    if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+    }
+</script>
+
+<header class="sticky top-0 z-40 glass-panel border-b border-white/10 light:border-slate-200 px-6 py-3.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between relative z-10">
+        <a href="index.html" class="flex items-center gap-3 group">
+            <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center rounded-xl shadow-lg shadow-blue-500/30">
+                <span class="material-symbols-outlined text-white text-[22px]">hub</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-xl font-black text-white dark:text-white light:text-slate-900 tracking-tight">Vendor<span class="text-blue-500">Intel</span></span>
+                <span class="text-[9px] font-mono-data text-blue-300 uppercase font-bold">Contracts Portal</span>
+            </div>
+        </a>
+        <div class="flex items-center gap-3">
+            <a href="procurement_dashboard.html" class="text-xs font-semibold text-tertiary-fixed-dim hover:text-white px-3 py-2 transition-colors">
+                Back to Dashboard
+            </a>
+            <a href="login.html" class="bg-rose-500/20 text-rose-300 px-3.5 py-2 rounded-xl text-xs font-bold font-mono-data">Logout</a>
+        </div>
+    </div>
+</header>
+
+<main class="flex-grow relative z-10 max-w-7xl mx-auto px-6 py-8 space-y-8 w-full">
+    <!-- Contracts Header -->
+    <section class="glass-panel p-6 lg:p-8 rounded-2xl border border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-black text-white tracking-tight">Contract Management</h1>
+            <p class="text-sm text-tertiary-fixed-dim mt-2 max-w-xl">Track active vendor contracts, monitor expiration dates, and upload signed agreements.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="openCreateContractModal()" class="bg-primary hover:bg-blue-600 text-white px-5 py-3 rounded-xl font-bold transition-all shadow-lg flex items-center gap-2">
+                <span class="material-symbols-outlined">add</span> Create Contract
+            </button>
+            <button onclick="openUploadContractModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 rounded-xl font-bold transition-all shadow-lg flex items-center gap-2">
+                <span class="material-symbols-outlined">upload_file</span> Upload Document
+            </button>
+        </div>
+    </section>
+
+    <!-- Expiration Alerts Section -->
+    <section id="expiring-contracts-section" class="hidden">
+        <div class="glass-panel p-4 rounded-2xl border border-rose-500/30 bg-rose-500/5">
+            <div class="flex items-center gap-3 mb-2">
+                <span class="material-symbols-outlined text-rose-500">warning</span>
+                <h3 class="font-bold text-base text-rose-400">Contracts Expiring Soon</h3>
+            </div>
+            <ul id="expiring-list" class="space-y-2 mt-3">
+                <!-- Expiring contracts appended here -->
+            </ul>
+        </div>
+    </section>
+
+    <!-- All Contracts Table -->
+    <section class="glass-panel p-6 rounded-2xl border border-white/10">
+        <div class="overflow-x-auto rounded-xl border border-white/10">
+            <table class="w-full text-left text-xs font-sans">
+                <thead class="bg-white/5 text-tertiary-fixed-dim uppercase font-mono-data text-[10px] border-b border-white/10">
+                    <tr>
+                        <th class="p-3.5">Vendor</th>
+                        <th class="p-3.5">Valid From</th>
+                        <th class="p-3.5">Valid Until</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5">Document</th>
+                    </tr>
+                </thead>
+                <tbody id="contracts-table-body" class="divide-y divide-white/5 text-tertiary-fixed-dim">
+                    <!-- Populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<!-- Upload Contract Modal -->
+<div id="upload-contract-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative">
+        <button onclick="closeUploadContractModal()" class="absolute top-4 right-4 text-tertiary-fixed-dim hover:text-white transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-white"><span class="material-symbols-outlined text-indigo-500">upload_file</span> Upload Contract</h2>
+        <form onsubmit="submitUploadContract(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Contract ID</label>
+                <input type="number" id="contract-id" required class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-indigo-500" placeholder="Enter Contract ID to upload to">
+            </div>
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">PDF/Document File</label>
+                <input type="file" required accept=".pdf,.doc,.docx" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-indigo-500 text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-500/20 file:text-indigo-400 hover:file:bg-indigo-500/30">
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl mt-4">
+                Upload Document
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Create Contract Modal -->
+<div id="create-contract-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative">
+        <button onclick="closeCreateContractModal()" class="absolute top-4 right-4 text-tertiary-fixed-dim hover:text-white transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-white"><span class="material-symbols-outlined text-primary">add</span> Create Contract</h2>
+        <form onsubmit="submitCreateContract(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Vendor ID</label>
+                <input type="number" id="cc-vendor-id" required class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-primary" placeholder="Vendor ID (e.g. 1)">
+            </div>
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Start Date</label>
+                <input type="date" id="cc-start-date" required class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-primary">
+            </div>
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Expiry Date</label>
+                <input type="date" id="cc-expiry-date" required class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-primary">
+            </div>
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Status</label>
+                <select id="cc-status" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-primary">
+                    <option value="Active">Active</option>
+                    <option value="Pending">Pending</option>
+                </select>
+            </div>
+            <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3 rounded-xl mt-4">
+                Create Contract
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadContracts();
+    });
+
+    async function loadContracts() {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch('http://127.0.0.1:8000/api/contracts', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const contracts = await response.json();
+
+            const vendorRes = await fetch('http://127.0.0.1:8000/api/vendors');
+            const vendors = await vendorRes.json();
+            const vendorMap = {};
+            vendors.forEach(v => vendorMap[v.id] = v.company_name);
+
+            const tbody = document.getElementById('contracts-table-body');
+            const expList = document.getElementById('expiring-list');
+            tbody.innerHTML = '';
+            expList.innerHTML = '';
+            let hasExpiring = false;
+
+            const now = new Date();
+            const dayInMs = 24 * 60 * 60 * 1000;
+
+            contracts.forEach(c => {
+                const vendorName = vendorMap[c.vendor_id] || `Vendor #${c.vendor_id}`;
+                const validUntil = new Date(c.expiry_date);
+                const validFrom = new Date(c.start_date);
+                const diffDays = Math.ceil((validUntil - now) / dayInMs);
+                
+                const isExpiring30 = diffDays > 0 && diffDays <= 30;
+                const isExpiring60 = diffDays > 30 && diffDays <= 60;
+                const isExpiring90 = diffDays > 60 && diffDays <= 90;
+                const isExpired = diffDays <= 0;
+
+                let statusBadge = '';
+                if(isExpired) statusBadge = '<span class="bg-rose-500/20 text-rose-400 px-2 py-1.5 rounded-lg text-[10px] font-bold border border-rose-500/20">EXPIRED</span>';
+                else if(isExpiring30) statusBadge = '<span class="bg-rose-500/20 text-rose-400 px-2 py-1.5 rounded-lg text-[10px] font-bold border border-rose-500/20">EXPIRING (30)</span>';
+                else if(isExpiring60) statusBadge = '<span class="bg-amber-500/20 text-amber-400 px-2 py-1.5 rounded-lg text-[10px] font-bold border border-amber-500/20">EXPIRING (60)</span>';
+                else if(isExpiring90) statusBadge = '<span class="bg-yellow-500/20 text-yellow-400 px-2 py-1.5 rounded-lg text-[10px] font-bold border border-yellow-500/20">EXPIRING (90)</span>';
+                else statusBadge = '<span class="bg-emerald-500/20 text-emerald-400 px-2 py-1.5 rounded-lg text-[10px] font-bold border border-emerald-500/20">ACTIVE</span>';
+
+                if (isExpiring30 || isExpiring60 || isExpiring90) {
+                    hasExpiring = true;
+                    let warningColor = isExpiring30 ? 'rose' : (isExpiring60 ? 'amber' : 'yellow');
+                    expList.innerHTML += `
+                        <li class="glass-widget p-4 rounded-xl border border-${warningColor}-500/30 flex justify-between items-center text-sm">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-${warningColor}-500">gavel</span>
+                                <div>
+                                    <strong class="text-white">${vendorName}</strong>
+                                    <p class="text-xs text-tertiary-fixed-dim mt-0.5">Contract expires in <span class="font-mono-data text-${warningColor}-400 font-bold">${diffDays} days</span> (${validUntil.toLocaleDateString()})</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="openChatModal('Contract', ${c.id})" class="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 transition-all">
+                                    <span class="material-symbols-outlined text-[16px]">chat</span> Chat
+                                </button>
+                                <button onclick="alert('Renew contract flow...')" class="bg-${warningColor}-500/10 hover:bg-${warningColor}-500/20 text-${warningColor}-400 border border-${warningColor}-500/20 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 transition-all">
+                                    <span class="material-symbols-outlined text-[16px]">autorenew</span> Renew
+                                </button>
+                            </div>
+                        </li>
+                    `;
+                }
+
+                const docLink = c.document_url 
+                    ? `<a href="${c.document_url}" target="_blank" class="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all inline-flex max-w-max text-xs font-bold">
+                           <span class="material-symbols-outlined text-[14px]">description</span> View
+                       </a>`
+                    : '<span class="text-slate-500 italic text-[10px] font-bold">No document</span>';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors border-b border-white/5">
+                        <td class="p-4 font-bold text-white text-sm">${vendorName}</td>
+                        <td class="p-4 font-mono-data text-xs">${validFrom.toLocaleDateString()}</td>
+                        <td class="p-4 font-mono-data text-xs text-amber-100">${validUntil.toLocaleDateString()}</td>
+                        <td class="p-4">${statusBadge}</td>
+                        <td class="p-4"><div class="flex items-center gap-2">${docLink} <button onclick="openChatModal('Contract', ${c.id})" class="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 px-2 py-1.5 rounded-lg flex items-center transition-all ml-2" title="Negotiate/Chat"><span class="material-symbols-outlined text-[14px]">chat</span></button> <span class="text-[9px] text-tertiary-fixed-dim font-mono-data ml-auto">(ID: ${c.id})</span></div></td>
+                    </tr>
+                `;
+            });
+
+            if(hasExpiring) {
+                document.getElementById('expiring-contracts-section').classList.remove('hidden');
+            } else {
+                document.getElementById('expiring-contracts-section').classList.add('hidden');
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    function openUploadContractModal() { document.getElementById('upload-contract-modal').classList.remove('hidden'); }
+    function closeUploadContractModal() { document.getElementById('upload-contract-modal').classList.add('hidden'); }
+
+    async function submitUploadContract(e) {
+        e.preventDefault();
+        const id = document.getElementById('contract-id').value;
+        const file = "https://example.com/mock_contract_document_" + id + ".pdf";
+        const token = localStorage.getItem('accessToken');
+        
+        try {
+            await fetch(`http://127.0.0.1:8000/api/contracts/${id}/upload`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ document_url: file })
+            });
+            closeUploadContractModal();
+            loadContracts();
+            e.target.reset();
+        } catch(err) {
+            alert("Error uploading contract");
+        }
+    }
+
+    function openCreateContractModal() { document.getElementById('create-contract-modal').classList.remove('hidden'); }
+    function closeCreateContractModal() { document.getElementById('create-contract-modal').classList.add('hidden'); }
+
+    async function submitCreateContract(e) {
+        e.preventDefault();
+        const vendor_id = parseInt(document.getElementById('cc-vendor-id').value);
+        const start_date = document.getElementById('cc-start-date').value;
+        const expiry_date = document.getElementById('cc-expiry-date').value;
+        const status = document.getElementById('cc-status').value;
+        const token = localStorage.getItem('accessToken');
+        
+        try {
+            await fetch(`http://127.0.0.1:8000/api/contracts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ vendor_id, start_date, expiry_date, status, renewal_notice_days: 30 })
+            });
+            closeCreateContractModal();
+            loadContracts();
+            e.target.reset();
+        } catch(err) {
+            alert("Error creating contract");
+        }
+    }
+
+    // Chat Logic
+    let currentThreadId = null;
+    let currentEntityType = null;
+    let currentEntityId = null;
+
+    async function openChatModal(entityType, entityId) {
+        currentEntityType = entityType;
+        currentEntityId = entityId;
+        document.getElementById('chat-modal-title').innerText = `${entityType} #${entityId} Communication`;
+        document.getElementById('chat-messages').innerHTML = '<p class="text-xs text-slate-400 italic">Loading messages...</p>';
+        document.getElementById('chat-modal').classList.remove('hidden');
+        
+        const token = localStorage.getItem('accessToken');
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/threads/${entityType}/${entityId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const thread = await res.json();
+            currentThreadId = thread.id;
+            renderMessages(thread.messages || []);
+        } catch(e) {
+            console.error(e);
+            document.getElementById('chat-messages').innerHTML = '<p class="text-xs text-rose-400 italic">Failed to load thread</p>';
+        }
+    }
+
+    function closeChatModal() {
+        document.getElementById('chat-modal').classList.add('hidden');
+    }
+
+    function renderMessages(messages) {
+        const container = document.getElementById('chat-messages');
+        const currentUserId = parseInt(localStorage.getItem('userId'), 10);
+        container.innerHTML = '';
+        if (messages.length === 0) {
+            container.innerHTML = '<p class="text-xs text-slate-400 italic">No messages yet.</p>';
+            return;
+        }
+        messages.forEach(m => {
+            const isMe = m.sender_id === currentUserId;
+            container.innerHTML += `
+                <div class="mb-3 flex ${isMe ? 'justify-end' : 'justify-start'}">
+                    <div class="${isMe ? 'bg-indigo-600' : 'bg-[#1e293b] border border-white/10'} p-3 rounded-xl max-w-[80%]">
+                        <p class="text-xs text-white">${m.content}</p>
+                        <p class="text-[9px] ${isMe ? 'text-indigo-200' : 'text-slate-400'} mt-1 text-right">${new Date(m.timestamp).toLocaleTimeString()}</p>
+                    </div>
+                </div>
+            `;
+        });
+        container.scrollTop = container.scrollHeight;
+    }
+
+    async function submitChatMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById('chat-input');
+        const content = input.value.trim();
+        if(!content || !currentThreadId) return;
+
+        const token = localStorage.getItem('accessToken');
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentThreadId}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ content })
+            });
+            const newMsg = await res.json();
+            input.value = '';
+            // Refresh messages
+            openChatModal(currentEntityType, currentEntityId);
+        } catch(err) {
+            console.error(err);
+        }
+    }
+</script>
+
+<!-- Chat Modal -->
+<div id="chat-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-lg rounded-2xl relative flex flex-col h-[600px] max-h-[90vh]">
+        <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5 rounded-t-2xl">
+            <h2 class="text-lg font-bold flex items-center gap-2 text-white"><span class="material-symbols-outlined text-indigo-400">forum</span> <span id="chat-modal-title">Communication</span></h2>
+            <button onclick="closeChatModal()" class="text-tertiary-fixed-dim hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-2">
+            <!-- Messages go here -->
+        </div>
+        <div class="p-4 border-t border-white/10 bg-[#0f172a]/50 rounded-b-2xl">
+            <form onsubmit="submitChatMessage(event)" class="flex gap-2">
+                <input type="text" id="chat-input" required class="flex-1 bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500" placeholder="Type your message...">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl transition-colors font-bold flex items-center justify-center">
+                    <span class="material-symbols-outlined">send</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

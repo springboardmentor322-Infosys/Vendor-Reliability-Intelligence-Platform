@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vendor Dashboard | VendorIntel</title>
+
+<!-- Google Fonts: Inter & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+                    "surface-container-highest": "#e0e3e5",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "background": "#f7f9fb",
+                    "outline": "#737686",
+                    "on-error": "#ffffff",
+                    "surface": "#f7f9fb",
+                    "primary-fixed": "#dbe1ff",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "tertiary-container": "#5e6e85",
+                    "on-primary-fixed": "#00174b",
+                    "tertiary": "#46566c",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "tertiary-fixed": "#d3e4fe",
+                    "on-primary-container": "#eeefff",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-background": "#191c1e",
+                    "surface-variant": "#e0e3e5",
+                    "on-surface": "#191c1e",
+                    "surface-container": "#eceef0",
+                    "secondary": "#565e74",
+                    "secondary-fixed": "#dae2fd",
+                    "surface-dim": "#d8dadc",
+                    "surface-bright": "#f7f9fb",
+                    "secondary-container": "#dae2fd",
+                    "inverse-primary": "#b4c5ff",
+                    "primary-container": "#2563eb",
+                    "inverse-surface": "#2d3133",
+                    "on-secondary-container": "#5c647a",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f2f4f6",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-tertiary-container": "#e9f0ff",
+                    "outline-variant": "#c3c6d7",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "surface-tint": "#0053db",
+                    "surface-container-high": "#e6e8ea",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "on-secondary-fixed": "#131b2e",
+                    "primary": "#004ac6",
+                    "on-surface-variant": "#434655"
+            },
+            fontFamily: {
+                    "sans": ["Inter", "sans-serif"],
+                    "mono-data": ["JetBrains Mono", "monospace"]
+            }
+          },
+        },
+        plugins: [
+          ({ addVariant }) => addVariant('light', ':is(.light &)')
+        ]
+      }
+    </script>
+
+<style>
+        html { scroll-behavior: smooth; }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(37, 99, 235, 0.3); border-radius: 3px; }
+        
+        /* Smooth Global Theme Transitions */
+        body, header, div, section, footer, button, p, h1, h2, h3, h4, table {
+            transition: background-color 0.35s ease, 
+                        border-color 0.35s ease, 
+                        color 0.25s ease, 
+                        box-shadow 0.3s ease;
+        }
+
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 10s infinite alternate; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+        /* Premium Dark Theme */
+        .dark body { 
+            background-color: #030712; /* gray-950 */
+            color: #f8fafc; /* slate-50 */
+        }
+
+        .dark .glass-panel {
+            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .dark .glass-widget {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.4));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark .glass-widget::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-20deg);
+            transition: all 0.5s ease;
+        }
+
+        .dark .glass-widget:hover::before {
+            left: 150%;
+        }
+
+        .dark .glass-widget:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border-color: rgba(16, 185, 129, 0.4); /* Emerald glow for vendor */
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #34d399, #3b82f6);
+        }
+        
+        .btn-glow {
+            position: relative;
+        }
+        .btn-glow::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(to right, #10b981, #3b82f6);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            filter: blur(8px);
+        }
+        .btn-glow:hover::after {
+            opacity: 0.7;
+        }
+        
+        .light .glass-panel {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.5));
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 1);
+            border-left: 1px solid rgba(255, 255, 255, 1);
+            border-right: 1px solid rgba(255, 255, 255, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 40px -12px rgba(100, 116, 139, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+        }
+
+        .light .glass-widget {
+            background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(255, 255, 255, 0.9);
+            border-left: 1px solid rgba(255, 255, 255, 0.9);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 25px -10px rgba(100, 116, 139, 0.1), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+        
+        .light .glass-widget:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -10px rgba(100, 116, 139, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.9);
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.6));
+        }
+
+        /* Global typography overrides for light mode */
+        .light h1, .light h2, .light h3, .light h4, .light h5, .light h6, .light .text-white { 
+            color: #0f172a !important; 
+        }
+        .light p, .light .text-tertiary-fixed-dim { 
+            color: #475569 !important; 
+        }
+        .light .border-white\\/10 {
+            border-color: rgba(100, 116, 139, 0.1) !important;
+        }
+.light .group:hover .group-hover\\:text-white {
+            color: #0f172a !important;
+        }
+
+        /* Premium Light Theme Override */
+        .light body { 
+            background-color: #f8fafc; /* Soft slate-50 */
+            color: #0f172a; 
+        }
+        .light .glass-panel, .light .glass-widget {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border-top: 1px solid rgba(255, 255, 255, 1) !important;
+            border-left: 1px solid rgba(255, 255, 255, 1) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.4) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 20px 40px -12px rgba(100, 116, 139, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.8) !important;
+        }
+        .light h1, .light h2, .light h3, .light .text-white { color: #0f172a !important; }
+        .light p, .light .text-tertiary-fixed-dim { color: #475569 !important; }
+        .light .bg-\[\#1e293b\] { 
+            background-color: #ffffff !important; 
+            color: #0f172a !important; 
+            border-color: #cbd5e1 !important;
+        }
+        .light table th, .light table td {
+            border-color: #e2e8f0 !important;
+        }
+        .light .border-white\/5, .light .border-white\/10, .light .border-white\/20 {
+            border-color: #cbd5e1 !important;
+        }
+        .light .bg-white\/5 {
+            background-color: rgba(241, 245, 249, 0.8) !important;
+        }
+        .light .text-slate-400 {
+            color: #64748b !important;
+        }
+
+</style>
+</head>
+<body class="font-sans selection:bg-emerald-500/30 selection:text-emerald-200 min-h-screen flex flex-col overflow-y-auto relative">
+    
+    <!-- Animated Background -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-emerald-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob"></div>
+        <div class="absolute top-[20%] right-[-10%] w-96 h-96 bg-teal-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-[-20%] left-[20%] w-[500px] h-[500px] bg-blue-600/10 rounded-full mix-blend-screen filter blur-[120px] animate-blob animation-delay-4000"></div>
+    </div>
+
+<script>
+    if (localStorage.getItem('userRole') !== 'vendor') {
+        window.location.href = 'login.html';
+    }
+</script>
+<header class="sticky top-0 z-40 glass-panel border-b border-white/5 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between relative z-10">
+        <div class="flex items-center gap-3">
+            <span class="text-2xl font-black tracking-tight text-white">Vendor<span class="text-gradient">Intel</span></span>
+            <span class="text-[10px] font-mono-data text-emerald-300 tracking-widest uppercase font-bold px-2 py-1 bg-emerald-500/10 rounded-md border border-emerald-500/20">Supplier Portal</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="login.html" onclick="localStorage.clear()" class="bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 px-3.5 py-2 rounded-xl text-xs font-bold font-mono-data border border-rose-500/30">Logout</a>
+        </div>
+    </div>
+</header>
+
+<main class="flex-grow relative z-10 max-w-7xl mx-auto px-6 py-10 space-y-10 w-full">
+    <section class="glass-panel p-8 lg:p-10 rounded-3xl border border-white/5 flex flex-col relative overflow-hidden animate-float">
+        <!-- Shine effect -->
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] animate-[shimmer_3s_infinite]"></div>
+        
+        <h1 class="text-4xl lg:text-5xl font-black text-white tracking-tight" id="welcome-message">👋 Welcome, Partner</h1>
+        <p class="text-base text-emerald-100/80 max-w-2xl mt-3 font-medium">Manage your profile, fulfill active purchase orders, and monitor your reliability metrics securely.</p>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-widget p-6 rounded-2xl">
+            <h3 class="font-bold text-lg mb-2">Quality Score</h3>
+            <p class="text-4xl font-black text-emerald-400" id="kpi-quality-score">0%</p>
+        </div>
+        <div class="glass-widget p-6 rounded-2xl">
+            <h3 class="font-bold text-lg mb-2">Active Orders</h3>
+            <p class="text-4xl font-black text-blue-400" id="kpi-active-orders">0</p>
+        </div>
+        <div class="glass-widget p-6 rounded-2xl">
+            <h3 class="font-bold text-lg mb-2">On-Time Delivery</h3>
+            <p class="text-4xl font-black text-amber-400" id="kpi-ontime-delivery">0%</p>
+        </div>
+    </section>
+
+    <section class="glass-panel p-6 rounded-2xl border border-white/10 mt-8">
+        <h3 class="font-bold text-base text-white flex items-center gap-2 mb-6">
+            <span class="material-symbols-outlined text-blue-400">receipt</span>
+            My Purchase Orders
+        </h3>
+        
+        <div class="overflow-x-auto rounded-xl border border-white/10">
+            <table class="w-full text-left text-xs font-sans">
+                <thead class="bg-white/5 text-tertiary-fixed-dim uppercase font-mono-data text-[10px] border-b border-white/10">
+                    <tr>
+                        <th class="p-3.5">PO Number</th>
+                        <th class="p-3.5">Status</th>
+                        <th class="p-3.5">Total Amount</th>
+                        <th class="p-3.5">Invoice</th>
+                        <th class="p-3.5">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="po-table-body" class="divide-y divide-white/5 text-tertiary-fixed-dim">
+                    <!-- Dynamic data will be injected here -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<!-- Upload Invoice Modal -->
+<div id="upload-invoice-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative">
+        <button onclick="closeUploadInvoiceModal()" class="absolute top-4 right-4 text-tertiary-fixed-dim hover:text-white transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-white"><span class="material-symbols-outlined text-blue-500">upload_file</span> Upload Invoice</h2>
+        <form onsubmit="submitUploadInvoice(event)" class="space-y-4">
+            <input type="hidden" id="upload-po-id">
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Invoice / Receipt PDF</label>
+                <input type="file" required accept=".pdf" id="invoice-file" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2 text-sm text-white focus:outline-none focus:border-blue-500 text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-500/20 file:text-blue-400 hover:file:bg-blue-500/30">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl mt-4 transition-all">
+                Submit Invoice
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('welcome-message').innerText = `👋 Welcome, ${localStorage.getItem('userName')}!`;
+    
+    async function loadVendorData() {
+        try {
+            const resVendors = await fetch('http://127.0.0.1:8000/api/vendors');
+            const vendors = await resVendors.json();
+            
+            // In a real app we fetch vendor by user ID from token, here we simulate:
+            const currentUserId = parseInt(localStorage.getItem('userId'), 10) || 3; 
+            let targetVendor = vendors.find(v => v.user_id === currentUserId) || vendors[0];
+            
+            if (targetVendor) {
+                document.getElementById('kpi-quality-score').innerText = targetVendor.quality_score.toFixed(1) + '%';
+                document.getElementById('kpi-ontime-delivery').innerText = targetVendor.delivery_rate.toFixed(1) + '%';
+            }
+            
+            const resOrders = await fetch('http://127.0.0.1:8000/api/purchase_orders');
+            const orders = await resOrders.json();
+            
+            // Filter POs for this vendor
+            const myOrders = targetVendor ? orders.filter(o => o.vendor_id === targetVendor.id) : orders;
+            
+            const activeOrders = myOrders.filter(o => o.fulfillment_status === 'In Progress').length;
+            document.getElementById('kpi-active-orders').innerText = activeOrders;
+
+            const tbody = document.getElementById('po-table-body');
+            tbody.innerHTML = '';
+
+            myOrders.forEach(o => {
+                let statusBadge = '';
+                if(o.fulfillment_status === 'Pending') statusBadge = '<span class="bg-amber-500/20 text-amber-400 px-2 py-1.5 rounded-lg text-[10px] font-bold border border-amber-500/20">PENDING</span>';
+                else if(o.fulfillment_status === 'In Progress') statusBadge = '<span class="bg-blue-500/20 text-blue-400 px-2 py-1.5 rounded-lg text-[10px] font-bold border border-blue-500/20">IN PROGRESS</span>';
+                else if(o.fulfillment_status === 'Delivered') statusBadge = '<span class="bg-emerald-500/20 text-emerald-400 px-2 py-1.5 rounded-lg text-[10px] font-bold border border-emerald-500/20">DELIVERED</span>';
+
+                const actions = `
+                    <div class="flex items-center gap-2">
+                        <select onchange="updatePOStatus(${o.id}, this.value)" class="bg-[#1e293b] border border-white/20 rounded-lg p-2 text-xs text-white font-bold focus:outline-none focus:border-blue-500 cursor-pointer transition-colors shadow-sm w-full max-w-[140px]">
+                            <option value="Pending" ${o.fulfillment_status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="In Progress" ${o.fulfillment_status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                            <option value="Delivered" ${o.fulfillment_status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                        </select>
+                        <button onclick="openChatModal('PurchaseOrder', ${o.id})" class="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 px-2 py-1.5 rounded-lg flex items-center transition-all">
+                            <span class="material-symbols-outlined text-[16px]">chat</span>
+                        </button>
+                    </div>
+                `;
+
+                // The property is invoice_url (based on main.py) but here we mapped it previously. Let's fix that too.
+                const hasInvoice = o.invoice_url;
+                const invoiceLink = hasInvoice 
+                    ? `<a href="${o.invoice_url}" target="_blank" class="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all inline-flex max-w-max">
+                           <span class="material-symbols-outlined text-[14px]">visibility</span> <span class="font-bold">View</span>
+                       </a>`
+                    : `<button onclick="openUploadInvoiceModal(${o.id})" class="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all">
+                           <span class="material-symbols-outlined text-[14px]">cloud_upload</span> <span class="font-bold">Upload</span>
+                       </button>`;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors border-b border-white/5">
+                        <td class="p-4 font-bold text-white text-sm">${o.po_number}</td>
+                        <td class="p-4">${statusBadge}</td>
+                        <td class="p-4 text-emerald-400 font-mono-data">$${(o.total_amount || 0).toFixed(2)}</td>
+                        <td class="p-4 text-xs">${invoiceLink}</td>
+                        <td class="p-4">${actions}</td>
+                    </tr>
+                `;
+            });
+            
+        } catch (e) {
+            console.error('Failed to load data:', e);
+        }
+    }
+    
+    async function updatePOStatus(poId, status) {
+        const token = localStorage.getItem('accessToken');
+        try {
+            await fetch(`http://127.0.0.1:8000/api/purchase_orders/${poId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ fulfillment_status: status })
+            });
+            loadVendorData();
+        } catch(e) {
+            alert("Error updating status");
+        }
+    }
+
+    function openUploadInvoiceModal(poId) {
+        document.getElementById('upload-po-id').value = poId;
+        document.getElementById('upload-invoice-modal').classList.remove('hidden');
+    }
+    function closeUploadInvoiceModal() {
+        document.getElementById('upload-invoice-modal').classList.add('hidden');
+    }
+
+    async function submitUploadInvoice(e) {
+        e.preventDefault();
+        const poId = document.getElementById('upload-po-id').value;
+        const file = "https://example.com/mock_invoice_" + poId + ".pdf";
+        const token = localStorage.getItem('accessToken');
+
+        try {
+            await fetch(`http://127.0.0.1:8000/api/purchase_orders/${poId}/upload`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ invoice_receipt_url: file })
+            });
+            closeUploadInvoiceModal();
+            loadVendorData();
+        } catch(err) {
+            alert("Error uploading invoice");
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadVendorData);
+    document.addEventListener('DOMContentLoaded', loadVendorData);
+
+    // Chat Logic
+    let currentThreadId = null;
+    let currentEntityType = null;
+    let currentEntityId = null;
+
+    async function openChatModal(entityType, entityId) {
+        currentEntityType = entityType;
+        currentEntityId = entityId;
+        document.getElementById('chat-modal-title').innerText = `${entityType} #${entityId} Communication`;
+        document.getElementById('chat-messages').innerHTML = '<p class="text-xs text-slate-400 italic">Loading messages...</p>';
+        document.getElementById('chat-modal').classList.remove('hidden');
+        
+        const token = localStorage.getItem('accessToken');
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/threads/${entityType}/${entityId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const thread = await res.json();
+            currentThreadId = thread.id;
+            renderMessages(thread.messages || []);
+        } catch(e) {
+            console.error(e);
+            document.getElementById('chat-messages').innerHTML = '<p class="text-xs text-rose-400 italic">Failed to load thread</p>';
+        }
+    }
+
+    function closeChatModal() {
+        document.getElementById('chat-modal').classList.add('hidden');
+    }
+
+    function renderMessages(messages) {
+        const container = document.getElementById('chat-messages');
+        const currentUserId = parseInt(localStorage.getItem('userId'), 10);
+        container.innerHTML = '';
+        if (messages.length === 0) {
+            container.innerHTML = '<p class="text-xs text-slate-400 italic">No messages yet.</p>';
+            return;
+        }
+        messages.forEach(m => {
+            const isMe = m.sender_id === currentUserId;
+            container.innerHTML += `
+                <div class="mb-3 flex ${isMe ? 'justify-end' : 'justify-start'}">
+                    <div class="${isMe ? 'bg-indigo-600' : 'bg-[#1e293b] border border-white/10'} p-3 rounded-xl max-w-[80%]">
+                        <p class="text-xs text-white">${m.content}</p>
+                        <p class="text-[9px] ${isMe ? 'text-indigo-200' : 'text-slate-400'} mt-1 text-right">${new Date(m.timestamp).toLocaleTimeString()}</p>
+                    </div>
+                </div>
+            `;
+        });
+        container.scrollTop = container.scrollHeight;
+    }
+
+    async function submitChatMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById('chat-input');
+        const content = input.value.trim();
+        if(!content || !currentThreadId) return;
+
+        const token = localStorage.getItem('accessToken');
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentThreadId}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ content })
+            });
+            const newMsg = await res.json();
+            input.value = '';
+            // Refresh messages
+            openChatModal(currentEntityType, currentEntityId);
+        } catch(err) {
+            console.error(err);
+        }
+    }
+</script>
+
+<!-- Chat Modal -->
+<div id="chat-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-lg rounded-2xl relative flex flex-col h-[600px] max-h-[90vh]">
+        <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5 rounded-t-2xl">
+            <h2 class="text-lg font-bold flex items-center gap-2 text-white"><span class="material-symbols-outlined text-indigo-400">forum</span> <span id="chat-modal-title">Communication</span></h2>
+            <button onclick="closeChatModal()" class="text-tertiary-fixed-dim hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-2">
+            <!-- Messages go here -->
+        </div>
+        <div class="p-4 border-t border-white/10 bg-[#0f172a]/50 rounded-b-2xl">
+            <form onsubmit="submitChatMessage(event)" class="flex gap-2">
+                <input type="text" id="chat-input" required class="flex-1 bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500" placeholder="Type your message...">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl transition-colors font-bold flex items-center justify-center">
+                    <span class="material-symbols-outlined">send</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

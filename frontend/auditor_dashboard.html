@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Dashboard | VendorIntel Enterprise Portal</title>
+<title>Auditor Console | VendorIntel Enterprise Portal</title>
 
 <!-- Google Fonts: Inter & JetBrains Mono -->
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
@@ -224,7 +224,7 @@
 </head>
 <body class="bg-on-tertiary-fixed text-white font-sans selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen flex flex-col overflow-hidden">
 <script>
-    if (localStorage.getItem('userRole') !== 'admin') {
+    if (localStorage.getItem('userRole') !== 'auditor') {
         window.location.href = 'login.html';
     }
 </script>
@@ -254,7 +254,7 @@
             </div>
             <div class="flex flex-col">
                 <span class="text-xl font-black text-white dark:text-white light:text-slate-900 tracking-tight">Vendor<span class="text-blue-500">Intel</span></span>
-                <span class="text-[9px] font-mono-data text-blue-300 dark:text-blue-300 light:text-blue-600 tracking-wider uppercase font-bold">Executive Console</span>
+                <span class="text-[9px] font-mono-data text-blue-300 dark:text-blue-300 light:text-blue-600 tracking-wider uppercase font-bold">Auditor Console</span>
             </div>
         </a>
 
@@ -266,10 +266,10 @@
                 Home Portal
             </a>
 
-            <!-- Admin Profile Indicator -->
+            <!-- Auditor Profile Indicator -->
             <div id="header-profile" class="flex items-center gap-2 px-3 py-1.5 rounded-xl glass-widget border border-white/10 light:border-slate-300">
-                <div id="header-avatar" class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-black text-white font-mono-data">AD</div>
-                <span id="header-name" class="text-xs font-bold text-white dark:text-white light:text-slate-900">Admin</span>
+                <div id="header-avatar" class="w-6 h-6 rounded-full bg-rose-600 flex items-center justify-center text-[10px] font-black text-white font-mono-data">AU</div>
+                <span id="header-name" class="text-xs font-bold text-white dark:text-white light:text-slate-900">Auditor</span>
             </div>
 
             <!-- Dark / Light Mode Toggle Button -->
@@ -294,10 +294,10 @@
                 <span id="banner-badge-text">System Executive Command</span>
             </div>
             <h1 id="welcome-message" class="text-3xl font-black text-white dark:text-white light:text-slate-900 tracking-tight">
-                👋 Welcome back, Admin!
+                👋 Welcome back, Auditor!
             </h1>
             <p id="welcome-subtext" class="text-xs lg:text-sm text-tertiary-fixed-dim dark:text-tertiary-fixed-dim light:text-slate-600 max-w-2xl leading-relaxed">
-                Manage vendors, monitor performance, identify procurement risks, and make smarter business decisions—all from one intelligent dashboard.
+                Monitor risk analysis, view reports, and track compliance metrics seamlessly. (Read-Only Mode)
             </p>
         </div>
 
@@ -307,9 +307,9 @@
             </div>
             <div>
                 <p class="text-[10px] font-mono-data font-bold uppercase text-tertiary-fixed-dim light:text-slate-500">Current Date</p>
-                <p class="text-xs font-mono-data font-extrabold text-white dark:text-white light:text-slate-900" id="current-date-display"></p>
+                <p class="text-xs font-mono-data font-extrabold text-white dark:text-white light:text-slate-900" id="current-date-display-auditor"></p>
                 <script>
-                    document.getElementById('current-date-display').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                    document.getElementById('current-date-display-auditor').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
                 </script>
             </div>
         </div>
@@ -669,12 +669,7 @@
             Quick Actions
         </h3>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <button onclick="openAddVendorModal()" class="glass-widget p-3 rounded-xl text-center hover:bg-blue-600 hover:text-white transition-all group">
-                <span class="material-symbols-outlined text-2xl text-blue-400 group-hover:text-white mb-1">add_circle</span>
-                <p class="text-xs font-bold font-mono-data">➕ Add Vendor</p>
-            </button>
-
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <a href="reports.html" class="glass-widget p-3 rounded-xl text-center hover:bg-blue-600 hover:text-white transition-all group flex flex-col items-center justify-center">
                 <span class="material-symbols-outlined text-2xl text-emerald-400 group-hover:text-white mb-1">bar_chart</span>
                 <p class="text-xs font-bold font-mono-data">📊 View Reports</p>
@@ -689,20 +684,6 @@
                 <span class="material-symbols-outlined text-2xl text-indigo-400 group-hover:text-white mb-1">download</span>
                 <p class="text-xs font-bold font-mono-data">📄 Export Reports</p>
             </a>
-
-            <button onclick="openManageVendorsModal()" class="glass-widget p-3 rounded-xl text-center hover:bg-blue-600 hover:text-white transition-all group">
-                <span class="material-symbols-outlined text-2xl text-amber-400 group-hover:text-white mb-1">group</span>
-                <p class="text-xs font-bold font-mono-data">👥 Manage Vendors</p>
-            </button>
-
-            <button onclick="openSettingsModal()" class="glass-widget p-3 rounded-xl text-center hover:bg-blue-600 hover:text-white transition-all group">
-                <span class="material-symbols-outlined text-2xl text-slate-400 group-hover:text-white mb-1">settings</span>
-                <p class="text-xs font-bold font-mono-data">⚙️ Settings</p>
-            </button>
-            <button onclick="openAuditLogDrawer()" class="glass-widget p-3 rounded-xl text-center hover:bg-purple-600 hover:text-white transition-all group">
-                <span class="material-symbols-outlined text-2xl text-purple-400 group-hover:text-white mb-1">history_edu</span>
-                <p class="text-xs font-bold font-mono-data">🔍 Audit Logs</p>
-            </button>
         </div>
     </section>
 
@@ -1086,29 +1067,15 @@
         const companyName = document.getElementById('add-company-name').value;
         const email = document.getElementById('add-email').value;
         const status = document.getElementById('add-status').value;
-        const riskLevel = document.getElementById('add-risk').value;
-        const rating = parseFloat(document.getElementById('add-rating').value) || 0;
-        const deliveryRate = parseFloat(document.getElementById('add-delivery').value) || 100;
-        const qualityScore = parseFloat(document.getElementById('add-quality').value) || 100;
-
-        // Retrieve auth token
-        const token = localStorage.getItem('accessToken');
 
         try {
             const response = await fetch('http://127.0.0.1:8000/api/vendors', {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     company_name: companyName,
                     contact_email: email,
-                    approval_status: status,
-                    risk_level: riskLevel,
-                    rating: rating,
-                    delivery_rate: deliveryRate,
-                    quality_score: qualityScore
+                    status: status
                 })
             });
 
@@ -1166,43 +1133,21 @@
         </button>
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-blue-500">add_circle</span> Add New Vendor</h2>
         <form onsubmit="submitAddVendor(event)" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Company Name</label>
-                    <input type="text" id="add-company-name" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="e.g. Omega Corp">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Contact Email</label>
-                    <input type="email" id="add-email" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="email@company.com">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Status</label>
-                    <select id="add-status" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
-                        <option value="Active">Active</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Suspended">Suspended</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Risk Level</label>
-                    <select id="add-risk" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
-                        <option value="Low">Low Risk</option>
-                        <option value="Medium">Medium Risk</option>
-                        <option value="High">High Risk</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Rating (0-5)</label>
-                    <input type="number" step="0.1" max="5" min="0" id="add-rating" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="e.g. 4.5" value="5.0">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Quality Score (%)</label>
-                    <input type="number" step="0.1" max="100" min="0" id="add-quality" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="e.g. 98.5" value="100">
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Delivery Rate (%)</label>
-                    <input type="number" step="0.1" max="100" min="0" id="add-delivery" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="e.g. 99.0" value="100">
-                </div>
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Company Name</label>
+                <input type="text" id="add-company-name" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="e.g. Omega Corp">
+            </div>
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Contact Email</label>
+                <input type="email" id="add-email" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="email@company.com">
+            </div>
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Status</label>
+                <select id="add-status" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                    <option value="Active">Active</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Suspended">Suspended</option>
+                </select>
             </div>
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-blue-500/25 mt-2">
                 Submit Vendor
@@ -1213,35 +1158,20 @@
 
 <!-- Manage Vendors Modal -->
 <div id="manage-vendors-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-    <div class="glass-panel w-full max-w-5xl max-h-[85vh] rounded-2xl p-6 relative flex flex-col">
+    <div class="glass-panel w-full max-w-4xl max-h-[80vh] rounded-2xl p-6 relative flex flex-col">
         <button onclick="closeManageVendorsModal()" class="absolute top-4 right-4 text-tertiary-fixed-dim hover:text-white transition-colors">
             <span class="material-symbols-outlined">close</span>
         </button>
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-amber-500">group</span> All Vendors</h2>
-        
-        <div class="flex gap-4 mb-4">
-            <input type="text" id="vendor-search" placeholder="Search vendors..." oninput="filterVendors()" class="flex-1 bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-            <select id="vendor-category-filter" onchange="filterVendors()" class="w-48 bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
-                <option value="">All Categories</option>
-                <option value="IT">IT</option>
-                <option value="Logistics">Logistics</option>
-                <option value="Services">Services</option>
-                <option value="Equipment">Equipment</option>
-                <option value="Raw Materials">Raw Materials</option>
-            </select>
-        </div>
-
         <div class="overflow-y-auto flex-1 pr-2">
             <table class="w-full text-left">
                 <thead class="sticky top-0 bg-[#0b1c30] z-10">
                     <tr class="text-xs font-mono-data text-tertiary-fixed-dim uppercase border-b border-white/10">
                         <th class="p-3">Company Name</th>
-                        <th class="p-3">Category</th>
                         <th class="p-3">Email</th>
                         <th class="p-3">Status</th>
                         <th class="p-3">Risk Level</th>
                         <th class="p-3">Rating</th>
-                        <th class="p-3">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="all-vendors-tbody" class="divide-y divide-white/5">
@@ -1344,51 +1274,6 @@
         document.getElementById('settings-modal').classList.remove('hidden');
     }
 
-    // --- Audit Log Drawer Logic ---
-    function openAuditLogDrawer() {
-        document.getElementById('audit-drawer').classList.remove('translate-x-full');
-        loadAuditLogs();
-    }
-
-    function closeAuditLogDrawer() {
-        document.getElementById('audit-drawer').classList.add('translate-x-full');
-    }
-
-    async function loadAuditLogs() {
-        try {
-            const token = localStorage.getItem('accessToken');
-            const res = await fetch('http://127.0.0.1:8000/api/audit_logs', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const logs = await res.json();
-            const container = document.getElementById('audit-logs-container');
-            container.innerHTML = '';
-            
-            logs.forEach(log => {
-                let icon = 'info';
-                let color = 'text-blue-400';
-                if(log.action.includes('CREATE')) { icon = 'add_circle'; color = 'text-emerald-400'; }
-                if(log.action.includes('UPDATE')) { icon = 'edit'; color = 'text-amber-400'; }
-                if(log.action.includes('DELETE')) { icon = 'delete'; color = 'text-rose-400'; }
-                
-                container.innerHTML += `
-                    <div class="p-3 border-l-2 border-white/20 hover:border-purple-500 transition-colors bg-[#1e293b] rounded-r-xl">
-                        <div class="flex gap-2 items-start mb-1">
-                            <span class="material-symbols-outlined ${color} text-sm mt-0.5">${icon}</span>
-                            <div>
-                                <p class="text-xs font-bold text-white">${log.action} on ${log.entity_type}</p>
-                                <p class="text-[10px] text-tertiary-fixed-dim font-mono-data mt-1">By User #${log.user_id} | ${new Date(log.created_at).toLocaleString()}</p>
-                            </div>
-                        </div>
-                        <p class="text-[10px] text-slate-400 mt-2 bg-black/20 p-2 rounded">${log.details}</p>
-                    </div>
-                `;
-            });
-        } catch(e) {
-            console.error("Failed to load audit logs", e);
-        }
-    }
-
     function exportCSV() {
         if (!globalVendorsData || globalVendorsData.length === 0) {
             alert('No vendor data available to export.');
@@ -1451,15 +1336,5 @@
     }
     document.addEventListener('DOMContentLoaded', loadDashboardData);
 </script>
-<!-- Slide-out Audit Drawer -->
-<div id="audit-drawer" class="fixed inset-y-0 right-0 w-96 bg-[#0b1c30] border-l border-white/10 shadow-2xl z-[200] transform translate-x-full transition-transform duration-300 flex flex-col">
-    <div class="p-4 border-b border-white/10 flex items-center justify-between bg-black/20">
-        <h2 class="text-lg font-bold text-white flex items-center gap-2"><span class="material-symbols-outlined text-purple-400">history_edu</span> System Audit Logs</h2>
-        <button onclick="closeAuditLogDrawer()" class="text-tertiary-fixed-dim hover:text-white"><span class="material-symbols-outlined">close</span></button>
-    </div>
-    <div id="audit-logs-container" class="flex-1 overflow-y-auto p-4 space-y-3">
-        <!-- Logs injected here -->
-    </div>
-</div>
 </body>
 </html>

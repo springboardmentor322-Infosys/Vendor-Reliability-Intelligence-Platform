@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reports | VendorIntel</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    body { background-color: #f1f5f9; color: #0f172a; font-family: 'Inter', sans-serif; }
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(20px);
+        border: 1px solid #cbd5e1;
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+    }
+    .btn-primary { background: linear-gradient(135deg, #2563eb, #4f46e5); color: white; }
+    .btn-primary:hover { filter: brightness(1.1); }
+
+        /* Premium Light Theme Override */
+        .light body { 
+            background-color: #f8fafc; /* Soft slate-50 */
+            color: #0f172a; 
+        }
+        .light .glass-panel, .light .glass-widget {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border-top: 1px solid rgba(255, 255, 255, 1) !important;
+            border-left: 1px solid rgba(255, 255, 255, 1) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.4) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 20px 40px -12px rgba(100, 116, 139, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.8) !important;
+        }
+        .light h1, .light h2, .light h3, .light .text-white { color: #0f172a !important; }
+        .light p, .light .text-tertiary-fixed-dim { color: #475569 !important; }
+        .light .bg-\[\#1e293b\] { 
+            background-color: #ffffff !important; 
+            color: #0f172a !important; 
+            border-color: #cbd5e1 !important;
+        }
+        .light table th, .light table td {
+            border-color: #e2e8f0 !important;
+        }
+        .light .border-white\/5, .light .border-white\/10, .light .border-white\/20 {
+            border-color: #cbd5e1 !important;
+        }
+        .light .bg-white\/5 {
+            background-color: rgba(241, 245, 249, 0.8) !important;
+        }
+        .light .text-slate-400 {
+            color: #64748b !important;
+        }
+
+</style>
+</head>
+<body class="min-h-screen flex flex-col p-6 max-w-7xl mx-auto space-y-6">
+
+    <header class="flex justify-between items-center pb-4 border-b border-slate-300">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Reports & Exports</h1>
+            <p class="text-sm text-slate-600">Filter vendor performance and download aggregated insights.</p>
+        </div>
+        <a href="dashboard.html" class="flex items-center gap-2 text-sm font-bold text-blue-600 hover:underline">
+            <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Dashboard
+        </a>
+    </header>
+
+    <div class="glass-panel p-6 rounded-2xl">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+            <div class="flex gap-4">
+                <select id="riskFilter" class="border border-slate-300 rounded-lg px-4 py-2 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Risk Levels</option>
+                    <option value="Low">Low Risk</option>
+                    <option value="Medium">Medium Risk</option>
+                    <option value="High">High Risk</option>
+                </select>
+                <button onclick="fetchPreview()" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-700 transition">Apply Filters</button>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="downloadCSV()" class="btn-primary flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition shadow-md">
+                    <span class="material-symbols-outlined text-sm">csv</span> Download CSV
+                </button>
+                <button onclick="downloadPDF()" class="bg-rose-600 text-white hover:bg-rose-500 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition shadow-md">
+                    <span class="material-symbols-outlined text-sm">picture_as_pdf</span> Download PDF
+                </button>
+            </div>
+        </div>
+
+        <h3 class="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wider">Live Preview (Top 25)</h3>
+        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+            <table class="w-full text-left text-sm whitespace-nowrap">
+                <thead class="bg-slate-100 border-b border-slate-200 text-slate-600">
+                    <tr>
+                        <th class="px-4 py-3 font-semibold">Vendor Name</th>
+                        <th class="px-4 py-3 font-semibold">Risk Level</th>
+                        <th class="px-4 py-3 font-semibold">Quality Score</th>
+                        <th class="px-4 py-3 font-semibold">Rating</th>
+                    </tr>
+                </thead>
+                <tbody id="preview-tbody" class="divide-y divide-slate-100 bg-white">
+                    <tr><td colspan="4" class="p-4 text-center text-slate-500">Loading preview...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function fetchPreview() {
+            const riskFilter = document.getElementById('riskFilter').value;
+            let url = 'http://localhost:8000/api/vendors';
+            
+            try {
+                const res = await fetch(url);
+                let data = await res.json();
+                
+                if (riskFilter) {
+                    data = data.filter(v => v.risk_level === riskFilter);
+                }
+
+                const tbody = document.getElementById('preview-tbody');
+                tbody.innerHTML = '';
+                if(data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">No matching records found.</td></tr>`;
+                    return;
+                }
+
+                data.slice(0, 25).forEach(v => {
+                    let riskColor = v.risk_level === 'High' ? 'text-rose-600 bg-rose-100' : (v.risk_level === 'Medium' ? 'text-amber-600 bg-amber-100' : 'text-emerald-600 bg-emerald-100');
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-4 py-3 font-medium text-slate-800">${v.company_name}</td>
+                            <td class="px-4 py-3"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${riskColor}">${v.risk_level}</span></td>
+                            <td class="px-4 py-3 font-mono text-slate-600">${v.quality_score}%</td>
+                            <td class="px-4 py-3 font-mono font-bold text-amber-500">${parseFloat(v.rating).toFixed(1)} ★</td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function downloadCSV() {
+            const riskFilter = document.getElementById('riskFilter').value;
+            let url = 'http://localhost:8000/api/v1/reports/csv';
+            if (riskFilter) url += '?risk_level=' + riskFilter;
+            window.open(url, '_blank');
+        }
+
+        function downloadPDF() {
+            window.open('http://localhost:8000/api/v1/reports/pdf', '_blank');
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchPreview);
+    </script>
+</body>
+</html>
