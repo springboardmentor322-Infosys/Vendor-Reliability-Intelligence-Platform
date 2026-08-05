@@ -9,8 +9,9 @@ from app.db.base import Base
 from app.db.seed_admin import ensure_admin_account
 from app.db.seed_vendor_categories import ensure_vendor_categories
 from app.db.session import SessionLocal, engine
-from app.routers import admin, auth, procurement, vendors
+from app.routers import admin, auth, procurement, purchase_orders, vendors
 from app.services.vendor_documents import ensure_upload_dir
+from app.services.po_documents import ensure_po_upload_dir
 
 app = FastAPI(title="Vendor Reliability Platform")
 
@@ -32,8 +33,10 @@ app.include_router(admin.router)
 app.include_router(vendors.router)
 app.include_router(vendors.categories_router)
 app.include_router(procurement.router)
+app.include_router(purchase_orders.router)
 
 ensure_upload_dir()
+ensure_po_upload_dir()
 uploads_path = Path(__file__).resolve().parent.parent / "uploads"
 app.mount("/uploads", StaticFiles(directory=str(uploads_path)), name="uploads")
 

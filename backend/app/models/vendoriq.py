@@ -99,6 +99,24 @@ class ProcurementRequestItem(Base):
     procurement_request: Mapped["ProcurementRequest"] = relationship(back_populates="items")
 
 
+class PurchaseOrderStatus(str, PyEnum):
+    PENDING = "Pending"
+    APPROVED = "Approved"
+    ORDERED = "Ordered"
+    IN_PROGRESS = "In Progress"
+    SHIPPED = "Shipped"
+    PARTIAL_DELIVERY = "Partial Delivery"
+    DELIVERED = "Delivered"
+    COMPLETED = "Completed"
+    CANCELLED = "Cancelled"
+
+
+class DeliveryDocType(str, PyEnum):
+    INVOICE = "Invoice"
+    RECEIPT = "Receipt"
+    PROOF_OF_DELIVERY = "Proof of Delivery"
+
+
 class PurchaseOrder(Base):
     __tablename__ = "purchase_orders"
 
@@ -114,8 +132,11 @@ class PurchaseOrder(Base):
     expected_delivery_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     total_amount: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     currency: Mapped[str] = mapped_column(String(10), nullable=False, default="USD")
-    status: Mapped[str] = mapped_column(String(50), nullable=False, default="pending")
+    status: Mapped[PurchaseOrderStatus] = mapped_column(
+        String(50), nullable=False, default=PurchaseOrderStatus.PENDING
+    )
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -124,6 +145,50 @@ class PurchaseOrder(Base):
 
     procurement_request: Mapped[Optional["ProcurementRequest"]] = relationship(back_populates="purchase_orders")
     vendor: Mapped["Vendor"] = relationship(back_populates="purchase_orders")
+    creator: Mapped[User] = relationship(foreign_keys=[created_by])
+    items: Mapped[list["POItem"]] = relationship(
+        back_populates="purchase_order",
+        cascade="all, delete-orphan",
+    )
+    documents: Mapped[list["DeliveryDocument"]] = relationship(
+        back_populates="purchase_order",
+        cascade="all, delete-orphan",
+        order_by="DeliveryDocument.uploaded_at.desc()",
+    )
+
+
+class POItem(Base):
+    __tablename__ = "po_items"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    purchase_order_id: Mapped[int] = mapped_column(
+        ForeignKey("purchase_orders.id"), nullable=False, index=True
+    )
+    item_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    quantity: Mapped[int] = mapped_column(Integer, nullable=False)
+    unit_price: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
+
+    purchase_order: Mapped["PurchaseOrder"] = relationship(back_populates="items")
+
+
+class DeliveryDocument(Base):
+    __tablename__ = "delivery_documents"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    purchase_order_id: Mapped[int] = mapped_column(
+        ForeignKey("purchase_orders.id"), nullable=False, index=True
+    )
+    doc_type: Mapped[DeliveryDocType] = mapped_column(String(50), nullable=False)
+    file_url: Mapped[str] = mapped_column(String(500), nullable=False)
+    uploaded_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    uploaded_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+
+    purchase_order: Mapped["PurchaseOrder"] = relationship(back_populates="documents")
+    uploader: Mapped[User] = relationship(foreign_keys=[uploaded_by])
 
 
 class Contract(Base):
@@ -255,7 +320,12 @@ __all__ = [
     "ReliabilityScore",
     "PerformanceRecord",
     "ProcurementRequest",
+    "ProcurementRequestStatus",
     "PurchaseOrder",
+    "PurchaseOrderStatus",
+    "POItem",
+    "DeliveryDocument",
+    "DeliveryDocType",
     "Contract",
     "ComplianceDocument",
     "Communication",
