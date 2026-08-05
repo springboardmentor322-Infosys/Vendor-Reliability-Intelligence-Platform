@@ -13,19 +13,48 @@
         {{ message }}
       </div>
 
-      <div class="mb-3.5">
-        <label class="block text-[12.5px] font-semibold mb-1.5 text-[#132436]">Work email</label>
-        <input type="text" [(ngModel)]="email" class="w-full p-2.5 border border-[#E1E8EC] rounded-md text-[14px] bg-[#F9FAFA] focus:outline-none focus:border-[#00F0B5]" placeholder="you@organization.com">
-      </div>
-      
-      <div class="mb-3.5">
-        <label class="block text-[12.5px] font-semibold mb-1.5 text-[#132436]">Password</label>
-        <input type="password" [(ngModel)]="password" class="w-full p-2.5 border border-[#E1E8EC] rounded-md text-[14px] bg-[#F9FAFA] focus:outline-none focus:border-[#00F0B5]" placeholder="••••••••••">
-      </div>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3.5">
+          <label class="block text-[12.5px] font-semibold mb-1.5 text-[#132436]">Work email</label>
+          <input type="text" formControlName="email" class="w-full p-2.5 border border-[#E1E8EC] rounded-md text-[14px] bg-[#F9FAFA] focus:outline-none focus:border-[#00F0B5]" placeholder="you@organization.com">
+          <div *ngIf="f['email'].touched && f['email'].invalid" class="text-red-500 text-[11px] mt-1">
+            <span *ngIf="f['email'].errors?.['required']">Email is required</span>
+            <span *ngIf="f['email'].errors?.['email']">Must be a valid email</span>
+          </div>
+        </div>
+        
+        <div class="mb-3.5">
+          <label class="block text-[12.5px] font-semibold mb-1.5 text-[#132436]">Password</label>
+          <input type="password" formControlName="password" class="w-full p-2.5 border border-[#E1E8EC] rounded-md text-[14px] bg-[#F9FAFA] focus:outline-none focus:border-[#00F0B5]" placeholder="••••••••••">
+          <div *ngIf="f['password'].touched && f['password'].invalid" class="text-red-500 text-[11px] mt-1">
+            <span *ngIf="f['password'].errors?.['required']">Password is required</span>
+            <span *ngIf="f['password'].errors?.['minlength']">Must be at least 8 characters</span>
+          </div>
+        </div>
 
-      <button (click)="onSubmit()" class="w-full bg-[#00B386] hover:bg-[#00F0B5] text-white p-3 rounded-md font-semibold text-[14.5px] mt-4 transition-colors">
-        Register User
-      </button>
+        <div class="mb-3.5">
+          <label class="block text-[12.5px] font-semibold mb-1.5 text-[#132436]">Confirm Password</label>
+          <input type="password" formControlName="confirmPassword" class="w-full p-2.5 border border-[#E1E8EC] rounded-md text-[14px] bg-[#F9FAFA] focus:outline-none focus:border-[#00F0B5]" placeholder="••••••••••">
+          <div *ngIf="f['confirmPassword'].touched || registerForm.hasError('mismatch')" class="text-red-500 text-[11px] mt-1">
+            <span *ngIf="registerForm.hasError('mismatch') && f['confirmPassword'].touched">Passwords do not match</span>
+          </div>
+        </div>
+
+        <div class="mb-3.5">
+          <label class="block text-[12.5px] font-semibold mb-1.5 text-[#132436]">Role</label>
+          <select formControlName="role_name" class="w-full p-2.5 border border-[#E1E8EC] rounded-md text-[14px] bg-[#F9FAFA] focus:outline-none focus:border-[#00F0B5]">
+            <option value="Vendor">Vendor</option>
+            <option value="Procurement Manager">Procurement Manager</option>
+            <option value="Supply Chain Manager">Supply Chain Manager</option>
+            <option value="Finance Officer">Finance Officer</option>
+            <option value="Auditor">Auditor</option>
+          </select>
+        </div>
+
+        <button type="submit" [disabled]="registerForm.invalid" [ngClass]="{'opacity-50 cursor-not-allowed': registerForm.invalid}" class="w-full bg-[#00B386] hover:bg-[#00F0B5] text-white p-3 rounded-md font-semibold text-[14.5px] mt-4 transition-colors">
+          Register User
+        </button>
+      </form>
     </div>
     
   </div>

@@ -80,17 +80,23 @@ export const roles = {
   },
   pm:{
     label:"Procurement Manager", initials:"MW", name:"Marcus Webb",
-    groups:[{label:"Main", items:[
-      {id:"dashboard", label:"Dashboard"},
-      {id:"requests", label:"Procurement Requests"},
-      {id:"pos", label:"Purchase Orders"},
-      {id:"vendors", label:"Vendor Assignment"},
-      {id:"contracts", label:"Contracts"},
-      {id:"invoices", label:"Invoices"},
-      {id:"communication", label:"Communication"},
-      {id:"reports", label:"Reports"},
-      {id:"notifications", label:"Notifications"}
-    ]}]
+    groups:[
+      {label:"MAIN MENU", items:[
+        {id:"dashboard", label:"Procurement Overview"},
+        {id:"pm_requests", label:"Procurement Requests"},
+        {id:"pm_pos", label:"Purchase Orders"},
+        {id:"pm_vendors", label:"Vendor Management"},
+        {id:"pm_contracts", label:"Contracts Repository"},
+        {id:"pm_invoices", label:"Invoices"},
+        {id:"pm_communication", label:"Communication"},
+        {id:"pm_notifications", label:"Notifications"}
+      ]},
+      {label:"REPORTS", items:[
+        {id:"pm_reports_proc", label:"Procurement Reports"},
+        {id:"pm_reports_spend", label:"Spend Analytics"},
+        {id:"pm_reports_export", label:"Export Data"}
+      ]}
+    ]
   },
   scm:{
     label:"Supply Chain Manager", initials:"PN", name:"Priya Nair",
@@ -128,16 +134,29 @@ export const roles = {
   },
   vendor:{
     label:"Vendor", initials:"JD", name:"John Doe",
-    groups:[{label:"Main", items:[
-      {id:"dashboard", label:"Dashboard"},
-      {id:"profile", label:"Vendor Profile"},
-      {id:"pos", label:"Purchase Orders"},
-      {id:"contracts", label:"Contracts & Compliance"},
-      {id:"invoices", label:"Invoices & Payments"},
-      {id:"communication", label:"Communication"},
-      {id:"documents", label:"Documents"},
-      {id:"notifications", label:"Notifications"}
-    ]}]
+    groups:[
+      {label:"MAIN MENU", items:[
+        {id:"dashboard", label:"Dashboard"},
+        {id:"vendor_profile", label:"Vendor Profile"},
+        {id:"vendor_performance", label:"Performance Overview"},
+        {id:"vendor_pos", label:"Purchase Orders"},
+        {id:"vendor_contracts", label:"Contracts & Compliance"},
+        {id:"vendor_invoices", label:"Invoices & Payments"},
+        {id:"vendor_communication", label:"Communication"},
+        {id:"vendor_documents", label:"Documents"},
+        {id:"vendor_notifications", label:"Notifications"}
+      ]},
+      {label:"REPORTS", items:[
+        {id:"vendor_reports_perf", label:"Performance Reports"},
+        {id:"vendor_reports_order", label:"Order Reports"},
+        {id:"vendor_reports_comp", label:"Compliance Reports"},
+        {id:"vendor_reports_export", label:"Export Reports"}
+      ]},
+      {label:"ACCOUNT", items:[
+        {id:"vendor_settings", label:"Settings"},
+        {id:"vendor_support", label:"Help & Support"}
+      ]}
+    ]
   }
 };
 
@@ -238,23 +257,99 @@ export const pages: any = {};
 pages.dashboard = function(){
   if(currentRole==='vendor'){
     const v = vendors[0];
-    return head("Vendor Dashboard","Welcome back, "+v.contact+". Here's how "+v.name+" is performing.") +
-    `<div class="kpi-row">
-      ${kpi("Reliability Score", v.score+"/100", "High reliability band","up")}
-      ${kpi("Total Purchase Orders","28","This year","up")}
+    return head("Vendor Dashboard","Home > Vendor Dashboard") +
+    `<div class="kpi-row" style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-bottom:16px;overflow-x:auto;">
+      ${kpi("Reliability Score", v.score+"/100", "High Reliability","up")}
+      ${kpi("Total Purchase Orders","28","This Year","up")}
       ${kpi("On-Time Delivery",v.onTime+"%","vs last 90 days","up")}
       ${kpi("Quality Rating",v.quality+"/5","vs last 90 days","up")}
-      ${kpi("Pending Payments","$32,450","2 invoices","down")}
+      ${kpi("Total Invoiced","$248,760","This Year","up")}
+      ${kpi("Pending Payments","$32,450","2 Invoices","down")}
     </div>
-    <div class="grid-2">
-      ${card("Overall Reliability Score", `<div class="gauge-wrap">${gaugeSvg(v.score)}<div class="gauge-label">Based on delivery, quality, communication & compliance</div></div>`)}
-      ${card("Performance Summary (last 90 days)", `${bar("On-Time Deliveries",25,30)}${bar("Delayed Deliveries",2,30)}${bar("Quality Score (/5)",4.6,5)}${bar("Order Completion Rate",96,100)}`)}
+    <div class="grid-3">
+      ${card("Overall Reliability Score", `<div class="gauge-wrap">${gaugeSvg(v.score)}<div class="gauge-label" style="margin-top:10px;text-align:center;font-weight:600;color:var(--green)">High Reliability</div><p style="font-size:11px;color:var(--slate);text-align:center;margin-top:6px;">Your reliability score is based on delivery performance, quality, communication, compliance and service.</p></div>`)}
+      ${card("Performance Summary (last 90 days)", `${bar("On-Time Deliveries",25,27)}${bar("Delayed Deliveries",2,27)}${bar("Quality Score",4.6,5)}${bar("Response Time (Avg.)",12,24)}${bar("Issue Resolution Time (Avg.)",1.8,5)}${bar("Order Completion Rate",96.3,100)}`)}
+      ${card("Recent Purchase Orders", tableHtml(["PO Number","Item/Service","Status","Order Date","Delivery Date"], purchaseOrders.filter(p=>p.vendor==='TechBuild Solutions').slice(0,5).map(p=>[p.id,p.item,badgeFor(p.status),p.order,p.delivery])), "View All")}
     </div>
-    <div class="grid-2">
-      ${card("Recent Purchase Orders", tableHtml(["PO Number","Item","Status","Delivery"], purchaseOrders.filter(p=>p.vendor==='TechBuild Solutions').slice(0,5).map(p=>[p.id,p.item,badgeFor(p.status),p.delivery])), "View all")}
-      ${card("Important Documents", ["Business License","Tax Certificate","Insurance Certificate","ISO 9001 Certification"].map(d=>`<div class="doc-row"><span>${d}</span><span class="meta">Download</span></div>`).join(""))}
+    <div class="grid-3">
+      ${card("Contract Alerts", `<div class="legend" style="padding-top:10px;">
+        <div class="row" style="margin-bottom:12px;"><span class="name" style="align-items:flex-start;"><span class="dot amber" style="margin-top:4px;"></span><div><div style="font-weight:500;">Contract CT-2024-0456 is expiring in 15 days</div><div style="font-size:11px;color:var(--slate)">Renewal date: 30 May 2024</div></div></span></div>
+        <div class="row"><span class="name" style="align-items:flex-start;"><span class="dot amber" style="margin-top:4px;"></span><div><div style="font-weight:500;">Insurance document is due for update</div><div style="font-size:11px;color:var(--slate)">Due date: 28 May 2024</div></div></span></div>
+      </div>`, "View All Alerts")}
+      ${card("Notifications", `<div class="timeline" style="margin-top:10px;">
+        <div class="tl-item"><span class="tdot green"></span><div><div style="font-weight:500;">Your invoice INV-2024-087 has been approved</div><div class="t">2 hours ago</div></div></div>
+        <div class="tl-item"><span class="tdot teal"></span><div><div style="font-weight:500;">PO-2024-0987 status updated to In Transit</div><div class="t">5 hours ago</div></div></div>
+        <div class="tl-item"><span class="tdot slate"></span><div><div style="font-weight:500;">New message from Procurement Manager</div><div class="t">1 day ago</div></div></div>
+      </div>`, "View All")}
+      ${card("Account Summary", `<div class="legend" style="margin-top:10px;">
+        <div class="row"><span class="name" style="color:var(--slate)">Vendor ID</span><b class="mono" style="font-size:12px">${v.id}</b></div>
+        <div class="row"><span class="name" style="color:var(--slate)">Vendor Since</span><b style="font-size:12px">${v.since}</b></div>
+        <div class="row"><span class="name" style="color:var(--slate)">Primary Contact</span><b style="font-size:12px">${v.contact}</b></div>
+        <div class="row"><span class="name" style="color:var(--slate)">Contact Email</span><b style="font-size:12px">${v.email}</b></div>
+        <div class="row"><span class="name" style="color:var(--slate)">Contact Phone</span><b style="font-size:12px">${v.phone}</b></div>
+      </div>`)}
+    </div>
+    <div class="grid-3">
+      ${card("Performance Trend", trendSvg())}
+      ${card("Contract Status", `<div style="display:flex;align-items:center;justify-content:center;height:120px;gap:20px;">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#EEF1F2" stroke-width="12"/>
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#2F8F5B" stroke-width="12" stroke-dasharray="167 251" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#B9762C" stroke-width="12" stroke-dasharray="41 251" stroke-dashoffset="-167" stroke-linecap="round"/>
+          <text x="50" y="47" text-anchor="middle" font-weight="600" font-size="16">12</text>
+          <text x="50" y="62" text-anchor="middle" font-size="9" fill="#5B6B75">Total Contracts</text>
+        </svg>
+        <div class="legend">
+          <div class="row" style="font-size:11px"><span class="name"><span class="dot green"></span>Active</span><b>8 (66.7%)</b></div>
+          <div class="row" style="font-size:11px"><span class="name"><span class="dot amber"></span>Expiring Soon</span><b>2 (16.7%)</b></div>
+          <div class="row" style="font-size:11px"><span class="name"><span class="dot red"></span>Expired</span><b>0 (0%)</b></div>
+          <div class="row" style="font-size:11px"><span class="name"><span class="dot slate"></span>Draft</span><b>2 (16.7%)</b></div>
+        </div>
+      </div>`, "View All Contracts")}
+      ${card("Important Documents", ["Business License (Uploaded on 10 Jan 2024)","Tax Certificate (Uploaded on 10 Jan 2024)","Insurance Certificate (Uploaded on 15 Feb 2024)","Quality Certification (ISO 9001) (Uploaded on 20 Mar 2024)"].map(d=>`<div class="doc-row" style="font-size:11px;padding:8px 0;align-items:center;"><span>${d.split(' (')[0]}<br><span style="color:var(--slate);font-size:10px">${'('+d.split(' (')[1]}</span></span><span class="meta" style="cursor:pointer;background:#F5F7F8;padding:4px 8px;border-radius:4px;">⬇</span></div>`).join(""), "View All")}
     </div>`;
   }
+  
+  if(currentRole==='pm'){
+    return head("Procurement Overview","Organization-wide procurement requests, POs, and spend analytics.") +
+    `<div class="kpi-row">
+      ${kpi("Total PRs","142","+5 this week","up")}
+      ${kpi("Pending Approval","24","Requires your action","down")}
+      ${kpi("Total Spend","$1.85M","+12% vs last month","up")}
+      ${kpi("Vendor Fulfillment","94.2%","Average across active vendors","up")}
+      ${kpi("Avg Lead Time","4.5 days","-1.2 days vs last month","down")}
+    </div>
+    <div class="grid-2">
+      ${card("Active Purchase Orders", tableHtml(["PO ID","Vendor","Item","Status"], [
+        ["PO-2024-0815", "Global Steel Corp", "Steel Rods (5T)", badgeFor("Ordered")],
+        ["PO-2024-0816", "TechBuild Solutions", "Server Racks", badgeFor("Pending")],
+        ["PO-2024-0817", "QuickLogistics", "Freight Services", badgeFor("Delivered")]
+      ]), "View All POs")}
+      ${card("Delivery Status Tracker", `${bar("Delivered", 85, 120)}${bar("Ordered", 20, 120)}${bar("Pending", 15, 120)}`, "Track Orders")}
+    </div>
+    <div class="grid-2">
+      ${card("Vendor Performance Summary", tableHtml(["Vendor","Category","On-Time %","Quality Score"], [
+        ["Global Steel Corp","Raw Materials","95.1%","4.8/5.0"],
+        ["TechBuild Solutions","IT","92.6%","4.6/5.0"],
+        ["QuickLogistics","Logistics","88.4%","4.3/5.0"]
+      ]), "Manage Vendors")}
+      ${card("Procurement Cost Analysis", `<div class="legend" style="display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--slate-2); border-bottom:1px solid #E2E8F0; padding-bottom:8px;">
+          <span>Raw Materials</span><span style="font-weight:600; color:var(--slate-3);">$850,000 (45%)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--slate-2); border-bottom:1px solid #E2E8F0; padding-bottom:8px;">
+          <span>IT & Technology</span><span style="font-weight:600; color:var(--slate-3);">$520,000 (28%)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--slate-2); border-bottom:1px solid #E2E8F0; padding-bottom:8px;">
+          <span>Logistics & Freight</span><span style="font-weight:600; color:var(--slate-3);">$310,000 (17%)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--slate-2);">
+          <span>Services & Maintenance</span><span style="font-weight:600; color:var(--slate-3);">$170,000 (10%)</span>
+        </div>
+      </div>`, "View Full Analysis")}
+    </div>`;
+  }
+  
   if(currentRole==='admin'){
     return head("Admin Dashboard","Organization-wide snapshot across vendors, procurement and compliance.") +
     `<div class="kpi-row">
@@ -264,240 +359,63 @@ pages.dashboard = function(){
       ${kpi("Total Spend","$2.48M","+18.6% vs last 30 days","up")}
       ${kpi("Compliance Score","92%","+5.3% vs last 30 days","up")}
     </div>
+    
     <div class="grid-2">
-      ${card("Vendor Reliability Distribution", legendDist())}
-      ${card("Top 5 Vendors by Reliability Score", tableHtml(["Vendor","Category","Score"], vendors.slice(0,5).map(v=>[v.name,v.cat,v.score])),"View all vendors")}
+      ${card("Recent Vendor Registrations", tableHtml(["Vendor Name","Category","Date","Status"], [
+        ["ABC Industrial Supplies","Equipment Vendors","02 May 2024",badgeFor("Active")],
+        ["Northline Components","Raw Material Suppliers","08 Jan 2024",badgeFor("Critical")],
+        ["Coastal Freight Ltd","Logistics Partners","14 Sep 2023",badgeFor("Medium")]
+      ]), "View All Vendors")}
+      ${card("Overall Compliance Status", `<div class="gauge-wrap">${gaugeSvg(92)}<div class="gauge-label">Overall System Compliance</div></div>`, "View Details")}
     </div>
-    <div class="grid-3">
-      ${card("Contract Alerts", `<div class="legend"><div class="row"><span class="name"><span class="dot amber"></span>Expiring soon</span><b>8</b></div><div class="row"><span class="name"><span class="dot red"></span>Expired</span><b>5</b></div><div class="row"><span class="name"><span class="dot slate"></span>Pending renewal</span><b>12</b></div></div>`)}
-      ${card("Compliance Overview", `<div class="legend"><div class="row"><span class="name"><span class="dot green"></span>Compliant</span><b>85 (76%)</b></div><div class="row"><span class="name"><span class="dot amber"></span>At risk</span><b>18 (16%)</b></div><div class="row"><span class="name"><span class="dot red"></span>Non-compliant</span><b>9 (8%)</b></div></div>`)}
-      ${card("System Health", ["Backend Services","Database","Storage","Email Service","API Gateway"].map(s=>`<div class="doc-row"><span>${s}</span>${badgeFor("Active")}</div>`).join(""))}
-    </div>
-    ${card("Recent System Activity", `<div class="timeline">${auditLogs.slice(0,5).map(a=>`<div class="tl-item"><span class="tdot"></span><div><div>${a.action}</div><div class="t">${a.t} · ${a.who}</div></div></div>`).join("")}</div>`)}`;
-  }
-  if(currentRole==='pm'){
-    return head("Procurement Dashboard","Your active buying cycle at a glance.") +
-    `<div class="kpi-row">
-      ${kpi("Active Purchase Orders","28","This month","up")}
-      ${kpi("Pending Approvals","5","Needs your review","down")}
-      ${kpi("Total Spend (MTD)","$362K","+9% vs last month","up")}
-      ${kpi("Vendors Assigned","34","Across open POs","up")}
-    </div>
+    
     <div class="grid-2">
-      ${card("Purchase Orders by Status", `${bar("Delivered",3,8)}${bar("In Transit",2,8)}${bar("Approved",1,8)}${bar("Pending",2,8)}`)}
-      ${card("Recent Purchase Orders", tableHtml(["PO Number","Vendor","Status"], purchaseOrders.slice(0,5).map(p=>[p.id,p.vendor,badgeFor(p.status)])),"View all")}
-    </div>
-    ${card("Contract Renewals Due", tableHtml(["Contract","Vendor","Expiry","Status"], contracts.slice(0,4).map(c=>[c.id,c.vendor,c.expiry,badgeFor(c.status)])))}`;
-  }
-  if(currentRole==='scm'){
-    return head("Supply Chain Dashboard","Vendor reliability and risk overview.") +
-    `<div class="kpi-row">
-      ${kpi("Avg Reliability Score","78/100","+3.1 vs last quarter","up")}
-      ${kpi("Vendors at Risk","23","High + Medium risk","down")}
-      ${kpi("On-Time Delivery Rate","92.6%","+1.2% vs last quarter","up")}
-      ${kpi("Avg Issue Resolution","1.8 days","-0.3 days","up")}
-    </div>
-    <div class="grid-2">
-      ${card("Reliability Distribution", legendDist())}
-      ${card("Vendors Requiring Attention", tableHtml(["Vendor","Score","Risk"], vendors.filter(v=>v.risk!=='Low').map(v=>[v.name,v.score,badgeFor(v.risk)])),"View all")}
-    </div>
-    ${card("Performance Trend (6 months)", trendSvg())}`;
-  }
-  if(currentRole==='finance'){
-    return head("Finance Dashboard","Invoices, payments and vendor cost overview.") +
-    `<div class="kpi-row">
-      ${kpi("Total Invoiced (YTD)","$1.86M","+11% vs last year","up")}
-      ${kpi("Pending Payments","$74,750","4 invoices","down")}
-      ${kpi("Overdue Invoices","1","$42,300","down")}
-      ${kpi("Avg Payment Cycle","18 days","-2 days","up")}
-    </div>
-    ${card("Invoices Awaiting Action", tableHtml(["Invoice","Vendor","Amount","Status"], invoices.map(i=>[i.id,i.vendor,i.amount,badgeFor(i.status)])),"View all invoices")}`;
-  }
-  if(currentRole==='auditor'){
-    return head("Audit Dashboard","Read-only compliance and activity oversight.") +
-    `<div class="kpi-row">
-      ${kpi("Compliance Score","92%","Organization-wide","up")}
-      ${kpi("Non-Compliant Vendors","9","8% of total","down")}
-      ${kpi("Contracts Expired","5","Needs renewal or exit","down")}
-      ${kpi("Audit Events (7d)","142","Logged actions","up")}
-    </div>
-    <div class="grid-2">
-      ${card("Compliance Overview", `<div class="legend"><div class="row"><span class="name"><span class="dot green"></span>Compliant</span><b>85 (76%)</b></div><div class="row"><span class="name"><span class="dot amber"></span>At risk</span><b>18 (16%)</b></div><div class="row"><span class="name"><span class="dot red"></span>Non-compliant</span><b>9 (8%)</b></div></div>`)}
-      ${card("Recent Audit Log Entries", `<div class="timeline">${auditLogs.slice(0,5).map(a=>`<div class="tl-item"><span class="tdot"></span><div><div>${a.action}</div><div class="t">${a.t} · ${a.who}</div></div></div>`).join("")}</div>`,"View full log")}
+      ${card("Upcoming Contract Expirations", tableHtml(["Contract ID","Vendor","Type","Expiry","Status"], contracts.slice(0,3).map(c=>[c.id, c.vendor, c.type, c.expiry, badgeFor(c.status)])), "Renew Contracts")}
+      ${card("System Health Alerts", `<div class="legend">
+        <div class="row"><span class="name"><span class="dot amber"></span>3 High-Risk Vendors identified</span></div>
+        <div class="row"><span class="name"><span class="dot red"></span>2 Contracts Expiring this week</span></div>
+        <div class="row"><span class="name"><span class="dot green"></span>Nightly Data Sync Completed</span></div>
+      </div>`)}
     </div>`;
   }
-};
-
-export function legendDist(){
-  const bands = [["Excellent (80-100)",45,"green"],["Good (60-79)",58,"teal"],["Average (40-59)",32,"amber"],["Poor (20-39)",15,"red"],["Critical (0-19)",6,"red"]];
-  return `<div class="legend">${bands.map(b=>`<div class="row"><span class="name"><span class="dot ${b[2]}"></span>${b[0]}</span><b>${b[1]}</b></div>`).join("")}</div>`;
-}
-export function trendSvg(){
-  return `<svg width="100%" height="120" viewBox="0 0 560 120" preserveAspectRatio="none">
-    <polyline points="0,70 90,60 180,66 270,45 360,50 450,32 540,26" fill="none" stroke="#0E7C7B" stroke-width="2.5"/>
-    <polyline points="0,90 90,82 180,88 270,70 360,74 450,58 540,54" fill="none" stroke="#B9762C" stroke-width="2.5"/>
-  </svg><div class="legend" style="flex-direction:row;gap:18px;margin-top:6px;"><span class="name"><span class="dot teal"></span>On-time delivery</span><span class="name"><span class="dot amber"></span>Reliability score</span></div>`;
-}
-export function tableHtml(cols, rows){
-  return `<table><thead><tr>${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr class="clickrow">${r.map((c,i)=>`<td class="${i===0?'idcell':''}">${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
-}
-
-pages.vendors = function(){
-  return head("Vendor Management","Registered vendor profiles, categories and approval status.", `<button class="btn-sm">Filter</button><button class="btn-sm solid">+ Register Vendor</button>`) +
-  card("All Vendors", tableHtml(["Vendor ID","Name","Category","Reliability Score","Risk","Since"], vendors.map(v=>[v.id,v.name,v.cat,v.score,badgeFor(v.risk),v.since])));
-};
-pages.profile = function(){
-  const v = vendors[0];
-  return head("Vendor Profile","Your organization's profile as seen by procurement.", `<button class="btn-sm solid">Edit Profile</button>`) +
-  `<div class="grid-2">
-    ${card("Company Details", `<div class="legend">
-      <div class="row"><span class="name">Vendor ID</span><b class="mono">${v.id}</b></div>
-      <div class="row"><span class="name">Category</span><b>${v.cat}</b></div>
-      <div class="row"><span class="name">Vendor Since</span><b>${v.since}</b></div>
-      <div class="row"><span class="name">Primary Contact</span><b>${v.contact}</b></div>
-      <div class="row"><span class="name">Contact Email</span><b>${v.email}</b></div>
-      <div class="row"><span class="name">Contact Phone</span><b>${v.phone}</b></div>
-    </div>`)}
-    ${card("Reliability Snapshot", `<div class="gauge-wrap">${gaugeSvg(v.score)}<div class="gauge-label">${v.band} · ${v.risk} risk</div></div>`)}
+  
+  return head("Dashboard","Overview of key metrics and recent activities.") +
+  `<div class="kpi-row">
+    ${kpi("Total Vendors","124","Active across all regions","up")}
+    ${kpi("Pending Approvals","12","Requires your attention","down")}
+    ${kpi("Compliance Rate","94%","vs last month","up")}
   </div>
-  ${card("Verification Status", `<div class="doc-row"><span>Verified Vendor</span>${badgeFor("Active")}</div><div class="doc-row"><span>Business License</span>${badgeFor("Compliant")}</div><div class="doc-row"><span>Insurance Certificate</span><span class="badge amber">Renewal due</span></div>`)}`;
-};
-pages.vendorDetail = function(v){
-  return head(v.name, v.id+" · "+v.cat, `<button class="btn-sm">Message</button><button class="btn-sm solid">Edit</button>`) +
-  `<div class="grid-2">
-    ${card("Contact & Account", `<div class="legend">
-      <div class="row"><span class="name">Contact</span><b>${v.contact}</b></div>
-      <div class="row"><span class="name">Email</span><b>${v.email}</b></div>
-      <div class="row"><span class="name">Phone</span><b>${v.phone}</b></div>
-      <div class="row"><span class="name">Vendor Since</span><b>${v.since}</b></div>
-      <div class="row"><span class="name">Risk Level</span>${badgeFor(v.risk)}</div>
-    </div>`)}
-    ${card("Reliability Score", `<div class="gauge-wrap">${gaugeSvg(v.score)}<div class="gauge-label">${v.band}</div></div>`)}
-  </div>
-  ${card("Purchase Order History", tableHtml(["PO Number","Item","Amount","Status"], purchaseOrders.filter(p=>p.vendor===v.name).map(p=>[p.id,p.item,p.amount,badgeFor(p.status)])))}`;
-};
-
-pages.procurement = pages.requests = function(){
-  return head(currentPage==='requests'?"Procurement Requests":"Procurement Overview","Requests moving through the approval pipeline.", `<button class="btn-sm solid">+ New Request</button>`) +
-  `<div class="kpi-row">${kpi("Open Requests","14","Awaiting approval","down")}${kpi("Approved (7d)","22","+4 vs last week","up")}${kpi("Avg Approval Time","19 hrs","Within SLA","up")}</div>` +
-  card("Requests", tableHtml(["Request ID","Requested Item","Department","Status"], [
-    ["REQ-2024-441","Server Racks (x4)","IT",badgeFor("Pending")],
-    ["REQ-2024-440","Site Safety Gear","Operations",badgeFor("Approved")],
-    ["REQ-2024-439","Diesel Generators","Facilities",badgeFor("Pending")],
-    ["REQ-2024-438","Office Furniture","Admin",badgeFor("Ordered")]
-  ]));
-};
-pages.pos = function(){
-  return head("Purchase Orders","Track every order from creation to delivery.", `<button class="btn-sm">Export</button><button class="btn-sm solid">+ Create PO</button>`) +
-  card("Purchase Order List", tableHtml(["PO Number","Vendor","Item / Service","Amount","Status","Delivery Date"], purchaseOrders.map(p=>[p.id,p.vendor,p.item,p.amount,badgeFor(p.status),p.delivery])));
-};
-pages.contracts = function(){
-  return head(currentRole==='auditor'?"Contract Compliance":"Contracts & Compliance","Repository, renewal tracking and certification status.", currentRole!=='auditor'?`<button class="btn-sm solid">+ Add Contract</button>`:"") +
-  card("Contracts", tableHtml(["Contract ID","Vendor","Type","Status","Expiry Date"], contracts.map(c=>[c.id,c.vendor,c.type,badgeFor(c.status),c.expiry])));
-};
-pages.compliance = function(){
-  return head("Compliance Monitoring","Organization-wide compliance posture across active vendors.") +
-  `<div class="grid-2">
-    ${card("Compliance Overview", `<div class="legend"><div class="row"><span class="name"><span class="dot green"></span>Compliant</span><b>85 (76%)</b></div><div class="row"><span class="name"><span class="dot amber"></span>At risk</span><b>18 (16%)</b></div><div class="row"><span class="name"><span class="dot red"></span>Non-compliant</span><b>9 (8%)</b></div></div>`)}
-    ${card("Certifications Nearing Expiry", tableHtml(["Vendor","Certification","Expiry"], [["TechBuild Solutions","ISO 9001","20 Mar 2025"],["Global Steel Corp","ISO 14001","02 Feb 2025"],["Coastal Freight Ltd","Transport License","11 Jun 2024"]]))}
+  <div class="grid-2">
+    ${card("Vendor Performance", "Chart placeholder")}
+    ${card("Recent Activity", "Timeline placeholder")}
   </div>`;
-};
-pages.invoices = function(){
-  return head(currentRole==='vendor'?"Invoices & Payments":"Invoices & Payments","Invoice status and payment schedules.", currentRole!=='vendor'&&currentRole!=='auditor'?`<button class="btn-sm solid">+ Record Invoice</button>`:"") +
-  card("Invoices", tableHtml(["Invoice ID","Vendor","Amount","Status","Due Date"], invoices.map(i=>[i.id,i.vendor,i.amount,badgeFor(i.status),i.due])));
-};
-pages.payhistory = function(){
-  return head("Vendor Payment History","Historical payments grouped by vendor.") +
-  card("Payment History", tableHtml(["Vendor","Total Paid (YTD)","Last Payment","On-Time Rate"], [
-    ["Global Steel Corp","$612,400","01 Jun 2024","98%"],
-    ["TechBuild Solutions","$248,760","24 May 2024","94%"],
-    ["QuickLogistics","$186,200","—","81%"],
-    ["BuildRight Services","$142,900","18 May 2024","96%"]
-  ]));
-};
-pages.communication = function(){
-  return head("Communication","Direct messaging and file sharing with vendors.") +
-  `<div class="grid-2">
-    ${card("Conversation — TechBuild Solutions", `<div class="msg-thread">
-      <div class="msg in"><div class="who">TechBuild Solutions · 2h ago</div>PO-2024-0987 has shipped, ETA 18 May.</div>
-      <div class="msg out"><div class="who">You · 1h ago</div>Noted — please share the carrier tracking number.</div>
-      <div class="msg in"><div class="who">TechBuild Solutions · 40m ago</div>Tracking: 1Z999AA10123456784</div>
-    </div>`)}
-    ${card("Recent Threads", ["Global Steel Corp","QuickLogistics","BuildRight Services","OneFix Maintenance"].map(n=>`<div class="doc-row"><span>${n}</span><span class="meta">View</span></div>`).join(""))}
-  </div>`;
-};
-pages.performance = function(){
-  return head(currentRole==='scm'?"Vendor Performance":"Performance Analytics","Delivery, quality and responsiveness metrics per vendor.") +
-  `<div class="grid-2">
-    ${card("Performance Summary", `${bar("On-Time Deliveries",25,30)}${bar("Delayed Deliveries",2,30)}${bar("Quality Score (/5)",4.6,5)}${bar("Response Time (hrs)",12,24)}${bar("Order Completion Rate",96,100)}`)}
-    ${card("Performance Trend (6 months)", trendSvg())}
-  </div>
-  ${card("Vendor Performance Table", tableHtml(["Vendor","On-Time %","Quality","Response Time"], vendors.map(v=>[v.name,v.onTime+"%",v.quality+"/5",Math.round(24-v.score/6)+" hrs"])))}`;
-};
-pages.reliability = function(){
-  return head("Reliability Scoring","Composite score from delivery, quality, compliance and communication data.") +
-  `<div class="grid-2">
-    ${card("Score Distribution", legendDist())}
-    ${card("Reliability Factors (org average)", `${bar("Delivery History",84,100)}${bar("Product Quality",81,100)}${bar("Communication Efficiency",76,100)}${bar("Contract Compliance",88,100)}${bar("Issue Resolution",73,100)}`)}
-  </div>
-  ${card("Vendor Ranking", tableHtml(["Rank","Vendor","Score","Risk Level"], vendors.slice().sort((a,b)=>b.score-a.score).map((v,i)=>[i+1,v.name,v.score,badgeFor(v.risk)])))}`;
-};
-pages.delivery = function(){
-  return head("Delivery Tracking","In-flight and recent delivery status across all open purchase orders.") +
-  card("Deliveries", tableHtml(["PO Number","Vendor","Item","Status","Expected"], purchaseOrders.map(p=>[p.id,p.vendor,p.item,badgeFor(p.status),p.delivery])));
-};
-pages.risk = function(){
-  return head("Risk Assessment","Vendors flagged by procurement risk level.") +
-  card("Vendors by Risk Level", tableHtml(["Vendor","Category","Score","Risk Level"], vendors.filter(v=>v.risk!=='Low').map(v=>[v.name,v.cat,v.score,badgeFor(v.risk)])));
-};
-pages.users = function(){
-  return head("User Management","Organization accounts and their assigned roles.", `<button class="btn-sm solid">+ Invite User</button>`) +
-  card("Users", tableHtml(["Name","Email","Role","Status"], users.map(u=>[u.name,u.email,u.role,badgeFor(u.status)])));
-};
-pages["roles-perms"] = function(){
-  return head("Roles & Permissions","Control what each role can see and do across VendorIQ.") +
-  Object.keys(roles).map(k=>card(roles[k].label, roles[k].groups.flatMap(g=>g.items).map(it=>`<div class="toggle-row"><span>${it.label}</span><div class="toggle on"></div></div>`).join(""))).join("");
-};
-pages.settings = function(){
-  return head("System Settings","Platform-wide configuration.") +
-  `<div class="grid-2">
-    ${card("General", `<div class="toggle-row"><span>Two-factor authentication required</span><div class="toggle on"></div></div><div class="toggle-row"><span>Auto-approve vendors above 80 score</span><div class="toggle"></div></div><div class="toggle-row"><span>Email notifications</span><div class="toggle on"></div></div><div class="toggle-row"><span>SMS notifications</span><div class="toggle"></div></div>`)}
-    ${card("Data & Backup", `<div class="doc-row"><span>Last automated backup</span><span class="meta">Today, 02:00</span></div><div class="doc-row"><span>Backup frequency</span><span class="meta">Daily</span></div><div class="doc-row"><span>Data retention</span><span class="meta">36 months</span></div>`)}
-  </div>`;
-};
-pages.audit = function(){
-  return head("Audit Logs","System-wide activity trail across all roles.", `<button class="btn-sm">Export CSV</button>`) +
-  card("Activity", `<div class="timeline">${auditLogs.map(a=>`<div class="tl-item"><span class="tdot"></span><div><div>${a.action}</div><div class="t">${a.t} · ${a.who}</div></div></div>`).join("")}</div>`);
-};
-pages.reports = function(){
-  return head("Reports & Exports","Generate and download procurement, vendor and compliance reports.") +
-  `<div class="grid-3">
-    ${card("Vendor Performance Report", `<p style="font-size:12.5px;color:var(--slate);margin:0 0 14px;">Delivery, quality and response metrics per vendor.</p><button class="btn-sm solid">Generate PDF</button>`)}
-    ${card("Procurement Spend Report", `<p style="font-size:12.5px;color:var(--slate);margin:0 0 14px;">Spend breakdown by vendor and category.</p><button class="btn-sm solid">Generate Excel</button>`)}
-    ${card("Compliance Report", `<p style="font-size:12.5px;color:var(--slate);margin:0 0 14px;">Certification and contract compliance status.</p><button class="btn-sm solid">Generate PDF</button>`)}
-  </div>
-  ${card("Scheduled Reports", tableHtml(["Report","Frequency","Last Sent"], [["Weekly Procurement Summary","Weekly","27 May 2024"],["Monthly Compliance Digest","Monthly","01 May 2024"]]))}`;
-};
-pages.notifications = function(){
-  return head("Notifications","Alerts across vendor approvals, deliveries, contracts and compliance.") +
-  card("All Notifications", `<div class="timeline">
-    <div class="tl-item"><span class="tdot"></span><div><div>Your invoice INV-2024-087 has been approved</div><div class="t">2 hours ago</div></div></div>
-    <div class="tl-item"><span class="tdot"></span><div><div>PO-2024-0987 status updated to In Transit</div><div class="t">5 hours ago</div></div></div>
-    <div class="tl-item"><span class="tdot"></span><div><div>New message from Procurement Manager</div><div class="t">1 day ago</div></div></div>
-    <div class="tl-item"><span class="tdot"></span><div><div>Contract CT-2024-0456 is expiring in 15 days</div><div class="t">1 day ago</div></div></div>
-    <div class="tl-item"><span class="tdot"></span><div><div>Insurance document is due for update</div><div class="t">2 days ago</div></div></div>
-  </div>`);
-};
-pages.documents = function(){
-  return head("Documents","Certifications and files shared with procurement.", `<button class="btn-sm solid">+ Upload Document</button>`) +
-  card("Your Documents", [
-    ["Business License","Uploaded 10 Jan 2024"],["Tax Certificate","Uploaded 10 Jan 2024"],
-    ["Insurance Certificate","Uploaded 15 Feb 2024"],["Quality Certification (ISO 9001)","Uploaded 20 Mar 2024"]
-  ].map(d=>`<div class="doc-row"><span>${d[0]}</span><span class="meta">${d[1]} · Download</span></div>`).join(""));
-};
-
-export function renderPage(){
-  document.getElementById('crumb-page').textContent = pageLabel(currentPage);
-  const fn = pages[currentPage] || pages.dashboard;
-  document.getElementById('page-content').innerHTML = fn();
 }
+
+
+pages.vendor_profile = function(){ return head("Vendor Profile","Manage your company details and primary contacts.") + card("Profile Information","Content for Vendor Profile goes here."); }
+pages.vendor_performance = function(){ return head("Performance Overview","Detailed breakdown of your performance metrics.") + card("Performance Metrics","Content for Performance Overview goes here."); }
+pages.vendor_pos = function(){ return head("Purchase Orders","Track all active and past purchase orders.") + card("Orders List","Content for Purchase Orders goes here."); }
+pages.vendor_contracts = function(){ return head("Contracts & Compliance","View active contracts and compliance status.") + card("Contracts List","Content for Contracts & Compliance goes here."); }
+pages.vendor_invoices = function(){ return head("Invoices & Payments","Track your submitted invoices and payment statuses.") + card("Invoices List","Content for Invoices & Payments goes here."); }
+pages.vendor_communication = function(){ return head("Communication","Messages and correspondence with procurement managers.") + card("Messages","Content for Communication goes here."); }
+pages.vendor_documents = function(){ return head("Documents","Manage uploaded certificates and licenses.") + card("Document Repository","Content for Documents goes here."); }
+pages.vendor_notifications = function(){ return head("Notifications","Recent alerts and system notifications.") + card("Recent Notifications","Content for Notifications goes here."); }
+pages.vendor_reports_perf = function(){ return head("Performance Reports","Generate and download historical performance reports.") + card("Generate Report","Content for Performance Reports goes here."); }
+pages.vendor_reports_order = function(){ return head("Order Reports","Generate and download historical order volume reports.") + card("Generate Report","Content for Order Reports goes here."); }
+pages.vendor_reports_comp = function(){ return head("Compliance Reports","Generate and download compliance audit reports.") + card("Generate Report","Content for Compliance Reports goes here."); }
+pages.vendor_reports_export = function(){ return head("Export Reports","Export raw data across all modules.") + card("Export Tools","Content for Export Reports goes here."); }
+pages.vendor_settings = function(){ return head("Settings","Manage your account preferences and security.") + card("Account Settings","Content for Settings goes here."); }
+pages.vendor_support = function(){ return head("Help & Support","Access knowledge base or contact system administrators.") + card("Support Center","Content for Help & Support goes here."); }
+
+
+pages.pm_requests = function(){ return head("Procurement Requests","Create and manage PRs across departments.") + card("PR List","Content for Procurement Requests goes here."); }
+pages.pm_pos = function(){ return head("Purchase Orders","Track PO fulfillment and delivery status.") + card("PO Tracker","Content for Purchase Orders goes here."); }
+pages.pm_vendors = function(){ return head("Vendor Management","Assign vendors to PRs and manage vendor relationships.") + card("Vendor Table","Content for Vendor Management goes here."); }
+pages.pm_contracts = function(){ return head("Contracts Repository","View and negotiate vendor contracts.") + card("Contracts","Content for Contracts Repository goes here."); }
+pages.pm_invoices = function(){ return head("Invoices","Approve or dispute vendor invoices.") + card("Invoices List","Content for Invoices goes here."); }
+pages.pm_communication = function(){ return head("Communication","Message thread with vendors and internal teams.") + card("Messages","Content for Communication goes here."); }
+pages.pm_notifications = function(){ return head("Notifications","Alerts for PO deliveries and PR approvals.") + card("Notifications","Content for Notifications goes here."); }
+pages.pm_reports_proc = function(){ return head("Procurement Reports","Analytics on PR volume and fulfillment times.") + card("Procurement Reports","Content for Procurement Reports goes here."); }
+pages.pm_reports_spend = function(){ return head("Spend Analytics","Breakdown of spend by vendor and category.") + card("Spend Analytics","Content for Spend Analytics goes here."); }
+pages.pm_reports_export = function(){ return head("Export Data","Export raw procurement data to CSV/Excel.") + card("Export","Content for Export Data goes here."); }
+

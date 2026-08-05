@@ -30,8 +30,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.authSub = this.authService.currentUser$.subscribe((user: any) => {
       if (user) {
         this.userEmail = user.email;
-        this.currentRoleKey = user.role?.name || 'admin';
-        // Normalize role key if it comes back different from backend (e.g. 'vendor' instead of 'vendor')
+        
+        const roleMap: Record<string, string> = {
+          'Administrator': 'admin',
+          'Procurement Manager': 'pm',
+          'Supply Chain Manager': 'scm',
+          'Finance Officer': 'finance',
+          'Auditor': 'auditor',
+          'Vendor': 'vendor'
+        };
+        
+        const rawRoleName = user.role?.name || 'Administrator';
+        this.currentRoleKey = roleMap[rawRoleName] || 'admin';
+        
         this.roleConfig = (roles as any)[this.currentRoleKey] || (roles as any)['admin'];
         this.renderPage();
       }

@@ -1,32 +1,43 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload
 from app.modules.auth.models import User, Role
 from app.modules.auth.schemas import UserCreate
 from app.core.security import get_password_hash
 
-def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+async def get_user_by_email(db: AsyncSession, email: str):
+    result = await db.execute(select(User).options(joinedload(User.role)).filter(User.email == email))
+    return result.scalars().first()
 
-def get_user_by_reset_token(db: Session, token: str):
-    return db.query(User).filter(User.reset_token == token).first()
+async def get_user_by_reset_token(db: AsyncSession, token: str):
+    result = await db.execute(select(User).filter(User.reset_token == token))
+    return result.scalars().first()
 
-def create_user(db: Session, user: UserCreate):
+async def create_user(db: AsyncSession, user: UserCreate):
     hashed_password = get_password_hash(user.password)
-    # Default to user role if it exists, otherwise role_id = None for now
-    db_user = User(email=user.email, password_hash=hashed_password)
+    result = await db.execute(select(Role).filter_by(name=user.role_name))
+    role = result.scalars().first()
+    
+    db_user = User(
+        email=user.email,
+        password_hash=hashed_password,
+        role_id=role.id if role else None,
+        status="pending_approval"
+    )
     db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    await db.commit()
+    await db.refresh(db_user)
     return db_user
 
-def update_user_reset_token(db: Session, user: User, token: str):
+async def update_user_reset_token(db: AsyncSession, user: User, token: str):
     user.reset_token = token
-    db.commit()
-    db.refresh(user)
+    await db.commit()
+    await db.refresh(user)
     return user
 
-def update_user_password(db: Session, user: User, new_password: str):
+async def update_user_password(db: AsyncSession, user: User, new_password: str):
     user.password_hash = get_password_hash(new_password)
     user.reset_token = None
-    db.commit()
-    db.refresh(user)
+    await db.commit()
+    await db.refresh(user)
     return user

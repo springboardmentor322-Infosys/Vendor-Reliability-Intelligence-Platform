@@ -1,5 +1,5 @@
 <div id="view-app" class="flex min-h-screen">
-  <aside class="sidebar">
+  <aside class="sidebar" [class.vendor-sidebar]="currentRoleKey === 'vendor'" [class.pm-sidebar]="currentRoleKey === 'pm'">
     <div class="brand">
       <div class="brand-mark"></div>
       <div>VendorIQ<small id="sb-role-label">{{ roleConfig?.label || 'Workspace' }}</small></div>
@@ -14,10 +14,21 @@
       </ng-container>
     </div>
 
-    <div class="sidebar-foot">
+    <div class="sidebar-foot" *ngIf="currentRoleKey !== 'vendor'">
       <div class="avatar">{{ roleConfig?.initials }}</div>
       <div class="who">{{ roleConfig?.name }}<span>{{ roleConfig?.label }}</span></div>
       <a class="logout cursor-pointer" (click)="logout()">Sign out</a>
+    </div>
+    
+    <div class="vendor-foot" *ngIf="currentRoleKey === 'vendor'">
+      <div class="v-avatar">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#7DD3FC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </div>
+      <div class="v-who">
+        <div class="v-name">{{ roleConfig?.name }}</div>
+        <div class="v-id">Vendor ID: VDR-2024-1025</div>
+        <div class="v-badge"><span class="v-dot"></span>Verified Vendor</div>
+      </div>
     </div>
   </aside>
 
