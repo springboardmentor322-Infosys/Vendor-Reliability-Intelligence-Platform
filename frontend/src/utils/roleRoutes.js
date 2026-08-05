@@ -65,6 +65,7 @@ export const ROLE_ALLOWED_ROUTES = {
   ],
   Auditor: [
     '/auditor-dashboard',
+    '/purchase-orders',
     '/analytics',
     '/reports',
     '/notifications',
@@ -121,6 +122,7 @@ export const ROLE_NAV_CONFIG = {
   ],
   Auditor: [
     { to: '/auditor-dashboard', label: 'Auditor Dashboard' },
+    { to: '/purchase-orders', label: 'Purchase Orders' },
     { to: '/analytics', label: 'Compliance Overview' },
     { to: '/reports', label: 'Reports' },
     { to: '/notifications', label: 'Notifications' },
@@ -211,6 +213,7 @@ export const ROLE_SIDEBAR_CONFIG = {
       items: [
         { to: '/auditor-dashboard', label: 'Auditor Dashboard' },
         { to: '#', label: 'Audit Logs' },
+        { to: '/purchase-orders', label: 'Purchase Orders' },
         { to: '/analytics', label: 'Compliance Overview' },
         { to: '#', label: 'Purchase Order Approval Trails' },
         { to: '#', label: 'Contracts & Compliance' },
