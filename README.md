@@ -1,97 +1,104 @@
-# VendorIntel Platform
+# 🚀 VendorIntel: Vendor Reliability Intelligence Platform
 
-This project includes a backend API powered by FastAPI and a frontend dashboard. It features role-based authentication (`admin`, `procumentor`, `auditor`, `vendor`), secure password hashing using `bcrypt` and JWT authentication.
+> **Vendor Reliability Intelligence & Procurement Risk Management Platform**
 
-## How to Run the Project (Every Time)
+VendorIntel is a full-stack web application designed to enable organizations to evaluate vendor reliability, manage procurement operations, monitor supplier performance, track delivery history, maintain contract compliance, and improve procurement decision-making through centralized dashboards and advanced analytics.
 
-Whenever you close the project and need to run it again, you must start both the backend server and open the frontend dashboard.
+This platform helps procurement teams reduce supply chain risks by providing vendor performance insights, procurement monitoring, contract management, communication tracking, and reliability scoring. It is built for manufacturing companies, retail businesses, logistics organizations, healthcare providers, construction firms, and enterprise procurement departments.
 
-### 1. Start the Backend API (Do this FIRST!)
+---
 
-The backend needs to run so the frontend can retrieve data and log users in. **You MUST start the backend before going live with `index.html` or `login.html`.** 
+## 🎯 Key Outcomes
+- ✅ Developed and deployed a full-stack Vendor Reliability Intelligence platform.
+- ✅ Implemented secure user authentication and role-based access control.
+- ✅ Built vendor registration and supplier management modules.
+- ✅ Developed procurement and purchase order management workflows.
+- ✅ Implemented vendor reliability scoring based on operational performance.
+- ✅ Built contract and compliance monitoring systems.
+- ✅ Developed dashboards for procurement analytics and vendor performance.
+- ✅ Implemented notifications and procurement alerts.
+- ✅ Generated procurement and vendor performance reports.
 
-> [!IMPORTANT]
-> **Prerequisite:** This project uses a **MySQL** database. Make sure you have a local MySQL server (like XAMPP or MySQL Server) running with the default username `root` and password `1234` on port `3306`. If your credentials differ, update them in `backend/database.py`.
+---
 
-**First Time Setup:**
-Before running the server for the first time, you must install dependencies and initialize the database. Open a terminal in the main project directory (`VendorIntel`) and run:
+## 🏗️ Architecture & Tech Stack
 
+### **Backend Framework**
+- **Language**: Python 3
+- **Framework**: FastAPI
+- **ORM**: SQLAlchemy
+- **Authentication**: JWT & bcrypt (Password Hashing)
+- **Server**: Uvicorn
+
+### **Frontend Framework**
+- **Core**: Vanilla HTML5, CSS3, JavaScript
+- **Styling**: TailwindCSS (via CDN) for a premium glass-morphism aesthetic
+- **Charts**: Chart.js
+
+### **Database**
+- **Current**: SQLite (for rapid prototyping)
+- **Production Ready**: PostgreSQL / MySQL
+
+---
+
+## 🧩 Core Modules
+
+### 1️⃣ User Authentication & Role Management
+- Secure User Registration & Login via JWT Authentication.
+- Dynamic Role-Based Access Control (RBAC) for Administrators, Procurement Managers, Vendors, and Auditors.
+
+### 2️⃣ Vendor Management Module
+- End-to-end vendor profile management and categorization (IT, Logistics, Raw Materials, etc.).
+- Strict vendor approval workflows (Pending → Under Review → Approved → Rejected).
+
+### 3️⃣ Procurement Management Module
+- Procurement Request (PR) generation with dynamic line-item calculation.
+- Automated multi-stage PR approval workflows.
+- Purchase Order (PO) creation, vendor assignment, and order tracking (In Progress → Shipped → Delivered).
+
+### 4️⃣ Contract & Compliance Module
+- Centralized contract repository with document uploads.
+- Tracking of start dates, expiry dates, and automated 30/60/90 day renewal notices.
+
+### 5️⃣ Vendor Performance & Reliability Module
+- Dynamic reliability scoring based on delivery history, product quality, communication efficiency, and contract compliance.
+- Risk matrix generation and trend analysis.
+
+### 6️⃣ Communication Module
+- Thread-based, contextual messaging tied to specific Vendors, PRs, POs, or Contracts.
+- Permanent activity and audit logs for compliance tracking.
+
+### 7️⃣ Dashboard & Analytics Module
+- Specialized, distinct dashboards for Admins, Procurement Managers, Auditors, and Vendors.
+- Real-time visualizations of active POs, vendor performance, and procurement costs.
+
+---
+
+## 🚀 How to Run Locally
+
+### 1. Backend Setup
+Navigate to the `backend` directory, install dependencies, and start the FastAPI server:
 ```bash
 cd backend
-# 1. Create and activate a virtual environment (Windows)
- venv\Scripts\uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
-# (If you are on Mac/Linux, use: source venv/bin/activate)
-
-# 2. Install required Python packages
-pip install -r requirements.txt
-
-# 3. Initialize and seed the MySQL Database
-python init_db.py
-python seed_db.py
+pip install fastapi uvicorn sqlalchemy python-jose[cryptography] passlib[bcrypt] python-multipart
+uvicorn main:app --reload
 ```
+The API and automatic interactive Swagger documentation will be available at `http://127.0.0.1:8000/docs`.
 
-**Running the Server (Every Time):**
-Once setup is complete, you simply need to start the Uvicorn server:
-
+### 2. Frontend Setup
+Simply serve the `frontend` directory using any local web server, for example:
 ```bash
-# From the backend folder with your virtual environment activated:
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Keep this terminal window open. The backend API server will run at `http://127.0.0.cd1:8000`.
-
-### 2. Open the Frontend Dashboard
-
-The frontend doesn't require a complex build process. You have two options to open it:
-
-**Option A (Easiest):**
-Open your File Explorer, navigate to the `frontend` folder, and simply double-click on the `login.html` file. It will open directly in your web browser.
-
-**Option B (Local Web Server):**
-If you prefer to run it on a local web server (useful if you encounter any CORS issues):
-1. Open a *new* terminal or command prompt (keep the backend one running).
-2. Navigate to the frontend folder:
-```bash
+# Using Python's built-in HTTP server
 cd frontend
+python -m http.server 5500
 ```
-3. Start a simple Python web server:
-```bash
-python -m http.server 3000
-```
-4. Open your web browser and go to `http://localhost:3000/login.html`.
+Open your browser and navigate to `http://localhost:5500/index.html`.
 
-### 3. Testing Authentication & Roles
+---
 
-The database is seeded with test users across different roles. The system enforces strict Role-Based Access Control (RBAC) both in the frontend and backend APIs.
-
-- **Admin Account**: 
-  - Email: `admin@vendorintel.com`
-  - Password: `1234`
-  - *Role Profile*: The Admin is the technical manager of the platform itself. They handle system maintenance, set up new user accounts, and enforce security protocols.
-  - *Permissions*: Absolute, unrestricted control (full Read, Write, Update, and Delete access) over all endpoints. Routes to the Executive Console.
-
-- **Procurement Officer**:
-  - Email: `procumentor@vendorintel.com`
-  - Password: `1234`
-  - *Role Profile*: The business-focused user who manages the day-to-day relationships with vendor companies (registering vendors, tracking deliveries).
-  - *Permissions*: Full editing rights (CRUD) for vendor profiles, evaluation logs, and dispute histories. Routes to the Procurement Console.
-
-- **Risk Auditor**:
-  - Email: `auditor@vendorintel.com`
-  - Password: `1234`
-  - *Role Profile*: An independent user who monitors supply chain compliance and checks historical performance trends.
-  - *Permissions*: Strictly Read-Only access to dashboards, vendor profiles, and risk matrices. Any write API calls are blocked. Routes to the Auditor Console.
-
-- **Vendor Account**:
-  - Email: `vendor@vendorintel.com`
-  - Password: `1234`
-  - *Routes to the simplified Vendor Dashboard.*
-
-### 4. Forgot Password Flow
-
-1. On the login page, click the **Forgot key?** link.
-2. Enter any registered email (e.g., `vendor@vendorintel.com`) and click submit.
-3. Because we don't have an email server configured, the application will display a demo "Click here to reset password" link on the page.
-4. Click the link to go to the Reset Password page.
-5. Enter a new password and submit. You can now return to the login page and sign in with the new password.
+## 📈 Performance Goals
+- **Vendor Registration**: Under 3 minutes.
+- **Purchase Order Approval**: Within 24 hours.
+- **Delivery Monitoring**: 95% On-Time tracking.
+- **API Response Time**: < 300 ms.
+- **Dashboard Load Time**: < 2 seconds.
