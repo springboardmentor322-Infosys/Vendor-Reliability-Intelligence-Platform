@@ -16,6 +16,18 @@ class ProcurementRequest(Base):
     requested_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     
     purchase_orders = relationship("PurchaseOrder", back_populates="procurement_request")
+    items = relationship("PRItem", back_populates="procurement_request", cascade="all, delete-orphan")
+
+class PRItem(Base):
+    __tablename__ = "pr_items"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    pr_id = Column(Integer, ForeignKey("procurement_requests.id"))
+    item_name = Column(String, nullable=False)
+    quantity = Column(Integer, nullable=False, default=1)
+    estimated_cost = Column(Float, nullable=False)
+    
+    procurement_request = relationship("ProcurementRequest", back_populates="items")
 
 
 class PurchaseOrder(Base):

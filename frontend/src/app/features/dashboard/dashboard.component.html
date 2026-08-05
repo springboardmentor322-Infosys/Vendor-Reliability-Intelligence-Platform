@@ -43,6 +43,33 @@
       </div>
     </div>
     
-    <div class="page" [innerHTML]="pageContent"></div>
+    <ng-container *ngIf="currentPage === 'vendors' || currentPage === 'pm_vendors'; else prCheck">
+      <app-vendor-directory></app-vendor-directory>
+    </ng-container>
+    <ng-template #prCheck>
+      <ng-container *ngIf="currentPage === 'pm_requests'; else dashboardSummaryCheck">
+        <app-pr-dashboard></app-pr-dashboard>
+      </ng-container>
+    </ng-template>
+    
+    <ng-template #dashboardSummaryCheck>
+      <ng-container *ngIf="currentPage === 'dashboard'; else staticContent">
+        <div class="page" *ngIf="dashboardData">
+          <app-admin-dashboard *ngIf="currentRoleKey === 'admin'" [data]="dashboardData"></app-admin-dashboard>
+          <app-pm-dashboard *ngIf="currentRoleKey === 'pm'" [data]="dashboardData"></app-pm-dashboard>
+          <app-scm-dashboard *ngIf="currentRoleKey === 'scm'" [data]="dashboardData"></app-scm-dashboard>
+          <app-finance-dashboard *ngIf="currentRoleKey === 'finance'" [data]="dashboardData"></app-finance-dashboard>
+          <app-vendor-dashboard *ngIf="currentRoleKey === 'vendor'" [data]="dashboardData"></app-vendor-dashboard>
+          <app-auditor-dashboard *ngIf="currentRoleKey === 'auditor'" [data]="dashboardData"></app-auditor-dashboard>
+        </div>
+        <div class="page" *ngIf="!dashboardData">
+          <div class="text-center py-12 text-[var(--slate)]">Loading dashboard...</div>
+        </div>
+      </ng-container>
+    </ng-template>
+
+    <ng-template #staticContent>
+      <div class="page" [innerHTML]="pageContent"></div>
+    </ng-template>
   </div>
 </div>

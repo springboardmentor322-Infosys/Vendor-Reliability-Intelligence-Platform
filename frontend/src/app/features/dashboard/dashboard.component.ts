@@ -6,10 +6,30 @@ import { AuthService } from '../../core/services/auth.service';
 import { roles, pages } from './dashboard-data';
 import { Subscription } from 'rxjs';
 
+import { VendorDirectoryComponent } from './components/vendor-directory/vendor-directory.component';
+import { PrDashboardComponent } from './components/pr-dashboard/pr-dashboard.component';
+import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
+import { PmDashboardComponent } from './components/pm-dashboard/pm-dashboard.component';
+import { ScmDashboardComponent } from './components/scm-dashboard/scm-dashboard.component';
+import { FinanceDashboardComponent } from './components/finance-dashboard/finance-dashboard.component';
+import { VendorDashboardComponent } from './components/vendor-dashboard/vendor-dashboard.component';
+import { AuditorDashboardComponent } from './components/auditor-dashboard/auditor-dashboard.component';
+import { DashboardService } from '../../core/services/dashboard.service';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule, 
+    VendorDirectoryComponent, 
+    PrDashboardComponent,
+    AdminDashboardComponent,
+    PmDashboardComponent,
+    ScmDashboardComponent,
+    FinanceDashboardComponent,
+    VendorDashboardComponent,
+    AuditorDashboardComponent
+  ],
   templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnInit, OnDestroy {
@@ -19,11 +39,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   currentPage = 'dashboard';
   pageContent: SafeHtml = '';
   authSub?: Subscription;
+  dashboardData: any = null;
 
   constructor(
     private authService: AuthService, 
     private router: Router,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit() {
@@ -44,8 +66,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.currentRoleKey = roleMap[rawRoleName] || 'admin';
         
         this.roleConfig = (roles as any)[this.currentRoleKey] || (roles as any)['admin'];
+        this.loadDashboardData();
         this.renderPage();
       }
+    });
+  }
+
+  loadDashboardData() {
+    this.dashboardService.getDashboardSummary().subscribe(data => {
+      this.dashboardData = data;
     });
   }
   

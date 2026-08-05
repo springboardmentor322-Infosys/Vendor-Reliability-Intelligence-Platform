@@ -2,6 +2,10 @@ from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 
+# Import dependencies to resolve SQLAlchemy string references
+from app.modules.procurement.models import PurchaseOrder
+from app.modules.contracts.models import Contract
+
 class VendorCategory(Base):
     __tablename__ = "vendor_categories"
     

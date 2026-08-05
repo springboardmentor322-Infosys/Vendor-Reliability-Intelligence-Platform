@@ -4,6 +4,7 @@ from sqlalchemy.orm import joinedload
 from app.modules.auth.models import User, Role
 from app.modules.auth.schemas import UserCreate
 from app.core.security import get_password_hash
+from app.modules.vendors.models import Vendor
 
 async def get_user_by_email(db: AsyncSession, email: str):
     result = await db.execute(select(User).options(joinedload(User.role)).filter(User.email == email))
@@ -17,7 +18,6 @@ async def create_user(db: AsyncSession, user: UserCreate):
     hashed_password = get_password_hash(user.password)
     result = await db.execute(select(Role).filter_by(name=user.role_name))
     role = result.scalars().first()
-    
     db_user = User(
         email=user.email,
         password_hash=hashed_password,
@@ -25,9 +25,18 @@ async def create_user(db: AsyncSession, user: UserCreate):
         status="pending_approval"
     )
     db.add(db_user)
+    
+    # Auto-create vendor profile if role is Vendor
+    if user.role_name == "Vendor":
+        db_vendor = Vendor(
+            name=user.email.split('@')[0], # Placeholder name
+            contact_email=user.email,
+            status="Pending"
+        )
+        db.add(db_vendor)
+
     await db.commit()
-    await db.refresh(db_user)
-    return db_user
+    return await get_user_by_email(db, user.email)
 
 async def update_user_reset_token(db: AsyncSession, user: User, token: str):
     user.reset_token = token
