@@ -1,4 +1,4 @@
-# 🚀 VendorIntel: Vendor Reliability Intelligence Platform
+# VendorIntel: Vendor Reliability Intelligence Platform
 
 > **Vendor Reliability Intelligence & Procurement Risk Management Platform**
 
