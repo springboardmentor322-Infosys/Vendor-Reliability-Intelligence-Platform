@@ -31,11 +31,10 @@ def seed_db():
         {"company_name": "Prime Industrial Solutions", "contact_email": "sales@primeind.com", "approval_status": "Approved", "rating": 4.7, "risk_level": "Low", "delivery_rate": 95.0, "quality_score": 96.0},
         {"company_name": "Zenith Traders", "contact_email": "support@zenith.com", "approval_status": "Approved", "rating": 4.6, "risk_level": "Low", "delivery_rate": 94.0, "quality_score": 95.0},
         {"company_name": "Horizon Enterprises", "contact_email": "hello@horizonent.com", "approval_status": "Approved", "rating": 4.5, "risk_level": "Medium", "delivery_rate": 92.0, "quality_score": 93.0},
-        {"company_name": "ABC Logistics", "contact_email": "abc@logistics.com", "approval_status": "Rejected", "rating": 2.1, "risk_level": "High", "delivery_rate": 58.0, "quality_score": 62.5},
-        {"company_name": "Nova Industries", "contact_email": "new@novaind.com", "approval_status": "Pending", "rating": 0.0, "risk_level": "Low", "delivery_rate": 100.0, "quality_score": 100.0},
         {"company_name": "TechSource Pvt. Ltd.", "contact_email": "tech@source.com", "approval_status": "Approved", "rating": 4.2, "risk_level": "Medium", "delivery_rate": 88.0, "quality_score": 90.0},
-        {"company_name": "Omega Corp", "contact_email": "contact@omega.com", "approval_status": "Approved", "rating": 3.5, "risk_level": "High", "delivery_rate": 75.0, "quality_score": 80.0},
         {"company_name": "Sigma Materials", "contact_email": "info@sigma.com", "approval_status": "Approved", "rating": 4.0, "risk_level": "Medium", "delivery_rate": 85.0, "quality_score": 85.0},
+        {"company_name": "Vanguard Logistics", "contact_email": "contact@vanguard.com", "approval_status": "Rejected", "rating": 2.1, "risk_level": "High", "delivery_rate": 58.0, "quality_score": 62.5},
+        {"company_name": "Nexus Supplies", "contact_email": "info@nexussupplies.com", "approval_status": "Suspended", "rating": 1.5, "risk_level": "High", "delivery_rate": 45.0, "quality_score": 50.0},
     ]
 
     for v_data in vendors_data:
@@ -58,10 +57,10 @@ def seed_db():
     
     # 3. Procurement Requests
     prs_data = [
-        {"request_number": "PR-1001", "department": "IT", "total_cost": 4500.0, "estimated_cost": 4500.0, "approval_status": "Pending"},
+        {"request_number": "PR-1001", "department": "IT", "total_cost": 4500.0, "estimated_cost": 4500.0, "approval_status": "Approved"},
         {"request_number": "PR-1002", "department": "Operations", "total_cost": 1200.0, "estimated_cost": 1200.0, "approval_status": "Approved"},
-        {"request_number": "PR-1003", "department": "Marketing", "total_cost": 8500.0, "estimated_cost": 8500.0, "approval_status": "Rejected"},
-        {"request_number": "PR-1004", "department": "HR", "total_cost": 300.0, "estimated_cost": 300.0, "approval_status": "Pending"}
+        {"request_number": "PR-1003", "department": "Marketing", "total_cost": 8500.0, "estimated_cost": 8500.0, "approval_status": "Approved"},
+        {"request_number": "PR-1004", "department": "HR", "total_cost": 300.0, "estimated_cost": 300.0, "approval_status": "Approved"}
     ]
     for pr in prs_data:
         db_pr = models.ProcurementRequest(**pr)
@@ -85,6 +84,24 @@ def seed_db():
     db.commit()
     print("Contracts seeded!")
     
+    db.close()
+    
+    # 5. Purchase Orders
+    po_data = [
+        {"pr_id": 1, "vendor_id": 1, "po_number": "PO-2026-001", "fulfillment_status": "Delivered"},
+        {"pr_id": 2, "vendor_id": 2, "po_number": "PO-2026-002", "fulfillment_status": "In Progress"},
+        {"pr_id": 3, "vendor_id": 3, "po_number": "PO-2026-003", "fulfillment_status": "Pending"},
+        {"pr_id": 4, "vendor_id": 8, "po_number": "PO-2026-004", "fulfillment_status": "Delayed"}
+    ]
+    db = SessionLocal()
+    for p_data in po_data:
+        po = models.PurchaseOrder(**p_data)
+        db.add(po)
+        db.flush()
+        po_item = models.POItem(po_id=po.id, pr_item_id=po.pr_id)
+        db.add(po_item)
+    db.commit()
+    print("Purchase Orders seeded!")
     db.close()
 
 if __name__ == "__main__":

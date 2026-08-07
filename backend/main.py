@@ -327,7 +327,22 @@ def get_vendors(db: Session = Depends(database.get_db)):
 
 @app.post("/api/vendors", response_model=VendorResponse)
 def create_vendor(vendor: VendorCreate, db: Session = Depends(database.get_db), current_user: models.User = Depends(allow_admin_procumentor)):
+    # Check if a user already exists for this email
+    existing_user = db.query(models.User).filter(models.User.email == vendor.contact_email).first()
+    
+    if not existing_user:
+        # Create new user for the vendor with default password "1234"
+        existing_user = models.User(
+            name=vendor.company_name + " Rep",
+            email=vendor.contact_email,
+            password_hash=get_password_hash("1234"),
+            role="vendor"
+        )
+        db.add(existing_user)
+        db.flush() # Get user ID
+        
     db_vendor = models.Vendor(**vendor.dict())
+    db_vendor.user_id = existing_user.id
     db.add(db_vendor)
     db.commit()
     db.refresh(db_vendor)
