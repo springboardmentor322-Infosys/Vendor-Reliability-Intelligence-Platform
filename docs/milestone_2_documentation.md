@@ -1,10 +1,8 @@
 # 1. Cover Page
 
 **Project Title:** Vendor Reliability Intelligence Platform  
-**Name:** [Your Name]  
-**College:** [Your College]  
+**Name:** B P S Kruthi   
 **Program:** Infosys Springboard Internship  
-**Mentor Name:** [Mentor Name]  
 **Milestone:** Milestone 2  
 
 ---
