@@ -191,6 +191,19 @@ class DeliveryDocument(Base):
     uploader: Mapped[User] = relationship(foreign_keys=[uploaded_by])
 
 
+class ContractStatus(str, PyEnum):
+    ACTIVE = "Active"
+    EXPIRING_SOON = "Expiring Soon"
+    EXPIRED = "Expired"
+    DRAFT = "Draft"
+
+
+class ComplianceFlag(str, PyEnum):
+    COMPLIANT = "Compliant"
+    NON_COMPLIANT = "Non-Compliant"
+    UNDER_REVIEW = "Under Review"
+
+
 class Contract(Base):
     __tablename__ = "contracts"
 
@@ -198,12 +211,20 @@ class Contract(Base):
     contract_number: Mapped[str] = mapped_column(String(100), nullable=False, unique=True, index=True)
     vendor_id: Mapped[int] = mapped_column(ForeignKey("vendors.id"), nullable=False, index=True)
     created_by_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    file_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     start_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    end_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    expiry_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    renewal_notice_period_days: Mapped[int] = mapped_column(Integer, nullable=False, default=30)
     contract_value: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     currency: Mapped[str] = mapped_column(String(10), nullable=False, default="USD")
-    status: Mapped[str] = mapped_column(String(50), nullable=False, default="active")
-    terms_summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    terms: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    compliance_flag: Mapped[ComplianceFlag] = mapped_column(
+        String(50), nullable=False, default=ComplianceFlag.UNDER_REVIEW
+    )
+    status: Mapped[ContractStatus] = mapped_column(
+        String(50), nullable=False, default=ContractStatus.DRAFT
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -327,6 +348,8 @@ __all__ = [
     "DeliveryDocument",
     "DeliveryDocType",
     "Contract",
+    "ContractStatus",
+    "ComplianceFlag",
     "ComplianceDocument",
     "Communication",
     "Message",

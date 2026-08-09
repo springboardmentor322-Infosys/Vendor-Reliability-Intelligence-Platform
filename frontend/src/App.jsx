@@ -21,6 +21,7 @@ import FinanceDashboard from './pages/FinanceDashboard'
 import AuditorDashboard from './pages/AuditorDashboard'
 import SupplyChainDashboard from './pages/SupplyChainDashboard'
 import ProcurementRequests from './pages/ProcurementRequests'
+import Contracts from './pages/Contracts'
 
 export default function App() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/supply-chain" element={<SupplyChainDashboard />} />
               <Route path="/procurement-requests" element={<ProcurementRequests />} />
+              <Route path="/contracts" element={<Contracts />} />
               <Route path="/auditor-dashboard" element={<AuditorDashboard />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/reset-password" element={<ResetPassword />} />
