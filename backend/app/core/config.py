@@ -21,6 +21,12 @@ class Settings:
     ADMIN_EMAIL: str = os.getenv("ADMIN_EMAIL", "")
     ADMIN_PASSWORD: str = os.getenv("ADMIN_PASSWORD", "")
 
+    SMTP_HOST: str = os.getenv("SMTP_HOST", "")
+    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_USER: str = os.getenv("SMTP_USER", "")
+    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
+    SMTP_FROM_NAME: str = os.getenv("SMTP_FROM_NAME", "VendorIQ")
+
     @property
     def database_url(self) -> str:
         password = quote_plus(self.DB_PASSWORD)

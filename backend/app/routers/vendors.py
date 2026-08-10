@@ -25,6 +25,7 @@ from app.schemas.vendor import (
     VendorUpdate,
 )
 from app.services.audit import format_status_change_description, record_audit_log
+from app.services.email import notify_vendor_status_change
 from app.services.vendor_documents import save_vendor_document
 
 router = APIRouter(prefix="/vendors", tags=["vendors"])
@@ -359,6 +360,14 @@ def update_vendor_status(
 
     db.commit()
     db.refresh(vendor)
+
+    notify_vendor_status_change(
+        vendor_name=vendor.name,
+        vendor_email=vendor.contact_email,
+        new_status=new_status.value,
+        rejection_reason=vendor.rejection_reason,
+    )
+
     return vendor
 
 

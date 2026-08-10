@@ -17,6 +17,7 @@ from app.schemas.procurement import (
     ProcurementRequestReject,
     ProcurementRequestResponse,
 )
+from app.services.email import notify_procurement_decision
 
 router = APIRouter(prefix="/procurement-requests", tags=["procurement-requests"])
 
@@ -150,6 +151,17 @@ def approve_procurement_request(
     pr.rejection_reason = None
     db.commit()
     db.refresh(pr)
+
+    requester = db.get(User, pr.requested_by)
+    if requester:
+        notify_procurement_decision(
+            requester_email=requester.email,
+            requester_name=requester.name,
+            request_id=pr.id,
+            department=pr.department,
+            approved=True,
+        )
+
     return pr
 
 
@@ -176,4 +188,16 @@ def reject_procurement_request(
     pr.rejection_reason = payload.reason
     db.commit()
     db.refresh(pr)
+
+    requester = db.get(User, pr.requested_by)
+    if requester:
+        notify_procurement_decision(
+            requester_email=requester.email,
+            requester_name=requester.name,
+            request_id=pr.id,
+            department=pr.department,
+            approved=False,
+            rejection_reason=payload.reason,
+        )
+
     return pr

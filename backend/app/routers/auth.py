@@ -10,7 +10,8 @@ from app.core.security import (
     verify_password,
 )
 from app.db.session import get_db
-from app.models.user import User
+from app.models.user import Role, User
+from app.services.vendor_profile import create_vendor_profile_for_user
 from app.schemas.auth import (
     ResetPasswordRequest,
     Token,
@@ -39,7 +40,11 @@ def register(payload: UserRegister, db: Session = Depends(get_db)) -> User:
         role=payload.role,
     )
     db.add(user)
+
     try:
+        db.flush()
+        if payload.role == Role.VENDOR:
+            create_vendor_profile_for_user(db, user)
         db.commit()
     except IntegrityError as exc:
         db.rollback()
@@ -47,6 +52,13 @@ def register(payload: UserRegister, db: Session = Depends(get_db)) -> User:
             status_code=status.HTTP_409_CONFLICT,
             detail="Email already registered",
         ) from exc
+    except ValueError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
+
     db.refresh(user)
     return user
 

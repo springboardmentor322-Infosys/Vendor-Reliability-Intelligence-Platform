@@ -1,9 +1,11 @@
 """Contracts router — manage vendor contracts with compliance tracking."""
 
+import uuid
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from sqlalchemy import select, or_, and_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.security import get_current_user
@@ -18,6 +20,7 @@ from app.schemas.contract import (
 )
 from app.services.audit import format_status_change_description, record_audit_log
 from app.services.contract_documents import ensure_contract_upload_dir, save_contract_file
+from app.services.email import notify_contract_expiring_soon
 
 router = APIRouter(prefix="/contracts", tags=["contracts"])
 
@@ -27,19 +30,13 @@ READONLY_ROLES = {Role.SUPPLY_CHAIN_MANAGER, Role.FINANCE_OFFICER, Role.AUDITOR,
 
 # Configurable expiry thresholds (in days)
 EXPIRY_THRESHOLDS = [90, 60, 30]
+MAX_CONTRACT_NUMBER_RETRIES = 3
 
 
-def _generate_contract_number(db: Session) -> str:
-    """Generate a unique contract number."""
-    today = datetime.now(timezone.utc).date()
-    count = db.scalar(
-        select(Contract.id).where(
-            Contract.created_at >= datetime.combine(today, datetime.min.time())
-        )
-    )
-    seq = (count or 0) + 1
+def _format_contract_number(contract_id: int) -> str:
+    """Build a unique contract number from the persisted row id."""
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d")
-    return f"CTR-{timestamp}-{seq:04d}"
+    return f"CTR-{timestamp}-{contract_id:06d}"
 
 
 def _get_contract_or_404(contract_id: int, db: Session) -> Contract:
@@ -165,6 +162,14 @@ def _create_expiry_notifications(contract: Contract, db: Session) -> None:
                         related_entity_id=contract.id,
                     )
                     db.add(notification)
+                    notify_contract_expiring_soon(
+                        recipient_email=pm.email,
+                        recipient_name=pm.name,
+                        contract_title=contract.title,
+                        contract_number=contract.contract_number,
+                        expiry_date=contract.expiry_date.strftime("%Y-%m-%d"),
+                        days_remaining=days_until,
+                    )
             
             # Also notify vendor's associated user (if any)
             vendor = contract.vendor
@@ -191,6 +196,14 @@ def _create_expiry_notifications(contract: Contract, db: Session) -> None:
                             related_entity_type="contract",
                             related_entity_id=contract.id,
                         ))
+                        notify_contract_expiring_soon(
+                            recipient_email=vendor_user.email,
+                            recipient_name=vendor_user.name,
+                            contract_title=contract.title,
+                            contract_number=contract.contract_number,
+                            expiry_date=contract.expiry_date.strftime("%Y-%m-%d"),
+                            days_remaining=days_until,
+                        )
             
             break  # Only notify once for the highest threshold met
     
@@ -237,30 +250,44 @@ async def create_contract(
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))
     
-    # Generate contract number
-    contract_number = _generate_contract_number(db)
-    
     # Compute initial status based on dates
     computed_status = _compute_status(data.expiry_date, data.renewal_notice_period_days)
-    
-    contract = Contract(
-        contract_number=contract_number,
-        vendor_id=data.vendor_id,
-        created_by_user_id=current_user.id,
-        title=data.title,
-        file_url=file_url,
-        start_date=data.start_date,
-        expiry_date=data.expiry_date,
-        renewal_notice_period_days=data.renewal_notice_period_days,
-        contract_value=data.contract_value,
-        currency=data.currency,
-        terms=data.terms,
-        compliance_flag=data.compliance_flag,
-        status=data.status if data.status != "Draft" else computed_status,
-    )
-    db.add(contract)
-    db.commit()
-    db.refresh(contract)
+
+    contract_fields = {
+        "vendor_id": data.vendor_id,
+        "created_by_user_id": current_user.id,
+        "title": data.title,
+        "file_url": file_url,
+        "start_date": data.start_date,
+        "expiry_date": data.expiry_date,
+        "renewal_notice_period_days": data.renewal_notice_period_days,
+        "contract_value": data.contract_value,
+        "currency": data.currency,
+        "terms": data.terms,
+        "compliance_flag": data.compliance_flag,
+        "status": data.status if data.status != "Draft" else computed_status,
+    }
+
+    contract = None
+    for attempt in range(MAX_CONTRACT_NUMBER_RETRIES):
+        contract = Contract(
+            contract_number=f"TMP-{uuid.uuid4().hex}",
+            **contract_fields,
+        )
+        db.add(contract)
+        try:
+            db.flush()
+            contract.contract_number = _format_contract_number(contract.id)
+            db.commit()
+            db.refresh(contract)
+            break
+        except IntegrityError as exc:
+            db.rollback()
+            if attempt == MAX_CONTRACT_NUMBER_RETRIES - 1:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Could not create contract due to a numbering conflict. Please retry.",
+                ) from exc
     
     # Check and create expiry notifications
     _create_expiry_notifications(contract, db)
@@ -308,6 +335,8 @@ def list_contracts(
                 contract.status = new_status
                 _maybe_log_status_change(contract, old_status, new_status, current_user, db)
                 db.commit()
+                if new_status == ContractStatus.EXPIRING_SOON:
+                    _create_expiry_notifications(contract, db)
         
         results.append(_enrich_response(contract))
     
@@ -340,6 +369,8 @@ def get_contract(
             contract.status = new_status
             _maybe_log_status_change(contract, old_status, new_status, current_user, db)
             db.commit()
+            if new_status == ContractStatus.EXPIRING_SOON:
+                _create_expiry_notifications(contract, db)
     
     return _enrich_response(contract)
 

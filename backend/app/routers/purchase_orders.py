@@ -1,8 +1,10 @@
+import uuid
 from datetime import datetime, timezone
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.security import get_current_user
@@ -28,23 +30,16 @@ from app.schemas.purchase_order import (
     VENDOR_ALLOWED_STATUSES,
 )
 from app.services.audit import format_status_change_description, record_audit_log
+from app.services.email import notify_po_issued
 from app.services.po_documents import ensure_po_upload_dir, save_po_document
 
 router = APIRouter(prefix="/purchase-orders", tags=["purchase-orders"])
 
 
-def _generate_po_number(db: Session) -> str:
-    """Generate a unique PO number based on timestamp and sequence."""
-    # Get the count of POs today to create a sequence
-    today = datetime.now(timezone.utc).date()
-    count = db.scalar(
-        select(PurchaseOrder.id).where(
-            PurchaseOrder.order_date >= datetime.combine(today, datetime.min.time())
-        )
-    )
-    seq = (count or 0) + 1
+def _format_po_number(po_id: int) -> str:
+    """Build a unique PO number from the persisted row id."""
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d")
-    return f"PO-{timestamp}-{seq:04d}"
+    return f"PO-{timestamp}-{po_id:06d}"
 
 
 def _get_po_or_404(po_id: int, db: Session, *, with_items: bool = False) -> PurchaseOrder:
@@ -160,15 +155,13 @@ def create_purchase_order(
             detail=f"Vendor must be approved (current status: {vendor.status.value})",
         )
 
-    # Create PO
-    po_number = _generate_po_number(db)
     total_amount = sum(
         Decimal(str(item.quantity)) * Decimal(str(item.estimated_unit_cost))
         for item in pr.items
     )
 
     po = PurchaseOrder(
-        po_number=po_number,
+        po_number=f"TMP-{uuid.uuid4().hex}",
         procurement_request_id=pr.id,
         vendor_id=vendor.id,
         order_date=datetime.now(timezone.utc),
@@ -190,12 +183,33 @@ def create_purchase_order(
     ]
 
     db.add(po)
-    db.commit()
-    db.refresh(po)
+    try:
+        db.flush()
+        po.po_number = _format_po_number(po.id)
+        pr.status = ProcurementRequestStatus.ORDERED
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Could not create purchase order due to a numbering conflict. Please retry.",
+        ) from exc
 
-    # Update PR status to Ordered
-    pr.status = ProcurementRequestStatus.ORDERED
-    db.commit()
+    db.refresh(po)
+    po_number = po.po_number
+
+    expected_delivery = (
+        payload.expected_delivery_date.strftime("%Y-%m-%d")
+        if payload.expected_delivery_date
+        else None
+    )
+    notify_po_issued(
+        vendor_name=vendor.name,
+        vendor_email=vendor.contact_email,
+        po_number=po_number,
+        total_amount=f"${total_amount:,.2f}",
+        expected_delivery=expected_delivery,
+    )
 
     # Reload with relationships
     return _get_po_or_404(po.id, db, with_items=True)

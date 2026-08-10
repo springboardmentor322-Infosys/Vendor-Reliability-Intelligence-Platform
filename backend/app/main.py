@@ -14,6 +14,7 @@ from app.routers import admin, audit_logs, auth, contracts, messages, procuremen
 from app.services.vendor_documents import ensure_upload_dir
 from app.services.po_documents import ensure_po_upload_dir
 from app.services.contract_documents import ensure_contract_upload_dir
+from app.services.vendor_profile import count_vendor_users_missing_profile
 
 app = FastAPI(title="Vendor Reliability Platform")
 
@@ -58,6 +59,12 @@ def initialize_database() -> None:
     try:
         ensure_admin_account(db)
         ensure_vendor_categories(db)
+        missing_profiles = count_vendor_users_missing_profile(db)
+        if missing_profiles:
+            print(
+                f"Vendor profile backfill needed: {missing_profiles} Vendor user(s) "
+                "have no linked vendor record"
+            )
     finally:
         db.close()
 
