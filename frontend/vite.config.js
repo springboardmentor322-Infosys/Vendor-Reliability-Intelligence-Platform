@@ -13,6 +13,8 @@ export default defineConfig({
       '/procurement-requests': 'http://127.0.0.1:8000',
       '/purchase-orders': 'http://127.0.0.1:8000',
       '/contracts': 'http://127.0.0.1:8000',
+      '/messages': 'http://127.0.0.1:8000',
+      '/audit-logs': 'http://127.0.0.1:8000',
       '/uploads': 'http://127.0.0.1:8000',
     },
   },

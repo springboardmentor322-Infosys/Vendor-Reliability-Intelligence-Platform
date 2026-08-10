@@ -9,6 +9,8 @@ import {
 } from '../api/contracts'
 import { fetchVendors } from '../api/vendors'
 import { getErrorMessage } from '../utils/auth'
+import DetailTabBar from '../components/DetailTabBar'
+import DiscussionPanel from '../components/DiscussionPanel'
 import '../dashboard-admin.css'
 import '../vendor-management.css'
 
@@ -78,6 +80,7 @@ function ContractDetailModal({ contractId, user, onClose, onUpdated }) {
   const [editForm, setEditForm] = useState({})
   const [updating, setUpdating] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [activeTab, setActiveTab] = useState('overview')
   const fileRef = useRef(null)
 
   const role = user?.role
@@ -156,6 +159,12 @@ function ContractDetailModal({ contractId, user, onClose, onUpdated }) {
           ) : error && !contract ? (
             <p className="form-error">{error}</p>
           ) : contract ? (
+            <>
+              <DetailTabBar activeTab={activeTab} onChange={setActiveTab} />
+
+              {activeTab === 'discussion' ? (
+                <DiscussionPanel threadType="contract" referenceId={contractId} />
+              ) : (
             <div className="contract-detail">
               <div className="contract-detail__header">
                 <h3>{contract.title}</h3>
@@ -264,27 +273,29 @@ function ContractDetailModal({ contractId, user, onClose, onUpdated }) {
                 </>
               )}
             </div>
+              )}
+            </>
           ) : null}
         </div>
 
         <div className="modal-panel__footer">
           {editing ? (
             <>
-              <button type="button" className="btn btn-secondary" onClick={() => setEditing(false)} disabled={updating}>
+              <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={() => setEditing(false)} disabled={updating}>
                 Cancel
               </button>
-              <button type="button" className="btn btn-primary" onClick={handleUpdate} disabled={updating}>
+              <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary" onClick={handleUpdate} disabled={updating}>
                 {updating ? 'Saving...' : 'Save Changes'}
               </button>
             </>
           ) : (
             <>
-              <button type="button" className="btn btn-secondary" onClick={onClose}>
+              <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={onClose}>
                 Close
               </button>
               {canModify && (
                 <>
-                  <label className="btn btn-secondary upload-btn">
+                  <label className="dashboard-admin-btn dashboard-admin-btn--ghost upload-btn">
                     {uploading ? 'Uploading...' : 'Upload File'}
                     <input
                       ref={fileRef}
@@ -295,7 +306,7 @@ function ContractDetailModal({ contractId, user, onClose, onUpdated }) {
                       hidden
                     />
                   </label>
-                  <button type="button" className="btn btn-primary" onClick={() => setEditing(true)}>
+                  <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary" onClick={() => setEditing(true)}>
                     Edit Contract
                   </button>
                 </>
@@ -382,7 +393,7 @@ function CreateContractModal({ onClose, onCreated }) {
           {loading ? (
             <p className="loading-state">Loading vendors…</p>
           ) : (
-            <form className="vendor-form" onSubmit={handleSubmit}>
+            <form id="create-contract-form" className="vendor-form" onSubmit={handleSubmit}>
               {error && <p className="form-error">{error}</p>}
 
               <label>
@@ -515,10 +526,10 @@ function CreateContractModal({ onClose, onCreated }) {
 
         {!loading && (
           <div className="modal-panel__footer">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>
+            <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={onClose}>
               Cancel
             </button>
-            <button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={submitting}>
+            <button type="submit" form="create-contract-form" className="dashboard-admin-btn dashboard-admin-btn--primary" disabled={submitting}>
               {submitting ? 'Creating...' : 'Create Contract'}
             </button>
           </div>
@@ -575,88 +586,94 @@ export default function Contracts() {
   }, [contracts])
 
   return (
-    <div className="dashboard-page page-enter">
-      <div className="page-header">
+    <section className="dashboard-admin-main page-enter">
+      <header className="dashboard-admin-header">
         <div>
           <h1>Contracts & Compliance</h1>
-          <p className="page-subtitle">
+          <p>
             {isVendor ? 'Your contracts' : 'Manage vendor contracts and track compliance'}
           </p>
         </div>
         {canCreate && (
-          <button className="btn btn-primary" onClick={() => setShowCreate(true)}>
-            + New Contract
-          </button>
+          <div className="dashboard-admin-header__actions">
+            <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary" onClick={() => setShowCreate(true)}>
+              + New Contract
+            </button>
+          </div>
         )}
+      </header>
+
+      <div className="dashboard-admin-grid dashboard-admin-grid--cards-4">
+        <article className="dashboard-card">
+          <div className="dashboard-card__label">Total Contracts</div>
+          <div className="dashboard-card__value">{stats.total}</div>
+        </article>
+        <article className="dashboard-card">
+          <div className="dashboard-card__label">Active</div>
+          <div className="dashboard-card__value">{stats.active}</div>
+        </article>
+        <article className="dashboard-card">
+          <div className="dashboard-card__label">Expiring Soon</div>
+          <div className="dashboard-card__value">{stats.expiringSoon}</div>
+        </article>
+        <article className="dashboard-card">
+          <div className="dashboard-card__label">Non-Compliant</div>
+          <div className="dashboard-card__value">{stats.nonCompliant}</div>
+        </article>
       </div>
 
-      {/* Stats Cards */}
-      <div className="stats-grid stats-grid--four">
-        <div className="stat-card">
-          <span className="stat-card__label">Total Contracts</span>
-          <span className="stat-card__value">{stats.total}</span>
-        </div>
-        <div className="stat-card stat-card--success">
-          <span className="stat-card__label">Active</span>
-          <span className="stat-card__value">{stats.active}</span>
-        </div>
-        <div className="stat-card stat-card--warning">
-          <span className="stat-card__label">Expiring Soon</span>
-          <span className="stat-card__value">{stats.expiringSoon}</span>
-        </div>
-        <div className="stat-card stat-card--danger">
-          <span className="stat-card__label">Non-Compliant</span>
-          <span className="stat-card__value">{stats.nonCompliant}</span>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="filters-bar">
-        <select
-          value={filters.status}
-          onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-        >
-          <option value="">All Statuses</option>
-          {CONTRACT_STATUSES.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
-        <select
-          value={filters.compliance_flag}
-          onChange={(e) => setFilters({ ...filters, compliance_flag: e.target.value })}
-        >
-          <option value="">All Compliance</option>
-          {COMPLIANCE_FLAGS.map((f) => (
-            <option key={f} value={f}>{f}</option>
-          ))}
-        </select>
-        {(filters.status || filters.compliance_flag) && (
-          <button
-            className="btn btn-text"
-            onClick={() => setFilters({ status: '', compliance_flag: '' })}
+      <div className="page-toolbar" style={{ marginTop: '1rem' }}>
+        <div className="filter-group">
+          <select
+            className="filter-search"
+            style={{ width: 'auto', minWidth: '160px' }}
+            value={filters.status}
+            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
           >
-            Clear filters
-          </button>
-        )}
-      </div>
-
-      {/* Table */}
-      {loading ? (
-        <p className="loading-text">Loading contracts...</p>
-      ) : error ? (
-        <p className="error-text">{error}</p>
-      ) : contracts.length === 0 ? (
-        <div className="empty-state">
-          <p>No contracts found</p>
-          {canCreate && (
-            <button className="btn btn-primary" onClick={() => setShowCreate(true)}>
-              Create your first contract
+            <option value="">All Statuses</option>
+            {CONTRACT_STATUSES.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+          <select
+            className="filter-search"
+            style={{ width: 'auto', minWidth: '160px' }}
+            value={filters.compliance_flag}
+            onChange={(e) => setFilters({ ...filters, compliance_flag: e.target.value })}
+          >
+            <option value="">All Compliance</option>
+            {COMPLIANCE_FLAGS.map((f) => (
+              <option key={f} value={f}>{f}</option>
+            ))}
+          </select>
+          {(filters.status || filters.compliance_flag) && (
+            <button type="button" className="btn-text" onClick={() => setFilters({ status: '', compliance_flag: '' })}>
+              Clear filters
             </button>
           )}
         </div>
+      </div>
+
+      {loading ? (
+        <p className="loading-state">Loading contracts…</p>
+      ) : error ? (
+        <p className="form-error">{error}</p>
+      ) : contracts.length === 0 ? (
+        <section className="table-card">
+          <p style={{ color: '#64748b' }}>No contracts found.</p>
+          {canCreate && (
+            <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary" onClick={() => setShowCreate(true)} style={{ marginTop: '0.75rem' }}>
+              Create your first contract
+            </button>
+          )}
+        </section>
       ) : (
-        <div className="table-responsive">
-          <table className="data-table">
+        <section className="table-card">
+          <div className="table-card__header">
+            <h3>Contracts</h3>
+            <span className="table-card__meta">{contracts.length} contract{contracts.length === 1 ? '' : 's'}</span>
+          </div>
+          <table>
             <thead>
               <tr>
                 <th>Contract #</th>
@@ -688,7 +705,9 @@ export default function Contracts() {
                     <td><ComplianceBadge flag={c.compliance_flag} /></td>
                     <td>
                       <button
-                        className="btn btn-sm btn-secondary"
+                        type="button"
+                        className="dashboard-admin-btn dashboard-admin-btn--ghost"
+                        style={{ padding: '0.35rem 0.75rem', fontSize: '0.82rem' }}
                         onClick={() => setSelectedId(c.id)}
                       >
                         View
@@ -699,7 +718,7 @@ export default function Contracts() {
               })}
             </tbody>
           </table>
-        </div>
+        </section>
       )}
 
       {/* Modals */}
@@ -718,6 +737,6 @@ export default function Contracts() {
           onCreated={load}
         />
       )}
-    </div>
+    </section>
   )
 }

@@ -24,6 +24,7 @@ from app.schemas.vendor import (
     VendorStatusUpdate,
     VendorUpdate,
 )
+from app.services.audit import format_status_change_description, record_audit_log
 from app.services.vendor_documents import save_vendor_document
 
 router = APIRouter(prefix="/vendors", tags=["vendors"])
@@ -342,6 +343,18 @@ def update_vendor_status(
         to_status=new_status,
         changed_by=current_user.id,
         rejection_reason=payload.rejection_reason if new_status == VendorStatus.REJECTED else None,
+    )
+
+    record_audit_log(
+        db,
+        action_description=format_status_change_description(
+            f"Vendor {vendor.name}",
+            new_status.value,
+            current_user,
+        ),
+        performed_by=current_user.id,
+        entity_type="vendor",
+        entity_id=vendor.id,
     )
 
     db.commit()

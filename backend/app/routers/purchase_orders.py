@@ -27,6 +27,7 @@ from app.schemas.purchase_order import (
     PM_ALLOWED_STATUSES,
     VENDOR_ALLOWED_STATUSES,
 )
+from app.services.audit import format_status_change_description, record_audit_log
 from app.services.po_documents import ensure_po_upload_dir, save_po_document
 
 router = APIRouter(prefix="/purchase-orders", tags=["purchase-orders"])
@@ -292,6 +293,18 @@ def update_purchase_order_status(
     po.status = PurchaseOrderStatus(payload.status)
     if payload.notes is not None:
         po.notes = payload.notes
+
+    record_audit_log(
+        db,
+        action_description=format_status_change_description(
+            f"PO {po.po_number}",
+            payload.status,
+            current_user,
+        ),
+        performed_by=current_user.id,
+        entity_type="purchase_order",
+        entity_id=po.id,
+    )
 
     db.commit()
     db.refresh(po)

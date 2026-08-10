@@ -12,6 +12,8 @@ import { fetchProcurementRequests } from '../api/procurement'
 import { fetchVendors } from '../api/vendors'
 import { getErrorMessage } from '../utils/auth'
 import { formatDateTime } from '../utils/vendorStatus'
+import DetailTabBar from '../components/DetailTabBar'
+import DiscussionPanel from '../components/DiscussionPanel'
 import '../dashboard-admin.css'
 import '../vendor-management.css'
 
@@ -81,6 +83,7 @@ function PODetailModal({ poId, user, onClose, onUpdated }) {
   const [updating, setUpdating] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [docType, setDocType] = useState(DOC_TYPES[0])
+  const [activeTab, setActiveTab] = useState('overview')
   const fileRef = useRef(null)
 
   const role = user?.role
@@ -156,6 +159,12 @@ function PODetailModal({ poId, user, onClose, onUpdated }) {
 
         {po && (
           <div className="modal-panel__body">
+            <DetailTabBar activeTab={activeTab} onChange={setActiveTab} />
+
+            {activeTab === 'discussion' ? (
+              <DiscussionPanel threadType="purchase_order" referenceId={poId} />
+            ) : (
+              <>
             {/* Status pipeline */}
             <div className="approval-pipeline">
               {ALL_STATUSES.filter((s) => s !== 'Cancelled').map((s, i) => {
@@ -318,6 +327,8 @@ function PODetailModal({ poId, user, onClose, onUpdated }) {
             </div>
 
             {error && <p className="form-error">{error}</p>}
+              </>
+            )}
           </div>
         )}
       </div>

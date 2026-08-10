@@ -16,6 +16,7 @@ from app.schemas.contract import (
     ContractResponse,
     ContractUpdate,
 )
+from app.services.audit import format_status_change_description, record_audit_log
 from app.services.contract_documents import ensure_contract_upload_dir, save_contract_file
 
 router = APIRouter(prefix="/contracts", tags=["contracts"])
@@ -93,6 +94,29 @@ def _enrich_response(contract: Contract) -> ContractResponse:
         status=contract.status,
         created_at=contract.created_at,
         days_until_expiry=days_until,
+    )
+
+
+def _maybe_log_status_change(
+    contract: Contract,
+    old_status: ContractStatus,
+    new_status: ContractStatus,
+    user: User,
+    db: Session,
+) -> None:
+    if old_status == new_status:
+        return
+    new_status_value = new_status.value if hasattr(new_status, "value") else str(new_status)
+    record_audit_log(
+        db,
+        action_description=format_status_change_description(
+            f"Contract {contract.contract_number}",
+            new_status_value,
+            user,
+        ),
+        performed_by=user.id,
+        entity_type="contract",
+        entity_id=contract.id,
     )
 
 
@@ -280,7 +304,9 @@ def list_contracts(
         if contract.status != ContractStatus.DRAFT:
             new_status = _compute_status(contract.expiry_date, contract.renewal_notice_period_days)
             if contract.status != new_status:
+                old_status = contract.status
                 contract.status = new_status
+                _maybe_log_status_change(contract, old_status, new_status, current_user, db)
                 db.commit()
         
         results.append(_enrich_response(contract))
@@ -310,7 +336,9 @@ def get_contract(
     if contract.status != ContractStatus.DRAFT:
         new_status = _compute_status(contract.expiry_date, contract.renewal_notice_period_days)
         if contract.status != new_status:
+            old_status = contract.status
             contract.status = new_status
+            _maybe_log_status_change(contract, old_status, new_status, current_user, db)
             db.commit()
     
     return _enrich_response(contract)
@@ -335,6 +363,8 @@ def update_contract(
     update_data = updates.model_dump(exclude_unset=True)
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields to update")
+
+    old_status = contract.status
     
     for field, value in update_data.items():
         setattr(contract, field, value)
@@ -343,6 +373,9 @@ def update_contract(
     if "expiry_date" in update_data or "renewal_notice_period_days" in update_data:
         if contract.status != ContractStatus.DRAFT:
             contract.status = _compute_status(contract.expiry_date, contract.renewal_notice_period_days)
+
+    if "status" in update_data or contract.status != old_status:
+        _maybe_log_status_change(contract, old_status, contract.status, current_user, db)
     
     db.commit()
     db.refresh(contract)
