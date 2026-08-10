@@ -3,16 +3,20 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.security import (
     create_access_token,
+    create_password_reset_token,
+    decode_password_reset_token,
     get_current_user,
     get_password_hash,
     verify_password,
 )
 from app.db.session import get_db
 from app.models.user import Role, User
-from app.services.vendor_profile import create_vendor_profile_for_user
 from app.schemas.auth import (
+    ForgotPasswordRequest,
+    MessageResponse,
     ResetPasswordRequest,
     Token,
     UserLogin,
@@ -20,8 +24,14 @@ from app.schemas.auth import (
     UserRegister,
     UserResponse,
 )
+from app.services.email import notify_password_reset
+from app.services.vendor_profile import create_vendor_profile_for_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+FORGOT_PASSWORD_MESSAGE = (
+    "If an account exists for that email address, a password reset link has been sent."
+)
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -82,13 +92,36 @@ def login(payload: UserLogin, db: Session = Depends(get_db)) -> Token:
     return Token(access_token=access_token)
 
 
-@router.post("/reset-password", status_code=status.HTTP_204_NO_CONTENT)
-def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db)) -> None:
+@router.post("/forgot-password", response_model=MessageResponse)
+def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db)) -> MessageResponse:
+    """Request a password reset link. Always returns the same message to prevent email enumeration."""
     user = db.scalar(select(User).where(User.email == payload.email))
+    if user is not None and user.is_active:
+        settings = get_settings()
+        reset_token = create_password_reset_token(user.id)
+        reset_url = f"{settings.FRONTEND_URL.rstrip('/')}/reset-password/{reset_token}"
+        notify_password_reset(
+            recipient_email=user.email,
+            recipient_name=user.name,
+            reset_url=reset_url,
+        )
+
+    return MessageResponse(message=FORGOT_PASSWORD_MESSAGE)
+
+
+@router.post("/reset-password/{token}", status_code=status.HTTP_204_NO_CONTENT)
+def reset_password_with_token(
+    token: str,
+    payload: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+) -> None:
+    """Set a new password using a valid reset token from the forgot-password email."""
+    user_id = decode_password_reset_token(token)
+    user = db.scalar(select(User).where(User.id == user_id))
     if user is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset link. Please request a new password reset.",
         )
     if not user.is_active:
         raise HTTPException(

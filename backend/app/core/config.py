@@ -27,6 +27,9 @@ class Settings:
     SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
     SMTP_FROM_NAME: str = os.getenv("SMTP_FROM_NAME", "VendorIQ")
 
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    PASSWORD_RESET_EXPIRE_MINUTES: int = int(os.getenv("PASSWORD_RESET_EXPIRE_MINUTES", "60"))
+
     @property
     def database_url(self) -> str:
         password = quote_plus(self.DB_PASSWORD)

@@ -25,8 +25,15 @@ class UserLogin(BaseModel):
 
 
 class ResetPasswordRequest(BaseModel):
-    email: EmailStr
     new_password: str = Field(min_length=8, max_length=128)
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class MessageResponse(BaseModel):
+    message: str
 
 
 class UserProfileUpdate(BaseModel):

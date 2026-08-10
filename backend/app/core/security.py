@@ -29,8 +29,36 @@ def create_access_token(subject: str | int, expires_delta: timedelta | None = No
     if expires_delta is None:
         expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     expire = datetime.now(timezone.utc) + expires_delta
-    payload = {"sub": str(subject), "exp": expire}
+    payload = {"sub": str(subject), "exp": expire, "typ": "access"}
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+
+def create_password_reset_token(user_id: int) -> str:
+    expires_delta = timedelta(minutes=settings.PASSWORD_RESET_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + expires_delta
+    payload = {"sub": str(user_id), "exp": expire, "typ": "password_reset"}
+    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+
+def decode_password_reset_token(token: str) -> int:
+    try:
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET_KEY,
+            algorithms=[settings.JWT_ALGORITHM],
+        )
+    except JWTError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset link. Please request a new password reset.",
+        ) from exc
+
+    if payload.get("typ") != "password_reset" or payload.get("sub") is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset link. Please request a new password reset.",
+        )
+    return int(payload["sub"])
 
 
 def decode_access_token(token: str) -> dict[str, Any]:
@@ -46,6 +74,14 @@ def decode_access_token(token: str) -> dict[str, Any]:
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
+
+    token_type = payload.get("typ", "access")
+    if token_type != "access":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     if payload.get("sub") is None:
         raise HTTPException(

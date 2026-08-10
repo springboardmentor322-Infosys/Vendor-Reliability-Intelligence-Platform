@@ -1,3 +1,5 @@
+export const TOKEN_STORAGE_KEY = 'vendoriq_access_token'
+
 export const REGISTER_ROLES = [
   'Procurement Manager',
   'Supply Chain Manager',
@@ -5,6 +7,12 @@ export const REGISTER_ROLES = [
   'Finance Officer',
   'Auditor',
 ]
+
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+export function isValidEmail(email) {
+  return EMAIL_REGEX.test(String(email).trim())
+}
 
 export function getErrorMessage(error, fallback = 'Something went wrong') {
   const detail = error?.response?.data?.detail
@@ -58,4 +66,15 @@ export function isDuplicateEmailError(error) {
 
 export function isInvalidLoginError(error) {
   return error?.response?.status === 401
+}
+
+export function getEmailValidationError(email) {
+  const trimmed = String(email).trim()
+  if (!trimmed) {
+    return 'Email is required.'
+  }
+  if (!isValidEmail(trimmed)) {
+    return 'Enter a valid email address.'
+  }
+  return ''
 }

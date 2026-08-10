@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext'
 import Dashboard from './pages/Dashboard'
 import LandingPage from './pages/LandingPage'
 import Login from './pages/Login'
+import ForgotPassword from './pages/ForgotPassword'
 import Profile from './pages/Profile'
 import Register from './pages/Register'
 import ResetPassword from './pages/ResetPassword'
@@ -31,6 +32,8 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
@@ -50,7 +53,6 @@ export default function App() {
               <Route path="/audit-logs" element={<AuditLogs />} />
               <Route path="/auditor-dashboard" element={<AuditorDashboard />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
             </Route>
           </Route>
           <Route path="/" element={<LandingPage />} />

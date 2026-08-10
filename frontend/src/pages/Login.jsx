@@ -1,19 +1,42 @@
 import { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import AuthAlert from '../components/AuthAlert'
+import PasswordInput from '../components/PasswordInput'
 import { useAuth } from '../context/AuthContext'
-import { getLoginErrorMessage, isInvalidLoginError } from '../utils/auth'
+import {
+  getEmailValidationError,
+  getLoginErrorMessage,
+  isInvalidLoginError,
+} from '../utils/auth'
 import { getDashboardRouteForRole } from '../utils/roleRoutes'
 import '../auth.css'
 
 export default function Login() {
   const navigate = useNavigate()
-  const { login, isAuthenticated, user } = useAuth()
+  const location = useLocation()
+  const { login, isAuthenticated, user, initializing } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [error, setError] = useState(
+    location.state?.sessionExpired
+      ? 'Your session has expired. Please sign in again.'
+      : location.state?.accessDenied
+        ? 'Access denied. Please sign in again.'
+        : '',
+  )
   const [fieldErrors, setFieldErrors] = useState({ email: false, password: false })
+  const [emailMessage, setEmailMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  if (initializing) {
+    return (
+      <main className="auth-page page-enter">
+        <section className="auth-card">
+          <p className="auth-subtitle">Loading…</p>
+        </section>
+      </main>
+    )
+  }
 
   if (isAuthenticated) {
     return <Navigate to={getDashboardRouteForRole(user?.role)} replace />
@@ -22,15 +45,24 @@ export default function Login() {
   const clearErrors = () => {
     setError('')
     setFieldErrors({ email: false, password: false })
+    setEmailMessage('')
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     clearErrors()
+
+    const emailValidationError = getEmailValidationError(email)
+    if (emailValidationError) {
+      setFieldErrors({ email: true, password: false })
+      setEmailMessage(emailValidationError)
+      return
+    }
+
     setSubmitting(true)
 
     try {
-      const currentUser = await login(email, password)
+      const currentUser = await login(email.trim(), password)
       navigate(getDashboardRouteForRole(currentUser?.role))
     } catch (err) {
       setError(getLoginErrorMessage(err))
@@ -65,7 +97,7 @@ export default function Login() {
               value={email}
               onChange={(event) => {
                 setEmail(event.target.value)
-                if (error) clearErrors()
+                if (error || emailMessage) clearErrors()
               }}
               required
               autoComplete="email"
@@ -74,30 +106,31 @@ export default function Login() {
               className={fieldErrors.email ? 'input-error' : undefined}
             />
             <label htmlFor="login-email">Email</label>
-            {fieldErrors.email && (
+            {fieldErrors.email && emailMessage && (
+              <span className="field-error">{emailMessage}</span>
+            )}
+            {fieldErrors.email && !emailMessage && (
               <span className="field-error">Please check your email address.</span>
             )}
           </div>
 
-          <div className="auth-field auth-field-floating">
-            <input
-              id="login-password"
-              type="password"
-              value={password}
-              onChange={(event) => {
-                setPassword(event.target.value)
-                if (error) clearErrors()
-              }}
-              required
-              autoComplete="current-password"
-              placeholder=" "
-              aria-invalid={fieldErrors.password}
-              className={fieldErrors.password ? 'input-error' : undefined}
-            />
-            <label htmlFor="login-password">Password</label>
-            {fieldErrors.password && (
-              <span className="field-error">Please check your password.</span>
-            )}
+          <PasswordInput
+            id="login-password"
+            label="Password"
+            value={password}
+            onChange={(event) => {
+              setPassword(event.target.value)
+              if (error) clearErrors()
+            }}
+            error={fieldErrors.password}
+            errorMessage={fieldErrors.password ? 'Please check your password.' : undefined}
+            autoComplete="current-password"
+          />
+
+          <div className="auth-form__actions">
+            <Link to="/forgot-password" className="auth-link-inline">
+              Forgot password?
+            </Link>
           </div>
 
           <button type="submit" disabled={submitting} className={submitting ? 'is-loading' : undefined}>

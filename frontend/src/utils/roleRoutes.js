@@ -20,7 +20,6 @@ export const ROLE_ALLOWED_ROUTES = {
     '/audit-logs',
     '/notifications',
     '/profile',
-    '/reset-password',
   ],
   Vendor: [
     '/vendor-dashboard',
@@ -30,7 +29,6 @@ export const ROLE_ALLOWED_ROUTES = {
     '/contracts',
     '/notifications',
     '/profile',
-    '/reset-password',
   ],
   'Finance Officer': [
     '/finance-dashboard',
@@ -41,7 +39,6 @@ export const ROLE_ALLOWED_ROUTES = {
     '/reports',
     '/notifications',
     '/profile',
-    '/reset-password',
   ],
   'Procurement Manager': [
     '/procurement',
@@ -53,7 +50,6 @@ export const ROLE_ALLOWED_ROUTES = {
     '/reports',
     '/notifications',
     '/profile',
-    '/reset-password',
   ],
   'Supply Chain Manager': [
     '/supply-chain',
@@ -67,7 +63,6 @@ export const ROLE_ALLOWED_ROUTES = {
     '/reports',
     '/notifications',
     '/profile',
-    '/reset-password',
   ],
   Auditor: [
     '/auditor-dashboard',
@@ -78,7 +73,6 @@ export const ROLE_ALLOWED_ROUTES = {
     '/audit-logs',
     '/notifications',
     '/profile',
-    '/reset-password',
   ],
 }
 

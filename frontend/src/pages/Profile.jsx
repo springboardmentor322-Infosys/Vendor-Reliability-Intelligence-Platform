@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { getErrorMessage } from '../utils/auth'
+import { getEmailValidationError, getErrorMessage } from '../utils/auth'
 import '../auth.css'
 
 export default function Profile() {
@@ -9,6 +10,7 @@ export default function Profile() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
+  const [emailMessage, setEmailMessage] = useState('')
   const [success, setSuccess] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -29,10 +31,18 @@ export default function Profile() {
     event.preventDefault()
     setError('')
     setSuccess('')
+    setEmailMessage('')
+
+    const emailValidationError = getEmailValidationError(email)
+    if (emailValidationError) {
+      setEmailMessage(emailValidationError)
+      return
+    }
+
     setSubmitting(true)
 
     try {
-      await updateProfile({ name, email })
+      await updateProfile({ name, email: email.trim() })
       setSuccess('Profile updated successfully.')
       setEditing(false)
     } catch (err) {
@@ -66,11 +76,21 @@ export default function Profile() {
               <input
                 type="email"
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) => {
+                  setEmail(event.target.value)
+                  if (emailMessage) setEmailMessage('')
+                }}
                 required
                 autoComplete="email"
+                aria-invalid={Boolean(emailMessage)}
+                className={emailMessage ? 'input-error' : undefined}
               />
             </label>
+            {emailMessage && <p className="auth-error">{emailMessage}</p>}
+
+            <p className="auth-hint">
+              Need to change your password? <Link to="/forgot-password">Request a reset link</Link>
+            </p>
 
             <label>
               Role

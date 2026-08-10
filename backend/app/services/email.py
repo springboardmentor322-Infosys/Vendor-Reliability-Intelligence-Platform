@@ -165,3 +165,34 @@ def notify_contract_expiring_soon(
         f"Contract Expiring Soon: {contract_title}",
         body,
     )
+
+
+def notify_password_reset(*, recipient_email: str, recipient_name: str, reset_url: str) -> None:
+    body = _wrap_html(
+        "Reset Your Password",
+        f"""<h3>Password Reset Request</h3>
+<p>Hello {recipient_name},</p>
+<p>We received a request to reset your VendorIQ password. Click the link below to choose a new password:</p>
+<p style="margin: 24px 0;">
+  <a href="{reset_url}" style="background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">Reset Password</a>
+</p>
+<p>Or copy this link into your browser:</p>
+<p style="word-break: break-all; color: #2563eb;">{reset_url}</p>
+<p style="color: #6b7280; font-size: 14px;">This link expires in 1 hour. If you did not request a reset, you can ignore this email.</p>""",
+    )
+    send_email(recipient_email, "Reset your VendorIQ password", body)
+
+
+def notify_password_reset(*, recipient_email: str, recipient_name: str, reset_url: str) -> None:
+    body = _wrap_html(
+        "Reset Your Password",
+        f"""<h3>Password Reset Request</h3>
+<p>Hello {recipient_name},</p>
+<p>We received a request to reset your VendorIQ password. Click the button below to choose a new password. This link expires in 1 hour.</p>
+<p style="text-align: center; margin: 28px 0;">
+  <a href="{reset_url}" style="background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">Reset Password</a>
+</p>
+<p>If you did not request this, you can safely ignore this email.</p>
+<p style="font-size: 13px; color: #6b7280;">Or copy this link: {reset_url}</p>""",
+    )
+    send_email(recipient_email, "Reset your VendorIQ password", body)

@@ -1,21 +1,38 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import AuthAlert from '../components/AuthAlert'
+import PasswordInput from '../components/PasswordInput'
 import { useAuth } from '../context/AuthContext'
-import { REGISTER_ROLES, getRegisterErrorMessage, isDuplicateEmailError } from '../utils/auth'
+import {
+  getEmailValidationError,
+  getRegisterErrorMessage,
+  isDuplicateEmailError,
+  REGISTER_ROLES,
+} from '../utils/auth'
 import { getDashboardRouteForRole } from '../utils/roleRoutes'
 import '../auth.css'
 
 export default function Register() {
   const navigate = useNavigate()
-  const { register, isAuthenticated, user } = useAuth()
+  const { register, isAuthenticated, user, initializing } = useAuth()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState('Vendor')
   const [error, setError] = useState('')
   const [emailError, setEmailError] = useState(false)
+  const [emailMessage, setEmailMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  if (initializing) {
+    return (
+      <main className="auth-page page-enter">
+        <section className="auth-card">
+          <p className="auth-subtitle">Loading…</p>
+        </section>
+      </main>
+    )
+  }
 
   if (isAuthenticated) {
     return <Navigate to={getDashboardRouteForRole(user?.role)} replace />
@@ -24,15 +41,24 @@ export default function Register() {
   const clearErrors = () => {
     setError('')
     setEmailError(false)
+    setEmailMessage('')
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     clearErrors()
+
+    const emailValidationError = getEmailValidationError(email)
+    if (emailValidationError) {
+      setEmailError(true)
+      setEmailMessage(emailValidationError)
+      return
+    }
+
     setSubmitting(true)
 
     try {
-      await register({ name, email, password, role })
+      await register({ name, email: email.trim(), password, role })
       navigate(getDashboardRouteForRole(role))
     } catch (err) {
       setError(getRegisterErrorMessage(err))
@@ -60,7 +86,7 @@ export default function Register() {
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <AuthAlert message={error} />
 
-          {emailError && (
+          {emailError && !emailMessage && (
             <p className="auth-hint">
               Already have an account? <Link to="/login">Sign in here</Link>
             </p>
@@ -99,26 +125,23 @@ export default function Register() {
             />
             <label htmlFor="register-email">Email</label>
             {emailError && (
-              <span className="field-error">This email address is already in use.</span>
+              <span className="field-error">
+                {emailMessage || 'This email address is already in use.'}
+              </span>
             )}
           </div>
 
-          <div className="auth-field auth-field-floating">
-            <input
-              id="register-password"
-              type="password"
-              value={password}
-              onChange={(event) => {
-                setPassword(event.target.value)
-                if (error) clearErrors()
-              }}
-              required
-              minLength={8}
-              autoComplete="new-password"
-              placeholder=" "
-            />
-            <label htmlFor="register-password">Password</label>
-          </div>
+          <PasswordInput
+            id="register-password"
+            label="Password"
+            value={password}
+            onChange={(event) => {
+              setPassword(event.target.value)
+              if (error) clearErrors()
+            }}
+            autoComplete="new-password"
+            minLength={8}
+          />
 
           <div className="auth-field">
             <label className="auth-label-top" htmlFor="register-role">
