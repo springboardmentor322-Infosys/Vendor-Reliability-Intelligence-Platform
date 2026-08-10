@@ -85,7 +85,7 @@ export default function LandingPage() {
 
               <div className="hero-actions">
                 <Link to="/register" className="primary-btn">
-                  Request a Demo
+                  Get Started
                 </Link>
                 <Link to="/login" className="secondary-btn">
                   Sign In
