@@ -30,13 +30,36 @@ READONLY_ROLES = {Role.SUPPLY_CHAIN_MANAGER, Role.FINANCE_OFFICER, Role.AUDITOR,
 
 # Configurable expiry thresholds (in days)
 EXPIRY_THRESHOLDS = [90, 60, 30]
-MAX_CONTRACT_NUMBER_RETRIES = 3
+CONTRACT_NUMBER_RETRIES = 3
 
 
 def _format_contract_number(contract_id: int) -> str:
     """Build a unique contract number from the persisted row id."""
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d")
     return f"CTR-{timestamp}-{contract_id:06d}"
+
+
+def _persist_contract(db: Session, contract: Contract) -> Contract:
+    """Flush, assign the final contract number, and commit with retry on collision."""
+    last_error: IntegrityError | None = None
+
+    for _ in range(CONTRACT_NUMBER_RETRIES):
+        try:
+            db.flush()
+            contract.contract_number = _format_contract_number(contract.id)
+            db.commit()
+            db.refresh(contract)
+            return contract
+        except IntegrityError as exc:
+            db.rollback()
+            last_error = exc
+            contract.contract_number = f"TMP-{uuid.uuid4().hex}"
+            db.add(contract)
+
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT,
+        detail="Could not create contract due to a numbering conflict. Please retry.",
+    ) from last_error
 
 
 def _get_contract_or_404(contract_id: int, db: Session) -> Contract:
@@ -252,42 +275,24 @@ async def create_contract(
     
     # Compute initial status based on dates
     computed_status = _compute_status(data.expiry_date, data.renewal_notice_period_days)
-
-    contract_fields = {
-        "vendor_id": data.vendor_id,
-        "created_by_user_id": current_user.id,
-        "title": data.title,
-        "file_url": file_url,
-        "start_date": data.start_date,
-        "expiry_date": data.expiry_date,
-        "renewal_notice_period_days": data.renewal_notice_period_days,
-        "contract_value": data.contract_value,
-        "currency": data.currency,
-        "terms": data.terms,
-        "compliance_flag": data.compliance_flag,
-        "status": data.status if data.status != "Draft" else computed_status,
-    }
-
-    contract = None
-    for attempt in range(MAX_CONTRACT_NUMBER_RETRIES):
-        contract = Contract(
-            contract_number=f"TMP-{uuid.uuid4().hex}",
-            **contract_fields,
-        )
-        db.add(contract)
-        try:
-            db.flush()
-            contract.contract_number = _format_contract_number(contract.id)
-            db.commit()
-            db.refresh(contract)
-            break
-        except IntegrityError as exc:
-            db.rollback()
-            if attempt == MAX_CONTRACT_NUMBER_RETRIES - 1:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail="Could not create contract due to a numbering conflict. Please retry.",
-                ) from exc
+    
+    contract = Contract(
+        contract_number=f"TMP-{uuid.uuid4().hex}",
+        vendor_id=data.vendor_id,
+        created_by_user_id=current_user.id,
+        title=data.title,
+        file_url=file_url,
+        start_date=data.start_date,
+        expiry_date=data.expiry_date,
+        renewal_notice_period_days=data.renewal_notice_period_days,
+        contract_value=data.contract_value,
+        currency=data.currency,
+        terms=data.terms,
+        compliance_flag=data.compliance_flag,
+        status=data.status if data.status != "Draft" else computed_status,
+    )
+    db.add(contract)
+    contract = _persist_contract(db, contract)
     
     # Check and create expiry notifications
     _create_expiry_notifications(contract, db)
