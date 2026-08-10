@@ -72,34 +72,77 @@ export default function LandingPage() {
 
       <main>
         <section className="hero-section" id="overview">
-          <div className="hero-copy">
-            <p className="hero-eyebrow">Enterprise procurement intelligence</p>
-            <h1>Intelligent Procurement. Reliable Partnerships.</h1>
-            <p className="hero-subheadline">
-              Unify supplier oversight, procurement execution, and operational risk management with one secure platform.
-            </p>
-            <p className="hero-description">
-              VendorIQ helps procurement teams improve collaboration, reduce exposure, and drive better outcomes across every vendor relationship.
-            </p>
+          <div className="hero-inner">
+            <div className="hero-copy">
+              <p className="hero-eyebrow">Enterprise procurement intelligence</p>
+              <h1>Intelligent Procurement. Reliable Partnerships.</h1>
+              <p className="hero-subheadline">
+                Unify supplier oversight, procurement execution, and operational risk management with one secure platform.
+              </p>
+              <p className="hero-description">
+                VendorIQ helps procurement teams improve collaboration, reduce exposure, and drive better outcomes across every vendor relationship.
+              </p>
 
-            <div className="hero-actions">
-              <Link to="/register" className="primary-btn">
-                Request a Demo
-              </Link>
-              <Link to="/login" className="secondary-btn">
-                Sign In
-              </Link>
+              <div className="hero-actions">
+                <Link to="/register" className="primary-btn">
+                  Request a Demo
+                </Link>
+                <Link to="/login" className="secondary-btn">
+                  Sign In
+                </Link>
+              </div>
+
+              <div className="hero-highlights" aria-label="Core capabilities">
+                {heroHighlights.map((item) => (
+                  <div key={item.title} className="highlight-pill">
+                    <span className="highlight-icon" aria-hidden="true">
+                      {item.icon}
+                    </span>
+                    <span>{item.title}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="hero-highlights" aria-label="Core capabilities">
-              {heroHighlights.map((item) => (
-                <div key={item.title} className="highlight-pill">
-                  <span className="highlight-icon" aria-hidden="true">
-                    {item.icon}
-                  </span>
-                  <span>{item.title}</span>
+            <div className="hero-visual" aria-hidden="true">
+              <div className="hero-preview">
+                <div className="hero-preview__chrome">
+                  <span className="hero-preview__dot" />
+                  <span className="hero-preview__dot" />
+                  <span className="hero-preview__dot" />
+                  <span className="hero-preview__title">VendorIQ Dashboard Preview</span>
                 </div>
-              ))}
+                <div className="hero-preview__body">
+                  <div className="hero-preview__sidebar">
+                    <span className="hero-preview__nav-item hero-preview__nav-item--active" />
+                    <span className="hero-preview__nav-item" />
+                    <span className="hero-preview__nav-item" />
+                    <span className="hero-preview__nav-item" />
+                    <span className="hero-preview__nav-item" />
+                  </div>
+                  <div className="hero-preview__content">
+                    <div className="hero-preview__stats">
+                      {stats.slice(0, 3).map((stat) => (
+                        <div key={stat.label} className="hero-preview__stat">
+                          <strong>{stat.value}</strong>
+                          <span>{stat.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="hero-preview__panel">
+                      <span className="hero-preview__bar hero-preview__bar--wide" />
+                      <span className="hero-preview__bar hero-preview__bar--medium" />
+                      <span className="hero-preview__bar hero-preview__bar--accent" />
+                      <span className="hero-preview__bar hero-preview__bar--medium" />
+                      <span className="hero-preview__bar hero-preview__bar--wide" />
+                    </div>
+                  </div>
+                </div>
+                <div className="hero-preview__badge">
+                  <strong>92%</strong>
+                  <span>Vendor compliance score</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
