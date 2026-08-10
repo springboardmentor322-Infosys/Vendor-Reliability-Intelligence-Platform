@@ -31,6 +31,7 @@ from app.schemas.purchase_order import (
 )
 from app.services.audit import format_status_change_description, record_audit_log
 from app.services.email import notify_po_issued
+from app.services.in_app_notifications import create_notification
 from app.services.po_documents import ensure_po_upload_dir, save_po_document
 
 router = APIRouter(prefix="/purchase-orders", tags=["purchase-orders"])
@@ -210,6 +211,19 @@ def create_purchase_order(
         total_amount=f"${total_amount:,.2f}",
         expected_delivery=expected_delivery,
     )
+
+    vendor_user_id = vendor.user_id or vendor.created_by
+    if vendor_user_id:
+        create_notification(
+            db,
+            user_id=vendor_user_id,
+            notification_type="po_issued",
+            title=f"New Purchase Order: {po_number}",
+            message=f"A new purchase order ({po_number}) has been issued to {vendor.name}.",
+            related_entity_type="purchase_order",
+            related_entity_id=po.id,
+        )
+        db.commit()
 
     # Reload with relationships
     return _get_po_or_404(po.id, db, with_items=True)

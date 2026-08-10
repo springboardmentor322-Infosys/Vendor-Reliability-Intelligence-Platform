@@ -18,6 +18,7 @@ from app.schemas.procurement import (
     ProcurementRequestResponse,
 )
 from app.services.email import notify_procurement_decision
+from app.services.in_app_notifications import create_notification
 
 router = APIRouter(prefix="/procurement-requests", tags=["procurement-requests"])
 
@@ -161,6 +162,16 @@ def approve_procurement_request(
             department=pr.department,
             approved=True,
         )
+        create_notification(
+            db,
+            user_id=requester.id,
+            notification_type="procurement_approved",
+            title=f"Procurement Request #{pr.id} Approved",
+            message=f"Your procurement request for {pr.department} has been approved.",
+            related_entity_type="procurement_request",
+            related_entity_id=pr.id,
+        )
+        db.commit()
 
     return pr
 
@@ -199,5 +210,15 @@ def reject_procurement_request(
             approved=False,
             rejection_reason=payload.reason,
         )
+        create_notification(
+            db,
+            user_id=requester.id,
+            notification_type="procurement_rejected",
+            title=f"Procurement Request #{pr.id} Rejected",
+            message=f"Your procurement request for {pr.department} was rejected. Reason: {payload.reason}",
+            related_entity_type="procurement_request",
+            related_entity_id=pr.id,
+        )
+        db.commit()
 
     return pr

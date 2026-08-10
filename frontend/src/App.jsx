@@ -18,6 +18,8 @@ import VendorPerformance from './pages/VendorPerformance'
 import AnalyticsDashboard from './pages/AnalyticsDashboard'
 import ReportsDashboard from './pages/ReportsDashboard'
 import Notifications from './pages/Notifications'
+import Settings from './pages/Settings'
+import HelpSupport from './pages/HelpSupport'
 import FinanceDashboard from './pages/FinanceDashboard'
 import AuditorDashboard from './pages/AuditorDashboard'
 import SupplyChainDashboard from './pages/SupplyChainDashboard'
@@ -53,6 +55,8 @@ export default function App() {
               <Route path="/audit-logs" element={<AuditLogs />} />
               <Route path="/auditor-dashboard" element={<AuditorDashboard />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/help-support" element={<HelpSupport />} />
             </Route>
           </Route>
           <Route path="/" element={<LandingPage />} />

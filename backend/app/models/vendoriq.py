@@ -335,6 +335,25 @@ class Report(Base):
     vendor: Mapped[Optional["Vendor"]] = relationship(back_populates="reports")
 
 
+class SupportTicket(Base):
+    __tablename__ = "support_tickets"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    subject: Mapped[str] = mapped_column(String(255), nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="open")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+
+    submitter: Mapped[User] = relationship(foreign_keys=[user_id])
+
+
 __all__ = [
     "VendorCategory",
     "Vendor",
@@ -355,4 +374,5 @@ __all__ = [
     "Message",
     "Notification",
     "Report",
+    "SupportTicket",
 ]

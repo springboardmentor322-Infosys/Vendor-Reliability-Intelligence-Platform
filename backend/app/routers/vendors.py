@@ -26,6 +26,7 @@ from app.schemas.vendor import (
 )
 from app.services.audit import format_status_change_description, record_audit_log
 from app.services.email import notify_vendor_status_change
+from app.services.in_app_notifications import create_notification
 from app.services.vendor_documents import save_vendor_document
 
 router = APIRouter(prefix="/vendors", tags=["vendors"])
@@ -367,6 +368,19 @@ def update_vendor_status(
         new_status=new_status.value,
         rejection_reason=vendor.rejection_reason,
     )
+
+    vendor_user_id = vendor.user_id or vendor.created_by
+    if vendor_user_id:
+        create_notification(
+            db,
+            user_id=vendor_user_id,
+            notification_type="vendor_status",
+            title=f"Vendor Status: {new_status.value}",
+            message=f"Your vendor profile status has been updated to {new_status.value}.",
+            related_entity_type="vendor",
+            related_entity_id=vendor.id,
+        )
+        db.commit()
 
     return vendor
 

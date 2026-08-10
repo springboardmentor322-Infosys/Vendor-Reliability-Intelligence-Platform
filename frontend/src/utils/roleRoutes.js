@@ -20,6 +20,8 @@ export const ROLE_ALLOWED_ROUTES = {
     '/audit-logs',
     '/notifications',
     '/profile',
+    '/settings',
+    '/help-support',
   ],
   Vendor: [
     '/vendor-dashboard',
@@ -29,6 +31,8 @@ export const ROLE_ALLOWED_ROUTES = {
     '/contracts',
     '/notifications',
     '/profile',
+    '/settings',
+    '/help-support',
   ],
   'Finance Officer': [
     '/finance-dashboard',
@@ -39,6 +43,8 @@ export const ROLE_ALLOWED_ROUTES = {
     '/reports',
     '/notifications',
     '/profile',
+    '/settings',
+    '/help-support',
   ],
   'Procurement Manager': [
     '/procurement',
@@ -50,6 +56,8 @@ export const ROLE_ALLOWED_ROUTES = {
     '/reports',
     '/notifications',
     '/profile',
+    '/settings',
+    '/help-support',
   ],
   'Supply Chain Manager': [
     '/supply-chain',
@@ -63,6 +71,8 @@ export const ROLE_ALLOWED_ROUTES = {
     '/reports',
     '/notifications',
     '/profile',
+    '/settings',
+    '/help-support',
   ],
   Auditor: [
     '/auditor-dashboard',
@@ -73,6 +83,8 @@ export const ROLE_ALLOWED_ROUTES = {
     '/audit-logs',
     '/notifications',
     '/profile',
+    '/settings',
+    '/help-support',
   ],
 }
 
@@ -236,8 +248,8 @@ export const COMMON_SIDEBAR_ITEMS = [
   { to: 'role-dashboard', label: 'Dashboard' },
   { to: '/profile', label: 'Profile' },
   { to: '/notifications', label: 'Notifications' },
-  { to: '#', label: 'Settings' },
-  { to: '#', label: 'Help & Support' },
+  { to: '/settings', label: 'Settings' },
+  { to: '/help-support', label: 'Help & Support' },
 ]
 
 export const DASHBOARD_SUMMARY_CARDS = {
@@ -308,18 +320,20 @@ export function getNavItemsForRole(role) {
 
 export function getSidebarItemsForRole(role) {
   const sidebarItems = [...ROLE_SIDEBAR_CONFIG[role] || []]
-  const dashboardLabel = ROLE_HOME_ROUTES[role] ? 'Dashboard' : 'Dashboard'
-  const dashboardRoute = ROLE_HOME_ROUTES[role] || '/dashboard'
+  const commonItems = COMMON_SIDEBAR_ITEMS.map((item) => {
+    if (item.to === 'role-dashboard') {
+      return {
+        to: ROLE_HOME_ROUTES[role] || '/dashboard',
+        label: getRoleDashboardLabel(role),
+      }
+    }
+    return item
+  })
+
   return [
     {
       title: 'Common',
-      items: [
-        { to: dashboardRoute, label: dashboardLabel },
-        { to: '/profile', label: 'Profile' },
-        { to: '/notifications', label: 'Notifications' },
-        { to: '#', label: 'Settings' },
-        { to: '#', label: 'Help & Support' },
-      ],
+      items: commonItems,
     },
     ...sidebarItems,
   ]

@@ -15,6 +15,8 @@ export default defineConfig({
       '/contracts': 'http://127.0.0.1:8000',
       '/messages': 'http://127.0.0.1:8000',
       '/audit-logs': 'http://127.0.0.1:8000',
+      '/notifications': 'http://127.0.0.1:8000',
+      '/support': 'http://127.0.0.1:8000',
       '/uploads': 'http://127.0.0.1:8000',
     },
   },
