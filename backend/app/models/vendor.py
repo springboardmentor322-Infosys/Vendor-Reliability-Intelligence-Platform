@@ -80,6 +80,13 @@ class Vendor(Base):
     )
     communications: Mapped[list["Communication"]] = relationship(back_populates="vendor")
     reports: Mapped[list["Report"]] = relationship(back_populates="vendor")
+    products: Mapped[list["Product"]] = relationship(
+        back_populates="vendor",
+        cascade="all, delete-orphan",
+    )
+    quality_inspections: Mapped[list["QualityInspection"]] = relationship(
+        back_populates="vendor",
+    )
     owner: Mapped[Optional[User]] = relationship(foreign_keys=[user_id])
     creator: Mapped[Optional[User]] = relationship(foreign_keys=[created_by])
 

@@ -7,11 +7,11 @@ from sqlalchemy.exc import OperationalError
 
 from app.db.base import Base
 from app.models import communication  # noqa: F401 — register thread_messages & audit_logs tables
-import app.models.vendoriq  # noqa: F401 — register notifications & support_tickets tables
+import app.models.supply_chain  # noqa: F401 — register products, deliveries, invoices, quality_inspections
 from app.db.seed_admin import ensure_admin_account
 from app.db.seed_vendor_categories import ensure_vendor_categories
 from app.db.session import SessionLocal, engine
-from app.routers import admin, audit_logs, auth, contracts, messages, notifications, procurement, purchase_orders, support, vendors
+from app.routers import admin, audit_logs, auth, contracts, messages, notifications, procurement, purchase_orders, supply_chain, support, vendors
 from app.services.vendor_documents import ensure_upload_dir
 from app.services.po_documents import ensure_po_upload_dir
 from app.services.contract_documents import ensure_contract_upload_dir
@@ -43,6 +43,10 @@ app.include_router(messages.router)
 app.include_router(audit_logs.router)
 app.include_router(notifications.router)
 app.include_router(support.router)
+app.include_router(supply_chain.products_router)
+app.include_router(supply_chain.deliveries_router)
+app.include_router(supply_chain.invoices_router)
+app.include_router(supply_chain.quality_inspections_router)
 
 ensure_upload_dir()
 ensure_po_upload_dir()

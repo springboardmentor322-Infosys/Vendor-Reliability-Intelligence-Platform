@@ -155,6 +155,18 @@ class PurchaseOrder(Base):
         cascade="all, delete-orphan",
         order_by="DeliveryDocument.uploaded_at.desc()",
     )
+    deliveries: Mapped[list["Delivery"]] = relationship(
+        back_populates="purchase_order",
+        cascade="all, delete-orphan",
+    )
+    invoices: Mapped[list["Invoice"]] = relationship(
+        back_populates="purchase_order",
+        cascade="all, delete-orphan",
+    )
+    quality_inspections: Mapped[list["QualityInspection"]] = relationship(
+        back_populates="purchase_order",
+        cascade="all, delete-orphan",
+    )
 
 
 class POItem(Base):
