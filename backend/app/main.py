@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import vendors
 from app.routers import auth
+from app.routers import procurements
+from app.routers import purchase_orders
 from app.database import engine
 from app import models
 
@@ -16,6 +18,8 @@ app.add_middleware(
 models.Base.metadata.create_all(bind=engine)
 app.include_router(vendors.router)
 app.include_router(auth.router)
+app.include_router(procurements.router)
+app.include_router(purchase_orders.router)
 @app.get("/")
 def home():
     return {"message": "Welcome to Vendor Reliability Intelligence Platform"}
