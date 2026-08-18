@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs - VendorIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">System Audit Trail</h1>
+        <p style="color: var(--text-secondary);">Chronological transaction ledger tracking database record insertions, updates, logins, and deletions.</p>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="table-card">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Operation Event Logs</h3>
+            </div>
+            <div class="table-header-actions" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchUser" placeholder="Search user email..." onkeyup="filterLogs()">
+                </div>
+                <select id="filterAction" class="filter-select" onchange="filterLogs()">
+                    <option value="all">All Actions</option>
+                    <option value="LOGIN">LOGIN</option>
+                    <option value="REGISTER">REGISTER</option>
+                    <option value="CREATE">CREATE</option>
+                    <option value="UPDATE">UPDATE</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+                <select id="filterEntity" class="filter-select" onchange="filterLogs()">
+                    <option value="all">All Entities</option>
+                    <option value="USER">USER</option>
+                    <option value="VENDOR">VENDOR</option>
+                    <option value="PURCHASE_ORDER">PURCHASE_ORDER</option>
+                    <option value="INVOICE">INVOICE</option>
+                    <option value="QUALITY_INSPECTION">QUALITY_INSPECTION</option>
+                </select>
+                <input type="date" id="filterDate" class="filter-select" onchange="filterLogs()" style="padding: 7px 10px;">
+                <button onclick="clearFilters()" class="btn btn-secondary" style="padding: 8px 12px; font-size: 12px;">Clear Filters</button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="auditTable">
+                <thead>
+                    <tr>
+                        <th>Log ID</th>
+                        <th>User Name</th>
+                        <th>User Email</th>
+                        <th>Action</th>
+                        <th>Entity</th>
+                        <th>Entity ID</th>
+                        <th>Timestamp</th>
+                        <th>Details</th>
+                        <th>IP Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="9" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading system audit logs...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/audit_logs.js"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quality Inspections - VendorIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Quality Inspections Log</h1>
+        <p style="color: var(--text-secondary);">Log inspection results, calculate defect percentages, and assess quality control compliance.</p>
+    </div>
+
+    <!-- KPI Grid -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Inspections</span>
+                <span class="kpi-icon">🛡️</span>
+            </div>
+            <div class="kpi-value" id="kpiTotalInspections">0</div>
+            <div class="kpi-sub">Logged quality checks</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Passed Batches</span>
+                <span class="kpi-icon">✅</span>
+            </div>
+            <div class="kpi-value" id="kpiPassedInspections" style="color: var(--success-color);">0</div>
+            <div class="kpi-sub">Fulfills standard specifications</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Failed Batches</span>
+                <span class="kpi-icon">❌</span>
+            </div>
+            <div class="kpi-value" id="kpiFailedInspections" style="color: var(--danger-color);">0</div>
+            <div class="kpi-sub">Batches rejected</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Avg Quality Score</span>
+                <span class="kpi-icon">📈</span>
+            </div>
+            <div class="kpi-value" id="kpiAvgQuality">0.00%</div>
+            <div class="kpi-sub">Database average</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Avg Defect Rate</span>
+                <span class="kpi-icon">⚠️</span>
+            </div>
+            <div class="kpi-value" id="kpiAvgDefect" style="color: var(--warning-color);">0.00%</div>
+            <div class="kpi-sub">Database average latency</div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>Inspection Result Distribution</h3>
+            <div class="chart-container">
+                <canvas id="passedVsFailedChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Quality Score by Vendor</h3>
+            <div class="chart-container">
+                <canvas id="qualityByVendorChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card" style="grid-column: span 2;">
+            <h3>Defect Rate by Vendor</h3>
+            <div class="chart-container">
+                <canvas id="defectRateChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Quality Inspection Form (Only visible to Admin, PM, SCM) -->
+    <div id="addInspectionContainer" class="form-container" style="display: none; max-width: 100%;">
+        <div class="form-title">Record New Quality Inspection</div>
+        <form id="inspectionForm" onsubmit="submitInspection(event)">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="purchase_order_id">Purchase Order ID</label>
+                    <input type="number" id="purchase_order_id" required min="1" placeholder="e.g. 109710">
+                </div>
+                <div class="form-group">
+                    <label for="quantity_inspected">Quantity Inspected</label>
+                    <input type="number" id="quantity_inspected" required min="1" placeholder="Total inspected items">
+                </div>
+                <div class="form-group">
+                    <label for="quantity_failed">Quantity Failed</label>
+                    <input type="number" id="quantity_failed" required min="0" placeholder="Defective items count">
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="remarks" class="optional">Inspection Remarks</label>
+                <textarea id="remarks" rows="2" placeholder="Describe quality issues, defects, or details..."></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary">Submit Inspection</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-card" style="margin-top: 24px;">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Quality Inspection Records</h3>
+            </div>
+            <div class="table-header-actions">
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchFilter" placeholder="Search vendor name..." onkeyup="filterInspections()">
+                </div>
+                <select id="statusFilter" class="filter-select" onchange="filterInspections()">
+                    <option value="all">All Inspections</option>
+                    <option value="Passed">Passed</option>
+                    <option value="Accepted with Minor Issues">Accepted with Minor Issues</option>
+                    <option value="Review Required">Review Required</option>
+                    <option value="Failed">Failed</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="inspectionTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Vendor</th>
+                        <th>PO ID</th>
+                        <th>Product</th>
+                        <th>Date</th>
+                        <th>Inspected</th>
+                        <th>Passed</th>
+                        <th>Failed</th>
+                        <th>Defect Rate</th>
+                        <th>Quality Score</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="12" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading quality inspection logs...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/quality.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Requisitions - VendorIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Purchase Requisitions</h1>
+        <p style="color: var(--text-secondary);">Request procurement clearances, approve internal employee requisitions, and allocate vendors.</p>
+    </div>
+
+    <!-- Layout Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px; margin-bottom: 32px; align-items: start;">
+        <!-- Add Requisition Form -->
+        <div class="form-container" style="margin-bottom: 0; max-width: 100%;">
+            <div class="form-title">Create Requisition Request</div>
+            <form id="requestForm">
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="vendor_id">Supplier Partner</label>
+                    <select id="vendor_id" required>
+                        <option value="">Select Vendor</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="product_name">Product Name</label>
+                    <input type="text" id="product_name" required placeholder="e.g. Server Hardware SLA">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" id="quantity" required min="1" value="1">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="request_date">Request Date</label>
+                    <input type="date" id="request_date" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="requested_by">Requested By (Name)</label>
+                    <input type="text" id="requested_by" placeholder="e.g. Jane Doe" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="status">Initial Status</label>
+                    <select id="status" required>
+                        <option value="Pending" selected>Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="submit" class="btn btn-primary">Save Request</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Info / Workflow Instructions Card -->
+        <div class="chart-card" style="height: 100%; min-height: 480px; justify-content: center;">
+            <h3>Requisition Approval Workflow</h3>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+                Internal department procurement requests must specify an approved vendor and quantity prior to final budget sign-off.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-pending" style="width: 80px; justify-content: center;">Pending</span>
+                    <span style="font-size: 12px; color: var(--text-secondary);">Awaiting manager budget review</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-active" style="width: 80px; justify-content: center;">Approved</span>
+                    <span style="font-size: 12px; color: var(--text-secondary);">Cleared for purchase order conversion</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="badge badge-poor" style="width: 80px; justify-content: center;">Rejected</span>
+                    <span style="font-size: 12px; color: var(--text-secondary);">Returned to requestor for modifications</span>
+                </div>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 12px; font-style: italic;">
+                * Requisitions marked as Approved can be directly promoted to official Purchase Orders within the procurement register.
+            </p>
+        </div>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="table-card">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Requisitions Register</h3>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="requestTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Vendor Name</th>
+                        <th>Product Specification</th>
+                        <th>Quantity</th>
+                        <th>Request Date</th>
+                        <th>Requested By</th>
+                        <th>Status</th>
+                        <th>Approve Action</th>
+                        <th>Edit Action</th>
+                        <th>Delete Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="10" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading requisitions...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/purchase-request.js"></script>
+</body>
+</html>

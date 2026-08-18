@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendorIQ - Executive Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- KPI Grid -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Vendors</span>
+                <span class="kpi-icon">🏢</span>
+            </div>
+            <div class="kpi-value" id="vendorCount">0</div>
+            <div class="kpi-sub">Active supply chain partners</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Purchase Order Items</span>
+                <span class="kpi-icon">📦</span>
+            </div>
+            <div class="kpi-value" id="orderCount">0</div>
+            <div class="kpi-sub">Total catalog rows tracked</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Contracts</span>
+                <span class="kpi-icon">📄</span>
+            </div>
+            <div class="kpi-value" id="contractCount">0</div>
+            <div class="kpi-sub">Active legal agreements</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Avg Reliability</span>
+                <span class="kpi-icon">📈</span>
+            </div>
+            <div class="kpi-value" id="avgReliability">0.00%</div>
+            <div class="kpi-sub">Calculated from historical delivery</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Completed Items</span>
+                <span class="kpi-icon">✅</span>
+            </div>
+            <div class="kpi-value" id="completedOrders">0</div>
+            <div class="kpi-sub">PO rows successfully completed</div>
+        </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>Vendor Reliability Rankings</h3>
+            <div class="chart-container">
+                <canvas id="vendorReliabilityChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Purchase Order Status Distribution</h3>
+            <div class="chart-container">
+                <canvas id="poStatusChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Vendor Risk Overview</h3>
+            <div class="chart-container">
+                <canvas id="riskDistributionChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Contract Expiry Status</h3>
+            <div class="chart-container">
+                <canvas id="contractStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Sections -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 32px;">
+        <!-- Vendor Reliability summary -->
+        <div class="chart-card">
+            <h3>Vendor Reliability Summary</h3>
+            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                    <span style="color: var(--text-secondary); font-weight: 500;">Total Vendors Analysed</span>
+                    <span style="font-weight: 600;" id="totalVendors">Loading...</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                    <span style="color: var(--text-secondary); font-weight: 500;">Average Reliability Score</span>
+                    <span style="font-weight: 600; color: var(--primary-color);" id="averageReliability">Loading...</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                    <span style="color: var(--text-secondary); font-weight: 500;">Highest Rated Vendor</span>
+                    <span style="font-weight: 600; color: var(--success-color);" id="bestVendor">Loading...</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                    <span style="color: var(--text-secondary); font-weight: 500;">Best Performance Score</span>
+                    <span style="font-weight: 600;" id="bestScore">Loading...</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-bottom: 4px;">
+                    <span style="color: var(--text-secondary); font-weight: 500;">Critical Risk Vendors</span>
+                    <span style="font-weight: 600; color: var(--danger-color);" id="poorVendors">Loading...</span>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <a href="vendor-reliability.html" class="btn btn-primary" style="width: 100%;">View Vendor Reliability Analysis</a>
+            </div>
+        </div>
+
+        <!-- Contract Overview Summary -->
+        <div class="chart-card">
+            <h3>Contract Expiration Summary</h3>
+            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                    <span style="color: var(--text-secondary); font-weight: 500;">Total Active Contracts</span>
+                    <span style="font-weight: 600;" id="dashboardTotalContracts">0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                    <span style="color: var(--text-secondary); font-weight: 500;">Active Status</span>
+                    <span style="font-weight: 600; color: var(--success-color);" id="dashboardActiveContracts">0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                    <span style="color: var(--text-secondary); font-weight: 500;">Expiring Within 30 Days</span>
+                    <span style="font-weight: 600; color: var(--warning-color);" id="dashboardExpiringContracts">0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-bottom: 4px;">
+                    <span style="color: var(--text-secondary); font-weight: 500;">Expired Contracts</span>
+                    <span style="font-weight: 600; color: var(--danger-color);" id="dashboardExpiredContracts">0</span>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <a href="contract-monitoring.html" class="btn btn-secondary" style="width: 100%;">View Contract Intelligence Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Notifications Area -->
+        <div class="chart-card" style="max-height: 420px; display: flex; flex-direction: column;">
+            <h3>Active System Alerts & Risk Notifications</h3>
+            <div id="notificationArea" style="overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 12px; padding-right: 4px;">
+                <div id="noNotifications" class="loading-spinner-wrapper">
+                    <div class="spinner"></div>
+                    <p>Loading alerts...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

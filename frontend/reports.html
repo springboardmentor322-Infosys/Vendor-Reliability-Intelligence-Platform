@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Export Center - VendorIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Reports & Export Center</h1>
+        <p style="color: var(--text-secondary);">Compile operational ledgers, export calculated performance audits, and save compliance logs to local formats.</p>
+    </div>
+
+    <!-- Report Summary KPI Grid -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Active Partners</span>
+                <span class="kpi-icon">👥</span>
+            </div>
+            <div class="kpi-value" id="reportTotalVendors">0</div>
+            <div class="kpi-sub">Total distinct suppliers</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Purchase Orders</span>
+                <span class="kpi-icon">📦</span>
+            </div>
+            <div class="kpi-value" id="reportTotalOrders">0</div>
+            <div class="kpi-sub">Total logged PO items</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Completed Items</span>
+                <span class="kpi-icon">✅</span>
+            </div>
+            <div class="kpi-value" id="reportCompletedOrders" style="color: var(--success-color);">0</div>
+            <div class="kpi-sub">Fulfills delivery specification</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Pending Payouts</span>
+                <span class="kpi-icon">⏱️</span>
+            </div>
+            <div class="kpi-value" id="reportPendingOrders" style="color: var(--warning-color);">0</div>
+            <div class="kpi-sub">Awaiting audit completion</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Average Reliability</span>
+                <span class="kpi-icon">📊</span>
+            </div>
+            <div class="kpi-value" id="reportAverageReliability">0.00%</div>
+            <div class="kpi-sub">Aggregate score</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">High Risk Partners</span>
+                <span class="kpi-icon">🚨</span>
+            </div>
+            <div class="kpi-value" id="reportHighRiskVendors" style="color: var(--danger-color);">0</div>
+            <div class="kpi-sub">Requires supply chain review</div>
+        </div>
+    </div>
+
+    <!-- Vendor Reliability Report Section -->
+    <div class="table-card" style="margin-bottom: 32px;">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Vendor Performance Audit Ledger</h3>
+                <span id="vendorReportMessage" style="font-size: 12px; color: var(--text-secondary); margin-left: 12px; font-style: italic;">Loading...</span>
+            </div>
+            <div class="table-header-actions">
+                <button class="btn btn-secondary" onclick="exportVendorReportToCSV()" style="padding: 8px 12px; font-size: 12px;">📊 Export CSV</button>
+                <button class="btn btn-secondary" onclick="exportVendorReportToExcel()" style="padding: 8px 12px; font-size: 12px;">📈 Export Excel</button>
+                <button class="btn btn-primary" onclick="window.print()" style="padding: 8px 12px; font-size: 12px;">🖨️ Print / PDF</button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="vendorReportTable">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Vendor</th>
+                        <th>Total Orders</th>
+                        <th>Completed</th>
+                        <th>Pending</th>
+                        <th>Delivered</th>
+                        <th>Quality Score</th>
+                        <th>Delivery Rate</th>
+                        <th>Reliability Score</th>
+                        <th>Performance</th>
+                        <th>Risk</th>
+                        <th>Recommendation</th>
+                    </tr>
+                </thead>
+                <tbody id="vendorReportBody">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Purchase Order Report Section -->
+    <div class="table-card">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Purchase Order Transaction Ledger</h3>
+                <span id="purchaseReportMessage" style="font-size: 12px; color: var(--text-secondary); margin-left: 12px; font-style: italic;">Loading...</span>
+            </div>
+            <div class="table-header-actions">
+                <button class="btn btn-secondary" onclick="exportPOReportToCSV()" style="padding: 8px 12px; font-size: 12px;">📊 Export CSV</button>
+                <button class="btn btn-secondary" onclick="exportPOReportToExcel()" style="padding: 8px 12px; font-size: 12px;">📈 Export Excel</button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="purchaseReportTable">
+                <thead>
+                    <tr>
+                        <th>PO ID</th>
+                        <th>Vendor Name</th>
+                        <th>Product Specification</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Total Value</th>
+                        <th>Order Date</th>
+                        <th>Expected Delivery</th>
+                        <th>Workflow Status</th>
+                    </tr>
+                </thead>
+                <tbody id="purchaseReportBody">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>

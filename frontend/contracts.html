@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Management - VendorIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Contract Directory</h1>
+        <p style="color: var(--text-secondary);">Manage procurement agreements, active SLAs, legal start/end dates, and status categories.</p>
+    </div>
+
+    <!-- KPI Summary Grid -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Contracts</span>
+                <span class="kpi-icon">📄</span>
+            </div>
+            <div class="kpi-value" id="kpiTotalContracts">0</div>
+            <div class="kpi-sub">Total contract records</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Active Contracts</span>
+                <span class="kpi-icon">✅</span>
+            </div>
+            <div class="kpi-value" id="kpiActiveContracts" style="color: var(--success-color);">0</div>
+            <div class="kpi-sub">Contracts in active operations</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Expiring Soon</span>
+                <span class="kpi-icon">⏱️</span>
+            </div>
+            <div class="kpi-value" id="kpiExpiringContracts" style="color: var(--warning-color);">0</div>
+            <div class="kpi-sub">Action required in 30 days</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Expired Contracts</span>
+                <span class="kpi-icon">🚨</span>
+            </div>
+            <div class="kpi-value" id="kpiExpiredContracts" style="color: var(--danger-color);">0</div>
+            <div class="kpi-sub">Out of SLA coverage</div>
+        </div>
+    </div>
+
+    <!-- Create Contract Form (Visible to Admin & PM) -->
+    <div id="addContractContainer" class="form-container" style="display: none; max-width: 100%;">
+        <div class="form-title">Register New Contract</div>
+        <form id="contractForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="vendor_id">Vendor ID</label>
+                    <input type="number" id="vendor_id" placeholder="e.g. 19" required>
+                </div>
+                <div class="form-group">
+                    <label for="contract_name">Contract Name</label>
+                    <input type="text" id="contract_name" placeholder="e.g. FY27 Supply SLA" required>
+                </div>
+                <div class="form-group">
+                    <label for="status">Contract Status</label>
+                    <select id="status" required>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Expired">Expired</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" required>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                <button type="submit" class="btn btn-primary">Add Contract</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card" style="margin-top: 24px;">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>SLA Contracts Ledger</h3>
+            </div>
+            <div class="table-header-actions">
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchContracts" placeholder="Search contract or vendor name...">
+                </div>
+                <select id="filterContractStatus" class="filter-select">
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Expired">Expired</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="contractTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Vendor ID</th>
+                        <th>Vendor Name</th>
+                        <th>Contract Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Management Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="8" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading contracts...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/contracts.js"></script>
+</body>
+</html>

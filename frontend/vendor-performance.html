@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Vendor Performance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background: #f5f6fa;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin-top: 0;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 18px;
+        }
+
+        .card p {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        select {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-bottom: 30px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        #vendorDetails .card {
+            text-align: left;
+        }
+
+        #riskAlerts .card {
+            margin-bottom: 20px;
+        }
+
+        a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Vendor Performance Dashboard</h1>
+
+    <div class="cards">
+        <div class="card">
+            <h3>Total Vendors</h3>
+            <p id="totalVendors">0</p>
+        </div>
+        <div class="card">
+            <h3>Total Orders</h3>
+            <p id="totalOrders">0</p>
+        </div>
+        <div class="card">
+            <h3>Completed Orders</h3>
+            <p id="completedOrders">0</p>
+        </div>
+        <div class="card">
+            <h3>Average Reliability</h3>
+            <p id="averageReliability">0</p>
+        </div>
+    </div>
+
+    <h2>Vendor Details</h2>
+    <select id="vendorSelect">
+        <option value="">Select Vendor</option>
+    </select>
+    <div id="vendorDetails"></div>
+
+    <h2>Vendor Reliability Comparison</h2>
+    <div class="chart-card">
+        <canvas id="reliabilityChart"></canvas>
+    </div>
+
+    <h2>Vendor Performance History</h2>
+    <select id="historyVendorSelect">
+        <option value="">Select Vendor</option>
+    </select>
+
+    <div class="chart-card">
+        <canvas id="historyChart"></canvas>
+    </div>
+
+    <h3>Performance History Data</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Quality Score</th>
+                <th>Delivery Rate</th>
+                <th>Reliability Score</th>
+            </tr>
+        </thead>
+        <tbody id="historyTableBody"></tbody>
+    </table>
+
+    <h2>Vendor Performance</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Vendor</th>
+                <th>Total Orders</th>
+                <th>Completed</th>
+                <th>Pending</th>
+                <th>Ordered</th>
+                <th>Delivered</th>
+                <th>Quality Score</th>
+                <th>Delivery Rate</th>
+                <th>Reliability Score</th>
+                <th>Performance</th>
+                <th>Risk</th>
+                <th>Recommendation</th>
+            </tr>
+        </thead>
+        <tbody id="performanceTable"></tbody>
+    </table>
+
+    <h2>Vendor Risk Summary</h2>
+    <div class="cards">
+        <div class="card">
+            <h3>Low Risk Vendors</h3>
+            <p id="lowRiskVendors">0</p>
+        </div>
+        <div class="card">
+            <h3>Medium Risk Vendors</h3>
+            <p id="mediumRiskVendors">0</p>
+        </div>
+        <div class="card">
+            <h3>High Risk Vendors</h3>
+            <p id="highRiskVendors">0</p>
+        </div>
+    </div>
+
+    <h2>Vendor Risk Alerts</h2>
+    <div id="riskAlerts"></div>
+
+    <h2>Top Performing Vendor</h2>
+    <div class="card">
+        <h3 id="topVendorName">-</h3>
+        <p><strong>Reliability Score:</strong> <span id="topVendorReliability">0</span></p>
+        <p><strong>Performance:</strong> <span id="topVendorPerformance">-</span></p>
+        <p><strong>Risk:</strong> <span id="topVendorRisk">-</span></p>
+    </div>
+
+    <a href="dashboard.html">← Back To Dashboard</a>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/vendor-performance.js"></script>
+
+</body>
+
+</html>

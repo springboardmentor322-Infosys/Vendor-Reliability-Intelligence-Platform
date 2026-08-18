@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - VendorIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">System Notifications</h1>
+        <p style="color: var(--text-secondary);">Manage and clear system warnings, late deliveries, compliance notifications, and audit risk alerts.</p>
+    </div>
+
+    <!-- Alert Count Card -->
+    <div class="kpi-grid" style="grid-template-columns: 1fr;">
+        <div class="kpi-card" style="border-left: 4px solid var(--primary-color); background-color: var(--primary-light);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h3 style="font-size: 14px; font-weight: 600; color: var(--text-color); text-transform: uppercase;">Active Alerts</h3>
+                    <p style="font-size: 28px; font-weight: 700; color: var(--primary-color); margin-top: 4px;" id="unreadCount">0</p>
+                </div>
+                <div class="kpi-icon" style="background-color: #ffffff;">🔔</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Notifications Ledger</h3>
+            </div>
+            <div class="table-header-actions">
+                <select id="statusFilter" class="filter-select" onchange="filterNotifications()">
+                    <option value="all">All Statuses</option>
+                    <option value="Unread">Unread</option>
+                    <option value="Read">Read</option>
+                </select>
+                <select id="typeFilter" class="filter-select" onchange="filterNotifications()">
+                    <option value="all">All Types</option>
+                    <option value="Delivery Delay">Delivery Delay</option>
+                    <option value="Vendor Approval">Vendor Approval</option>
+                    <option value="Contract Expiry">Contract Expiry</option>
+                    <option value="Quality Issue">Quality Issue</option>
+                    <option value="Procurement Alert">Procurement Alert</option>
+                    <option value="Payment/Invoice">Payment/Invoice</option>
+                    <option value="Compliance">Compliance</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="notificationsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Message</th>
+                        <th>Date Created</th>
+                        <th>Status</th>
+                        <th>Management Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading system notifications...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/notifications.js"></script>
+</body>
+</html>

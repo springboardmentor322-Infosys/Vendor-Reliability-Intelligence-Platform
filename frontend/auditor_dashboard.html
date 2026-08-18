@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditor Dashboard - VendorIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">System Audit & Compliance</h1>
+        <p style="color: var(--text-secondary);">Verify platform operations, check audit logs, inspect contracts, and analyze partner risk compliance.</p>
+    </div>
+
+    <!-- Metrics Cards Grid -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Audit Logs</span>
+                <span class="kpi-icon">📝</span>
+            </div>
+            <div class="kpi-value" id="totalLogs">0</div>
+            <div class="kpi-sub">Total database events logged</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Create Actions</span>
+                <span class="kpi-icon">🆕</span>
+            </div>
+            <div class="kpi-value" id="createCount">0</div>
+            <div class="kpi-sub">Insert statements executed</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Update Actions</span>
+                <span class="kpi-icon">✏️</span>
+            </div>
+            <div class="kpi-value" id="updateCount">0</div>
+            <div class="kpi-sub">Modify actions executed</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Delete Actions</span>
+                <span class="kpi-icon">❌</span>
+            </div>
+            <div class="kpi-value" id="deleteCount" style="color: var(--danger-color);">0</div>
+            <div class="kpi-sub">Record deletions executed</div>
+        </div>
+    </div>
+
+    <!-- Compliance Section -->
+    <div class="chart-card" style="margin-bottom: 32px;">
+        <h3>Contract Compliance & Risks</h3>
+        <div class="kpi-grid" style="margin-bottom: 0; padding: 10px 0 0;">
+            <div class="kpi-card" style="border: 1px solid var(--border-color); box-shadow: none;">
+                <div class="kpi-header">
+                    <span class="kpi-label">Average Compliance Rate</span>
+                    <span class="kpi-icon">⏱️</span>
+                </div>
+                <div class="kpi-value" id="contractCompliance">0%</div>
+                <div class="kpi-sub">Contract delivery SLAs met</div>
+            </div>
+            <div class="kpi-card" style="border: 1px solid var(--border-color); box-shadow: none;">
+                <div class="kpi-header">
+                    <span class="kpi-label">Active Contracts</span>
+                    <span class="kpi-icon">📄</span>
+                </div>
+                <div class="kpi-value" id="activeContractsCount">0</div>
+                <div class="kpi-sub">SLAs currently active</div>
+            </div>
+            <div class="kpi-card" style="border: 1px solid var(--border-color); box-shadow: none;">
+                <div class="kpi-header">
+                    <span class="kpi-label">Expired/Expiring Contracts</span>
+                    <span class="kpi-icon">⚠️</span>
+                </div>
+                <div class="kpi-value" id="expiredContractsCount" style="color: var(--warning-color);">0</div>
+                <div class="kpi-sub">Requiring audit verification</div>
+            </div>
+            <div class="kpi-card" style="border: 1px solid var(--border-color); box-shadow: none;">
+                <div class="kpi-header">
+                    <span class="kpi-label">Pending Risk Alerts</span>
+                    <span class="kpi-icon">🚨</span>
+                </div>
+                <div class="kpi-value" id="pendingRiskAlerts" style="color: var(--danger-color);">0</div>
+                <div class="kpi-sub">Total active notifications</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Audit Activity Table -->
+    <div class="table-card">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Recent Activity Logs</h3>
+            </div>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Log ID</th>
+                        <th>User Email</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                        <th>Entity</th>
+                        <th>Details</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody id="auditTableBody">
+                    <tr>
+                        <td colspan="7" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading recent activity...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/auditor_dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Reliability Analysis - VendorIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Vendor Reliability Analysis</h1>
+        <p style="color: var(--text-secondary);">Audit historical shipping parameters, calculate partner performance scores, and analyze risk trends.</p>
+    </div>
+
+    <!-- Summary KPI Cards -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Partners</span>
+                <span class="kpi-icon">👥</span>
+            </div>
+            <div class="kpi-value" id="kpiTotalVendors">0</div>
+            <div class="kpi-sub">Analyzed in database</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Average Reliability</span>
+                <span class="kpi-icon">📈</span>
+            </div>
+            <div class="kpi-value" id="kpiAverageReliability">0.00%</div>
+            <div class="kpi-sub">Calculated average</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Best Performing Vendor</span>
+                <span class="kpi-icon">🏆</span>
+            </div>
+            <div class="kpi-value" id="kpiBestVendor" style="font-size: 18px; line-height: 1.4; padding: 6px 0;">Loading...</div>
+            <div class="kpi-sub">Highest scoring partner</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">High Risk Partners</span>
+                <span class="kpi-icon">🚨</span>
+            </div>
+            <div class="kpi-value" id="kpiHighRiskVendors" style="color: var(--danger-color);">0</div>
+            <div class="kpi-sub">Urgent attention needed</div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>Reliability Score by Vendor</h3>
+            <div class="chart-container">
+                <canvas id="rankingChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>On-Time vs Late Delivery Count</h3>
+            <div class="chart-container">
+                <canvas id="deliveryComparisonChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Vendor Risk Distribution</h3>
+            <div class="chart-container">
+                <canvas id="riskDistributionChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Avg Shipping vs Scheduled Days</h3>
+            <div class="chart-container">
+                <canvas id="shippingComparisonChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-card">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Calculated Reliability Performance Ledger</h3>
+            </div>
+            <div class="table-header-actions">
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchVendors" placeholder="Search vendor name...">
+                </div>
+                <select id="filterRisk" class="filter-select">
+                    <option value="">All Risk Levels</option>
+                    <option value="Low Risk">Low Risk</option>
+                    <option value="Medium Risk">Medium Risk</option>
+                    <option value="High Risk">High Risk</option>
+                </select>
+                <select id="filterStatus" class="filter-select">
+                    <option value="">All Statuses</option>
+                    <option value="Good">Good</option>
+                    <option value="Average">Average</option>
+                    <option value="Poor">Poor</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="reliabilityTable">
+                <thead>
+                    <tr>
+                        <th>Vendor Name</th>
+                        <th>Total Orders</th>
+                        <th>Late Orders</th>
+                        <th>Avg Shipping Days</th>
+                        <th>Avg Scheduled Days</th>
+                        <th>Total Sales</th>
+                        <th>On-Time Rate</th>
+                        <th>Late Delivery Rate</th>
+                        <th>Reliability Score</th>
+                        <th>Status</th>
+                        <th>Risk Level</th>
+                        <th>Recommendation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="12" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading vendor reliability data...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/vendor-reliability.js"></script>
+</body>
+</html>

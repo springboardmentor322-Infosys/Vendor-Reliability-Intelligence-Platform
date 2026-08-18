@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Monitoring - VendorIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Contract Intelligence</h1>
+        <p style="color: var(--text-secondary);">Automated monitoring of legal agreement statuses, remaining days, SLA compliance, and renewal guidelines.</p>
+    </div>
+
+    <!-- Summary KPI Cards -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Contracts</span>
+                <span class="kpi-icon">📄</span>
+            </div>
+            <div class="kpi-value" id="totalContracts">0</div>
+            <div class="kpi-sub">Total tracked legal agreements</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Active Contracts</span>
+                <span class="kpi-icon">✅</span>
+            </div>
+            <div class="kpi-value" id="activeContracts" style="color: var(--success-color);">0</div>
+            <div class="kpi-sub">Agreements in active operations</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Expiring Soon</span>
+                <span class="kpi-icon">⏱️</span>
+            </div>
+            <div class="kpi-value" id="expiringContracts" style="color: var(--warning-color);">0</div>
+            <div class="kpi-sub">Action required in 30 days</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Expired Contracts</span>
+                <span class="kpi-icon">🚨</span>
+            </div>
+            <div class="kpi-value" id="expiredContracts" style="color: var(--danger-color);">0</div>
+            <div class="kpi-sub">Agreement period has elapsed</div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>Contract Status Distribution</h3>
+            <div class="chart-container">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Active Contracts by Vendor</h3>
+            <div class="chart-container">
+                <canvas id="vendorChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details and Alerts Container -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 32px;">
+        <!-- Alerts Section -->
+        <div class="chart-card" style="max-height: 420px; display: flex; flex-direction: column;">
+            <h3>Active Contract Expiry Alerts</h3>
+            <div id="contractAlerts" style="overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 12px; padding-right: 4px;">
+                <p style="color: var(--text-secondary); font-style: italic;">Loading alerts...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-card">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Contract Lifecycle Monitoring Ledger</h3>
+            </div>
+            <div class="table-header-actions">
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchMonitoring" placeholder="Search contract or vendor...">
+                </div>
+                <select id="filterMonitoringStatus" class="filter-select">
+                    <option value="">All Monitoring Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Renewal Due Soon">Renewal Due Soon</option>
+                    <option value="Expiring Soon">Expiring Soon</option>
+                    <option value="Expired">Expired</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="contractTable">
+                <thead>
+                    <tr>
+                        <th>Vendor Name</th>
+                        <th>Contract Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Remaining Days</th>
+                        <th>Status</th>
+                        <th>Monitoring Status</th>
+                        <th>Recommendation</th>
+                    </tr>
+                </thead>
+                <tbody id="contractTableBody">
+                    <tr>
+                        <td colspan="8" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading contract details...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/contract-monitoring.js"></script>
+</body>
+</html>

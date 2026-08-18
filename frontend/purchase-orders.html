@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Orders - VendorIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Purchase Orders</h1>
+        <p style="color: var(--text-secondary);">Register and track procurement transactions, order items, unit costs, and delivery workflows.</p>
+    </div>
+
+    <!-- Metrics Cards Grid -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total PO Items</span>
+                <span class="kpi-icon">📦</span>
+            </div>
+            <div class="kpi-value" id="kpiTotalPOs">0</div>
+            <div class="kpi-sub">Total logged records</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Pending Payouts</span>
+                <span class="kpi-icon">⏱️</span>
+            </div>
+            <div class="kpi-value" id="kpiPendingPOs" style="color: var(--warning-color);">0</div>
+            <div class="kpi-sub">Awaiting delivery verification</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Completed Delivery</span>
+                <span class="kpi-icon">✅</span>
+            </div>
+            <div class="kpi-value" id="kpiCompletedPOs" style="color: var(--success-color);">0</div>
+            <div class="kpi-sub">Successfully fulfilled POs</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Delivered Status</span>
+                <span class="kpi-icon">🚚</span>
+            </div>
+            <div class="kpi-value" id="kpiDeliveredPOs" style="color: var(--primary-color);">0</div>
+            <div class="kpi-sub">In transit or received</div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px; margin-bottom: 32px; align-items: start;">
+        <!-- Add Purchase Order Form -->
+        <div class="form-container" style="margin-bottom: 0; max-width: 100%;">
+            <div class="form-title">Register Purchase Order</div>
+            <form id="purchaseForm">
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="vendor_id">Supplier Partner</label>
+                    <select id="vendor_id" required>
+                        <option value="">Select Vendor</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="product_name">Product Name</label>
+                    <input type="text" id="product_name" required placeholder="e.g. Nike Men's Shoe">
+                </div>
+
+                <div class="form-grid" style="margin-bottom: 16px; grid-template-columns: 1fr 1fr;">
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" required min="1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="unit_price">Unit Price</label>
+                        <input type="number" id="unit_price" required min="0.01" step="0.01" value="0.00">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="total_amount">Total Amount (Auto-Calculated)</label>
+                    <input type="number" id="total_amount" required readonly style="background-color: var(--bg-color);">
+                </div>
+
+                <div class="form-grid" style="margin-bottom: 16px; grid-template-columns: 1fr 1fr;">
+                    <div class="form-group">
+                        <label for="order_date">Order Date</label>
+                        <input type="date" id="order_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expected_delivery">Expected Delivery</label>
+                        <input type="date" id="expected_delivery" required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="status">Workflow Status</label>
+                    <select id="status" disabled style="background-color: var(--bg-color);">
+                        <option value="Pending" selected>Pending</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="submit" class="btn btn-primary" id="save-po-btn">Save Purchase Order</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- PO Chart -->
+        <div class="chart-card" style="height: 100%; min-height: 430px;">
+            <h3>Purchase Order Status Distribution</h3>
+            <div class="chart-container" style="height: 330px;">
+                <canvas id="poStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-card">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Procurement Ledger Log</h3>
+            </div>
+            <div class="table-header-actions">
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchPOs" placeholder="Search product name...">
+                </div>
+                <select id="filterPOStatus" class="filter-select">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Fraud">Fraud</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="purchaseTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Vendor Name</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Total Amount</th>
+                        <th>Order Date</th>
+                        <th>Expected Delivery</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="10" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading purchase orders...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/purchase.js"></script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply Chain Dashboard - VendorIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Supply Chain Operations</h1>
+        <p style="color: var(--text-secondary);">Real-time monitoring of delivery schedules, delays, and partner performance. <span style="font-size: 11px; color: var(--text-secondary); opacity: 0.8; display: block; margin-top: 4px;">* Note: Vendor Proxy is derived from Product Card Id because the source dataset does not contain actual supplier names.</span></p>
+    </div>
+
+    <!-- KPI Grid -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Delivery Records</span>
+                <span class="kpi-icon">🚚</span>
+            </div>
+            <div class="kpi-value" id="totalDeliveries">0</div>
+            <div class="kpi-sub">Total packages received</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">On-Time Rate</span>
+                <span class="kpi-icon">⏱️</span>
+            </div>
+            <div class="kpi-value" id="onTimeRate">0%</div>
+            <div class="kpi-sub">Meets target threshold</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Delayed Deliveries</span>
+                <span class="kpi-icon">⚠️</span>
+            </div>
+            <div class="kpi-value" id="delayedDeliveries" style="color: var(--danger-color);">0</div>
+            <div class="kpi-sub">Requires active follow-up</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Average Delay (Late Deliveries)</span>
+                <span class="kpi-icon">📅</span>
+            </div>
+            <div class="kpi-value" id="averageDelay">0 days</div>
+            <div class="kpi-sub">Latency average</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Vendors at Risk</span>
+                <span class="kpi-icon">🚨</span>
+            </div>
+            <div class="kpi-value" id="atRiskVendors" style="color: var(--danger-color);">0</div>
+            <div class="kpi-sub">Critical score threshold</div>
+        </div>
+    </div>
+
+    <!-- Alerts and Deliveries Container -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 32px;">
+        <!-- Alerts Section -->
+        <div class="chart-card" style="max-height: 420px; display: flex; flex-direction: column;">
+            <h3>Late Delivery Risk Alerts</h3>
+            <div id="alertsContainer" style="overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 12px; padding-right: 4px;">
+                <p style="color: var(--text-secondary); font-style: italic;">Loading alerts...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Deliveries Table -->
+    <div class="table-card">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Recent Shipments & Deliveries Log</h3>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="recentDeliveriesTable">
+                <thead>
+                    <tr>
+                        <th>Delivery ID</th>
+                        <th>Vendor</th>
+                        <th>Product</th>
+                        <th>Expected Date</th>
+                        <th>Actual Date</th>
+                        <th>Status</th>
+                        <th>Delay</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading recent deliveries...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Delivery Performance Trend Table -->
+    <div class="table-card">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Delivery Performance Monthly Trend</h3>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="trendTable">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Total Deliveries</th>
+                        <th>On-Time Deliveries</th>
+                        <th>Delayed Deliveries</th>
+                        <th>Performance Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading monthly trend data...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/supplychain_dashboard.js"></script>
+</body>
+</html>

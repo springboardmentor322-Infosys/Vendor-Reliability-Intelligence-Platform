@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procurement Analytics - VendorIQ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div style="margin-bottom: 24px;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Procurement Analytics</h1>
+        <p style="color: var(--text-secondary);">Executive review of spending, delivery parameters, monthly performance trends, and category risks.</p>
+    </div>
+
+    <!-- ERROR -->
+    <div id="errorMessage" class="toast toast-error" style="display: none; margin-bottom: 24px; position: static; min-width: 100%;"></div>
+
+    <!-- KPI Grid -->
+    <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Vendors</span>
+                <span class="kpi-icon">🏢</span>
+            </div>
+            <div class="kpi-value" id="totalVendors">0</div>
+            <div class="kpi-sub">Total distinct entities</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total PO Items</span>
+                <span class="kpi-icon">📦</span>
+            </div>
+            <div class="kpi-value" id="totalOrders">0</div>
+            <div class="kpi-sub">Total raw items logged</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Completed Items</span>
+                <span class="kpi-icon">✅</span>
+            </div>
+            <div class="kpi-value" id="completedOrders">0</div>
+            <div class="kpi-sub">Fulfilled order rows</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Pending Items</span>
+                <span class="kpi-icon">⏳</span>
+            </div>
+            <div class="kpi-value" id="pendingOrders" style="color: var(--warning-color);">0</div>
+            <div class="kpi-sub">Awaiting workflow steps</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Delivered Items</span>
+                <span class="kpi-icon">🚚</span>
+            </div>
+            <div class="kpi-value" id="deliveredOrders" style="color: var(--primary-color);">0</div>
+            <div class="kpi-sub">Logged as in-transit/received</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Ordered Items</span>
+                <span class="kpi-icon">🛒</span>
+            </div>
+            <div class="kpi-value" id="orderedOrders">0</div>
+            <div class="kpi-sub">Processing state rows</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Spend</span>
+                <span class="kpi-icon">💸</span>
+            </div>
+            <div class="kpi-value" id="totalSpend" style="font-size: 20px; line-height: 1.4; padding: 6px 0;">₹0.00</div>
+            <div class="kpi-sub">Cumulative order cost</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Profit</span>
+                <span class="kpi-icon">💰</span>
+            </div>
+            <div class="kpi-value" id="totalProfit" style="font-size: 20px; line-height: 1.4; padding: 6px 0; color: var(--success-color);">₹0.00</div>
+            <div class="kpi-sub">Calculated benefit</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">On-Time Delivery</span>
+                <span class="kpi-icon">⏱️</span>
+            </div>
+            <div class="kpi-value" id="onTimeDeliveryPct" style="color: var(--success-color);">0.00%</div>
+            <div class="kpi-sub">Zero-risk shipping count</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Late Risk Count</span>
+                <span class="kpi-icon">⚠️</span>
+            </div>
+            <div class="kpi-value" id="lateDeliveryCount" style="color: var(--danger-color);">0</div>
+            <div class="kpi-sub">Identified risk events</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Late Risk %</span>
+                <span class="kpi-icon">🚨</span>
+            </div>
+            <div class="kpi-value" id="lateRiskPct" style="color: var(--danger-color);">0.00%</div>
+            <div class="kpi-sub">Late risk percentage</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Avg Shipping Days</span>
+                <span class="kpi-icon">📅</span>
+            </div>
+            <div class="kpi-value" id="avgShippingDays">0.00</div>
+            <div class="kpi-sub">Mean real shipping duration</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Avg Reliability</span>
+                <span class="kpi-icon">📈</span>
+            </div>
+            <div class="kpi-value" id="averageReliability">0.00%</div>
+            <div class="kpi-sub">Mean vendor reliability score</div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>Order Status Distribution</h3>
+            <div class="chart-container">
+                <canvas id="orderStatusChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Delivery Status Distribution</h3>
+            <div class="chart-container">
+                <canvas id="deliveryStatusChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Category-wise Order Count (Top 10)</h3>
+            <div class="chart-container">
+                <canvas id="categoryOrdersChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Category-wise Sales (Top 10)</h3>
+            <div class="chart-container">
+                <canvas id="categorySalesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Risk Analysis Table -->
+    <div class="table-card">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Category Risk Analysis</h3>
+            </div>
+        </div>
+        <div id="loadingMessage" class="loading-spinner-wrapper">
+            <div class="spinner"></div>
+            <p>Loading category risk data...</p>
+        </div>
+        <div class="table-container">
+            <table id="riskTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Category</th>
+                        <th>Total Orders</th>
+                        <th>On-Time %</th>
+                        <th>Late %</th>
+                        <th>Avg Shipping Days</th>
+                        <th>Avg Scheduled Days</th>
+                        <th>Profit Ratio</th>
+                        <th>Avg Profit</th>
+                        <th>Risk Level</th>
+                    </tr>
+                </thead>
+                <tbody id="riskTableBody">
+                    <!-- Populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/analytics.js"></script>
+</body>
+</html>
