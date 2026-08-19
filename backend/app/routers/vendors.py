@@ -15,6 +15,8 @@ from app.models.vendor import (
     VendorStatus,
     VendorStatusHistory,
 )
+from app.schemas.performance import VendorPerformanceMetrics
+from app.schemas.reliability import VendorRankingEntry, VendorReliabilityScore
 from app.schemas.vendor import (
     VendorCategoryResponse,
     VendorCreate,
@@ -27,6 +29,8 @@ from app.schemas.vendor import (
 from app.services.audit import format_status_change_description, record_audit_log
 from app.services.email import notify_vendor_status_change
 from app.services.in_app_notifications import create_notification
+from app.services.performance import compute_all_vendors_performance, compute_vendor_performance
+from app.services.reliability import compute_vendor_ranking, compute_vendor_reliability
 from app.services.vendor_documents import save_vendor_document
 
 router = APIRouter(prefix="/vendors", tags=["vendors"])
@@ -210,6 +214,26 @@ def get_my_vendor(
     return vendor
 
 
+@router.get("/performance", response_model=list[VendorPerformanceMetrics])
+def list_vendors_performance(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> list[VendorPerformanceMetrics]:
+    if current_user.role == Role.VENDOR:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
+    return compute_all_vendors_performance(db)
+
+
+@router.get("/ranking", response_model=list[VendorRankingEntry])
+def list_vendor_ranking(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> list[VendorRankingEntry]:
+    if current_user.role == Role.VENDOR:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
+    return compute_vendor_ranking(db)
+
+
 @router.get("/{vendor_id}", response_model=VendorDetailResponse)
 def get_vendor(
     vendor_id: int,
@@ -219,6 +243,28 @@ def get_vendor(
     vendor = _get_vendor_or_404(vendor_id, db, detailed=True)
     _ensure_owned_vendor(vendor, current_user)
     return vendor
+
+
+@router.get("/{vendor_id}/performance", response_model=VendorPerformanceMetrics)
+def get_vendor_performance(
+    vendor_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> VendorPerformanceMetrics:
+    vendor = _get_vendor_or_404(vendor_id, db)
+    _ensure_owned_vendor(vendor, current_user)
+    return compute_vendor_performance(db, vendor)
+
+
+@router.get("/{vendor_id}/reliability-score", response_model=VendorReliabilityScore)
+def get_vendor_reliability_score(
+    vendor_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> VendorReliabilityScore:
+    vendor = _get_vendor_or_404(vendor_id, db)
+    _ensure_owned_vendor(vendor, current_user)
+    return compute_vendor_reliability(db, vendor)
 
 
 @router.get("/{vendor_id}/documents", response_model=list[VendorDocumentResponse])
