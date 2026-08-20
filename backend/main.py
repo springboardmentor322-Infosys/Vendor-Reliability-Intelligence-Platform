@@ -835,6 +835,28 @@ def calculate_score(vendor_id: int, db: Session = Depends(database.get_db)):
     
     risk_level = "Low" if score >= 80 else ("Medium" if score >= 60 else "High")
     
+    # Check if we transitioned to High risk
+    if risk_level == "High" and v.risk_level != "High":
+        # Notify Admin
+        admin_users = db.query(models.User).filter(models.User.role == 'admin').all()
+        for admin in admin_users:
+            db.add(models.Notification(
+                user_id=admin.id,
+                type="Risk Alert",
+                title=f"High Risk Contract Alert",
+                message=f"Vendor {v.company_name} risk level dropped to High (Score: {round(score,1)}). Please review active contracts.",
+                severity="Critical"
+            ))
+        # Notify Vendor
+        if v.user_id:
+            db.add(models.Notification(
+                user_id=v.user_id,
+                type="Risk Alert",
+                title=f"High Risk Warning",
+                message=f"Your reliability score has dropped to {round(score,1)} (High Risk). Your contracts are under review.",
+                severity="Critical"
+            ))
+    
     v.risk_level = risk_level
     # Save history
     db.add(models.VendorRiskHistory(vendor_id=vendor_id, score=score, risk_level=risk_level))
@@ -939,3 +961,24 @@ def submit_invoice(po_id: int, db: Session = Depends(database.get_db)):
     calculate_score(po.vendor_id, db)
     
     return {"success": True, "message": "Invoice Submitted and Paid"}
+
+
+from pydantic import BaseModel
+class PRCreateRequest(BaseModel):
+    department: str
+    estimated_cost: float
+    details: str
+
+@app.post("/api/procurement_requests")
+def create_pr(req: PRCreateRequest, db: Session = Depends(database.get_db)):
+    import random
+    pr = models.ProcurementRequest(
+        request_number=f"PR-{random.randint(10000, 99999)}",
+        department=req.department,
+        estimated_cost=req.estimated_cost,
+        total_cost=req.estimated_cost * random.uniform(0.9, 1.1),
+        approval_status="Pending"
+    )
+    db.add(pr)
+    db.commit()
+    return {"success": True, "message": "Department PR Created Successfully", "pr_id": pr.id}
