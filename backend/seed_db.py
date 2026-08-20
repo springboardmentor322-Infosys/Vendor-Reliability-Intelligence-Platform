@@ -13,11 +13,13 @@ def seed_db():
     
     db = SessionLocal()
     
-    # 1. Base Admin, Procurement & Auditor Users
+    # 1. Base Admin, Procurement, Auditor, Finance & Supply Chain Users
     users_data = [
         {"name": "Admin User", "email": "admin@vendorintel.com", "password_hash": get_password_hash("1234"), "role": "admin"},
         {"name": "Procurement Manager", "email": "procumentor@vendorintel.com", "password_hash": get_password_hash("1234"), "role": "procumentor"},
-        {"name": "Risk Auditor", "email": "auditor@vendorintel.com", "password_hash": get_password_hash("1234"), "role": "auditor"}
+        {"name": "Risk Auditor", "email": "auditor@vendorintel.com", "password_hash": get_password_hash("1234"), "role": "auditor"},
+        {"name": "Finance Director", "email": "finance@vendorintel.com", "password_hash": get_password_hash("1234"), "role": "finance"},
+        {"name": "Supply Chain Head", "email": "supplychain@vendorintel.com", "password_hash": get_password_hash("1234"), "role": "supply_chain"}
     ]
     for u_data in users_data:
         db.add(models.User(**u_data))
@@ -102,6 +104,22 @@ def seed_db():
         db.add(po_item)
     db.commit()
     print("Purchase Orders seeded!")
+    db.close()
+
+
+    # 6. Audit Logs
+    audit_data = [
+        {"action": "Vendor Approved", "entity_type": "Vendor", "entity_id": 1, "user_id": 1},
+        {"action": "PR Created", "entity_type": "ProcurementRequest", "entity_id": 1, "user_id": 2},
+        {"action": "PO Generated", "entity_type": "PurchaseOrder", "entity_id": 1, "user_id": 2},
+        {"action": "Vendor Suspended", "entity_type": "Vendor", "entity_id": 9, "user_id": 1},
+        {"action": "Contract Renewed", "entity_type": "Contract", "entity_id": 1, "user_id": 2}
+    ]
+    db = SessionLocal()
+    for a_data in audit_data:
+        db.add(models.AuditLog(**a_data))
+    db.commit()
+    print("Audit Logs seeded!")
     db.close()
 
 if __name__ == "__main__":

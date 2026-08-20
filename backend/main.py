@@ -236,6 +236,13 @@ def login(req: LoginRequest, db: Session = Depends(database.get_db)):
     if not user or not verify_password(req.password[:72], user.password_hash):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
     
+    if user.role == "vendor":
+        vendor = db.query(models.Vendor).filter(models.Vendor.user_id == user.id).first()
+        if vendor and vendor.approval_status == "Pending":
+            raise HTTPException(status_code=403, detail="Your account is pending admin approval.")
+        if vendor and vendor.approval_status == "Rejected":
+            raise HTTPException(status_code=403, detail="Your account has been rejected.")
+            
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.email, "role": user.role}, expires_delta=access_token_expires
@@ -309,9 +316,9 @@ class RoleChecker:
             raise HTTPException(status_code=403, detail="Operation not permitted for this role")
         return user
 
-allow_all_authenticated = RoleChecker(["admin", "procumentor", "vendor", "auditor"])
-allow_admin_procumentor = RoleChecker(["admin", "procumentor"])
-allow_read_only_and_above = RoleChecker(["admin", "procumentor", "auditor", "vendor"])
+allow_all_authenticated = RoleChecker(["admin", "procumentor", "vendor", "auditor", "finance", "supply_chain"])
+allow_admin_procumentor = RoleChecker(["admin", "procumentor", "finance", "supply_chain"])
+allow_read_only_and_above = RoleChecker(["admin", "procumentor", "auditor", "vendor", "finance", "supply_chain"])
 allow_admin_only = RoleChecker(["admin"])
 
 # --- Endpoints ---
@@ -376,6 +383,69 @@ def update_vendor(vendor_id: int, vendor_update: VendorUpdate, db: Session = Dep
     db.refresh(db_vendor)
     services.AuditService.log_action(db, f"Vendor {vendor_id} profile updated", "Vendor", vendor_id, current_user.id)
     return db_vendor
+
+@app.get("/api/vendors/{vendor_id}/performance")
+def get_vendor_performance(vendor_id: int, db: Session = Depends(database.get_db)):
+    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    if not vendor:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+        
+    orders = db.query(models.PurchaseOrder).filter(models.PurchaseOrder.vendor_id == vendor_id).all()
+    
+    total_orders = len(orders)
+    completed_orders = sum(1 for o in orders if o.fulfillment_status == 'Delivered')
+    pending_orders = sum(1 for o in orders if o.fulfillment_status in ['Pending', 'In Progress'])
+    
+    logs = db.query(models.PerformanceLog).filter(models.PerformanceLog.vendor_id == vendor_id).all()
+    
+    if logs:
+        delayed_orders = sum(1 for log in logs if log.actual_delivery_date and log.promised_delivery_date and log.actual_delivery_date > log.promised_delivery_date)
+        on_time_pct = ((len(logs) - delayed_orders) / len(logs) * 100) if len(logs) > 0 else 100
+        avg_delivery_time = sum((log.actual_delivery_date - log.created_at.date()).days for log in logs if log.actual_delivery_date) / len(logs) if logs else 3.5
+        quality = sum(log.service_rating for log in logs) / len(logs) if logs else 4.5
+    else:
+        delayed_orders = int(total_orders * 0.1)
+        on_time_pct = vendor.delivery_rate if vendor.delivery_rate else 100
+        avg_delivery_time = 4.2
+        quality = vendor.quality_score / 20 if vendor.quality_score else 4.5
+        
+    completion_rate = (completed_orders / total_orders * 100) if total_orders > 0 else 100
+    delivery_score = on_time_pct * 0.40
+    completion_score = completion_rate * 0.25
+    quality_score = (quality * 20 if quality <= 5 else quality) * 0.20
+    response_score = 95 * 0.15 # 95% assumed response rate
+    
+    total_score = min(100, delivery_score + completion_score + quality_score + response_score)
+    
+    if total_score >= 80:
+        risk_level = "Reliable"
+        vendor.risk_level = "Low"
+    elif total_score >= 60:
+        risk_level = "Moderate Risk"
+        vendor.risk_level = "Medium"
+    else:
+        risk_level = "High Risk"
+        vendor.risk_level = "High"
+        
+    vendor.rating = total_score / 20
+    db.commit()
+        
+    return {
+        "total_orders": total_orders,
+        "completed_orders": completed_orders,
+        "pending_orders": pending_orders,
+        "delayed_orders": delayed_orders,
+        "on_time_delivery_pct": round(on_time_pct, 1),
+        "average_delivery_days": round(avg_delivery_time, 1),
+        "reliability_score": round(total_score, 1),
+        "risk_level": risk_level,
+        "breakdown": {
+            "delivery": round(delivery_score, 1),
+            "completion": round(completion_score, 1),
+            "quality": round(quality_score, 1),
+            "response": round(response_score, 1)
+        }
+    }
 
 @app.get("/api/procurement_requests", response_model=List[ProcurementRequestResponse], tags=["Procurement"])
 def get_procurement_requests(db: Session = Depends(database.get_db)):
@@ -691,3 +761,181 @@ def create_dispute(dispute: DisputeCreate, db: Session = Depends(database.get_db
     db.commit()
     db.refresh(db_dispute)
     return db_dispute
+
+
+# --- MILESTONE 3: INTELLIGENCE APIs ---
+
+@app.get("/api/intelligence/risk_trend/{vendor_id}")
+def get_risk_trend(vendor_id: int, db: Session = Depends(database.get_db)):
+    history = db.query(models.VendorRiskHistory).filter(models.VendorRiskHistory.vendor_id == vendor_id).order_by(models.VendorRiskHistory.calculated_at.asc()).all()
+    return [{"score": h.score, "risk_level": h.risk_level, "date": h.calculated_at.strftime("%b %d")} for h in history]
+
+@app.get("/api/intelligence/notifications")
+def get_notifications(db: Session = Depends(database.get_db), current_user: models.User = Depends(get_current_user)):
+    notes = db.query(models.Notification).filter(models.Notification.user_id == current_user.id).order_by(models.Notification.created_at.desc()).limit(10).all()
+    return [{"id": n.id, "type": n.type, "title": n.title, "message": n.message, "severity": n.severity, "is_read": n.is_read, "date": n.created_at.strftime("%Y-%m-%d %H:%M")} for n in notes]
+
+@app.get("/api/analytics/supply_chain")
+def supply_chain_analytics(db: Session = Depends(database.get_db)):
+    pos = db.query(models.PurchaseOrder).all()
+    deliveries = db.query(models.DeliveryTracking).all()
+    total = len(pos)
+    in_transit = len([d for d in deliveries if d.status == "In Transit" or d.status == "Shipped"])
+    delivered = len([d for d in deliveries if d.status == "Delivered"])
+    delayed = len([d for d in deliveries if d.status == "Delayed"])
+    return {
+        "total_pos": total,
+        "in_transit": in_transit,
+        "delivered": delivered,
+        "delayed": delayed,
+        "on_time_pct": round((delivered/(delivered+delayed))*100, 1) if (delivered+delayed) > 0 else 100.0,
+        "avg_delay": round(sum(d.delay_days for d in deliveries if d.delay_days > 0) / max(delayed, 1), 1)
+    }
+
+@app.get("/api/analytics/finance")
+def finance_analytics(db: Session = Depends(database.get_db)):
+    prs = db.query(models.ProcurementRequest).all()
+    invoices = db.query(models.Invoice).all()
+    
+    total_procurement = sum(pr.total_cost for pr in prs)
+    approved_spending = sum(pr.total_cost for pr in prs if pr.approval_status == 'Approved')
+    pending_approval = sum(pr.total_cost for pr in prs if pr.approval_status == 'Pending')
+    invoice_amount = sum(inv.amount for inv in invoices)
+    outstanding = sum(inv.amount for inv in invoices if inv.status != 'Paid')
+    
+    return {
+        "total_procurement": total_procurement,
+        "approved_spending": approved_spending,
+        "pending_approval": pending_approval,
+        "invoice_amount": invoice_amount,
+        "outstanding": outstanding
+    }
+
+@app.post("/api/intelligence/calculate_score/{vendor_id}")
+def calculate_score(vendor_id: int, db: Session = Depends(database.get_db)):
+    v = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    if not v:
+        raise HTTPException(status_code=404, detail="Vendor not found")
+        
+    deliveries = db.query(models.DeliveryTracking).filter(models.DeliveryTracking.vendor_id == vendor_id).all()
+    if not deliveries:
+        return {"score": v.rating * 20, "risk_level": v.risk_level}
+        
+    on_time = len([d for d in deliveries if d.status == 'Delivered' and d.delay_days == 0])
+    total_del = len([d for d in deliveries if d.status == 'Delivered' or d.status == 'Delayed'])
+    
+    on_time_pct = (on_time / total_del * 100) if total_del > 0 else 100
+    completion_pct = 95.0
+    quality = v.quality_score
+    compliance = 100.0
+    invoice_acc = 98.0
+    
+    # Weighting
+    score = (0.30 * on_time_pct) + (0.25 * completion_pct) + (0.20 * quality) + (0.15 * compliance) + (0.10 * invoice_acc)
+    
+    risk_level = "Low" if score >= 80 else ("Medium" if score >= 60 else "High")
+    
+    v.risk_level = risk_level
+    # Save history
+    db.add(models.VendorRiskHistory(vendor_id=vendor_id, score=score, risk_level=risk_level))
+    db.commit()
+    
+    return {"score": round(score, 1), "risk_level": risk_level, "details": {
+        "on_time_delivery": round(on_time_pct, 1),
+        "completion_rate": completion_pct,
+        "quality_score": quality,
+        "compliance": compliance,
+        "invoice_accuracy": invoice_acc
+    }}
+
+
+# --- MILESTONE 3: INTERACTIVE ACTIONS ---
+
+@app.post("/api/procurement_requests/{pr_id}/approve")
+def approve_pr(pr_id: int, db: Session = Depends(database.get_db)):
+    pr = db.query(models.ProcurementRequest).filter(models.ProcurementRequest.id == pr_id).first()
+    if not pr:
+        raise HTTPException(status_code=404, detail="PR not found")
+    pr.approval_status = "Approved"
+    
+    # Auto-generate PO for demo interactivity
+    vendor = db.query(models.Vendor).first() # Assign to first vendor for simplicity
+    if vendor:
+        po = models.PurchaseOrder(
+            pr_id=pr.id,
+            vendor_id=vendor.id,
+            po_number=f"PO-{pr.request_number}",
+            fulfillment_status="In Progress"
+        )
+        db.add(po)
+        db.commit()
+        
+        # Create DeliveryTracking for the new PO
+        dt = models.DeliveryTracking(
+            po_id=po.id,
+            vendor_id=vendor.id,
+            status="Pending"
+        )
+        db.add(dt)
+        db.commit()
+    
+    db.commit()
+    return {"success": True, "message": "PR Approved and PO generated"}
+
+@app.post("/api/delivery/{po_id}/status")
+def update_delivery_status(po_id: int, status: str, db: Session = Depends(database.get_db)):
+    dt = db.query(models.DeliveryTracking).filter(models.DeliveryTracking.po_id == po_id).first()
+    po = db.query(models.PurchaseOrder).filter(models.PurchaseOrder.id == po_id).first()
+    if not dt or not po:
+        raise HTTPException(status_code=404, detail="Delivery tracking not found")
+    
+    dt.status = status
+    po.fulfillment_status = status
+    
+    if status == "Delayed":
+        dt.delay_days += 2 # Add arbitrary delay for demo
+        # Notify Admin/Supply chain
+        admin_user = db.query(models.User).filter(models.User.role == 'admin').first()
+        if admin_user:
+            db.add(models.Notification(
+                user_id=admin_user.id,
+                type="Risk Alert",
+                title=f"PO {po.po_number} Delayed",
+                message=f"Vendor {po.vendor_id} has delayed the shipment.",
+                severity="Critical"
+            ))
+            
+    db.commit()
+    
+    # Trigger Intelligence Score Recalculation
+    calculate_score(po.vendor_id, db)
+    
+    return {"success": True, "message": f"Status updated to {status}"}
+
+@app.post("/api/purchase_orders/{po_id}/invoice")
+def submit_invoice(po_id: int, db: Session = Depends(database.get_db)):
+    po = db.query(models.PurchaseOrder).filter(models.PurchaseOrder.id == po_id).first()
+    if not po:
+        raise HTTPException(status_code=404, detail="PO not found")
+    
+    inv = db.query(models.Invoice).filter(models.Invoice.po_id == po_id).first()
+    if inv:
+        inv.status = "Paid"
+    else:
+        inv = models.Invoice(
+            po_id=po.id,
+            vendor_id=po.vendor_id,
+            invoice_number=f"INV-{po.po_number}",
+            amount=po.total_amount if po.total_amount else 1500.0,
+            status="Paid"
+        )
+        db.add(inv)
+        
+    po.invoice_url = f"/invoices/{po.po_number}.pdf"
+    
+    db.commit()
+    
+    # Trigger Score Recalculation
+    calculate_score(po.vendor_id, db)
+    
+    return {"success": True, "message": "Invoice Submitted and Paid"}

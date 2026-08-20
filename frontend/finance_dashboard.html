@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Finance Dashboard | VendorIntel</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+                    "surface-container-highest": "#e0e3e5",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "background": "#f7f9fb",
+                    "outline": "#737686",
+                    "on-error": "#ffffff",
+                    "surface": "#f7f9fb",
+                    "primary-fixed": "#dbe1ff",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "tertiary-container": "#5e6e85",
+                    "on-primary-fixed": "#00174b",
+                    "tertiary": "#46566c",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "tertiary-fixed": "#d3e4fe",
+                    "on-primary-container": "#eeefff",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-background": "#191c1e",
+                    "surface-variant": "#e0e3e5",
+                    "on-surface": "#191c1e",
+                    "surface-container": "#eceef0",
+                    "secondary": "#565e74",
+                    "secondary-fixed": "#dae2fd",
+                    "surface-dim": "#d8dadc",
+                    "surface-bright": "#f7f9fb",
+                    "secondary-container": "#dae2fd",
+                    "inverse-primary": "#b4c5ff",
+                    "primary-container": "#2563eb",
+                    "inverse-surface": "#2d3133",
+                    "on-secondary-container": "#5c647a",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f2f4f6",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-tertiary-container": "#e9f0ff",
+                    "outline-variant": "#c3c6d7",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "surface-tint": "#0053db",
+                    "surface-container-high": "#e6e8ea",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "on-secondary-fixed": "#131b2e",
+                    "primary": "#004ac6",
+                    "on-surface-variant": "#434655"
+            },
+            fontFamily: {
+                    "sans": ["Inter", "sans-serif"],
+                    "mono-data": ["JetBrains Mono", "monospace"]
+            }
+          }
+        },
+        plugins: [
+          ({ addVariant }) => addVariant('light', ':is(.light &)')
+        ]
+      }
+    </script>
+<style>
+        html { scroll-behavior: smooth; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 10s infinite alternate; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+        /* Premium Dark Theme */
+        .dark body { 
+            background-color: #030712; /* gray-950 */
+            color: #f8fafc; /* slate-50 */
+        }
+
+        .dark .glass-panel {
+            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .dark .glass-widget {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.4));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark .glass-widget::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-20deg);
+            transition: all 0.5s ease;
+        }
+
+        .dark .glass-widget:hover::before {
+            left: 150%;
+        }
+
+        .dark .glass-widget:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border-color: rgba(99, 102, 241, 0.4); /* Indigo glow */
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #60a5fa, #c084fc);
+        }
+        
+        .btn-glow {
+            position: relative;
+        }
+        .btn-glow::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            filter: blur(8px);
+        }
+        .btn-glow:hover::after {
+            opacity: 0.7;
+        }
+
+        /* Premium Light Theme Override */
+        .light body { 
+            background-color: #f8fafc; /* Soft slate-50 */
+            color: #0f172a; 
+        }
+        .light .glass-panel, .light .glass-widget {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border-top: 1px solid rgba(255, 255, 255, 1) !important;
+            border-left: 1px solid rgba(255, 255, 255, 1) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.4) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 20px 40px -12px rgba(100, 116, 139, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.8) !important;
+        }
+        .light h1, .light h2, .light h3, .light .text-white { color: #0f172a !important; }
+        .light p, .light .text-tertiary-fixed-dim { color: #475569 !important; }
+        .light .bg-\[\#1e293b\] { 
+            background-color: #ffffff !important; 
+            color: #0f172a !important; 
+            border-color: #cbd5e1 !important;
+        }
+        .light table th, .light table td {
+            border-color: #e2e8f0 !important;
+        }
+        .light .border-white\/5, .light .border-white\/10, .light .border-white\/20 {
+            border-color: #cbd5e1 !important;
+        }
+        .light .bg-white\/5 {
+            background-color: rgba(241, 245, 249, 0.8) !important;
+        }
+        .light .text-slate-400 {
+            color: #64748b !important;
+        }
+
+</style>
+</head>
+<body class="font-sans selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen flex flex-col overflow-y-auto relative">
+    <!-- Animated Background -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/30 rounded-full mix-blend-screen filter blur-[100px] animate-blob"></div>
+        <div class="absolute top-[20%] right-[-10%] w-96 h-96 bg-indigo-600/30 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-[-20%] left-[20%] w-[500px] h-[500px] bg-purple-600/20 rounded-full mix-blend-screen filter blur-[120px] animate-blob animation-delay-4000"></div>
+    </div>
+
+<script>
+    if (localStorage.getItem('userRole') !== 'finance') {
+        window.location.href = 'login.html';
+    }
+</script>
+<header class="sticky top-0 z-40 glass-panel border-b border-white/5 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between relative z-10">
+        <div class="flex items-center gap-3">
+            <span class="text-2xl font-black tracking-tight text-white">Vendor<span class="text-gradient">Intel</span></span>
+            <span class="text-[10px] font-mono-data text-indigo-300 tracking-widest uppercase font-bold px-2 py-1 bg-indigo-500/10 rounded-md border border-indigo-500/20">Finance Console</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="login.html" onclick="localStorage.clear()" class="bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 px-3.5 py-2 rounded-xl text-xs font-bold font-mono-data border border-rose-500/30">Logout</a>
+        </div>
+    </div>
+</header>
+<main class="flex-grow relative z-10 max-w-7xl mx-auto px-6 py-10 space-y-10 w-full">
+    <section class="glass-panel p-8 lg:p-10 rounded-3xl border border-white/5 flex flex-col relative overflow-hidden animate-float">
+        <!-- Shine effect -->
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] animate-[shimmer_3s_infinite]"></div>
+        
+        <h1 class="text-4xl lg:text-5xl font-black text-white tracking-tight" id="welcome-message">👋 Welcome, Finance</h1>
+        <p class="text-base text-blue-200/80 max-w-2xl mt-3 font-medium">Approve PRs based on budget, track spending, and manage invoices effectively.</p>
+        <div class="mt-6 flex flex-wrap items-center gap-4">
+            <button onclick="openPerformanceModal()" class="btn-glow bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-500/25">
+                <span class="material-symbols-outlined">rate_review</span> Evaluate Performance
+            </button>
+            <a href="risk_analysis.html" class="bg-rose-600/20 text-rose-400 hover:bg-rose-600/30 border border-rose-500/30 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined">grid_view</span> Risk Matrix
+            </a>
+            <a href="#" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 border border-emerald-500/30 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined">shopping_cart</span> Financial Tracking
+            </a>
+            <a href="contracts.html" class="bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600/30 border border-indigo-500/30 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined">description</span> Contracts
+            </a>
+            <button onclick="exportReport()" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined">analytics</span> Advanced Analytics Export
+            </button>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="glass-widget p-6 rounded-2xl flex flex-col justify-between">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="material-symbols-outlined text-blue-500">groups</span>
+                <h3 class="font-bold text-sm text-tertiary-fixed-dim">Total Spending</h3>
+            </div>
+            <p class="text-4xl font-black text-blue-400" id="kpi-active-vendors">0</p>
+            <p class="text-[10px] text-blue-500/80 mt-2 font-mono-data">Registered & approved</p>
+        </div>
+        <div class="glass-widget p-6 rounded-2xl flex flex-col justify-between">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="material-symbols-outlined text-emerald-500">speed</span>
+                <h3 class="font-bold text-sm text-tertiary-fixed-dim">Avg Reliability Score</h3>
+            </div>
+            <p class="text-4xl font-black text-emerald-400" id="kpi-avg-reliability">0%</p>
+            <p class="text-[10px] text-emerald-500/80 mt-2 font-mono-data">Platform-wide average</p>
+        </div>
+        <div class="glass-widget p-6 rounded-2xl flex flex-col justify-between">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="material-symbols-outlined text-rose-500">warning</span>
+                <h3 class="font-bold text-sm text-tertiary-fixed-dim">Critical Risk Count</h3>
+            </div>
+            <p class="text-4xl font-black text-rose-400" id="kpi-critical-risk">0</p>
+            <p class="text-[10px] text-rose-500/80 mt-2 font-mono-data">Score < 50</p>
+        </div>
+        <div class="glass-widget p-6 rounded-2xl flex flex-col justify-between">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="material-symbols-outlined text-amber-500">gavel</span>
+                <h3 class="font-bold text-sm text-tertiary-fixed-dim">Open Disputes</h3>
+            </div>
+            <p class="text-4xl font-black text-amber-400" id="kpi-open-disputes">0</p>
+            <p class="text-[10px] text-amber-500/80 mt-2 font-mono-data">Pending resolution</p>
+        </div>
+    </section>
+
+    <!-- Analytics Charts Section -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass-panel p-6 rounded-2xl border border-white/10">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-base text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-400">trending_up</span>
+                    Monthly Trend Analysis
+                </h3>
+            </div>
+            <div class="h-64 relative w-full">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+        <div class="glass-panel p-6 rounded-2xl border border-white/10">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-base text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-indigo-400">donut_large</span>
+                    Risk Category Distribution
+                </h3>
+            </div>
+            <div class="h-64 relative w-full flex justify-center">
+                <canvas id="riskChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <section class="glass-panel p-6 rounded-2xl border border-white/10 mt-8">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="font-bold text-base text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-indigo-400">receipt_long</span>
+                Recent Transaction Feed
+            </h3>
+        </div>
+        <div class="overflow-x-auto rounded-xl border border-white/10">
+            <table class="w-full text-left text-xs font-sans">
+                <thead class="bg-white/5 text-tertiary-fixed-dim uppercase font-mono-data text-[10px] border-b border-white/10">
+                    <tr>
+                        <th class="p-3.5">Vendor Name</th>
+                        <th class="p-3.5">Action / Type</th>
+                        <th class="p-3.5">Date</th>
+                        <th class="p-3.5">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="transactions-table-body" class="divide-y divide-white/5 text-tertiary-fixed-dim">
+                    <!-- Dynamic data will be injected here -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<!-- Add Vendor Modal -->
+<div id="add-vendor-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative">
+        <button onclick="closeAddVendorModal()" class="absolute top-4 right-4 text-tertiary-fixed-dim hover:text-white transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-white"><span class="material-symbols-outlined text-blue-500">add_circle</span> Add New Vendor</h2>
+        <form onsubmit="submitAddVendor(event)" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Company Name</label>
+                    <input type="text" id="add-company-name" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="e.g. Omega Corp">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Contact Email</label>
+                    <input type="email" id="add-email" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="email@company.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Status</label>
+                    <select id="add-status" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Suspended">Suspended</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Risk Level</label>
+                    <select id="add-risk" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                        <option value="Low">Low Risk</option>
+                        <option value="Medium">Medium Risk</option>
+                        <option value="High">High Risk</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Rating (0-5)</label>
+                    <input type="number" step="0.1" max="5" min="0" id="add-rating" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="e.g. 4.5" value="5.0">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Quality Score (%)</label>
+                    <input type="number" step="0.1" max="100" min="0" id="add-quality" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="e.g. 98.5" value="100">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Delivery Rate (%)</label>
+                    <input type="number" step="0.1" max="100" min="0" id="add-delivery" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="e.g. 99.0" value="100">
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-blue-500/25 mt-2">
+                Submit Vendor
+            </button>
+        </form>
+    </div>
+    </div>
+</div>
+
+<!-- Performance Evaluation Modal -->
+<div id="performance-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl p-6 relative">
+        <button onclick="closePerformanceModal()" class="absolute top-4 right-4 text-tertiary-fixed-dim hover:text-white transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-white"><span class="material-symbols-outlined text-blue-500">rate_review</span> Log Performance Evaluation</h2>
+        <form onsubmit="submitPerformanceLog(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Select Vendor</label>
+                <select id="perf-vendor-id" required class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                    <option value="">Loading vendors...</option>
+                </select>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">PO Number (Optional)</label>
+                    <input type="text" id="perf-po" class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="PO-12345">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Service Rating (0-5)</label>
+                    <input type="number" step="0.1" max="5" min="0" id="perf-rating" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" value="5.0">
+                </div>
+            </div>
+
+            <div class="border border-white/10 p-3 rounded-xl bg-white/5 space-y-3">
+                <h4 class="text-xs font-bold text-white mb-2">Delivery Metrics</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider font-bold mb-1 text-tertiary-fixed-dim">Promised Date</label>
+                        <input type="date" id="perf-promised" required class="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider font-bold mb-1 text-tertiary-fixed-dim">Actual Date</label>
+                        <input type="date" id="perf-actual" required class="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-white/10 p-3 rounded-xl bg-white/5 space-y-3">
+                <h4 class="text-xs font-bold text-white mb-2">Quality Metrics</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider font-bold mb-1 text-tertiary-fixed-dim">Ordered Quantity</label>
+                        <input type="number" min="1" id="perf-ordered" required class="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider font-bold mb-1 text-tertiary-fixed-dim">Accepted Quantity</label>
+                        <input type="number" min="0" id="perf-accepted" required class="w-full bg-black/20 border border-white/10 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-blue-500/25 mt-2">
+                Submit Evaluation
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        document.getElementById('welcome-message').innerText = `👋 Welcome, ${localStorage.getItem('userName') || 'Finance'}!`;
+
+        window.approvePR = async function(prId) {
+            try {
+                await fetch(`http://127.0.0.1:8000/api/procurement_requests/${prId}/approve`, {method: 'POST'});
+                alert("PR Approved. PO Generated.");
+                window.location.reload();
+            } catch (e) { console.error(e); }
+        };
+
+        try {
+            const analytics = await fetch('http://127.0.0.1:8000/api/analytics/finance').then(res => res.json());
+            
+            document.getElementById('kpi-total-spending').innerText = `$${analytics.total_procurement.toLocaleString()}`;
+            document.getElementById('kpi-pending-prs').innerText = `$${analytics.pending_approval.toLocaleString()}`;
+            document.getElementById('kpi-pending-invoices').innerText = `$${analytics.invoice_amount.toLocaleString()}`;
+            
+            const budgetUtilized = (analytics.approved_spending / (analytics.total_procurement || 1)) * 100;
+            document.getElementById('kpi-budget-utilized').innerText = `${budgetUtilized.toFixed(1)}%`;
+            
+            const prs = await fetch('http://127.0.0.1:8000/api/procurement_requests').then(res => res.json());
+            const tbody = document.getElementById('vendors-table-body');
+            if(tbody) {
+                tbody.innerHTML = '';
+                prs.forEach(pr => {
+                    let btn = pr.approval_status === 'Pending' 
+                        ? `<button class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded hover:bg-emerald-500/40" onclick="approvePR(${pr.id})">Approve</button>`
+                        : `<span class="text-xs text-slate-500 font-bold px-2 py-1">${pr.approval_status}</span>`;
+                    
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-white/5 transition-colors group">
+                            <td class="p-3.5 border-b border-white/5">
+                                <p class="font-bold text-white">${pr.request_number}</p>
+                                <p class="text-xs text-tertiary-fixed-dim">${pr.department}</p>
+                            </td>
+                            <td class="p-3.5 border-b border-white/5 font-mono-data text-sm">$${pr.total_cost.toLocaleString()}</td>
+                            <td class="p-3.5 border-b border-white/5">${pr.approval_status}</td>
+                            <td class="p-3.5 border-b border-white/5">${btn}</td>
+                        </tr>
+                    `;
+                });
+            }
+        } catch (e) {
+            console.error('Error fetching finance data:', e);
+        }
+    });
+
+</script>
+</body>
+</html>

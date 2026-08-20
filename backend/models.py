@@ -184,3 +184,60 @@ class Message(Base):
     
     thread = relationship("MessageThread", back_populates="messages")
     sender = relationship("User")
+
+class Invoice(Base):
+    __tablename__ = "invoices"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    po_id = Column(Integer, ForeignKey("purchase_orders.id"))
+    vendor_id = Column(Integer, ForeignKey("vendors.id"))
+    invoice_number = Column(String(100), unique=True, index=True)
+    amount = Column(Float, default=0.0)
+    invoice_date = Column(DateTime(timezone=True), server_default=func.now())
+    status = Column(String(50), default="Pending") # Pending, Approved, Paid, Discrepancy
+    discrepancy = Column(Text, nullable=True)
+    document_path = Column(String(255), nullable=True)
+    
+    purchase_order = relationship("PurchaseOrder")
+    vendor = relationship("Vendor")
+
+class DeliveryTracking(Base):
+    __tablename__ = "delivery_tracking"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    po_id = Column(Integer, ForeignKey("purchase_orders.id"))
+    vendor_id = Column(Integer, ForeignKey("vendors.id"))
+    expected_date = Column(Date, nullable=True)
+    actual_date = Column(Date, nullable=True)
+    status = Column(String(50), default="In Transit") # Pending, Shipped, Delivered, Delayed
+    delay_days = Column(Integer, default=0)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    purchase_order = relationship("PurchaseOrder")
+    vendor = relationship("Vendor")
+
+class VendorRiskHistory(Base):
+    __tablename__ = "vendor_risk_history"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    vendor_id = Column(Integer, ForeignKey("vendors.id"))
+    score = Column(Float, default=0.0)
+    risk_level = Column(String(50), default="Low")
+    reason = Column(String(255), nullable=True)
+    calculated_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    vendor = relationship("Vendor")
+
+class Notification(Base):
+    __tablename__ = "notifications"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    type = Column(String(50)) # e.g., 'Risk Alert', 'PO Delayed'
+    title = Column(String(255))
+    message = Column(Text)
+    severity = Column(String(50), default="Info") # Info, Warning, Critical
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    user = relationship("User")

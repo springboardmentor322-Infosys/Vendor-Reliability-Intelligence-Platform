@@ -341,7 +341,7 @@
             <form action="#" class="space-y-4" method="POST" id="loginForm" onsubmit="handleFormSubmit(event)">
                 
                 <!-- PROFILE SELECTOR -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-2">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-2">
                     <button type="button" onclick="selectProfile('admin')" id="profile-admin" class="flex flex-col items-center justify-center p-3 rounded-xl border border-blue-500 bg-blue-500/20 text-blue-400 light:text-blue-700 transition-all shadow-md">
                         <span class="material-symbols-outlined mb-1 text-xl">admin_panel_settings</span>
                         <span class="text-[10px] font-bold font-mono-data uppercase">Admin</span>
@@ -357,6 +357,14 @@
                     <button type="button" onclick="selectProfile('auditor')" id="profile-auditor" class="flex flex-col items-center justify-center p-3 rounded-xl border border-white/10 light:border-slate-300 bg-white/5 light:bg-slate-100 text-tertiary-fixed-dim light:text-slate-500 transition-all hover:bg-white/10 light:hover:bg-slate-200">
                         <span class="material-symbols-outlined mb-1 text-xl">policy</span>
                         <span class="text-[10px] font-bold font-mono-data uppercase">Auditor</span>
+                    </button>
+                    <button type="button" onclick="selectProfile('finance')" id="profile-finance" class="flex flex-col items-center justify-center p-3 rounded-xl border border-white/10 light:border-slate-300 bg-white/5 light:bg-slate-100 text-tertiary-fixed-dim light:text-slate-500 transition-all hover:bg-white/10 light:hover:bg-slate-200">
+                        <span class="material-symbols-outlined mb-1 text-xl">account_balance</span>
+                        <span class="text-[10px] font-bold font-mono-data uppercase">Finance</span>
+                    </button>
+                    <button type="button" onclick="selectProfile('supply_chain')" id="profile-supply_chain" class="flex flex-col items-center justify-center p-3 rounded-xl border border-white/10 light:border-slate-300 bg-white/5 light:bg-slate-100 text-tertiary-fixed-dim light:text-slate-500 transition-all hover:bg-white/10 light:hover:bg-slate-200">
+                        <span class="material-symbols-outlined mb-1 text-xl">local_shipping</span>
+                        <span class="text-[10px] font-bold font-mono-data uppercase">Supply</span>
                     </button>
                 </div>
 
@@ -636,6 +644,8 @@
         const procumentorBtn = document.getElementById('profile-procumentor');
         const vendorBtn = document.getElementById('profile-vendor');
         const auditorBtn = document.getElementById('profile-auditor');
+        const financeBtn = document.getElementById('profile-finance');
+        const supplyChainBtn = document.getElementById('profile-supply_chain');
         const emailInput = document.getElementById('email');
 
         const defaultClass = "flex flex-col items-center justify-center p-3 rounded-xl border border-white/10 light:border-slate-300 bg-white/5 light:bg-slate-100 text-tertiary-fixed-dim light:text-slate-500 transition-all hover:bg-white/10 light:hover:bg-slate-200";
@@ -643,6 +653,8 @@
         procumentorBtn.className = defaultClass;
         vendorBtn.className = defaultClass;
         auditorBtn.className = defaultClass;
+        financeBtn.className = defaultClass;
+        supplyChainBtn.className = defaultClass;
 
         if (profile === 'admin') {
             adminBtn.className = "flex flex-col items-center justify-center p-3 rounded-xl border border-blue-500 bg-blue-500/20 text-blue-400 light:text-blue-700 transition-all shadow-md";
@@ -658,6 +670,12 @@
         } else if (profile === 'auditor') {
             auditorBtn.className = "flex flex-col items-center justify-center p-3 rounded-xl border border-rose-500 bg-rose-500/20 text-rose-400 light:text-rose-700 transition-all shadow-md";
             emailInput.value = "auditor@vendorintel.com";
+        } else if (profile === 'finance') {
+            financeBtn.className = "flex flex-col items-center justify-center p-3 rounded-xl border border-yellow-500 bg-yellow-500/20 text-yellow-400 light:text-yellow-700 transition-all shadow-md";
+            emailInput.value = "finance@vendorintel.com";
+        } else if (profile === 'supply_chain') {
+            supplyChainBtn.className = "flex flex-col items-center justify-center p-3 rounded-xl border border-cyan-500 bg-cyan-500/20 text-cyan-400 light:text-cyan-700 transition-all shadow-md";
+            emailInput.value = "supplychain@vendorintel.com";
         }
     }
 
@@ -693,12 +711,17 @@
             localStorage.setItem('userName', data.user.name);
 
             // Redirect based on role
-            if (data.user.role === 'vendor') {
+            const userRole = data.user.role;
+            if (userRole === 'vendor') {
                 window.location.href = 'vendor_dashboard.html';
-            } else if (data.user.role === 'procumentor') {
+            } else if (userRole === 'procumentor') {
                 window.location.href = 'procurement_dashboard.html';
-            } else if (data.user.role === 'auditor') {
+            } else if (userRole === 'auditor') {
                 window.location.href = 'auditor_dashboard.html';
+            } else if (userRole === 'finance') {
+                window.location.href = 'finance_dashboard.html';
+            } else if (userRole === 'supply_chain') {
+                window.location.href = 'supply_chain_dashboard.html';
             } else {
                 window.location.href = 'dashboard.html'; // Admin
             }
