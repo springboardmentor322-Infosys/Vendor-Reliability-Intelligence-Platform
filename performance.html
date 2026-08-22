@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Vendor Performance - VRIP</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <style>
+
+        /* =========================
+           PERFORMANCE CARD
+        ========================= */
+
+        .performance-card {
+
+            background: white;
+
+            padding: 25px;
+
+            margin-bottom: 20px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0, 0, 0, 0.1);
+
+        }
+
+
+        /* =========================
+           SCORE
+        ========================= */
+
+        .score {
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+            color: #2864e6;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        /* =========================
+           PROGRESS BAR
+        ========================= */
+
+        .progress {
+
+            width: 100%;
+
+            height: 20px;
+
+            background: #ddd;
+
+            border-radius: 10px;
+
+            overflow: hidden;
+
+            margin-top: 10px;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .progress-bar {
+
+            height: 100%;
+
+            background: #2864e6;
+
+            width: 0%;
+
+            transition: width 0.5s ease;
+
+        }
+
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+
+        th {
+
+            background: #2864e6;
+
+            color: white;
+
+            padding: 12px;
+
+            text-align: center;
+
+        }
+
+
+        td {
+
+            padding: 12px;
+
+            border: 1px solid #ddd;
+
+            text-align: center;
+
+        }
+
+
+        /* =========================
+           RISK LEVEL
+        ========================= */
+
+        .risk-low {
+
+            color: #198754;
+
+            font-weight: bold;
+
+        }
+
+
+        .risk-medium {
+
+            color: #d97706;
+
+            font-weight: bold;
+
+        }
+
+
+        .risk-high {
+
+            color: #dc3545;
+
+            font-weight: bold;
+
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            table {
+
+                font-size: 12px;
+
+            }
+
+
+            th,
+            td {
+
+                padding: 8px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     SIDEBAR
+========================= -->
+
+<div class="sidebar">
+
+    <h2>
+        VRIP
+    </h2>
+
+
+    <a href="dashboard.html">
+        Dashboard
+    </a>
+
+
+    <a href="vendors.html">
+        Vendors
+    </a>
+
+
+    <a href="procurement.html">
+        Procurement
+    </a>
+
+
+    <a href="purchase-orders.html">
+        Purchase Orders
+    </a>
+
+
+    <a href="performance.html">
+        Performance
+    </a>
+
+
+    <a href="analytics.html">
+        Analytics
+    </a>
+
+
+    <a href="reports.html">
+        Reports
+    </a>
+
+
+    <a href="notifications.html">
+        Notifications
+    </a>
+
+</div>
+
+
+
+<!-- =========================
+     MAIN CONTENT
+========================= -->
+
+<div class="main">
+
+
+    <!-- =========================
+         PAGE HEADER
+    ========================= -->
+
+    <h1>
+        Vendor Performance
+    </h1>
+
+
+    <p>
+        Monitor vendor reliability, delivery and quality performance.
+    </p>
+
+
+
+    <!-- =========================
+         OVERALL PERFORMANCE
+    ========================= -->
+
+    <div class="performance-card">
+
+
+        <h2>
+            Overall Performance
+        </h2>
+
+
+
+        <!-- ON-TIME DELIVERY -->
+
+        <p>
+            On-Time Delivery
+        </p>
+
+
+        <div
+            class="score"
+            id="overallDelivery"
+        >
+            0.00%
+        </div>
+
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                id="deliveryBar"
+            >
+            </div>
+
+        </div>
+
+
+
+        <!-- QUALITY SCORE -->
+
+        <p>
+            Quality Score
+        </p>
+
+
+        <div
+            class="score"
+            id="overallQuality"
+        >
+            0.00%
+        </div>
+
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                id="qualityBar"
+            >
+            </div>
+
+        </div>
+
+
+
+        <!-- RELIABILITY SCORE -->
+
+        <p>
+            Reliability Score
+        </p>
+
+
+        <div
+            class="score"
+            id="overallReliability"
+        >
+            0.00%
+        </div>
+
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                id="reliabilityBar"
+            >
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =========================
+         VENDOR PERFORMANCE DETAILS
+    ========================= -->
+
+    <div class="performance-card">
+
+
+        <h2>
+            Vendor Performance Details
+        </h2>
+
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Vendor
+                    </th>
+
+
+                    <th>
+                        On-Time Delivery
+                    </th>
+
+
+                    <th>
+                        Quality
+                    </th>
+
+
+                    <th>
+                        Reliability
+                    </th>
+
+
+                    <th>
+                        Overall Score
+                    </th>
+
+
+                    <th>
+                        Risk Level
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+
+            <tbody
+                id="performanceTable"
+            >
+
+                <tr>
+
+                    <td colspan="6">
+
+                        Loading vendor performance...
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+
+    <!-- =========================
+         PERFORMANCE SUMMARY
+    ========================= -->
+
+    <div class="performance-card">
+
+
+        <h2>
+            Performance Summary
+        </h2>
+
+
+        <p>
+
+            Vendor performance is evaluated based on
+            delivery, quality and reliability.
+
+        </p>
+
+
+        <p>
+
+            <b>
+
+                Overall Vendor Reliability Score:
+
+                <span id="summaryScore">
+
+                    0.00%
+
+                </span>
+
+            </b>
+
+        </p>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
+<script>
+
+
+async function loadVendorPerformance() {
+
+
+    try {
+
+
+        /* =========================
+           FETCH PERFORMANCE DATA
+        ========================= */
+
+        const response = await fetch(
+
+            "http://127.0.0.1:8000/vendor-performance"
+
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load vendor performance"
+            );
+
+        }
+
+
+        const performanceData =
+            await response.json();
+
+
+        console.log(
+            "Vendor Performance:",
+            performanceData
+        );
+
+
+
+        /* =========================
+           GET TABLE
+        ========================= */
+
+        const table =
+            document.getElementById(
+                "performanceTable"
+            );
+
+
+        table.innerHTML = "";
+
+
+
+        /* =========================
+           CHECK DATA
+        ========================= */
+
+        if (
+
+            !Array.isArray(performanceData)
+
+            ||
+
+            performanceData.length === 0
+
+        ) {
+
+
+            table.innerHTML = `
+
+                <tr>
+
+                    <td colspan="6">
+
+                        No vendor performance data available
+
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            return;
+
+        }
+
+
+
+        /* =========================
+           TOTAL VALUES
+        ========================= */
+
+        let totalDelivery = 0;
+
+        let totalQuality = 0;
+
+        let totalReliability = 0;
+
+
+
+        /* =========================
+           DISPLAY VENDORS
+        ========================= */
+
+        performanceData.forEach(
+
+            function (performance) {
+
+
+                const delivery =
+
+                    Number(
+                        performance.on_time_delivery_percentage
+                    )
+
+                    ||
+
+                    0;
+
+
+
+                const quality =
+
+                    Number(
+                        performance.quality_score
+                    )
+
+                    ||
+
+                    0;
+
+
+
+                const reliability =
+
+                    Number(
+                        performance.reliability_score
+                    )
+
+                    ||
+
+                    0;
+
+
+
+                const overallScore =
+
+                    Number(
+                        performance.overall_score
+                    )
+
+                    ||
+
+                    (
+                        delivery
+                        +
+                        quality
+                        +
+                        reliability
+                    ) / 3;
+
+
+
+                /* =========================
+                   ADD TOTALS
+                ========================= */
+
+                totalDelivery += delivery;
+
+                totalQuality += quality;
+
+                totalReliability += reliability;
+
+
+
+                /* =========================
+                   RISK LEVEL CLASS
+                ========================= */
+
+                const riskLevel =
+                    performance.risk_level || "Low";
+
+
+                let riskClass = "risk-low";
+
+
+                if (
+                    riskLevel.toLowerCase() === "medium"
+                ) {
+
+                    riskClass = "risk-medium";
+
+                }
+
+
+                else if (
+                    riskLevel.toLowerCase() === "high"
+                ) {
+
+                    riskClass = "risk-high";
+
+                }
+
+
+
+                /* =========================
+                   CREATE ROW
+                ========================= */
+
+                const row =
+                    document.createElement("tr");
+
+
+                row.innerHTML = `
+
+                    <td>
+
+                        ${
+                            performance.vendor_name
+                            ||
+                            "Vendor " + performance.vendor_id
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        ${delivery.toFixed(2)}%
+
+                    </td>
+
+
+                    <td>
+
+                        ${quality.toFixed(2)}%
+
+                    </td>
+
+
+                    <td>
+
+                        ${reliability.toFixed(2)}%
+
+                    </td>
+
+
+                    <td>
+
+                        ${overallScore.toFixed(2)}%
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="${riskClass}">
+
+                            ${riskLevel}
+
+                        </span>
+
+                    </td>
+
+                `;
+
+
+                table.appendChild(row);
+
+
+            }
+
+        );
+
+
+
+        /* =========================
+           CALCULATE AVERAGES
+        ========================= */
+
+        const count =
+            performanceData.length;
+
+
+
+        const averageDelivery =
+
+            totalDelivery / count;
+
+
+
+        const averageQuality =
+
+            totalQuality / count;
+
+
+
+        const averageReliability =
+
+            totalReliability / count;
+
+
+
+        /* =========================
+           UPDATE SCORES
+        ========================= */
+
+        document.getElementById(
+            "overallDelivery"
+        ).textContent =
+
+            averageDelivery.toFixed(2)
+            +
+            "%";
+
+
+
+        document.getElementById(
+            "overallQuality"
+        ).textContent =
+
+            averageQuality.toFixed(2)
+            +
+            "%";
+
+
+
+        document.getElementById(
+            "overallReliability"
+        ).textContent =
+
+            averageReliability.toFixed(2)
+            +
+            "%";
+
+
+
+        document.getElementById(
+            "summaryScore"
+        ).textContent =
+
+            averageReliability.toFixed(2)
+            +
+            "%";
+
+
+
+        /* =========================
+           UPDATE PROGRESS BARS
+        ========================= */
+
+        document.getElementById(
+            "deliveryBar"
+        ).style.width =
+
+            Math.min(
+                averageDelivery,
+                100
+            )
+            +
+            "%";
+
+
+
+        document.getElementById(
+            "qualityBar"
+        ).style.width =
+
+            Math.min(
+                averageQuality,
+                100
+            )
+            +
+            "%";
+
+
+
+        document.getElementById(
+            "reliabilityBar"
+        ).style.width =
+
+            Math.min(
+                averageReliability,
+                100
+            )
+            +
+            "%";
+
+
+    }
+
+
+    catch (error) {
+
+
+        console.error(
+            "Performance Error:",
+            error
+        );
+
+
+        document.getElementById(
+            "performanceTable"
+        ).innerHTML = `
+
+            <tr>
+
+                <td colspan="6">
+
+                    Failed to load vendor performance
+
+                </td>
+
+            </tr>
+
+        `;
+
+
+    }
+
+
+}
+
+
+
+/* =========================
+   LOAD DATA
+========================= */
+
+loadVendorPerformance();
+
+
+</script>
+
+
+</body>
+
+</html>

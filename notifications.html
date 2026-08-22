@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Notifications - VRIP</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+
+<body>
+
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <h2>VRIP</h2>
+
+    <a href="dashboard.html">Dashboard</a>
+
+    <a href="vendors.html">Vendors</a>
+
+    <a href="procurement.html">Procurement</a>
+
+    <a href="purchase-orders.html">Purchase Orders</a>
+
+    <a href="performance.html">Performance</a>
+
+    <a href="analytics.html">Analytics</a>
+
+    <a href="reports.html">Reports</a>
+
+    <a href="notifications.html">Notifications</a>
+
+</div>
+
+
+
+<!-- MAIN CONTENT -->
+
+<div class="main">
+
+    <h1>Notifications</h1>
+
+
+    <!-- NOTIFICATION SUMMARY -->
+
+    <div class="card">
+
+        <h2>Notification Summary</h2>
+
+        <table border="1" width="100%">
+
+            <thead>
+
+                <tr>
+
+                    <th>Total Notifications</th>
+
+                    <th>Unread</th>
+
+                    <th>Read</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                <tr>
+
+                    <td id="totalNotifications">
+                        0
+                    </td>
+
+                    <td id="unreadNotifications">
+                        0
+                    </td>
+
+                    <td id="readNotifications">
+                        0
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+
+    <!-- NOTIFICATIONS LIST -->
+
+    <div class="card">
+
+        <h2>Recent Notifications</h2>
+
+        <table border="1" width="100%">
+
+            <thead>
+
+                <tr>
+
+                    <th>Notification ID</th>
+
+                    <th>Message</th>
+
+                    <th>Type</th>
+
+                    <th>Date</th>
+
+                    <th>Status</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="notificationsTable">
+
+                <tr>
+
+                    <td colspan="6">
+                        Loading notifications...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+const API_URL = "http://127.0.0.1:8000";
+
+
+/* ========================================
+   LOAD NOTIFICATIONS
+======================================== */
+
+async function loadNotifications() {
+
+    const token = localStorage.getItem(
+        "access_token"
+    );
+
+
+    if (!token) {
+
+        alert(
+            "Please login first"
+        );
+
+        window.location.href =
+            "login.html";
+
+        return;
+
+    }
+
+
+    try {
+
+        const response = await fetch(
+
+            API_URL + "/notifications",
+
+            {
+
+                headers: {
+
+                    "Authorization":
+                        "Bearer " + token
+
+                }
+
+            }
+
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load notifications"
+            );
+
+        }
+
+
+        const notifications =
+            await response.json();
+
+
+        console.log(
+            "Notifications:",
+            notifications
+        );
+
+
+        const table =
+            document.getElementById(
+                "notificationsTable"
+            );
+
+
+        table.innerHTML = "";
+
+
+        let total =
+            notifications.length;
+
+
+        let unread = 0;
+
+
+        let read = 0;
+
+
+
+        notifications.forEach(
+            function(notification) {
+
+
+                if (
+                    notification.is_read === false ||
+                    notification.is_read === "No"
+                ) {
+
+                    unread++;
+
+                }
+
+                else {
+
+                    read++;
+
+                }
+
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                const status =
+
+                    notification.is_read === true ||
+                    notification.is_read === "Yes"
+
+                    ? "Read"
+
+                    : "Unread";
+
+
+                const action =
+
+                    status === "Unread"
+
+                    ? `<button onclick="markAsRead(${notification.id})">
+                        Mark as Read
+                       </button>`
+
+                    : "-";
+
+
+                row.innerHTML = `
+
+                    <td>
+                        N${notification.id}
+                    </td>
+
+                    <td>
+                        ${notification.message}
+                    </td>
+
+                    <td>
+                        ${notification.notification_type || "General"}
+                    </td>
+
+                    <td>
+                        ${notification.created_at || "-"}
+                    </td>
+
+                    <td>
+                        ${status}
+                    </td>
+
+                    <td>
+                        ${action}
+                    </td>
+
+                `;
+
+
+                table.appendChild(
+                    row
+                );
+
+
+            }
+        );
+
+
+
+        /* UPDATE SUMMARY */
+
+        document.getElementById(
+            "totalNotifications"
+        ).textContent =
+            total;
+
+
+        document.getElementById(
+            "unreadNotifications"
+        ).textContent =
+            unread;
+
+
+        document.getElementById(
+            "readNotifications"
+        ).textContent =
+            read;
+
+
+
+        /* EMPTY NOTIFICATIONS */
+
+        if (
+            notifications.length === 0
+        ) {
+
+            table.innerHTML = `
+
+                <tr>
+
+                    <td colspan="6">
+
+                        No notifications found
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Notification Error:",
+            error
+        );
+
+
+        document.getElementById(
+            "notificationsTable"
+        ).innerHTML = `
+
+            <tr>
+
+                <td colspan="6">
+
+                    Failed to load notifications
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+
+/* ========================================
+   MARK NOTIFICATION AS READ
+======================================== */
+
+async function markAsRead(
+    notificationId
+) {
+
+    const token = localStorage.getItem(
+        "access_token"
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+
+                API_URL +
+                "/notifications/" +
+                notificationId +
+                "/read",
+
+                {
+
+                    method: "PUT",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token
+
+                    }
+
+                }
+
+            );
+
+
+        if (response.ok) {
+
+            alert(
+                "Notification marked as Read!"
+            );
+
+
+            loadNotifications();
+
+        }
+
+        else {
+
+            alert(
+                "Failed to update notification"
+            );
+
+        }
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Mark Read Error:",
+            error
+        );
+
+
+        alert(
+            "Error updating notification"
+        );
+
+    }
+
+}
+
+
+
+/* ========================================
+   LOAD DATA
+======================================== */
+
+loadNotifications();
+
+</script>
+
+
+</body>
+
+</html>
