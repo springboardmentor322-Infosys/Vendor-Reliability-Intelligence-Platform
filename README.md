@@ -74,4 +74,4 @@ Vendor-Reliability-Platform/
 ├── requirements.txt 
 ├── alembic.ini 
 ├── .env.example 
-└── README.md idhi commit changes chess
+└── README.md 
