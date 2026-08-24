@@ -1,0 +1,162 @@
+@if(orders.length > 0){
+
+<div class="orders-grid">
+
+@for(order of orders; track order.id){
+
+
+<div class="order-card">
+
+
+<div class="order-header">
+
+
+<h2>
+Order #{{order.id}}
+</h2>
+
+
+<span class="status">
+{{order.status}}
+</span>
+
+
+</div>
+
+
+
+<hr>
+
+
+
+<div class="details">
+
+
+<p>
+
+<strong>
+Vendor:
+</strong>
+
+{{order.vendor_name}}
+
+</p>
+
+
+
+
+<p>
+
+<strong>
+Product:
+</strong>
+
+{{order.product_name}}
+
+</p>
+
+
+
+
+<p>
+
+<strong>
+Quantity:
+</strong>
+
+{{order.quantity}}
+
+</p>
+
+
+
+
+<p>
+
+<strong>
+Total Amount:
+</strong>
+
+₹{{order.total_amount}}
+
+</p>
+
+
+
+</div>
+
+
+
+
+
+<hr>
+
+
+
+
+<!-- Update Status -->
+
+<div class="status-update">
+
+
+<label>
+
+<strong>
+Update Status:
+</strong>
+
+</label>
+
+
+
+<select [(ngModel)]="order.status">
+
+
+<option
+*ngFor="let status of statuses"
+[value]="status">
+
+{{status}}
+
+</option>
+
+
+</select>
+
+
+
+
+<button
+(click)="updateStatus(order)">
+
+Update
+
+</button>
+
+
+</div>
+
+
+
+
+</div>
+
+
+}
+
+</div>
+
+
+}
+
+@else {
+
+
+<div class="empty">
+
+No purchase orders found.
+
+</div>
+
+
+}

@@ -1,0 +1,115 @@
+<div class="page-header">
+
+  <div>
+    <h1>Contract Management</h1>
+    <p>Manage vendor contracts and expiry tracking</p>
+  </div>
+
+  <button class="add-btn" (click)="addContract()">
+    + Add Contract
+  </button>
+
+</div>
+
+
+
+<div class="table-card">
+
+<table class="contract-table">
+
+<thead>
+<tr>
+  <th>Vendor Name</th>
+  <th>Contract Title</th>
+  <th>Start Date</th>
+  <th>Expiry Date</th>
+  <th>Notice Period</th>
+  <th>Compliance</th>
+  <th>Status</th>
+  <th>Actions</th>
+</tr>
+</thead>
+
+
+<tbody>
+
+@for(contract of contracts; track contract.id){
+
+<tr>
+
+<td>{{contract.vendor_name}}</td>
+
+<td>{{contract.contract_title}}</td>
+
+<td>{{contract.start_date}}</td>
+
+<td>{{contract.expiry_date}}</td>
+
+<td>{{contract.renewal_notice_period}} Days</td>
+
+
+<td>
+<span class="badge compliance">
+{{contract.compliance_flag}}
+</span>
+</td>
+
+
+<td>
+
+<span 
+class="badge"
+[class.active]="contract.status=='Active'"
+[class.expired]="contract.status=='Expired'"
+[class.near]="contract.status=='Near Expiry'">
+
+{{contract.status}}
+
+</span>
+
+</td>
+
+
+<td class="actions">
+
+<button class="expiry-btn"
+(click)="checkExpiry(contract.id)">
+Check Expiry
+</button>
+
+
+<button class="edit-btn"
+(click)="editContract(contract.id)">
+Edit
+</button>
+
+
+<button class="delete-btn"
+(click)="deleteContract(contract.id)">
+Delete
+</button>
+
+
+</td>
+
+</tr>
+
+}
+
+
+@empty {
+
+<tr>
+<td colspan="8" class="empty">
+No contracts available
+</td>
+</tr>
+
+}
+
+
+</tbody>
+
+</table>
+
+</div>
