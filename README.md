@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Vendor Reliability Intelligence Platform
 
 ## Milestone 1: Week 1 & 2
@@ -32,7 +32,6 @@ This repository contains the FastAPI backend for a vendor reliability and procur
 
 ## VendorIQ Milestone Build
 The current build includes a VendorIQ-aligned landing page, administrator dashboard and vendor dashboard, plus milestone authentication, role routing, vendor approval, procurement/PO/contract workflows and Alembic configuration. Configure credentials in `.env` before deployment.
-=======
 # Vendor-Reliability-Intelligence-Platform
 Vendor Reliability Intelligence Platform
->>>>>>> f6e6792b99dc568a190e8d12fb7a7e1cb9f3d369
+
