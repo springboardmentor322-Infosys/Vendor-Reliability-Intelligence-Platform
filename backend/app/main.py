@@ -11,7 +11,7 @@ import app.models.supply_chain  # noqa: F401 — register products, deliveries, 
 from app.db.seed_admin import ensure_admin_account
 from app.db.seed_vendor_categories import ensure_vendor_categories
 from app.db.session import SessionLocal, engine
-from app.routers import admin, analytics, audit_logs, auth, contracts, messages, notifications, procurement, purchase_orders, supply_chain, support, vendors
+from app.routers import admin, analytics, audit_logs, auth, contracts, messages, notifications, procurement, purchase_orders, reports, supply_chain, support, vendors
 from app.services.vendor_documents import ensure_upload_dir
 from app.services.po_documents import ensure_po_upload_dir
 from app.services.contract_documents import ensure_contract_upload_dir
@@ -37,6 +37,7 @@ app.include_router(admin.router)
 app.include_router(vendors.router)
 app.include_router(vendors.categories_router)
 app.include_router(analytics.router)
+app.include_router(reports.router)
 app.include_router(procurement.router)
 app.include_router(purchase_orders.router)
 app.include_router(contracts.router)

@@ -18,6 +18,7 @@ const apiPrefixes = [
   '/support',
   '/uploads',
   '/analytics',
+  '/reports',
   '/products',
   '/deliveries',
   '/invoices',
@@ -25,7 +26,19 @@ const apiPrefixes = [
 ]
 
 const proxy = Object.fromEntries(
-  apiPrefixes.map((prefix) => [prefix, backendTarget]),
+  apiPrefixes.map((prefix) => [
+    prefix,
+    {
+      target: backendTarget,
+      changeOrigin: true,
+      bypass(req) {
+        if (req.headers.accept?.includes('text/html')) {
+          return req.url
+        }
+        return undefined
+      },
+    },
+  ]),
 )
 
 // https://vite.dev/config/
