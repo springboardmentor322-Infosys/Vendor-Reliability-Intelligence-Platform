@@ -103,10 +103,6 @@ app = FastAPI(
 # ============================================================
 # CORS CONFIGURATION
 # ============================================================
-# Allows:
-# - Local Angular development
-# - Production Angular frontend deployed on Render
-# ============================================================
 
 app.add_middleware(
     CORSMiddleware,
