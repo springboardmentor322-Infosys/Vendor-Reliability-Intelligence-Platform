@@ -20,7 +20,7 @@ class UserRegister(BaseModel):
 
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    email: str = Field(min_length=3, max_length=255)
     password: str = Field(min_length=1, max_length=128)
 
 
@@ -51,7 +51,7 @@ class UserResponse(BaseModel):
 
     id: int
     name: str
-    email: EmailStr
+    email: str
     role: Role
     is_active: bool
     created_at: datetime

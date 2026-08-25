@@ -114,7 +114,7 @@ class VendorResponse(BaseModel):
     id: int
     name: str
     category: VendorCategoryResponse
-    contact_email: EmailStr
+    contact_email: str
     contact_phone: str
     address: str
     status: str

@@ -332,7 +332,7 @@ export default function VendorManagement() {
       const data = await fetchVendors(params)
       setVendors(data)
     } catch (err) {
-      setError(getErrorMessage(err, 'Failed to load vendors'))
+      setError(getErrorMessage(err, 'Failed to load vendors. Check that the backend is running.'))
     } finally {
       setLoading(false)
     }

@@ -1,23 +1,37 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+const backendTarget = 'http://127.0.0.1:8000'
+
+// All FastAPI route prefixes used by the frontend (dev proxy → backend)
+const apiPrefixes = [
+  '/auth',
+  '/vendors',
+  '/vendor-categories',
+  '/admin',
+  '/procurement-requests',
+  '/purchase-orders',
+  '/contracts',
+  '/messages',
+  '/audit-logs',
+  '/notifications',
+  '/support',
+  '/uploads',
+  '/analytics',
+  '/products',
+  '/deliveries',
+  '/invoices',
+  '/quality-inspections',
+]
+
+const proxy = Object.fromEntries(
+  apiPrefixes.map((prefix) => [prefix, backendTarget]),
+)
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
-    proxy: {
-      '/auth': 'http://127.0.0.1:8000',
-      '/vendors': 'http://127.0.0.1:8000',
-      '/vendor-categories': 'http://127.0.0.1:8000',
-      '/admin': 'http://127.0.0.1:8000',
-      '/procurement-requests': 'http://127.0.0.1:8000',
-      '/purchase-orders': 'http://127.0.0.1:8000',
-      '/contracts': 'http://127.0.0.1:8000',
-      '/messages': 'http://127.0.0.1:8000',
-      '/audit-logs': 'http://127.0.0.1:8000',
-      '/notifications': 'http://127.0.0.1:8000',
-      '/support': 'http://127.0.0.1:8000',
-      '/uploads': 'http://127.0.0.1:8000',
-    },
+    proxy,
   },
 })
