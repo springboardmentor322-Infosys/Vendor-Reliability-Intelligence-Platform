@@ -31,7 +31,7 @@ export class PerformanceComponent implements OnInit {
     'order_completion_rate', 'overall_score', 'action'
   ];
 
-  private apiUrl = 'http://127.0.0.1:8000/performance';
+  private apiUrl = 'https://vendor-reliability-intelligence-platform-2h9h.onrender.com/performance';
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -67,3 +67,4 @@ export class PerformanceComponent implements OnInit {
     });
   }
 }
+

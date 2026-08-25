@@ -16,3 +16,4 @@ export class DashboardComponent implements OnInit {
   constructor(private http:HttpClient){}
   ngOnInit(){this.http.get<DashboardStats>(`${environment.apiUrl}/dashboard/`).subscribe({next:d=>this.stats=d,error:()=>{}});}
 }
+

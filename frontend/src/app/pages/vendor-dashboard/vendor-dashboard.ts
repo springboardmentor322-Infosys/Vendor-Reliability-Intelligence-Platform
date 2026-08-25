@@ -16,3 +16,4 @@ export class VendorDashboardComponent implements OnInit{
  loadContracts(name:string){this.http.get<any[]>(`${environment.apiUrl}/contracts/`).subscribe({next:d=>this.activeContracts=d.filter(x=>x.vendor_name===name).length})}
  loadPerformance(name:string){this.http.get<any[]>(`${environment.apiUrl}/performance/`).subscribe({next:d=>{const p=d.find(x=>x.vendor_name===name);if(p)this.performanceScore=p.overall_score}})}
 }
+

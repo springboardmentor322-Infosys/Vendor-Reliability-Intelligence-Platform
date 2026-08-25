@@ -20,3 +20,4 @@ describe('EditVendor', () => {
     expect(component).toBeTruthy();
   });
 });
+

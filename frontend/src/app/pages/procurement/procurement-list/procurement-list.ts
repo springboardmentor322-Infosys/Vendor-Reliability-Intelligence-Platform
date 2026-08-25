@@ -16,7 +16,7 @@ export class ProcurementListComponent implements OnInit {
 
   procurements: any[] = [];
 
-  private apiUrl = 'http://127.0.0.1:8000/procurement';
+  private apiUrl = 'https://vendor-reliability-intelligence-platform-2h9h.onrender.com/procurement';
 
 
   constructor(

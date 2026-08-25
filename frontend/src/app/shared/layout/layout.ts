@@ -94,3 +94,4 @@ export class LayoutComponent implements OnInit {
   toggleSidenav(): void { this.sidenavOpened.update(v => !v); }
   logout(): void { this.auth.logout(); }
 }
+

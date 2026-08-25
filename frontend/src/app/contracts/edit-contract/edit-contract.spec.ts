@@ -20,3 +20,4 @@ describe('EditContract', () => {
     expect(component).toBeTruthy();
   });
 });
+

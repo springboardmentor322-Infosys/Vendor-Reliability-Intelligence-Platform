@@ -13,6 +13,7 @@ export class ComplianceComponent implements OnInit {
   summary:any={}; certs:any[]=[]; docs:any[]=[]; form:any={vendor_name:'',certification_name:'',certificate_number:'',issue_date:'',expiry_date:'',status:'Valid',document_path:''};
   constructor(private http:HttpClient){}
   ngOnInit(){this.load();}
-  load(){this.http.get<any>('http://127.0.0.1:8000/compliance/summary').subscribe({next:d=>this.summary=d});this.http.get<any[]>('http://127.0.0.1:8000/compliance/certifications').subscribe({next:d=>this.certs=d});this.http.get<any[]>('http://127.0.0.1:8000/compliance/documents').subscribe({next:d=>this.docs=d});}
-  addCertification(){this.http.post('http://127.0.0.1:8000/compliance/certifications',this.form).subscribe({next:()=>{this.load();this.form={vendor_name:'',certification_name:'',certificate_number:'',issue_date:'',expiry_date:'',status:'Valid',document_path:''}}});}
+  load(){this.http.get<any>('https://vendor-reliability-intelligence-platform-2h9h.onrender.com/compliance/summary').subscribe({next:d=>this.summary=d});this.http.get<any[]>('https://vendor-reliability-intelligence-platform-2h9h.onrender.com/compliance/certifications').subscribe({next:d=>this.certs=d});this.http.get<any[]>('https://vendor-reliability-intelligence-platform-2h9h.onrender.com/compliance/documents').subscribe({next:d=>this.docs=d});}
+  addCertification(){this.http.post('https://vendor-reliability-intelligence-platform-2h9h.onrender.com/compliance/certifications',this.form).subscribe({next:()=>{this.load();this.form={vendor_name:'',certification_name:'',certificate_number:'',issue_date:'',expiry_date:'',status:'Valid',document_path:''}}});}
 }
+

@@ -45,7 +45,7 @@ export class AddVendorComponent {
     });
 
     this.http.post(
-      'http://127.0.0.1:8000/vendors/add',
+      'https://vendor-reliability-intelligence-platform-2h9h.onrender.com/vendors/add',
       this.vendor,
       { headers }
     ).subscribe({

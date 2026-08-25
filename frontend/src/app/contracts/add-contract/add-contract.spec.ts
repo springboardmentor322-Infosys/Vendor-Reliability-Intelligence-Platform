@@ -20,3 +20,4 @@ describe('AddContract', () => {
     expect(component).toBeTruthy();
   });
 });
+

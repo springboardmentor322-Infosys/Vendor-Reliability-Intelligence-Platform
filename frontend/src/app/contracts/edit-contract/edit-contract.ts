@@ -36,7 +36,7 @@ export class EditContractComponent implements OnInit {
   };
 
 
-  apiUrl='http://127.0.0.1:8000/contracts';
+  apiUrl='https://vendor-reliability-intelligence-platform-2h9h.onrender.com/contracts';
 
 
 

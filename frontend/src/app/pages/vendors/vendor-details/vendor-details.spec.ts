@@ -20,3 +20,4 @@ describe('VendorDetails', () => {
     expect(component).toBeTruthy();
   });
 });
+

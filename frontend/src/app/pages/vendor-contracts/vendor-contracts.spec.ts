@@ -20,3 +20,4 @@ describe('VendorContracts', () => {
     expect(component).toBeTruthy();
   });
 });
+

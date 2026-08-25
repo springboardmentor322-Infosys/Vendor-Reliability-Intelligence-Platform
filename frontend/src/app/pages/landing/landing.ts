@@ -10,3 +10,4 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './landing.css'
 })
 export class LandingComponent {}
+

@@ -35,7 +35,7 @@ export class VendorDetailsComponent implements OnInit {
 
 
   private apiUrl =
-  'http://127.0.0.1:8000/vendors';
+  'https://vendor-reliability-intelligence-platform-2h9h.onrender.com/vendors';
 
 
 

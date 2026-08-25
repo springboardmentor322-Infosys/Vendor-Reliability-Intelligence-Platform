@@ -20,3 +20,4 @@ describe('Landing', () => {
     expect(component).toBeTruthy();
   });
 });
+

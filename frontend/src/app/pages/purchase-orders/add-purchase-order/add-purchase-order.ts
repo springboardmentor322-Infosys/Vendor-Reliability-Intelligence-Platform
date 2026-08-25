@@ -41,7 +41,7 @@ export class AddPurchaseOrderComponent {
 
     this.http.post(
 
-      'http://127.0.0.1:8000/purchase-orders/add',
+      'https://vendor-reliability-intelligence-platform-2h9h.onrender.com/purchase-orders/add',
 
       this.order
 

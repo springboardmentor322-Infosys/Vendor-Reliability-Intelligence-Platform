@@ -39,7 +39,7 @@ export class EditVendorComponent implements OnInit {
   loadVendor(): void {
 
     this.http.get<any>(
-      `http://127.0.0.1:8000/vendors/${this.vendorId}`
+      `https://vendor-reliability-intelligence-platform-2h9h.onrender.com/vendors/${this.vendorId}`
     ).subscribe({
 
       next: (data) => {
@@ -70,7 +70,7 @@ export class EditVendorComponent implements OnInit {
     });
 
     this.http.put(
-      `http://127.0.0.1:8000/vendors/${this.vendorId}`,
+      `https://vendor-reliability-intelligence-platform-2h9h.onrender.com/vendors/${this.vendorId}`,
       this.vendor,
       { headers }
     ).subscribe({

@@ -13,7 +13,8 @@ export class CommunicationComponent implements OnInit {
   messages:any[]=[]; form:any={vendor_name:'',recipient:'',subject:'',message:'',channel:'In-App',file_name:''};
   constructor(private http:HttpClient){}
   ngOnInit(){this.load();}
-  load(){this.http.get<any[]>('http://127.0.0.1:8000/communication/').subscribe({next:d=>this.messages=d});}
-  send(){this.http.post('http://127.0.0.1:8000/communication/',this.form).subscribe({next:()=>{this.form.message='';this.load();}});}
-  share(){this.http.post('http://127.0.0.1:8000/communication/share-file',this.form).subscribe({next:()=>this.load()});}
+  load(){this.http.get<any[]>('https://vendor-reliability-intelligence-platform-2h9h.onrender.com/communication/').subscribe({next:d=>this.messages=d});}
+  send(){this.http.post('https://vendor-reliability-intelligence-platform-2h9h.onrender.com/communication/',this.form).subscribe({next:()=>{this.form.message='';this.load();}});}
+  share(){this.http.post('https://vendor-reliability-intelligence-platform-2h9h.onrender.com/communication/share-file',this.form).subscribe({next:()=>this.load()});}
 }
+

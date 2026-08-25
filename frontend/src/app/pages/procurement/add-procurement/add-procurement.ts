@@ -32,7 +32,7 @@ export class AddProcurementComponent {
   addProcurement() {
 
     this.http.post(
-      'http://127.0.0.1:8000/procurement/add',
+      'https://vendor-reliability-intelligence-platform-2h9h.onrender.com/procurement/add',
       this.procurement
     )
     .subscribe({

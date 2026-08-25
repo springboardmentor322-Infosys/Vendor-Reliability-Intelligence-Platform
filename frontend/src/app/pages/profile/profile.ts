@@ -9,3 +9,4 @@ import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../core/auth.service';
 @Component({selector:'app-profile',standalone:true,imports:[CommonModule,FormsModule,MatCardModule,MatButtonModule,MatFormFieldModule,MatInputModule],templateUrl:'./profile.html',styleUrl:'./profile.css'})
 export class ProfileComponent { user:any={}; constructor(public auth:AuthService,private http:HttpClient){this.user=this.auth.currentUser()||{};} }
+

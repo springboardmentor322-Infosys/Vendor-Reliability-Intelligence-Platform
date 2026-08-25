@@ -44,7 +44,7 @@ export class EditProcurementComponent implements OnInit {
   loadProcurement(){
 
     this.http.get<any>(
-      `http://127.0.0.1:8000/procurement/${this.id}`
+      `https://vendor-reliability-intelligence-platform-2h9h.onrender.com/procurement/${this.id}`
     )
     .subscribe({
 
@@ -68,7 +68,7 @@ export class EditProcurementComponent implements OnInit {
   updateProcurement(){
 
     this.http.put(
-      `http://127.0.0.1:8000/procurement/${this.id}`,
+      `https://vendor-reliability-intelligence-platform-2h9h.onrender.com/procurement/${this.id}`,
       this.procurement
     )
     .subscribe({

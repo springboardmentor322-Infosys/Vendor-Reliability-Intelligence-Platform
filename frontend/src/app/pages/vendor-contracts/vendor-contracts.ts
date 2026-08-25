@@ -31,12 +31,12 @@ loading = true;
 
 
 private contractApi =
-'http://127.0.0.1:8000/contracts';
+'https://vendor-reliability-intelligence-platform-2h9h.onrender.com/contracts';
 
 
 
 private vendorApi =
-'http://127.0.0.1:8000/vendors';
+'https://vendor-reliability-intelligence-platform-2h9h.onrender.com/vendors';
 
 
 

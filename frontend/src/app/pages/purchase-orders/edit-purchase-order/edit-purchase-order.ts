@@ -55,7 +55,7 @@ export class EditPurchaseOrderComponent implements OnInit {
   loadOrder(){
 
     this.http.get<any>(
-      `http://127.0.0.1:8000/purchase-orders/${this.id}`
+      `https://vendor-reliability-intelligence-platform-2h9h.onrender.com/purchase-orders/${this.id}`
     )
     .subscribe({
 
@@ -80,7 +80,7 @@ export class EditPurchaseOrderComponent implements OnInit {
   updateOrder(){
 
     this.http.put(
-      `http://127.0.0.1:8000/purchase-orders/${this.id}`,
+      `https://vendor-reliability-intelligence-platform-2h9h.onrender.com/purchase-orders/${this.id}`,
       this.order
     )
     .subscribe({

@@ -13,5 +13,6 @@ export class ReportsComponent {
     {name:'Compliance Reports',key:'compliance'},
     {name:'Contract Reports',key:'contracts'}
   ];
-  export(key:string,ext:string){window.open(`http://127.0.0.1:8000/reports/${key}.${ext}`,'_blank');}
+  export(key:string,ext:string){window.open(`https://vendor-reliability-intelligence-platform-2h9h.onrender.com/reports/${key}.${ext}`,'_blank');}
 }
+

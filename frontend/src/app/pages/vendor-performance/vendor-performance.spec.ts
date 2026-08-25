@@ -20,3 +20,4 @@ describe('VendorPerformance', () => {
     expect(component).toBeTruthy();
   });
 });
+

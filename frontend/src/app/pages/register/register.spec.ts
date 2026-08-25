@@ -20,3 +20,4 @@ describe('Register', () => {
     expect(component).toBeTruthy();
   });
 });
+
