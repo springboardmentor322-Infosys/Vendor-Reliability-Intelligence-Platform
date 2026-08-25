@@ -21,6 +21,8 @@ from app.routers import (
     compliance,
 )
 
+
+# Create database tables
 Base.metadata.create_all(bind=engine)
 
 
@@ -64,30 +66,48 @@ def _ensure_legacy_columns():
     with engine.begin() as conn:
         tables = set(inspector.get_table_names())
 
-        for table, cols in migrations.items():
+        for table, columns in migrations.items():
             if table not in tables:
                 continue
 
-            existing = {c["name"] for c in inspector.get_columns(table)}
+            existing_columns = {
+                column["name"]
+                for column in inspector.get_columns(table)
+            }
 
-            for name, typ in cols.items():
-                if name not in existing:
+            for column_name, column_type in columns.items():
+                if column_name not in existing_columns:
                     conn.execute(
-                        text(f"ALTER TABLE {table} ADD COLUMN {name} {typ}")
+                        text(
+                            f"ALTER TABLE {table} "
+                            f"ADD COLUMN {column_name} {column_type}"
+                        )
                     )
 
 
+# Add missing legacy columns if required
 _ensure_legacy_columns()
 
 
+# Create FastAPI application
 app = FastAPI(
     title="Vendor Reliability Intelligence Platform",
     version="2.0.0",
-    description="Vendor Reliability Intelligence & Procurement Risk Management Platform",
+    description=(
+        "Vendor Reliability Intelligence & "
+        "Procurement Risk Management Platform"
+    ),
 )
 
 
-# CORS configuration
+# ============================================================
+# CORS CONFIGURATION
+# ============================================================
+# Allows:
+# - Local Angular development
+# - Production Angular frontend deployed on Render
+# ============================================================
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -103,24 +123,29 @@ app.add_middleware(
 )
 
 
-for router in [
-    users.router,
-    vendors.router,
-    procurement.router,
-    purchase_orders.router,
-    performance.router,
-    dashboard.router,
-    contracts.router,
-    reliability.router,
-    analytics.router,
-    notifications.router,
-    reports.router,
-    communication.router,
-    invoices.router,
-    compliance.router,
-]:
-    app.include_router(router)
+# ============================================================
+# ROUTERS
+# ============================================================
 
+app.include_router(users.router)
+app.include_router(vendors.router)
+app.include_router(procurement.router)
+app.include_router(purchase_orders.router)
+app.include_router(performance.router)
+app.include_router(dashboard.router)
+app.include_router(contracts.router)
+app.include_router(reliability.router)
+app.include_router(analytics.router)
+app.include_router(notifications.router)
+app.include_router(reports.router)
+app.include_router(communication.router)
+app.include_router(invoices.router)
+app.include_router(compliance.router)
+
+
+# ============================================================
+# ROOT / HEALTH CHECK
+# ============================================================
 
 @app.get("/")
 def home():
