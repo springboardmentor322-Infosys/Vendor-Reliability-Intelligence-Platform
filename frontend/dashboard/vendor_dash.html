@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Reliability Vendor Portal</title>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="vendor_style.css">
+  <script src="vendor_script.js"></script>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="top-bar">
+    <div class="logo-title">
+      <i class="fa-solid fa-shield-halved"></i> Vendor Reliability Vendor Portal
+    </div>
+    <div class="user-profile">
+      <i class="fa-regular fa-circle-user"></i>
+      <span id="vendorDisplayName">LENOVO</span>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+      <div>
+        <div class="sidebar-header">Vendor Navigation</div>
+        <ul class="nav-list">
+          <li class="nav-item active" onclick="switchTab('dashboard-view', this)">
+            <i class="fa-solid fa-chart-line"></i> Dashboard
+          </li>
+          <li class="nav-item" onclick="switchTab('notifications-view', this)">
+            <i class="fa-regular fa-bell"></i> Notifications
+          </li>
+          <li class="nav-item" onclick="switchTab('orders-view', this)">
+            <i class="fa-solid fa-file-invoice"></i> Purchase Orders
+          </li>
+          <li class="nav-item" onclick="switchTab('reliability-view', this)">
+            <i class="fa-regular fa-star"></i> Reliability & Score
+          </li>
+          <li class="nav-item" onclick="switchTab('contracts-view', this)">
+            <i class="fa-regular fa-file-lines"></i> Contracts
+          </li>
+          <li class="nav-item" onclick="switchTab('transactions-view', this)">
+            <i class="fa-solid fa-receipt"></i> Transactions
+          </li>
+          <li class="nav-item" onclick="switchTab('settings-view', this)">
+            <i class="fa-solid fa-gear"></i> Profile Settings
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <a href="#" class="nav-item logout-item" onclick="handleLogout(event)">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main Content Panel -->
+    <main class="main-content">
+
+      <!-- DASHBOARD VIEW -->
+      <section id="dashboard-view" class="tab-panel active">
+        <h1 class="page-title">Dashboard Overview</h1>
+        
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Reliability Score</div>
+            <div class="metric-value" id="metric-reliability">94%</div>
+            <div class="subtext">Top Tier Performance</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Active Contracts</div>
+            <div class="metric-value" id="metric-active-contracts">0</div>
+            <div class="subtext">Orders in fulfillment</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">On-Time Delivery Rate</div>
+            <div class="metric-value" id="metric-ontime-rate">0%</div>
+            <div class="subtext">Based on expiry timeline</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Pending Transactions</div>
+            <div class="metric-value" id="metric-pending-txns">0</div>
+            <div class="subtext">Awaiting payment</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 style="font-size: 16px; margin-bottom: 16px;">Pending Order Requests</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>PO Ref</th>
+                  <th>Vendor</th>
+                  <th>Dept</th>
+                  <th>Product</th>
+                  <th>Creation Date</th>
+                  <th>Expiry Date</th>
+                  <th>Qty</th>
+                  <th>Total Value</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="pending-orders-body">
+                <tr class="empty-row"><td colspan="9">No pending order requests awaiting acceptance.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- NOTIFICATIONS VIEW -->
+      <section id="notifications-view" class="tab-panel">
+        <h1 class="page-title">Notifications</h1>
+        <div class="card" id="vendor-notifications-container">
+          <div style="text-align: center; color: #718096; padding: 2rem;">Loading notifications...</div>
+        </div>
+      </section>
+
+      <!-- PURCHASE ORDERS VIEW -->
+      <section id="orders-view" class="tab-panel">
+        <h1 class="page-title">Active Purchase Orders</h1>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 style="font-size: 16px; margin: 0;">Active Orders List</h2>
+            <button class="btn-primary" onclick="exportPurchaseOrders()" style="font-size: 13px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-file-arrow-down"></i> Export CSV
+            </button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>PO Ref</th>
+                  <th>Vendor</th>
+                  <th>Dept</th>
+                  <th>Product</th>
+                  <th>Creation</th>
+                  <th>Expiry</th>
+                  <th>Units Completed</th>
+                  <th>Total Value</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="po-table-body">
+                <tr class="empty-row"><td colspan="10">No active purchase orders found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- RELIABILITY & SCORE VIEW -->
+      <section id="reliability-view" class="tab-panel">
+        <h1 class="page-title">Reliability & Analytics</h1>
+        
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Overall Rating</div>
+            <div class="metric-value" id="breakdown-rating">94 / 100</div>
+            <div class="subtext">Grade: Excellent</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">On-Time Delivery</div>
+            <div class="metric-value" id="breakdown-ontime">0%</div>
+            <div class="subtext">On-schedule fulfillment</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Quality Assurance</div>
+            <div class="metric-value" id="metric-quality-assurance">100%</div>
+            <div class="subtext">0 Defect Flags</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+          <div class="card">
+            <h2 style="font-size: 16px; margin-bottom: 16px;">Performance Trend</h2>
+            <div class="chart-container">
+              <canvas id="performanceTrendChart"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <h2 style="font-size: 16px; margin-bottom: 16px;">Quality Inspection</h2>
+            <div class="chart-container">
+              <canvas id="qualityPieChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTRACTS VIEW -->
+      <section id="contracts-view" class="tab-panel">
+        <h1 class="page-title">Contracts & Agreements</h1>
+
+        <div class="card">
+          <h2 style="font-size: 16px; margin-bottom: 16px;">Active Contracts</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>PO Ref</th><th>Vendor</th><th>Product</th><th>Start Date</th><th>Expiry Date</th><th>Value</th><th>Status</th><th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="active-contracts-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 style="font-size: 16px; margin-bottom: 16px;">Completed Contracts</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>PO Ref</th><th>Vendor</th><th>Product</th><th>Start Date</th><th>Expiry Date</th><th>Value</th><th>Status</th><th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="completed-contracts-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 style="font-size: 16px; margin-bottom: 16px;">Expired Contracts</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>PO Ref</th><th>Vendor</th><th>Product</th><th>Start Date</th><th>Expiry Date</th><th>Value</th><th>Status</th><th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="expired-contracts-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 style="font-size: 16px; margin-bottom: 16px;">Rejected Contracts</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>PO Ref</th><th>Vendor</th><th>Product</th><th>Start Date</th><th>Expiry Date</th><th>Value</th><th>Status</th><th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="rejected-contracts-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS VIEW -->
+      <section id="transactions-view" class="tab-panel">
+        <h1 class="page-title">Payment Transactions</h1>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 style="font-size: 16px; margin: 0;">Transactions List</h2>
+            <button class="btn-primary" onclick="exportTransactions()" style="font-size: 13px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-file-arrow-down"></i> Export CSV
+            </button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>PO Ref</th>
+                  <th>Vendor</th>
+                  <th>Product</th>
+                  <th>Payment Status</th>
+                  <th>Transaction ID</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="transactions-table-body">
+                <tr class="empty-row"><td colspan="6">No payment transactions available.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROFILE SETTINGS VIEW -->
+      <section id="settings-view" class="tab-panel">
+        <h1 class="page-title">Vendor Profile & Settings</h1>
+        
+        <div class="card form-card">
+          <form onsubmit="saveProfileSettings(event)">
+            <div class="form-group">
+              <label for="setting-vendor-name">Vendor Name</label>
+              <input type="text" id="setting-vendor-name" class="form-control" readonly style="background-color: #f7fafc;">
+            </div>
+
+            <div class="form-group">
+              <label for="setting-contact-email">Contact Email</label>
+              <input type="email" id="setting-contact-email" class="form-control" placeholder="vendor@domain.com">
+            </div>
+
+            <div class="form-group">
+              <label for="setting-contact-phone">Contact Phone</label>
+              <input type="text" id="setting-contact-phone" class="form-control" placeholder="1234567890">
+            </div>
+
+            <div class="form-group">
+              <label for="setting-active-status">Active Status</label>
+              <select id="setting-active-status" class="form-control">
+                <option value="Accepting Orders">Accepting Orders</option>
+                <option value="Temporarily Paused">Temporarily Paused</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+
+            <!-- Vendor Category Dropdown -->
+            <div class="form-group">
+              <label for="setting-vendor-category">Vendor Category</label>
+              <select id="setting-vendor-category" class="form-control">
+                <option value="" disabled selected>Select a Category</option>
+                <option value="Raw Material Suppliers">Raw Material Suppliers</option>
+                <option value="Equipment Vendors">Equipment Vendors</option>
+                <option value="IT Vendors">IT Vendors</option>
+                <option value="Service Providers">Service Providers</option>
+                <option value="Logistics Partners">Logistics Partners</option>
+                <option value="Maintenance Vendors">Maintenance Vendors</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn-primary">
+              <i class="fa-solid fa-floppy-disk"></i> Save Changes
+            </button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Edit Order Modal -->
+  <div id="editModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">Update Production Progress</div>
+      <input type="hidden" id="modal-po-id">
+      <div style="font-size: 13px; color: #4a5568; line-height: 1.6; margin-bottom: 16px;">
+        <p><strong>PO Reference:</strong> <span id="modal-invNo"></span></p>
+        <p><strong>Product:</strong> <span id="modal-product"></span></p>
+        <p><strong>Department:</strong> <span id="modal-dept"></span></p>
+        <p><strong>Company:</strong> <span id="modal-company"></span></p>
+        <p><strong>Order Value:</strong> <span id="modal-amount"></span></p>
+        <p><strong>Creation / Expiry:</strong> <span id="modal-orderDate"></span> to <span id="modal-expiryDate"></span></p>
+        <p><strong>Total Target Units:</strong> <span id="modal-total-units"></span></p>
+      </div>
+
+      <div class="form-group">
+        <label for="modal-input-completed">Completed Units</label>
+        <input type="number" id="modal-input-completed" class="form-control" min="0">
+      </div>
+
+      <div class="form-group">
+        <label for="modal-select-status">Production Status</label>
+        <select id="modal-select-status" class="form-control">
+          <option value="In Production">In Production</option>
+          <option value="Ready for Dispatch">Ready for Dispatch</option>
+          <option value="In Transit">In Transit</option>
+          <option value="Delivered">Delivered</option>
+        </select>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-action" onclick="closeEditModal()">Cancel</button>
+        <button class="btn-primary" onclick="saveOrderChangesDB()">Save Progress</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contract Details Modal -->
+  <div id="contractDetailsModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">Contract Details</div>
+      <div style="font-size: 13px; color: #4a5568; line-height: 1.8;">
+        <p><strong>PO Ref:</strong> <span id="contract-modal-invno"></span></p>
+        <p><strong>Vendor:</strong> <span id="contract-modal-company"></span></p>
+        <p><strong>Department:</strong> <span id="contract-modal-dept"></span></p>
+        <p><strong>Product:</strong> <span id="contract-modal-product"></span></p>
+        <p><strong>Units:</strong> <span id="contract-modal-units"></span></p>
+        <p><strong>Contract Value:</strong> <span id="contract-modal-amount"></span></p>
+        <p><strong>Start Date:</strong> <span id="contract-modal-date"></span></p>
+        <p><strong>Expiry Date:</strong> <span id="contract-modal-expiry"></span></p>
+        <p><strong>Status:</strong> <span id="contract-modal-status"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="closeContractDetailsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transaction Details Modal -->
+  <div id="transactionDetailsModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">Transaction Receipt</div>
+      <div style="font-size: 13px; color: #4a5568; line-height: 1.8;">
+        <p><strong>Transaction ID:</strong> <span id="txn-modal-id"></span></p>
+        <p><strong>Amount:</strong> <span id="txn-modal-amount"></span></p>
+        <p><strong>Timestamp:</strong> <span id="txn-modal-time"></span></p>
+        <p><strong>Sender:</strong> <span id="txn-modal-sender"></span></p>
+        <p><strong>Recipient:</strong> <span id="txn-modal-receiver"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="closeTransactionDetailsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="vendor_script_2.js"></script>
+</body>
+</html>

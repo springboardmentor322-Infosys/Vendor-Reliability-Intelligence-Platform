@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Reliability - Finance Portal</title>
+    <!-- FontAwesome CDN for UI Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="finance_style.css">
+    <script src="finance_script.js" defer></script>
+</head>
+<body>
+
+    <!-- TOP HEADER BAR -->
+    <header class="top-header">
+        <div class="brand-title">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Vendor Reliability Finance Portal</span>
+        </div>
+        <div class="user-info">
+            <i class="fa-regular fa-circle-user"></i>
+            <span>Finance Manager</span>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <!-- LIGHT SIDEBAR NAVIGATION -->
+        <aside class="sidebar">
+            <div class="sidebar-menu-wrapper">
+                <div class="sidebar-heading">Finance Navigation</div>
+                <ul class="nav-links">
+                    <li class="active" id="nav-dashboard">
+                        <a href="#" onclick="switchTab(event, 'view-dashboard')"><i class="fa-solid fa-house"></i> Dashboard</a>
+                    </li>
+                    <li id="nav-invoices">
+                        <a href="#" onclick="switchTab(event, 'view-invoices')"><i class="fa-solid fa-file-invoice-dollar"></i> Invoices</a>
+                    </li>
+                    <li id="nav-budget">
+                        <a href="#" onclick="switchTab(event, 'view-budget')"><i class="fa-solid fa-chart-pie"></i> Budget & Allocation</a>
+                    </li>
+                    <li id="nav-vendors">
+                        <a href="#" onclick="switchTab(event, 'view-vendors')"><i class="fa-solid fa-truck-field"></i> Vendor Orders</a>
+                    </li>
+                    <li id="nav-analytics">
+                        <a href="#" onclick="switchTab(event, 'view-analytics')"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+                    </li>
+                    <li id="nav-settings">
+                        <a href="#" onclick="switchTab(event, 'view-settings')"><i class="fa-solid fa-gear"></i> Settings</a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-footer">
+                <a href="#" class="logout-link" onclick="handleLogout(event)">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1 style="font-size: 1.6rem; font-weight: 700;">Finance Manager Dashboard</h1>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 2px;">Monitor organizational spending, track department budgets, and approve vendor invoices.</p>
+            </header>
+
+            <!-- DASHBOARD VIEW -->
+            <div id="view-dashboard" class="tab-content">
+                <!-- KPI Cards -->
+                <section class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Total Spend (Approved)</span>
+                            <i class="fa-solid fa-dollar-sign"></i>
+                        </div>
+                        <div class="kpi-value" id="total-spend">$0.00</div>
+                        <div class="kpi-subtext text-success">
+                            <i class="fa-solid fa-check-double"></i> Sum of all approved invoices
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Pending Approvals</span>
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div class="kpi-value" id="pending-count">0</div>
+                        <div class="kpi-subtext text-warning">
+                            Action required
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Approved Invoices</span>
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="kpi-value" id="approved-count">0</div>
+                        <div class="kpi-subtext text-success">
+                            Total accepted invoices
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Rejected Invoices</span>
+                            <i class="fa-solid fa-circle-xmark" style="color: var(--danger);"></i>
+                        </div>
+                        <div class="kpi-value" id="rejected-count">0</div>
+                        <div class="kpi-subtext text-danger">
+                            Total declined invoices
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Data Table Section -->
+                <section class="data-section">
+                    <div class="section-header">
+                        <h3>Pending Invoices for Approval</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Invoice ID</th>
+                                <th>Vendor Name</th>
+                                <th>Product Name</th>
+                                <th>Department</th>
+                                <th>Quantity</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoice-tbody">
+                            <tr id="empty-pending-msg">
+                                <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading pending invoices from database...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
+            <!-- INVOICES VIEW -->
+            <div id="view-invoices" class="tab-content" style="display: none;">
+                <!-- Approved Invoices Section -->
+                <section class="data-section">
+                    <div class="section-header">
+                        <h3>Approved Invoices</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Manage and review all approved company invoices.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Invoice ID</th>
+                                <th>Vendor Name</th>
+                                <th>Product Name</th>
+                                <th>Department</th>
+                                <th>Quantity</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="approved-invoices-tbody">
+                            <tr id="empty-approved-msg">
+                                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No approved invoices found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Rejected Invoices Section -->
+                <section class="data-section" style="margin-top: 2rem;">
+                    <div class="section-header">
+                        <h3 style="color: var(--danger);">Rejected Invoices</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Review all declined company invoices.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Invoice ID</th>
+                                <th>Vendor Name</th>
+                                <th>Product Name</th>
+                                <th>Department</th>
+                                <th>Quantity</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rejected-invoices-tbody">
+                            <tr id="empty-rejected-msg">
+                                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No rejected invoices found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
+            <!-- BUDGET & ALLOCATION VIEW -->
+            <div id="view-budget" class="tab-content" style="display: none;">
+                <section class="data-section">
+                    <div class="section-header">
+                        <h3>Budget & Allocation</h3>
+                        <button class="btn btn-extract" onclick="extractBudgetReport()">
+                            <i class="fa-solid fa-download"></i> Extract Report
+                        </button>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Monitor departmental budget limits, allocated funds, and real-time spending based on approved invoices.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Total Budget</th>
+                                <th>Allocated Amount</th>
+                                <th>Spent Amount</th>
+                                <th>Remaining Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="budget-tbody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                        <tfoot id="budget-tfoot">
+                            <!-- Grand Total populated dynamically via JS -->
+                        </tfoot>
+                    </table>
+                </section>
+            </div>
+
+            <!-- VENDORS VIEW -->
+            <div id="view-vendors" class="tab-content" style="display: none;">
+                <section class="data-section">
+                    <div class="section-header">
+                        <h3>Approved Vendor Orders & Quality Tracking</h3>
+                        <button class="btn btn-extract" onclick="extractVendorOrdersReport()">
+                            <i class="fa-solid fa-download"></i> Extract Report
+                        </button>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Displays approved invoices along with order status, inspection checks, and conditional payment options.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Inv No.</th>
+                                <th>Vendor</th>
+                                <th>Product Name</th>
+                                <th>Order Status</th>
+                                <th>Inspection</th>
+                                <th>Payment</th>
+                                <th>Transaction ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vendor-tbody">
+                            <tr id="empty-vendor-msg">
+                                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No approved vendor orders. Approve an invoice in the Dashboard tab to populate this list.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
+            <!-- ANALYTICS VIEW -->
+            <div id="view-analytics" class="tab-content" style="display: none;">
+                <!-- Analytics Overview Cards -->
+                <section class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Total Approved Spend</span>
+                            <i class="fa-solid fa-chart-line text-success"></i>
+                        </div>
+                        <div class="kpi-value" id="analytics-total-spend">$0.00</div>
+                        <div class="kpi-subtext text-success">Calculated from approved invoices</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Average Invoice Value</span>
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <div class="kpi-value" id="analytics-avg-spend">$0.00</div>
+                        <div class="kpi-subtext text-muted">Per approved invoice</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Top Department Spend</span>
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+                        <div class="kpi-value" id="analytics-top-dept" style="font-size: 1.4rem;">N/A</div>
+                        <div class="kpi-subtext text-muted" id="analytics-top-dept-val">No data</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Top Vendor Recipient</span>
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <div class="kpi-value" id="analytics-top-vendor" style="font-size: 1.4rem;">N/A</div>
+                        <div class="kpi-subtext text-muted" id="analytics-top-vendor-val">No data</div>
+                    </div>
+                </section>
+
+                <!-- Main Analytics Breakdown Grid -->
+                <div class="analytics-grid">
+                    <section class="data-section">
+                        <div class="section-header">
+                            <h3>Departmental Spending Thresholds</h3>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+                            Real-time segmented spending indicators showing blue, orange, and red threshold progress.
+                        </p>
+
+                        <!-- COLOR THRESHOLD LEGEND -->
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background-color: var(--color-blue);"></div>
+                                <span>Below Allocated</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background-color: var(--color-orange);"></div>
+                                <span>Above Allocated</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background-color: var(--color-red);"></div>
+                                <span>Above Total Budget</span>
+                            </div>
+                        </div>
+
+                        <!-- SEGMENTED THRESHOLD CHARTS CONTAINER -->
+                        <div class="chart-container-group" id="analytics-budget-chart">
+                            <!-- Populated dynamically via Javascript -->
+                        </div>
+                    </section>
+
+                    <!-- Vendor Spend Distribution -->
+                    <section class="data-section">
+                        <div class="section-header">
+                            <h3>Top Vendor Allocations</h3>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+                            Vendor share percentage relative to approved totals.
+                        </p>
+                        <div id="analytics-vendor-list">
+                            <p style="text-align:center; color: var(--text-muted); padding: 2rem;">No approved invoices found.</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- SETTINGS VIEW -->
+            <div id="view-settings" class="tab-content" style="display: none;">
+                <section class="data-section">
+                    <div class="section-header">
+                        <h3>Account Settings</h3>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Manage departmental budget limits and allocated funds.</p>
+
+                    <div class="settings-card">
+                        <h4><i class="fa-solid fa-wallet" style="color: var(--header-bg);"></i> Department Budget & Allocation Controls</h4>
+                        <p>Adjust total budgets and allocated limits for each department. Changes apply immediately across the dashboard.</p>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Total Budget ($)</th>
+                                    <th>Allocated Amount ($)</th>
+                                    <th>Current Spend</th>
+                                    <th>Remaining Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="settings-budget-tbody">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create Invoice Modal -->
+    <div class="modal" id="invoiceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Invoice</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer; color: var(--text-muted);" onclick="closeModal()"></i>
+            </div>
+            <form id="invoiceForm" onsubmit="handleCreateInvoiceSubmit(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Vendor Name</label>
+                        <input type="text" id="vendorName" required placeholder="e.g. Acme Logistics">
+                    </div>
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="productName" required placeholder="e.g. Enterprise Laptops">
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select id="departmentName" required>
+                            <option value="" disabled selected>Select department</option>
+                            <option value="Software Development">Software Development</option>
+                            <option value="HR">HR</option>
+                            <option value="Network">Network</option>
+                            <option value="Cyber Security">Cyber Security</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Management">Management</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Quantity</label>
+                            <input type="number" id="productQuantity" min="1" value="1" required placeholder="1">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Amount ($)</label>
+                            <input type="number" id="invoiceAmount" step="0.01" required placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap: 10px; margin-top: 1.5rem;">
+                    <button type="button" class="btn" style="background:#e2e8f0; color: var(--text-dark);" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit to Dashboard</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

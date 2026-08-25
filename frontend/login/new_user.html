@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Vendor Reliability Platform</title>
+    <link rel="stylesheet" href="new_user_style.css">
+</head>
+<body>
+
+    <div class="signup-card">
+        <a href="index.html" class="home">x</a>
+        <!-- Title with icon on the left -->
+        <h2 class="title-container">
+            <svg class="header-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <line x1="19" y1="8" x2="19" y2="14"></line>
+                <line x1="22" y1="11" x2="16" y2="11"></line>
+            </svg>
+            <span>Create Account</span>
+            
+        </h2>
+        
+        <form>
+            <div class="form-grid">
+                <div class="input-group">
+                    <input type="text" id="fullname" placeholder="Name" required autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <input type="email" id="email" placeholder="Email" required autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <input type="tel" id="phone" placeholder="Phone" required autocomplete="off">
+                </div>
+
+                <div class="input-group">
+                    <div class="select-wrapper">
+                        <select id="role" required>
+                            <option value="" disabled selected>Role</option>
+                            <option value="admin">Admin</option>
+                            <option value="procurement_manager">Procurement Manager</option>
+                            <option value="finance_officer">Finance Officer</option>
+                            <option value="vendor">Vendor</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="pass" placeholder="Password" required>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="repass" placeholder="Re-Enter Password" required>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button type="submit" class="create-btn">Create</button>
+            </div>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="login.html">Sign In</a>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevents default form submission
+
+            const fullname = document.getElementById('fullname').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const role = document.getElementById('role').value;
+            const password = document.getElementById('pass').value;
+            const repassword = document.getElementById('repass').value;
+
+            if (password !== repassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            const payload = {
+                fullname: fullname,
+                email: email,
+                phone: phone,
+                role: role,
+                password: password
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert("Account created successfully!");
+                    window.location.href = "login.html";
+                } else {
+                    alert(data.detail || "Registration failed");
+                }
+            } catch (error) {
+                alert("Cannot connect to server. Make sure FastAPI is running!");
+            }
+        });
+    </script>
+</body>
+</html>

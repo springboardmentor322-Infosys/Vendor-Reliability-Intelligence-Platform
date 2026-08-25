@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Reliability - Admin Portal</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="admin_style.css"/>
+  <script src="admin_script.js"></script>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <span class="material-symbols-outlined">shield</span>
+      Vendor Reliability Admin Portal
+    </div>
+    <div class="navbar-actions">
+      <div class="user-profile">
+        <span class="material-symbols-outlined">account_circle</span>
+        <span>Administrator</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="app-container">
+    
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-title">Admin Navigation</div>
+        <ul class="sidebar-menu">
+          <li class="sidebar-item active" onclick="navigateTo('home')">
+            <span class="material-symbols-outlined">home</span> Admin Home
+          </li>
+          <li class="sidebar-item" onclick="navigateTo('notifications')">
+            <span class="material-symbols-outlined">notifications</span> Notifications
+          </li>
+          <li class="sidebar-item" onclick="navigateTo('users', 'All')">
+            <span class="material-symbols-outlined">group</span> All Users
+          </li>
+          <li class="sidebar-item" onclick="navigateTo('users', 'Procurement Manager')">
+            <span class="material-symbols-outlined">shopping_cart</span> Procurement Managers
+          </li>
+          <li class="sidebar-item" onclick="navigateTo('users', 'Finance Officer')">
+            <span class="material-symbols-outlined">payments</span> Finance Officers
+          </li>
+          <li class="sidebar-item" onclick="navigateTo('users', 'Vendor')">
+            <span class="material-symbols-outlined">store</span> Vendors
+          </li>
+        </ul>
+      </div>
+
+      <!-- Logout Button -->
+      <div class="sidebar-bottom">
+        <ul class="sidebar-menu">
+          <li class="sidebar-item logout-item" onclick="handleLogout()">
+            <span class="material-symbols-outlined">logout</span> Logout
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="content-area">
+
+      <!-- PAGE 1: ADMIN HOME VIEW -->
+      <section id="view-home" class="view-section active-view">
+        <div class="page-header">
+          <h1 class="page-title">Admin System Overview</h1>
+        </div>
+
+        <!-- Metrics Row -->
+        <div class="metrics-grid">
+          <div class="card">
+            <div class="card-title">Total Users</div>
+            <div class="card-value" id="stat-total-users">5</div>
+            <div class="card-subtitle">Registered Accounts</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Pending Approvals</div>
+            <div class="card-value warning" id="stat-pending-approvals">2</div>
+            <div class="card-subtitle">Awaiting Admin Action</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Active Sessions</div>
+            <div class="card-value" id="activeSessionsCount">4</div>
+            <div class="card-subtitle">Users Currently Online</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Security Alerts</div>
+            <div class="card-value danger">0</div>
+            <div class="card-subtitle">System Risk Status</div>
+          </div>
+        </div>
+
+        <!-- System Stats Grid -->
+        <div class="main-grid">
+          <div class="card">
+            <div class="page-header" style="margin-bottom:0.8rem;">
+              <h3>Quick User Summary</h3>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Role Category</th>
+                    <th>Count</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Procurement Managers</strong></td>
+                    <td id="count-pm">2</td>
+                    <td>
+                      <div style="display: flex; gap: 0.3rem;">
+                        <button class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.8rem;" onclick="navigateTo('users', 'Procurement Manager')">View</button>
+                        <button class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.8rem;" onclick="exportRoleToCSV('Procurement Manager')">Export</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Finance Officers</strong></td>
+                    <td id="count-fo">1</td>
+                    <td>
+                      <div style="display: flex; gap: 0.3rem;">
+                        <button class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.8rem;" onclick="navigateTo('users', 'Finance Officer')">View</button>
+                        <button class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.8rem;" onclick="exportRoleToCSV('Finance Officer')">Export</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Vendors</strong></td>
+                    <td id="count-vendor">2</td>
+                    <td>
+                      <div style="display: flex; gap: 0.3rem;">
+                        <button class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.8rem;" onclick="navigateTo('users', 'Vendor')">View</button>
+                        <button class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.8rem;" onclick="exportRoleToCSV('Vendor')">Export</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- User Activity Log Card -->
+          <div class="card">
+            <div class="page-header" style="margin-bottom:0.8rem;">
+              <h3>User Activity Log</h3>
+              <button class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openAddUserModal()">
+                <span class="material-symbols-outlined" style="font-size:16px;">person_add</span> + Add User
+              </button>
+            </div>
+            <ul class="activity-list" id="activity-log-list">
+              <!-- Dynamically Populated Activities -->
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 2: NOTIFICATIONS VIEW -->
+      <section id="view-notifications" class="view-section">
+        <div class="page-header">
+          <h1 class="page-title">System Notifications & Alerts</h1>
+        </div>
+
+        <div class="card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Event Type</th>
+                  <th>Details</th>
+                  <th>Action / Status</th>
+                </tr>
+              </thead>
+              <tbody id="notifications-table-body">
+                <tr>
+                  <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">No new notifications.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE 3: USER MANAGEMENT VIEW -->
+      <section id="view-users" class="view-section">
+        <div class="page-header">
+          <h1 class="page-title" id="role-heading">All Users</h1>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary" onclick="exportUsersToCSV()">
+              <span class="material-symbols-outlined" style="font-size:18px;">download</span> Export CSV
+            </button>
+            <button class="btn btn-primary" onclick="openAddUserModal()">
+              <span class="material-symbols-outlined">person_add</span> Add New User
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>User Name</th>
+                  <th>Email Address</th>
+                  <th>Assigned Role</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="user-table-body">
+                <!-- Dynamically Populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Add User Modal Window -->
+  <div class="modal-overlay" id="user-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add New System User</h3>
+        <span class="material-symbols-outlined" style="cursor:pointer;" onclick="closeAddUserModal()">close</span>
+      </div>
+      <form id="add-user-form" onsubmit="handleAddUserSubmit(event)">
+        <div class="form-group">
+          <label for="user-name">Full Name</label>
+          <input type="text" id="user-name" required placeholder="e.g. John Doe" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="user-email">Email Address</label>
+          <input type="email" id="user-email" required placeholder="e.g. john@company.com" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="user-phone">Phone Number</label>
+          <input type="tel" id="user-phone" required placeholder="e.g. +91 9865374165" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="user-role">System Role</label>
+          <select id="user-role" required>
+            <option value="" disabled selected hidden>Select role</option>
+            <option value="Procurement Manager">Procurement Manager</option>
+            <option value="Finance Officer">Finance Officer</option>
+            <option value="Vendor">Vendor</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="user-pass">Password</label>
+          <input type="password" id="user-pass" required placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <label for="user-repass">Re-Enter Password</label>
+          <input type="password" id="user-repass" required placeholder="••••••••">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeAddUserModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Reliability - Procurement Manager Portal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="manager_style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="manager_script.js?v=108"></script>
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="top-header">
+    <div class="brand-logo">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>Vendor Reliability Procurement Portal</span>
+    </div>
+    <div class="user-profile">
+      <i class="fa-regular fa-circle-user" style="font-size: 18px;"></i>
+      <span>Procurement Manager</span>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div>
+        <div class="nav-title">PROCUREMENT NAVIGATION</div>
+        <ul class="nav-list">
+          <li>
+            <a class="nav-item active" onclick="switchTab('dashboard', this)">
+              <i class="fa-solid fa-house"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-item" onclick="switchTab('notifications', this)">
+              <i class="fa-solid fa-bell"></i>
+              <span>Notifications</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-item" onclick="switchTab('vendor-management', this)">
+              <i class="fa-solid fa-truck"></i>
+              <span>Vendor Management</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-item" onclick="switchTab('purchase-orders', this)">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span>Purchase Orders</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-item" onclick="switchTab('contracts-risk', this)">
+              <i class="fa-solid fa-file-contract"></i>
+              <span>Contracts & Risk</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-item" onclick="switchTab('view-inspection', this)">
+              <i class="fa-solid fa-clipboard-check"></i>
+              <span>Quality Inspection</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-item" onclick="switchTab('analytics', this)">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Analytics</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="nav-item logout-item" onclick="handleLogout(event)">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Logout</span>
+      </a>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- TAB 1: DASHBOARD -->
+      <div id="dashboard" class="tab-content active">
+        <div class="page-header">
+          <h1 class="page-title">Procurement Manager Dashboard</h1>
+          <p class="page-subtitle">Monitor organizational spending, track purchase requisitions, and evaluate supplier reliability scoring.</p>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-title">Active Purchase Orders</div>
+            <i class="fa-solid fa-cart-flatbed metric-icon blue"></i>
+            <div class="metric-value" id="kpiActiveOrders">0</div>
+            <div class="metric-footer text-blue"><i class="fa-solid fa-circle-info"></i> Based on contract status</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Pending Requisitions</div>
+            <i class="fa-regular fa-clock metric-icon clock"></i>
+            <div class="metric-value" id="kpiPendingRequisitions">0</div>
+            <div class="metric-footer text-orange">Action required</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Approved Contracts</div>
+            <i class="fa-regular fa-circle-check metric-icon check"></i>
+            <div class="metric-value" id="kpiApprovedContracts">0</div>
+            <div class="metric-footer text-green"><i class="fa-solid fa-check"></i> From purchase orders</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Rejected Requisitions</div>
+            <i class="fa-solid fa-circle-xmark metric-icon red"></i>
+            <div class="metric-value" id="kpiRejectedRequisitions">0</div>
+            <div class="metric-footer text-red"><i class="fa-solid fa-arrow-down"></i> From purchase orders</div>
+          </div>
+        </div>
+
+        <!-- Pending Orders Table -->
+        <div class="content-card">
+          <div class="card-header">
+            <h2 class="card-title">Pending Orders</h2>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Invoice ID</th>
+                <th>Vendor Name</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Department</th>
+                <th>Expiry Date</th>
+                <th>Risk Level</th>
+              </tr>
+            </thead>
+            <tbody id="dashboard-pending-tbody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: #718096; padding: 2rem;">Loading pending orders...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: NOTIFICATIONS -->
+      <div id="notifications" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">System Notifications & Alerts</h1>
+          <p class="page-subtitle">Real-time alerts tracking purchase orders, acceptances, contract expirations, and transit updates.</p>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h2 class="card-title">Activity Feed</h2>
+          </div>
+          <div class="notifications-list" id="notifications-list-container" style="padding: 20px 24px;">
+            <div style="text-align: center; color: #718096; padding: 2rem;">Loading notifications...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: VENDOR MANAGEMENT -->
+      <div id="vendor-management" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Vendor Management</h1>
+          <p class="page-subtitle">View, approve, and manage registered suppliers and their categories.</p>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h2 class="card-title">Registered Suppliers Overview</h2>
+          </div>
+          <table class="data-table" id="vendorsTable">
+            <thead>
+              <tr>
+                <th>Vendor Name</th>
+                <th>Category</th>
+                <th>Contact Person</th>
+                <th>Email</th>
+                <th>Risk Level</th>
+                <th>Status</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="vendor-tbody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: #718096; padding: 2rem;">Loading registered suppliers...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 4: PURCHASE ORDERS -->
+      <div id="purchase-orders" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Purchase Orders</h1>
+          <p class="page-subtitle">Track and create purchase orders issued to vendors.</p>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h2 class="card-title">All Purchase Orders</h2>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-secondary" onclick="exportPurchaseOrdersExcel()"><i class="fa-solid fa-file-excel"></i> Extract</button>
+              <button class="btn btn-primary" onclick="openCreatePOModal()"><i class="fa-solid fa-plus"></i> Create PO</button>
+            </div>
+          </div>
+          <table class="data-table" id="poTable">
+            <thead>
+              <tr>
+                <th>Invoice No</th>
+                <th>Vendor</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Department</th>
+                <th>Creation Date</th>
+                <th>Expiry Date</th>
+                <th>Total Value</th>
+                <th>Order Status</th>
+              </tr>
+            </thead>
+            <tbody id="po-tbody">
+              <tr>
+                <td colspan="9" style="text-align: center; color: #718096; padding: 2rem;">Loading purchase orders...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 5: CONTRACTS & RISK -->
+      <div id="contracts-risk" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Contracts & Risk Compliance</h1>
+          <p class="page-subtitle">Monitor vendor reliability scores, risk tiers, and upcoming contract expirations.</p>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h2 class="card-title">Vendor Risk & Contract Evaluation</h2>
+            <button class="btn btn-secondary" onclick="exportContractsExcel()"><i class="fa-solid fa-file-excel"></i> Extract</button>
+          </div>
+          <table class="data-table" id="contractsTable">
+            <thead>
+              <tr>
+                <th>Invoice No</th>
+                <th>Vendor Name</th>
+                <th>Product Name</th>
+                <th>Produced Qty</th>
+                <th>Contract Status</th>
+                <th>Expiry Date</th>
+                <th>Order Status</th>
+                <th>Reliability Score</th>
+                <th>Risk Tier</th>
+              </tr>
+            </thead>
+            <tbody id="contracts-tbody">
+              <tr>
+                <td colspan="9" style="text-align: center; color: #718096; padding: 2rem;">Loading contracts and risk data...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 6: QUALITY INSPECTION VIEW -->
+      <div id="view-inspection" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Quality Inspection & Order Verification</h1>
+          <p class="page-subtitle">Inspect delivered vendor orders and update quality status.</p>
+        </div>
+
+        <div class="content-card">
+          <div class="card-header">
+            <h2 class="card-title">Inspection Queue</h2>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Invoice / PO ID</th>
+                <th>Vendor Name</th>
+                <th>Product Name</th>
+                <th>Order Status</th>
+                <th>Inspection Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="inspection-tbody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: #718096; padding: 2rem;">Loading orders for inspection...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 7: ANALYTICS -->
+      <div id="analytics" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Procurement Analytics</h1>
+          <p class="page-subtitle">Operational metrics, delivery performance, and cost distribution analysis.</p>
+        </div>
+
+        <div class="metrics-grid-analytics">
+          <div class="metric-card">
+            <div class="metric-title">On-Time Delivery Rate</div>
+            <i class="fa-solid fa-chart-line metric-icon check"></i>
+            <div class="metric-value" id="analyticsOnTimeRate">0%</div>
+            <div class="metric-footer text-green">Target: 95%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Avg Order Processing Time</div>
+            <i class="fa-solid fa-clock metric-icon blue"></i>
+            <div class="metric-value" id="avg-processing-time-value">0 Days</div>
+          </div>
+        </div>
+
+        <div class="analytics-charts-grid">
+          <div class="chart-card">
+            <h2 class="card-title">Accepted Orders Spend Trend</h2>
+            <div class="chart-container">
+              <canvas id="spendTrendChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h2 class="card-title">Vendor Risk Distribution</h2>
+            <div class="chart-container">
+              <canvas id="riskDistributionChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h2 class="card-title">Orders per Vendor</h2>
+            <div class="chart-container">
+              <canvas id="vendorOrdersChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h2 class="card-title">Orders per Department</h2>
+            <div class="chart-container">
+              <canvas id="deptOrdersChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- CREATE PO MODAL -->
+  <div id="createPoModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">Create Purchase Order</div>
+        <div class="modal-close" onclick="closeCreatePOModal()"><i class="fa-solid fa-xmark"></i></div>
+      </div>
+      <form id="createPoForm" onsubmit="handleCreatePO(event)">
+        <div class="modal-body">
+          <div class="form-grid">
+
+            <!-- CATEGORY DROPDOWN -->
+            <div class="form-group full-width">
+              <label for="poCategory">Category</label>
+              <select id="poCategory" onchange="handleCategoryChange()" required>
+                <option value="">Select a Category</option>
+                <option value="Raw Material Suppliers">Raw Material Suppliers</option>
+                <option value="Equipment Vendors">Equipment Vendors</option>
+                <option value="IT Vendors">IT Vendors</option>
+                <option value="Service Providers">Service Providers</option>
+                <option value="Logistics Partners">Logistics Partners</option>
+                <option value="Maintenance Vendors">Maintenance Vendors</option>
+              </select>
+            </div>
+
+            <!-- UNBLOCKED VENDOR NAME DROPDOWN -->
+            <div class="form-group full-width">
+              <label for="poVendor">Vendor Name</label>
+              <select id="poVendor" onchange="handleVendorChange()" required>
+                <option value="">Select Vendor...</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label for="poProductName">Product Name</label>
+              <input type="text" id="poProductName" placeholder="e.g. Industrial Steel Sheeting" required>
+            </div>
+            <div class="form-group">
+              <label for="poQuantity">Quantity</label>
+              <input type="number" id="poQuantity" placeholder="1" min="1" value="1" required>
+            </div>
+            <div class="form-group">
+              <label for="poDepartment">Department</label>
+              <select id="poDepartment" required>
+                <option value="">Select Department...</option>
+                <option value="Management">Management</option>
+                <option value="Software Development">Software Development</option>
+                <option value="Finance">Finance</option>
+                <option value="Network">Network</option>
+                <option value="Cyber Security">Cyber Security</option>
+                <option value="HR">HR</option>
+                <option value="Procurement">Procurement</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="poCreationDate">Creation Date</label>
+              <input type="date" id="poCreationDate" required>
+            </div>
+            <div class="form-group">
+              <label for="poContract">Expiry Date</label>
+              <input type="date" id="poContract" class="form-control" required>
+            </div>
+            <div class="form-group full-width">
+              <label for="poTotalValue">Total Value ($)</label>
+              <input type="number" id="poTotalValue" placeholder="0.00" step="0.01" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeCreatePOModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Request Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- VENDOR DETAILS MODAL -->
+  <div id="vendorModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">Vendor Information</div>
+        <div class="modal-close" onclick="closeVendorModal()"><i class="fa-solid fa-xmark"></i></div>
+      </div>
+      <div class="modal-body">
+        <div class="detail-row">
+          <span class="detail-label">Vendor Name</span>
+          <span class="detail-value" id="modalVendorName">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Category</span>
+          <span class="detail-value" id="modalCategory">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Contact Person</span>
+          <span class="detail-value" id="modalContactPerson">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Email</span>
+          <span class="detail-value" id="modalEmail">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Risk Level</span>
+          <span class="detail-value" id="modalRiskLevel">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Last Ordered Date</span>
+          <span class="detail-value" id="modalLastOrderedDate">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Last Contract Ended Date</span>
+          <span class="detail-value" id="modalLastContractEndedDate">-</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeVendorModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
