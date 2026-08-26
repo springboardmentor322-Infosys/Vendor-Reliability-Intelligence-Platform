@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VendorIQ | Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="app-shell" id="app-shell"></div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuth();
+renderShell("dashboard.html", "Procurement Dashboard");
+
+async function load() {
+  const content = document.getElementById("page-content");
+  try {
+    const s = await api("/dashboard/summary");
+
+    content.innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="label">Total Vendors</div>
+          <div class="value">${s.vendors.total}</div>
+          <div class="sub">${s.vendors.approved} approved · ${s.vendors.pending} pending</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Active Purchase Orders</div>
+          <div class="value">${s.procurement.active_purchase_orders}</div>
+          <div class="sub">${s.procurement.total_purchase_orders} total raised</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Total Procurement Spend</div>
+          <div class="value">${fmtMoney(s.procurement.total_spend)}</div>
+          <div class="sub">${s.procurement.completed_purchase_orders} orders completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Avg. Reliability Score</div>
+          <div class="value">${s.vendors.average_reliability_score}</div>
+          <div class="sub">${s.contracts_expiring_next_30_days} contracts expiring in 30 days</div>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="panel">
+          <h3>Purchase Orders by Status</h3>
+          <canvas id="poChart" height="200"></canvas>
+        </div>
+        <div class="panel">
+          <h3>Vendors by Category</h3>
+          <canvas id="categoryChart" height="200"></canvas>
+        </div>
+        <div class="panel">
+          <h3>Vendor Risk Distribution</h3>
+          <canvas id="riskChart" height="200"></canvas>
+        </div>
+        <div class="panel">
+          <h3>Top 5 Vendors by Reliability Score</h3>
+          <table>
+            <thead><tr><th>Vendor</th><th>Score</th><th>Risk</th></tr></thead>
+            <tbody>
+              ${s.top_vendors.map(v => `<tr><td>${v.name}</td><td>${v.reliability_score}</td><td>${statusBadge(v.risk_level)}</td></tr>`).join("") || `<tr><td colspan="3" class="text-muted">No performance data yet</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    drawChart("poChart", "doughnut", Object.keys(s.procurement.by_status), Object.values(s.procurement.by_status), ["#3182ce","#c05621","#2f855a","#805ad5","#c53030","#718096"]);
+    drawChart("categoryChart", "bar", Object.keys(s.vendors.by_category), Object.values(s.vendors.by_category), ["#2c5282"]);
+    drawChart("riskChart", "pie", Object.keys(s.vendors.by_risk_level), Object.values(s.vendors.by_risk_level), ["#2f855a","#c05621","#c53030"]);
+
+  } catch (err) {
+    content.innerHTML = `<p class="error-msg">${err.message}</p>`;
+  }
+}
+
+function drawChart(canvasId, type, labels, data, colors) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  new Chart(ctx, {
+    type,
+    data: {
+      labels,
+      datasets: [{ data, backgroundColor: colors, borderWidth: type === "bar" ? 0 : 1 }],
+    },
+    options: {
+      plugins: { legend: { display: type !== "bar", position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } },
+      scales: type === "bar" ? { y: { beginAtZero: true } } : {},
+    },
+  });
+}
+
+load();
+</script>
+</body>
+</html>

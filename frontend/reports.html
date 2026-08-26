@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VendorIQ | Reports & Notifications</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell" id="app-shell"></div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuth();
+renderShell("reports.html", "Reports & Notifications");
+
+async function load() {
+  const content = document.getElementById("page-content");
+  content.innerHTML = `
+    <div class="charts-grid">
+      <div class="panel">
+        <h3>Export Reports</h3>
+        <p class="text-muted" style="font-size:13px;">Download CSV reports (can be opened directly in Excel).</p>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+          <a class="btn secondary" href="/api/reports/vendor-performance.csv" onclick="return withAuthDownload(this)">📄 Vendor Performance Report</a>
+          <a class="btn secondary" href="/api/reports/purchase-orders.csv" onclick="return withAuthDownload(this)">📄 Purchase Orders Report</a>
+          <a class="btn secondary" href="/api/reports/contracts.csv" onclick="return withAuthDownload(this)">📄 Contracts &amp; Compliance Report</a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Notifications</h3>
+        <div id="notif-list" style="max-height:360px; overflow-y:auto;"></div>
+      </div>
+    </div>
+  `;
+
+  const notifications = await api("/notifications");
+  document.getElementById("notif-list").innerHTML = notifications.length ? notifications.map(n => `
+    <div style="padding:10px 0; border-bottom:1px solid var(--border); ${n.is_read ? "opacity:0.55;" : ""}">
+      <div class="flex-between">
+        <strong style="font-size:13px;">${n.title}</strong>
+        <span class="badge blue">${n.category}</span>
+      </div>
+      <div style="font-size:13px; color:var(--text-muted); margin-top:2px;">${n.message}</div>
+      <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">${fmtDate(n.created_at)}
+        ${!n.is_read ? `<a href="#" onclick="markRead(${n.id}); return false;" style="margin-left:8px; color:var(--accent);">Mark as read</a>` : ""}
+      </div>
+    </div>
+  `).join("") : `<p class="text-muted">No notifications.</p>`;
+}
+
+async function markRead(id) {
+  await api(`/notifications/${id}/read`, { method: "POST" });
+  load();
+  refreshNotifIndicator();
+}
+
+// Since downloads need the auth header, fetch as blob then trigger a save.
+async function withAuthDownload(link) {
+  const url = link.getAttribute("href");
+  const filename = url.split("/").pop();
+  try {
+    const res = await api(url.replace("/api", ""), { raw: true });
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  } catch (err) {
+    alert("Download failed: " + err.message);
+  }
+  return false;
+}
+
+load();
+</script>
+</body>
+</html>

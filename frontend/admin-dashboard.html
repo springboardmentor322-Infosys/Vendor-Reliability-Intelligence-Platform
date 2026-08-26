@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VendorIQ | Admin Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="app-shell" id="app-shell"></div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuth();
+renderShell("admin-dashboard.html", "Admin Dashboard");
+
+async function load() {
+  const content = document.getElementById("page-content");
+  try {
+    const s = await api("/dashboard/admin-summary");
+
+    content.innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">Total Users</div><div class="value">${s.users.total}</div><div class="sub">${s.users.active} active</div></div>
+        <div class="stat-card"><div class="label">Total Vendors</div><div class="value">${s.vendors.total}</div><div class="sub">Avg score ${s.vendors.average_reliability_score}</div></div>
+        <div class="stat-card"><div class="label">Total Purchase Orders</div><div class="value">${s.system.total_purchase_orders}</div><div class="sub">${fmtMoney(s.system.total_spend)} total spend</div></div>
+        <div class="stat-card"><div class="label">System Activity</div><div class="value" style="font-size:18px;">${s.system.total_messages} msgs</div><div class="sub">${s.system.total_notifications} notifications</div></div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="panel">
+          <h3>Vendor Analytics — By Category</h3>
+          <canvas id="categoryChart" height="200"></canvas>
+        </div>
+        <div class="panel">
+          <h3>Vendor Analytics — Risk Distribution</h3>
+          <canvas id="riskChart" height="200"></canvas>
+        </div>
+        <div class="panel">
+          <h3>Compliance Monitoring</h3>
+          <canvas id="complianceChart" height="200"></canvas>
+        </div>
+        <div class="panel">
+          <h3>Top 5 Vendors by Reliability</h3>
+          <table>
+            <thead><tr><th>Vendor</th><th>Score</th><th>Risk</th></tr></thead>
+            <tbody>
+              ${s.top_vendors.map(v => `<tr><td>${v.name}</td><td>${v.reliability_score}</td><td>${statusBadge(v.risk_level)}</td></tr>`).join("") || `<tr><td colspan="3" class="text-muted">No data yet</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="flex-between mb-16">
+          <h3 style="margin:0;">User Management</h3>
+          <a href="reports.html" class="btn small secondary">Procurement Reports →</a>
+        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="user-rows"><tr><td colspan="5" class="text-muted">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    `;
+
+    drawChart("categoryChart", "bar", Object.keys(s.vendors.by_category), Object.values(s.vendors.by_category), ["#2c5282"]);
+    drawChart("riskChart", "pie", Object.keys(s.vendors.by_risk_level), Object.values(s.vendors.by_risk_level), ["#2f855a","#c05621","#c53030"]);
+    drawChart("complianceChart", "doughnut", Object.keys(s.compliance.by_status), Object.values(s.compliance.by_status), ["#2f855a","#c05621","#c53030"]);
+
+    await loadUsers();
+  } catch (err) {
+    content.innerHTML = `<p class="error-msg">${err.message}</p>`;
+  }
+}
+
+async function loadUsers() {
+  const users = await api("/auth/users");
+  const currentUser = getUser();
+  document.getElementById("user-rows").innerHTML = users.map(u => `
+    <tr>
+      <td>${u.full_name}</td>
+      <td>${u.email}</td>
+      <td><span class="badge blue">${u.role}</span></td>
+      <td>${u.is_active ? `<span class="badge green">Active</span>` : `<span class="badge red">Disabled</span>`}</td>
+      <td>
+        ${u.id === currentUser.id
+          ? `<span class="text-muted">You</span>`
+          : `<button class="btn small ${u.is_active ? "danger" : "success"}" onclick="toggleUser(${u.id})">${u.is_active ? "Deactivate" : "Activate"}</button>`
+        }
+      </td>
+    </tr>
+  `).join("");
+}
+
+async function toggleUser(id) {
+  try {
+    await api(`/auth/users/${id}/toggle-active`, { method: "POST" });
+    await loadUsers();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+function drawChart(canvasId, type, labels, data, colors) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  new Chart(ctx, {
+    type,
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: type === "bar" ? 0 : 1 }] },
+    options: {
+      plugins: { legend: { display: type !== "bar", position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } },
+      scales: type === "bar" ? { y: { beginAtZero: true } } : {},
+    },
+  });
+}
+
+load();
+</script>
+</body>
+</html>

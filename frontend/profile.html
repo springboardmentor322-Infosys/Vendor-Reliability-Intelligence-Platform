@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VendorIQ | My Profile</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell" id="app-shell"></div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuth();
+renderShell("", "My Profile");
+
+async function load() {
+  const content = document.getElementById("page-content");
+  const me = await api("/auth/me");
+
+  content.innerHTML = `
+    <div class="charts-grid">
+      <div class="panel">
+        <h3>Profile Information</h3>
+        <div class="field"><label>Full Name</label><input id="p-name" value="${me.full_name}"></div>
+        <div class="field"><label>Email</label><input id="p-email" type="email" value="${me.email}"></div>
+        <div class="field"><label>Role</label><input value="${me.role}" disabled style="background:#f7fafc;"></div>
+        <button class="btn" onclick="saveProfile()">Save Changes</button>
+        <div class="error-msg" id="profile-error"></div>
+        <div class="hint-box hidden" id="profile-success"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Change Password</h3>
+        <div class="field"><label>Current Password</label><input id="old-pw" type="password"></div>
+        <div class="field"><label>New Password</label><input id="new-pw" type="password" minlength="6"></div>
+        <div class="field"><label>Confirm New Password</label><input id="confirm-pw" type="password" minlength="6"></div>
+        <button class="btn" onclick="changePassword()">Update Password</button>
+        <div class="error-msg" id="pw-error"></div>
+        <div class="hint-box hidden" id="pw-success"></div>
+      </div>
+    </div>
+  `;
+}
+
+async function saveProfile() {
+  const errorEl = document.getElementById("profile-error");
+  const successEl = document.getElementById("profile-success");
+  errorEl.textContent = "";
+  successEl.classList.add("hidden");
+
+  try {
+    const updated = await api("/auth/profile", {
+      method: "PUT",
+      body: {
+        full_name: document.getElementById("p-name").value,
+        email: document.getElementById("p-email").value,
+      },
+    });
+    // Keep the locally stored session in sync so the topbar name updates too.
+    setSession(getToken(), updated);
+    successEl.classList.remove("hidden");
+    successEl.textContent = "Profile updated successfully.";
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+}
+
+async function changePassword() {
+  const errorEl = document.getElementById("pw-error");
+  const successEl = document.getElementById("pw-success");
+  errorEl.textContent = "";
+  successEl.classList.add("hidden");
+
+  const newPw = document.getElementById("new-pw").value;
+  const confirmPw = document.getElementById("confirm-pw").value;
+
+  if (newPw !== confirmPw) {
+    errorEl.textContent = "New passwords don't match.";
+    return;
+  }
+
+  try {
+    await api("/auth/change-password", {
+      method: "POST",
+      body: {
+        old_password: document.getElementById("old-pw").value,
+        new_password: newPw,
+      },
+    });
+    successEl.classList.remove("hidden");
+    successEl.textContent = "Password updated successfully.";
+    document.getElementById("old-pw").value = "";
+    document.getElementById("new-pw").value = "";
+    document.getElementById("confirm-pw").value = "";
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+}
+
+load();
+</script>
+</body>
+</html>

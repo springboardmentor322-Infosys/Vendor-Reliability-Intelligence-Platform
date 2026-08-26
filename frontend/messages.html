@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VendorIQ | Communication</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell" id="app-shell"></div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuth();
+renderShell("messages.html", "Communication");
+
+let vendors = [];
+let selectedVendorId = null;
+
+async function load() {
+  const content = document.getElementById("page-content");
+  vendors = await api("/vendors");
+  if (!selectedVendorId && vendors.length) selectedVendorId = vendors[0].id;
+
+  content.innerHTML = `
+    <div class="panel">
+      <div class="flex-between mb-16">
+        <h3 style="margin:0;">Vendor Messaging</h3>
+        <select id="vendor-select" onchange="selectVendor(this.value)">
+          ${vendors.map(v => `<option value="${v.id}" ${v.id === selectedVendorId ? "selected" : ""}>${v.name}</option>`).join("")}
+        </select>
+      </div>
+      <div id="thread" style="max-height:360px; overflow-y:auto; border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:14px; background:#fafcff;"></div>
+      <div style="display:flex; gap:10px;">
+        <input id="msg-input" placeholder="Type a message..." style="flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:6px;">
+        <button class="btn" onclick="sendMsg()">Send</button>
+      </div>
+    </div>
+  `;
+  await loadThread();
+}
+
+function selectVendor(id) {
+  selectedVendorId = Number(id);
+  loadThread();
+}
+
+async function loadThread() {
+  const thread = document.getElementById("thread");
+  const messages = await api(`/messages/vendor/${selectedVendorId}`);
+  thread.innerHTML = messages.length ? messages.map(m => `
+    <div style="margin-bottom:12px;">
+      <div style="font-size:12px; font-weight:700; color:var(--primary);">${m.sender} <span class="text-muted" style="font-weight:400;">· ${fmtDate(m.sent_at)}</span></div>
+      <div style="font-size:14px;">${m.content}</div>
+    </div>
+  `).join("") : `<p class="text-muted">No messages yet. Start the conversation below.</p>`;
+  thread.scrollTop = thread.scrollHeight;
+}
+
+async function sendMsg() {
+  const input = document.getElementById("msg-input");
+  if (!input.value.trim()) return;
+  const user = getUser();
+  try {
+    await api("/messages", {
+      method: "POST",
+      body: { vendor_id: selectedVendorId, sender: user.full_name, content: input.value.trim() },
+    });
+    input.value = "";
+    loadThread();
+  } catch (err) { alert(err.message); }
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && document.activeElement.id === "msg-input") sendMsg();
+});
+
+load();
+</script>
+</body>
+</html>

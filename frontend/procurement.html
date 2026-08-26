@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VendorIQ | Procurement</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell" id="app-shell"></div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuth();
+renderShell("procurement.html", "Procurement & Purchase Orders");
+
+const STATUS_FLOW = ["Pending","Approved","Ordered","Delivered","Completed","Cancelled"];
+let approvedVendors = [];
+
+async function load() {
+  const content = document.getElementById("page-content");
+  content.innerHTML = `
+    <div class="table-toolbar">
+      <select id="filter-status" onchange="load()">
+        <option value="">All Statuses</option>
+        ${STATUS_FLOW.map(s => `<option>${s}</option>`).join("")}
+      </select>
+      <button class="btn" onclick="openModal()">+ Raise Purchase Order</button>
+    </div>
+    <table>
+      <thead><tr><th>PO Number</th><th>Vendor</th><th>Item</th><th>Qty</th><th>Total</th><th>Status</th><th>Expected Delivery</th><th>Actions</th></tr></thead>
+      <tbody id="po-rows"><tr><td colspan="8" class="text-muted">Loading...</td></tr></tbody>
+    </table>
+
+    <div class="modal-backdrop hidden" id="modal">
+      <div class="modal">
+        <h3>Raise Purchase Order</h3>
+        <div class="field"><label>Vendor (approved only)</label>
+          <select id="p-vendor"></select>
+        </div>
+        <div class="field"><label>Item Description</label><input id="p-item"></div>
+        <div class="field"><label>Quantity</label><input id="p-qty" type="number" value="1" min="1"></div>
+        <div class="field"><label>Unit Price (₹)</label><input id="p-price" type="number" value="0" min="0" step="0.01"></div>
+        <div class="field"><label>Expected Delivery Date</label><input id="p-delivery" type="date"></div>
+        <div class="error-msg" id="p-error"></div>
+        <div class="modal-actions">
+          <button class="btn secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn" onclick="submitPO()">Create PO</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  approvedVendors = await api("/vendors?status=Approved");
+  document.getElementById("p-vendor").innerHTML = approvedVendors.map(v => `<option value="${v.id}">${v.name}</option>`).join("") || `<option value="">No approved vendors</option>`;
+
+  const status = document.getElementById("filter-status").value;
+  try {
+    const pos = await api(`/procurement${status ? `?status=${encodeURIComponent(status)}` : ""}`);
+    const vendorMap = {};
+    (await api("/vendors")).forEach(v => vendorMap[v.id] = v.name);
+
+    document.getElementById("po-rows").innerHTML = pos.length ? pos.map(po => `
+      <tr>
+        <td><strong>${po.po_number}</strong></td>
+        <td>${vendorMap[po.vendor_id] || po.vendor_id}</td>
+        <td>${po.item_description}</td>
+        <td>${po.quantity}</td>
+        <td>${fmtMoney(po.total_amount)}</td>
+        <td>${statusBadge(po.status)}</td>
+        <td>${fmtDate(po.expected_delivery)}</td>
+        <td>${renderActions(po)}</td>
+      </tr>
+    `).join("") : `<tr><td colspan="8" class="text-muted">No purchase orders found.</td></tr>`;
+  } catch (err) {
+    document.getElementById("po-rows").innerHTML = `<tr><td colspan="8" class="error-msg">${err.message}</td></tr>`;
+  }
+}
+
+function renderActions(po) {
+  const idx = STATUS_FLOW.indexOf(po.status);
+  if (po.status === "Completed" || po.status === "Cancelled") return `<span class="text-muted">—</span>`;
+  const nextStatus = STATUS_FLOW[idx + 1];
+  let btns = "";
+  if (nextStatus && nextStatus !== "Cancelled") {
+    btns += `<button class="btn small success" onclick="advance(${po.id}, '${nextStatus}')">Mark ${nextStatus}</button> `;
+  }
+  btns += `<button class="btn small danger" onclick="advance(${po.id}, 'Cancelled')">Cancel</button>`;
+  return btns;
+}
+
+async function advance(id, status) {
+  try {
+    await api(`/procurement/${id}`, { method: "PUT", body: { status } });
+    load();
+  } catch (err) { alert(err.message); }
+}
+
+function openModal() { document.getElementById("modal").classList.remove("hidden"); }
+function closeModal() { document.getElementById("modal").classList.add("hidden"); }
+
+async function submitPO() {
+  const errorEl = document.getElementById("p-error");
+  errorEl.textContent = "";
+  const deliveryVal = document.getElementById("p-delivery").value;
+  try {
+    await api("/procurement", {
+      method: "POST",
+      body: {
+        vendor_id: Number(document.getElementById("p-vendor").value),
+        item_description: document.getElementById("p-item").value,
+        quantity: Number(document.getElementById("p-qty").value),
+        unit_price: Number(document.getElementById("p-price").value),
+        expected_delivery: deliveryVal ? new Date(deliveryVal).toISOString() : null,
+      },
+    });
+    closeModal();
+    load();
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+}
+
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VendorIQ | Register</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <h1>Create Account</h1>
+    <p class="sub">Join the VendorIQ procurement platform</p>
+
+    <form id="register-form">
+
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="full_name" required>
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" required>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" required minlength="6">
+      </div>
+
+      <div class="field">
+        <label>Role</label>
+
+        <select id="role" required>
+          <option value="Administrator">Administrator</option>
+          <option value="Procurement Manager" selected>
+            Procurement Manager
+          </option>
+          <option value="Supply Chain Manager">
+            Supply Chain Manager
+          </option>
+          <option value="Finance Officer">
+            Finance Officer
+          </option>
+          <option value="Auditor">
+            Auditor
+          </option>
+          <option value="Vendor">
+            Vendor
+          </option>
+        </select>
+
+      </div>
+
+      <button type="submit" class="btn full">
+        Register
+      </button>
+
+      <div class="error-msg" id="error"></div>
+
+    </form>
+
+    <p style="text-align:center; font-size:13px; margin-top:16px;">
+      Already have an account?
+      <a href="index.html"
+         style="color:var(--accent); font-weight:600;">
+        Sign in
+      </a>
+    </p>
+
+  </div>
+</div>
+
+<!-- API Helper -->
+<script src="js/api.js"></script>
+
+<script>
+
+document.getElementById("register-form").addEventListener("submit", async (e) => {
+
+  e.preventDefault();
+
+  const errorEl = document.getElementById("error");
+
+  errorEl.textContent = "";
+
+  try {
+
+    // ==========================================
+    // 1. REGISTER USER
+    // ==========================================
+
+    await api("/auth/register", {
+      method: "POST",
+
+      body: {
+        full_name: document.getElementById("full_name").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+        role: document.getElementById("role").value
+      }
+    });
+
+
+    // ==========================================
+    // 2. LOGIN AUTOMATICALLY AFTER REGISTRATION
+    // ==========================================
+
+    const loginData = await api("/auth/login", {
+      method: "POST",
+
+      body: {
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value
+      }
+    });
+
+
+    // ==========================================
+    // 3. SAVE LOGIN SESSION
+    // ==========================================
+
+    setSession(
+      loginData.access_token,
+      loginData.user
+    );
+
+
+    // ==========================================
+    // 4. GET USER ROLE
+    // ==========================================
+
+    const role = loginData.user.role;
+
+
+    // ==========================================
+    // 5. ROLE-BASED REDIRECT
+    // ==========================================
+
+    if (role === "Vendor") {
+
+      window.location.href = "vendors.html";
+
+    }
+
+    else if (role === "Supply Chain Manager") {
+
+      window.location.href = "performance.html";
+
+    }
+
+    else if (role === "Finance Officer") {
+
+      window.location.href = "reports.html";
+
+    }
+
+    else if (role === "Auditor") {
+
+      window.location.href = "reports.html";
+
+    }
+
+    else {
+
+      // Administrator
+      // Procurement Manager
+
+      window.location.href = "dashboard.html";
+
+    }
+
+  }
+
+  catch (err) {
+
+    console.error("Registration Error:", err);
+
+    errorEl.textContent = err.message;
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>

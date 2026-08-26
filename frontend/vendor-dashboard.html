@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VendorIQ | My Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell" id="app-shell"></div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuth();
+renderShell("vendor-dashboard.html", "My Vendor Dashboard");
+
+async function load() {
+  const content = document.getElementById("page-content");
+
+  let vendor;
+  try {
+    vendor = await api("/vendors/me");
+  } catch (err) {
+    content.innerHTML = `
+      <div class="panel" style="max-width:520px;">
+        <h3>No Vendor Profile Linked</h3>
+        <p class="text-muted" style="font-size:14px; line-height:1.6;">${err.message}</p>
+        <p class="text-muted" style="font-size:13px; margin-top:10px;">
+          Vendor accounts are matched automatically at registration by email address.
+          If your company was already registered by a procurement manager, make sure
+          you sign up here using that exact same email.
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  content.innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="label">Reliability Score</div>
+        <div class="value">${vendor.reliability_score}</div>
+        <div class="sub">${statusBadge(vendor.risk_level)}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Account Status</div>
+        <div class="value" style="font-size:18px;">${statusBadge(vendor.status)}</div>
+        <div class="sub">${vendor.category}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Vendor ID</div>
+        <div class="value" style="font-size:20px;">VDR-${String(vendor.id).padStart(4, "0")}</div>
+        <div class="sub">${vendor.email || ""}</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="panel">
+        <h3>Performance History</h3>
+        <table id="perf-table">
+          <thead><tr><th>Date</th><th>On-Time</th><th>Delayed</th><th>Quality</th><th>Completion</th></tr></thead>
+          <tbody><tr><td colspan="5" class="text-muted">Loading...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h3>Contract Status</h3>
+        <table id="contract-table">
+          <thead><tr><th>Title</th><th>End Date</th><th>Compliance</th></tr></thead>
+          <tbody><tr><td colspan="3" class="text-muted">Loading...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h3>Order History</h3>
+        <table id="order-table">
+          <thead><tr><th>PO Number</th><th>Item</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody><tr><td colspan="4" class="text-muted">Loading...</td></tr></tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <div class="flex-between mb-16">
+          <h3 style="margin:0;">Communication Activity</h3>
+          <a href="messages.html" class="btn small secondary">Open Inbox</a>
+        </div>
+        <div id="comm-activity"><p class="text-muted">Loading...</p></div>
+      </div>
+    </div>
+  `;
+
+  const [performance, contracts, orders, messages] = await Promise.all([
+    api(`/performance/vendor/${vendor.id}`),
+    api(`/contracts?vendor_id=${vendor.id}`),
+    api(`/procurement?vendor_id=${vendor.id}`),
+    api(`/messages/vendor/${vendor.id}`),
+  ]);
+
+  document.querySelector("#perf-table tbody").innerHTML = performance.length ? performance.map(r => `
+    <tr>
+      <td>${fmtDate(r.recorded_at)}</td>
+      <td>${r.on_time_deliveries}</td>
+      <td>${r.delayed_deliveries}</td>
+      <td>${r.quality_rating} / 5</td>
+      <td>${r.order_completion_rate}%</td>
+    </tr>
+  `).join("") : `<tr><td colspan="5" class="text-muted">No performance data logged yet.</td></tr>`;
+
+  document.querySelector("#contract-table tbody").innerHTML = contracts.length ? contracts.map(c => `
+    <tr>
+      <td>${c.contract_title}</td>
+      <td>${fmtDate(c.end_date)}</td>
+      <td>${statusBadge(c.compliance_status)}</td>
+    </tr>
+  `).join("") : `<tr><td colspan="3" class="text-muted">No contracts on file.</td></tr>`;
+
+  document.querySelector("#order-table tbody").innerHTML = orders.length ? orders.map(po => `
+    <tr>
+      <td>${po.po_number}</td>
+      <td>${po.item_description}</td>
+      <td>${fmtMoney(po.total_amount)}</td>
+      <td>${statusBadge(po.status)}</td>
+    </tr>
+  `).join("") : `<tr><td colspan="4" class="text-muted">No purchase orders yet.</td></tr>`;
+
+  const recentMessages = messages.slice(-4).reverse();
+  document.getElementById("comm-activity").innerHTML = recentMessages.length ? recentMessages.map(m => `
+    <div style="padding:8px 0; border-bottom:1px solid var(--border); font-size:13px;">
+      <strong>${m.sender}</strong> <span class="text-muted">· ${fmtDate(m.sent_at)}</span><br>
+      <span class="text-muted">${m.content}</span>
+    </div>
+  `).join("") : `<p class="text-muted">No messages yet.</p>`;
+}
+
+load();
+</script>
+</body>
+</html>

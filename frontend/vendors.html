@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VendorIQ | Vendor Management</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .cat-chip-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+  .cat-chip {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 20px;
+    border: 1px solid var(--border); background: #fff;
+    font-size: 12.5px; font-weight: 600; cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .cat-chip:hover { border-color: var(--accent); }
+  .cat-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .cat-chip .count { font-family: monospace; opacity: 0.75; }
+</style>
+</head>
+<body>
+<div class="app-shell" id="app-shell"></div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuth();
+renderShell("vendors.html", "Vendor Management");
+
+const CATEGORIES = ["Raw Material Suppliers","Equipment Vendors","IT Vendors","Service Providers","Logistics Partners","Maintenance Vendors"];
+let activeCategory = "";
+
+async function load() {
+  const content = document.getElementById("page-content");
+  content.innerHTML = `
+    <div class="cat-chip-row" id="cat-chips"></div>
+
+    <div class="table-toolbar">
+      <div>
+        <select id="filter-status" onchange="load()">
+          <option value="">All Statuses</option>
+          <option>Pending Approval</option>
+          <option>Approved</option>
+          <option>Rejected</option>
+          <option>Suspended</option>
+        </select>
+      </div>
+      <button class="btn" onclick="openModal()">+ Register Vendor</button>
+    </div>
+    <table>
+      <thead><tr><th>Name</th><th>Category</th><th>Contact</th><th>Status</th><th>Reliability</th><th>Risk</th><th>Actions</th></tr></thead>
+      <tbody id="vendor-rows"><tr><td colspan="7" class="text-muted">Loading...</td></tr></tbody>
+    </table>
+
+    <div class="modal-backdrop hidden" id="modal">
+      <div class="modal">
+        <h3>Register New Vendor</h3>
+        <div class="field"><label>Vendor Name</label><input id="v-name"></div>
+        <div class="field"><label>Category</label>
+          <select id="v-category">${CATEGORIES.map(c => `<option>${c}</option>`).join("")}</select>
+        </div>
+        <div class="field"><label>Contact Person</label><input id="v-contact"></div>
+        <div class="field"><label>Email</label><input id="v-email" type="email"></div>
+        <div class="field"><label>Phone</label><input id="v-phone"></div>
+        <div class="field"><label>Address</label><textarea id="v-address" rows="2"></textarea></div>
+        <div class="error-msg" id="v-error"></div>
+        <div class="modal-actions">
+          <button class="btn secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn" onclick="submitVendor()">Save</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Category chips always reflect the full vendor list, regardless of the
+  // current filter, so you can see the whole spread and click into any one.
+  const allVendors = await api("/vendors");
+  const counts = {};
+  CATEGORIES.forEach(c => counts[c] = 0);
+  allVendors.forEach(v => { counts[v.category] = (counts[v.category] || 0) + 1; });
+
+  const chipsEl = document.getElementById("cat-chips");
+  chipsEl.innerHTML = `
+    <div class="cat-chip ${activeCategory === "" ? "active" : ""}" onclick="setCategory('')">
+      All Categories <span class="count">${allVendors.length}</span>
+    </div>
+    ${CATEGORIES.map(c => `
+      <div class="cat-chip ${activeCategory === c ? "active" : ""}" onclick="setCategory('${c}')">
+        ${c} <span class="count">${counts[c]}</span>
+      </div>
+    `).join("")}
+  `;
+
+  const status = document.getElementById("filter-status").value;
+  const params = new URLSearchParams();
+  if (status) params.set("status", status);
+  if (activeCategory) params.set("category", activeCategory);
+  const query = params.toString() ? `?${params.toString()}` : "";
+
+  try {
+    const vendors = await api(`/vendors${query}`);
+    const rows = document.getElementById("vendor-rows");
+    rows.innerHTML = vendors.length ? vendors.map(v => `
+      <tr>
+        <td><strong>${v.name}</strong></td>
+        <td>${v.category}</td>
+        <td>${v.contact_person || "-"}<br><span class="text-muted">${v.email || ""}</span></td>
+        <td>${statusBadge(v.status)}</td>
+        <td>${v.reliability_score}</td>
+        <td>${statusBadge(v.risk_level)}</td>
+        <td>
+          ${v.status === "Pending Approval" ? `
+            <button class="btn small success" onclick="approve(${v.id})">Approve</button>
+            <button class="btn small danger" onclick="reject(${v.id})">Reject</button>
+          ` : `<a href="performance.html?vendor_id=${v.id}" class="btn small secondary">View</a>`}
+        </td>
+      </tr>
+    `).join("") : `<tr><td colspan="7" class="text-muted">No vendors found.</td></tr>`;
+  } catch (err) {
+    document.getElementById("vendor-rows").innerHTML = `<tr><td colspan="7" class="error-msg">${err.message}</td></tr>`;
+  }
+}
+
+function setCategory(cat) {
+  activeCategory = cat;
+  load();
+}
+
+function openModal() { document.getElementById("modal").classList.remove("hidden"); }
+function closeModal() { document.getElementById("modal").classList.add("hidden"); }
+
+async function submitVendor() {
+  const errorEl = document.getElementById("v-error");
+  errorEl.textContent = "";
+  try {
+    await api("/vendors", {
+      method: "POST",
+      body: {
+        name: document.getElementById("v-name").value,
+        category: document.getElementById("v-category").value,
+        contact_person: document.getElementById("v-contact").value,
+        email: document.getElementById("v-email").value,
+        phone: document.getElementById("v-phone").value,
+        address: document.getElementById("v-address").value,
+      },
+    });
+    closeModal();
+    load();
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+}
+
+async function approve(id) {
+  try { await api(`/vendors/${id}/approve`, { method: "POST" }); load(); }
+  catch (err) { alert(err.message); }
+}
+async function reject(id) {
+  try { await api(`/vendors/${id}/reject`, { method: "POST" }); load(); }
+  catch (err) { alert(err.message); }
+}
+
+load();
+</script>
+</body>
+</html>

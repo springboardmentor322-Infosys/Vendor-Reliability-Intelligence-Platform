@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VendorIQ | Performance & Reliability</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell" id="app-shell"></div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuth();
+renderShell("performance.html", "Vendor Performance & Reliability");
+
+const params = new URLSearchParams(window.location.search);
+let selectedVendorId = params.get("vendor_id") ? Number(params.get("vendor_id")) : null;
+let vendors = [];
+
+async function load() {
+  const content = document.getElementById("page-content");
+  vendors = await api("/vendors");
+  if (!selectedVendorId && vendors.length) selectedVendorId = vendors[0].id;
+
+  content.innerHTML = `
+    <div class="charts-grid" style="grid-template-columns: 1fr 2fr;">
+      <div class="panel">
+        <h3>Vendor Ranking</h3>
+        <table>
+          <thead><tr><th>#</th><th>Vendor</th><th>Score</th></tr></thead>
+          <tbody id="ranking-rows"></tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <div class="flex-between mb-16">
+          <h3 style="margin:0;">Performance History</h3>
+          <div>
+            <select id="vendor-select" onchange="selectVendor(this.value)">
+              ${vendors.map(v => `<option value="${v.id}" ${v.id === selectedVendorId ? "selected" : ""}>${v.name}</option>`).join("")}
+            </select>
+            <button class="btn small" onclick="openModal()">+ Log Performance</button>
+          </div>
+        </div>
+        <div id="vendor-summary" class="stat-grid" style="margin-bottom:16px;"></div>
+        <table>
+          <thead><tr><th>Date</th><th>On-Time</th><th>Delayed</th><th>Quality</th><th>Response (hrs)</th><th>Resolution (hrs)</th><th>Completion %</th></tr></thead>
+          <tbody id="perf-rows"></tbody>
+        </table>
+
+        <h3 style="margin-top:24px;">Procurement Recommendations</h3>
+        <div id="recommendations-list"></div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop hidden" id="modal">
+      <div class="modal">
+        <h3>Log Performance Record</h3>
+        <div class="field"><label>On-Time Deliveries</label><input id="f-ontime" type="number" value="0" min="0"></div>
+        <div class="field"><label>Delayed Deliveries</label><input id="f-delayed" type="number" value="0" min="0"></div>
+        <div class="field"><label>Quality Rating (0-5)</label><input id="f-quality" type="number" value="4" min="0" max="5" step="0.1"></div>
+        <div class="field"><label>Avg. Response Time (hours)</label><input id="f-response" type="number" value="6" min="0"></div>
+        <div class="field"><label>Avg. Issue Resolution Time (hours)</label><input id="f-resolution" type="number" value="12" min="0"></div>
+        <div class="field"><label>Order Completion Rate (%)</label><input id="f-completion" type="number" value="90" min="0" max="100"></div>
+        <div class="error-msg" id="f-error"></div>
+        <div class="modal-actions">
+          <button class="btn secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn" onclick="submitPerf()">Save</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  await loadRanking();
+  await loadVendorDetail();
+}
+
+async function loadRanking() {
+  const ranking = await api("/performance/ranking");
+  document.getElementById("ranking-rows").innerHTML = ranking.map((v, i) => `
+    <tr style="cursor:pointer;" onclick="selectVendor(${v.id})">
+      <td>${i + 1}</td><td>${v.name}</td><td><strong>${v.reliability_score}</strong> ${statusBadge(v.risk_level)}</td>
+    </tr>
+  `).join("");
+}
+
+function selectVendor(id) {
+  selectedVendorId = Number(id);
+  loadVendorDetail();
+  document.getElementById("vendor-select").value = selectedVendorId;
+}
+
+async function loadVendorDetail() {
+  if (!selectedVendorId) return;
+  const vendor = vendors.find(v => v.id === selectedVendorId) || (await api(`/vendors/${selectedVendorId}`));
+  document.getElementById("vendor-summary").innerHTML = `
+    <div class="stat-card"><div class="label">Reliability Score</div><div class="value">${vendor.reliability_score}</div></div>
+    <div class="stat-card"><div class="label">Risk Level</div><div class="value" style="font-size:18px;">${statusBadge(vendor.risk_level)}</div></div>
+    <div class="stat-card"><div class="label">Status</div><div class="value" style="font-size:18px;">${statusBadge(vendor.status)}</div></div>
+  `;
+
+  const history = await api(`/performance/vendor/${selectedVendorId}`);
+  document.getElementById("perf-rows").innerHTML = history.length ? history.map(r => `
+    <tr>
+      <td>${fmtDate(r.recorded_at)}</td>
+      <td>${r.on_time_deliveries}</td>
+      <td>${r.delayed_deliveries}</td>
+      <td>${r.quality_rating}</td>
+      <td>${r.response_time_hours}</td>
+      <td>${r.issue_resolution_hours}</td>
+      <td>${r.order_completion_rate}%</td>
+    </tr>
+  `).join("") : `<tr><td colspan="7" class="text-muted">No performance records logged yet.</td></tr>`;
+
+  const recoBox = document.getElementById("recommendations-list");
+  try {
+    const reco = await api(`/performance/vendor/${selectedVendorId}/recommendations`);
+    recoBox.innerHTML = reco.recommendations.length
+      ? `<ul style="margin:0; padding-left:20px; line-height:1.7;">${reco.recommendations.map(r => `<li>${r}</li>`).join("")}</ul>`
+      : `<p class="text-muted">No recommendations yet.</p>`;
+  } catch (err) {
+    recoBox.innerHTML = `<p class="error-msg">${err.message}</p>`;
+  }
+}
+
+function openModal() { document.getElementById("modal").classList.remove("hidden"); }
+function closeModal() { document.getElementById("modal").classList.add("hidden"); }
+
+async function submitPerf() {
+  const errorEl = document.getElementById("f-error");
+  errorEl.textContent = "";
+  try {
+    await api("/performance", {
+      method: "POST",
+      body: {
+        vendor_id: selectedVendorId,
+        on_time_deliveries: Number(document.getElementById("f-ontime").value),
+        delayed_deliveries: Number(document.getElementById("f-delayed").value),
+        quality_rating: Number(document.getElementById("f-quality").value),
+        response_time_hours: Number(document.getElementById("f-response").value),
+        issue_resolution_hours: Number(document.getElementById("f-resolution").value),
+        order_completion_rate: Number(document.getElementById("f-completion").value),
+      },
+    });
+    closeModal();
+    vendors = await api("/vendors"); // refresh scores
+    await loadRanking();
+    await loadVendorDetail();
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+}
+
+load();
+</script>
+</body>
+</html>

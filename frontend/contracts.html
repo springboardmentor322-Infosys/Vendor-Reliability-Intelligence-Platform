@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VendorIQ | Contracts & Compliance</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell" id="app-shell"></div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuth();
+renderShell("contracts.html", "Contracts & Compliance");
+
+const DOC_TYPES = ["Business License", "Tax Certificate", "Insurance Certificate", "ISO Certification", "Other"];
+let vendorsCache = [];
+let selectedDocVendorId = null;
+
+async function load() {
+  const content = document.getElementById("page-content");
+  vendorsCache = await api("/vendors");
+  if (!selectedDocVendorId && vendorsCache.length) selectedDocVendorId = vendorsCache[0].id;
+
+  content.innerHTML = `
+    <div class="table-toolbar">
+      <div></div>
+      <button class="btn" onclick="openModal()">+ Add Contract</button>
+    </div>
+    <table>
+      <thead><tr><th>Title</th><th>Vendor</th><th>Start</th><th>End</th><th>Compliance</th><th>Document</th><th>Actions</th></tr></thead>
+      <tbody id="contract-rows"><tr><td colspan="7" class="text-muted">Loading...</td></tr></tbody>
+    </table>
+
+    <div class="panel" style="margin-top:28px;">
+      <div class="flex-between mb-16">
+        <h3 style="margin:0;">Documents &amp; Certifications</h3>
+        <select id="doc-vendor-select" onchange="selectDocVendor(this.value)">
+          ${vendorsCache.map(v => `<option value="${v.id}" ${v.id === selectedDocVendorId ? "selected" : ""}>${v.name}</option>`).join("")}
+        </select>
+      </div>
+
+      <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-bottom:18px; padding-bottom:18px; border-bottom:1px solid var(--border);">
+        <div class="field" style="margin-bottom:0;">
+          <label>Document Type</label>
+          <select id="doc-type">${DOC_TYPES.map(t => `<option>${t}</option>`).join("")}</select>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Expiry Date (optional)</label>
+          <input id="doc-expiry" type="date">
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>File (PDF/JPG/PNG/DOC, max 10MB)</label>
+          <input id="doc-file" type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+        </div>
+        <button class="btn small" onclick="uploadDocument()">Upload</button>
+      </div>
+      <div class="error-msg" id="doc-error"></div>
+
+      <table>
+        <thead><tr><th>Type</th><th>File</th><th>Expiry</th><th>Uploaded</th><th></th></tr></thead>
+        <tbody id="doc-rows"><tr><td colspan="5" class="text-muted">Loading...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="modal-backdrop hidden" id="modal">
+      <div class="modal">
+        <h3>Add Contract</h3>
+        <div class="field"><label>Vendor</label>
+          <select id="c-vendor">${vendorsCache.map(v => `<option value="${v.id}">${v.name}</option>`).join("")}</select>
+        </div>
+        <div class="field"><label>Contract Title</label><input id="c-title"></div>
+        <div class="field"><label>Start Date</label><input id="c-start" type="date"></div>
+        <div class="field"><label>End Date</label><input id="c-end" type="date"></div>
+        <div class="field"><label>Notes</label><textarea id="c-notes" rows="2"></textarea></div>
+        <div class="error-msg" id="c-error"></div>
+        <div class="modal-actions">
+          <button class="btn secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn" onclick="submitContract()">Save</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  await loadContracts();
+  await loadDocuments();
+}
+
+async function loadContracts() {
+  try {
+    const contracts = await api("/contracts");
+    const vendorMap = {};
+    vendorsCache.forEach(v => vendorMap[v.id] = v.name);
+    document.getElementById("contract-rows").innerHTML = contracts.length ? contracts.map(c => `
+      <tr>
+        <td>${c.contract_title}</td>
+        <td>${vendorMap[c.vendor_id] || c.vendor_id}</td>
+        <td>${fmtDate(c.start_date)}</td>
+        <td>${fmtDate(c.end_date)}</td>
+        <td>${statusBadge(c.compliance_status)}</td>
+        <td>
+          ${c.document_name
+            ? `<a href="#" onclick="downloadFile('/contracts/${c.id}/document', '${c.document_name}'); return false;">📄 ${c.document_name}</a>`
+            : `<label class="btn small secondary" style="cursor:pointer;">Upload<input type="file" style="display:none;" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="uploadContractDoc(${c.id}, this)"></label>`}
+        </td>
+        <td>
+          <select onchange="updateCompliance(${c.id}, this.value)">
+            <option value="">Update...</option>
+            <option>Compliant</option>
+            <option>At Risk</option>
+            <option>Non-Compliant</option>
+          </select>
+        </td>
+      </tr>
+    `).join("") : `<tr><td colspan="7" class="text-muted">No contracts on file.</td></tr>`;
+  } catch (err) {
+    document.getElementById("contract-rows").innerHTML = `<tr><td colspan="7" class="error-msg">${err.message}</td></tr>`;
+  }
+}
+
+function selectDocVendor(id) {
+  selectedDocVendorId = Number(id);
+  loadDocuments();
+}
+
+async function loadDocuments() {
+  const rows = document.getElementById("doc-rows");
+  try {
+    const docs = await api(`/vendors/${selectedDocVendorId}/documents`);
+    const now = new Date();
+    rows.innerHTML = docs.length ? docs.map(d => {
+      let expiryLabel = "-";
+      if (d.expiry_date) {
+        const exp = new Date(d.expiry_date);
+        const daysLeft = Math.round((exp - now) / (1000 * 60 * 60 * 24));
+        const cls = daysLeft < 0 ? "red" : daysLeft <= 30 ? "orange" : "green";
+        expiryLabel = `<span class="badge ${cls}">${fmtDate(d.expiry_date)}</span>`;
+      }
+      return `
+        <tr>
+          <td>${d.document_type}</td>
+          <td><a href="#" onclick="downloadFile('/vendors/documents/${d.id}/download', '${d.file_name}'); return false;">📄 ${d.file_name}</a></td>
+          <td>${expiryLabel}</td>
+          <td>${fmtDate(d.uploaded_at)}</td>
+          <td><button class="btn small danger" onclick="deleteDocument(${d.id})">Delete</button></td>
+        </tr>
+      `;
+    }).join("") : `<tr><td colspan="5" class="text-muted">No documents uploaded for this vendor yet.</td></tr>`;
+  } catch (err) {
+    rows.innerHTML = `<tr><td colspan="5" class="error-msg">${err.message}</td></tr>`;
+  }
+}
+
+async function uploadDocument() {
+  const errorEl = document.getElementById("doc-error");
+  errorEl.textContent = "";
+  const fileInput = document.getElementById("doc-file");
+  if (!fileInput.files.length) {
+    errorEl.textContent = "Choose a file first.";
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("document_type", document.getElementById("doc-type").value);
+  const expiry = document.getElementById("doc-expiry").value;
+  if (expiry) formData.append("expiry_date", new Date(expiry).toISOString());
+  formData.append("file", fileInput.files[0]);
+
+  try {
+    await api(`/vendors/${selectedDocVendorId}/documents`, { method: "POST", body: formData, isForm: true });
+    fileInput.value = "";
+    document.getElementById("doc-expiry").value = "";
+    loadDocuments();
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+}
+
+async function deleteDocument(id) {
+  if (!confirm("Delete this document?")) return;
+  try { await api(`/vendors/documents/${id}`, { method: "DELETE" }); loadDocuments(); }
+  catch (err) { alert(err.message); }
+}
+
+async function uploadContractDoc(contractId, inputEl) {
+  if (!inputEl.files.length) return;
+  const formData = new FormData();
+  formData.append("file", inputEl.files[0]);
+  try {
+    await api(`/contracts/${contractId}/document`, { method: "POST", body: formData, isForm: true });
+    loadContracts();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// Downloads are authenticated GETs (not plain links), so fetch as a blob
+// and trigger the save manually - same pattern used on the Reports page.
+async function downloadFile(path, filename) {
+  try {
+    const res = await api(path, { raw: true });
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  } catch (err) {
+    alert("Download failed: " + err.message);
+  }
+}
+
+function openModal() { document.getElementById("modal").classList.remove("hidden"); }
+function closeModal() { document.getElementById("modal").classList.add("hidden"); }
+
+async function submitContract() {
+  const errorEl = document.getElementById("c-error");
+  errorEl.textContent = "";
+  try {
+    await api("/contracts", {
+      method: "POST",
+      body: {
+        vendor_id: Number(document.getElementById("c-vendor").value),
+        contract_title: document.getElementById("c-title").value,
+        start_date: new Date(document.getElementById("c-start").value).toISOString(),
+        end_date: new Date(document.getElementById("c-end").value).toISOString(),
+        notes: document.getElementById("c-notes").value,
+      },
+    });
+    closeModal();
+    loadContracts();
+  } catch (err) {
+    errorEl.textContent = err.message;
+  }
+}
+
+async function updateCompliance(id, status) {
+  if (!status) return;
+  try {
+    await api(`/contracts/${id}/compliance?status=${encodeURIComponent(status)}`, { method: "PUT" });
+    loadContracts();
+  } catch (err) { alert(err.message); }
+}
+
+load();
+</script>
+</body>
+</html>
