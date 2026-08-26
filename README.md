@@ -21,7 +21,7 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-## 2. (Optional but recommended) Load demo data
+## 2.  Loaded demo data
 
 This creates 5 demo user logins (one per role) and sample vendors, purchase
 orders, performance history, contracts and messages so the dashboards aren't empty:
