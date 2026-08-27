@@ -47,10 +47,11 @@ app.include_router(notifications.router)
 app.include_router(dashboard.router)
 app.include_router(reports.router)
 
-FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "frontend")
 
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
-
+app.mount("/css", StaticFiles(directory=os.path.join(FRONTEND_DIR, "css")), name="css")
+app.mount("/js", StaticFiles(directory=os.path.join(FRONTEND_DIR, "js")), name="js")
 
 @app.get("/")
 def serve_index():

@@ -1,5 +1,5 @@
 // ---------- Core API helper ----------
-const API_BASE = "http://127.0.0.1:8000/api";
+const API_BASE = "/api";
 // NOTE: hardcoded for local dev because the frontend is being opened separately
 // from the FastAPI server. Change back to "/api" once you deploy both together
 // (e.g. behind the same Nginx/Docker setup), or it will break in production.
