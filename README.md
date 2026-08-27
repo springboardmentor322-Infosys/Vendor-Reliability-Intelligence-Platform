@@ -1,38 +1,85 @@
-<<<<<<< HEAD
 # Vendor Reliability Intelligence Platform
 
-## Milestone 1: Week 1 & 2
+A Vendor Reliability and Procurement Intelligence Platform designed to help organizations manage vendors, procurement activities, purchase orders, contracts, performance, and reliability insights.
 
-This repository contains the FastAPI backend for a vendor reliability and procurement intelligence platform.
+## Project Overview
 
-### Milestone 1 status
-- FastAPI project initialized
-- PostgreSQL-ready database configuration added
-- JWT authentication implemented
-- Basic user, vendor, procurement, purchase order, performance, and dashboard routes established
-- Angular frontend scaffold initialized
-- Angular Material theme and animation support configured for the UI shell
-- Login, register, dashboard, vendor, and procurement routes are wired for the milestone flow
+The Vendor Reliability Intelligence Platform provides a centralized application for managing vendor-related activities and analyzing vendor performance.
 
-### Setup
-1. Copy `.env.example` to `.env`
-2. Install dependencies:
-   ```bash
-   python -m pip install -r requirements.txt
-   ```
-3. Start the app:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
+The project includes a FastAPI backend, Angular frontend, database integration, authentication, dashboards, procurement workflows, and Docker-based deployment.
 
-### Notes
-- The backend now supports PostgreSQL through `DATABASE_URL` and falls back to local SQLite for quick development.
-- The repository includes a data model for users, vendors, procurement requests, purchase orders, and vendor performance.
-- Angular frontend scaffolding is planned for the next phase; current focus is backend initialization and authentication.
+## Key Features
 
-## VendorIQ Milestone Build
-The current build includes a VendorIQ-aligned landing page, administrator dashboard and vendor dashboard, plus milestone authentication, role routing, vendor approval, procurement/PO/contract workflows and Alembic configuration. Configure credentials in `.env` before deployment.
-=======
-# Vendor-Reliability-Intelligence-Platform
-Vendor Reliability Intelligence Platform
->>>>>>> f6e6792b99dc568a190e8d12fb7a7e1cb9f3d369
+- User registration and login
+- JWT-based authentication
+- Role-based access
+- Vendor management
+- Vendor approval workflow
+- Procurement management
+- Purchase order management
+- Contract management
+- Vendor performance tracking
+- Reliability analysis
+- Analytics and dashboards
+- Notifications
+- Reports
+- Invoice management
+- Compliance management
+
+## Technology Stack
+
+### Backend
+
+- Python
+- FastAPI
+- Uvicorn
+- SQLAlchemy
+- Pydantic
+- JWT Authentication
+- Alembic
+
+### Frontend
+
+- Angular
+- Angular Material
+- TypeScript
+- HTML
+- CSS
+
+### Database
+
+- SQLite for local development
+- PostgreSQL-ready configuration
+
+### Deployment
+
+- Docker
+- Docker Compose
+- Nginx
+
+## Milestone 4 Demonstration
+
+The complete application demonstration and screen recording are available below:
+
+[Watch Milestone 4 Demo](https://github.com/springboardmentor322-Infosys/Vendor-Reliability-Intelligence-Platform/blob/main/docs/milestone4.mp4)
+
+The demonstration covers the major application workflows, including authentication, dashboard, vendor management, procurement, purchase orders, contracts, performance, reliability, analytics, and other platform features.
+
+## Project Structure
+
+```text
+Vendor-Reliability-Platform/
+├── app/
+│   ├── routers/
+│   └── ...
+├── frontend/
+├── dataset/
+├── docs/
+├── scripts/
+├── alembic/
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── alembic.ini
+├── .env.example
+└── README.md
