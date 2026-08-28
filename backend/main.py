@@ -220,14 +220,36 @@ def verify_user_session(user_id: int, db: Session = Depends(get_db)):
 
 @app.get("/admin/metrics")
 def get_admin_metrics(db: Session = Depends(get_db)):
-    all_users = db.query(models.User).all()
+    all_approved = db.query(models.User).filter(models.User.status == "approved").all()
+    all_pending = db.query(models.User).filter(models.User.status == "pending").all()
+    
     return {
-        "total_users": len([u for u in all_users if u.status == "approved"]),
-        "pending_approvals": len([u for u in all_users if u.status == "pending"]),
-        "pm_count": len([u for u in all_users if u.role == "procurement_manager" and u.status == "approved"]),
-        "fo_count": len([u for u in all_users if u.role == "finance_officer" and u.status == "approved"]),
-        "vendor_count": len([u for u in all_users if u.role == "vendor" and u.status == "approved"])
+        "total_users": len(all_approved),
+        "pending_approvals": len(all_pending),
+        "pm_count": len([u for u in all_approved if str(u.role).strip().lower().replace(" ", "_") == "procurement_manager"]),
+        "fo_count": len([u for u in all_approved if str(u.role).strip().lower().replace(" ", "_") in ["finance_officer", "auditor"]]),
+        "scm_count": len([u for u in all_approved if str(u.role).strip().lower().replace(" ", "_") == "supply_chain_manager"]),
+        "vendor_count": len([u for u in all_approved if str(u.role).strip().lower().replace(" ", "_") == "vendor"])
     }
+
+
+@app.get("/admin/users")
+def get_users(role: str = "All", db: Session = Depends(get_db)):
+    query = db.query(models.User).filter(models.User.status == "approved")
+    
+    if role and role != "All":
+        normalized_role = role.strip().lower().replace(" ", "_")
+        # Match both exact DB value and normalized variations
+        if normalized_role == "finance_officer":
+            query = query.filter(func.lower(models.User.role).in_(["finance_officer", "auditor", "finance officer"]))
+        else:
+            query = query.filter(
+                (func.lower(models.User.role) == normalized_role) | 
+                (func.lower(func.replace(models.User.role, "_", " ")) == role.strip().lower())
+            )
+            
+    users = query.all()
+    return [{"id": u.id, "fullname": u.fullname, "email": u.email, "role": u.role} for u in users]
 
 
 @app.get("/api/v1/admin/active-sessions-count")
@@ -251,6 +273,7 @@ def get_users(role: str = "All", db: Session = Depends(get_db)):
     role_map = {
         "Procurement Manager": "procurement_manager",
         "Finance Officer": "finance_officer",
+        "Supply Chain Manager": "supply_chain_manager",
         "Vendor": "vendor"
     }
     if role in role_map:
