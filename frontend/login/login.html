@@ -21,7 +21,6 @@
         <h2>Sign In</h2>
         <p class="subtitle">Access your vendor risk management dashboard</p>
 
-        <!-- Removed action="#" and method="POST" to let JS handle submission -->
         <form id="loginForm">
 
             <div class="form-group">
@@ -32,6 +31,7 @@
                         <option value="admin">Admin</option>
                         <option value="procurement_manager">Procurement Manager</option>
                         <option value="finance_officer">Finance Officer</option>
+                        <option value="supply_chain_manager">Supply Chain Manager</option>
                         <option value="vendor">Vendor</option>
                     </select>
                 </div>
@@ -90,10 +90,10 @@
                 sessionStorage.setItem("user_id", userObj.id);
                 sessionStorage.setItem("user_role", userObj.role);
                 
-                // 2. Capture and store the vendor's name from any available field (fullname, username, or email prefix)
-                const vendorName = userObj.fullname || userObj.username || email.split('@')[0];
-                sessionStorage.setItem("vendor_name", vendorName);
-                localStorage.setItem("vendor_name", vendorName);
+                // 2. Capture and store the vendor/user's name
+                const userName = userObj.fullname || userObj.username || email.split('@')[0];
+                sessionStorage.setItem("vendor_name", userName);
+                localStorage.setItem("vendor_name", userName);
 
                 alert("Login Successful!");
 
@@ -106,6 +106,8 @@
                     window.location.href = "../dashboard/manager_dash.html";
                 } else if (userRole === 'finance_officer' || userRole === 'finance officer') {
                     window.location.href = "../dashboard/finance_dash.html";
+                } else if (userRole === 'supply_chain_manager' || userRole === 'supply chain manager') {
+                    window.location.href = "../dashboard/supply_dash.html";
                 } else if (userRole === 'vendor') {
                     window.location.href = "../dashboard/vendor_dash.html";
                 } else {
