@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Reliability Supply Chain Portal</title>
+  <link rel="stylesheet" href="supply_style.css">
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="supply_script.js" defer></script>
+</head>
+<body>
+
+  <div class="app-shell">
+    <!-- Top Header Bar -->
+    <header class="top-header">
+      <div class="header-brand">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Vendor Reliability Supply Chain Portal</span>
+      </div>
+      <div class="header-user" style="display: flex; align-items: center; gap: 15px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-user-circle"></i>
+          <span>Supply Chain Manager</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="nav-section-title">SUPPLY CHAIN NAVIGATION</div>
+        <ul class="nav-list">
+          <li>
+            <a class="nav-item active" onclick="switchTab('dashboard', this)">
+              <i class="fa-solid fa-house"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-item" onclick="switchTab('notifications', this)">
+              <i class="fa-solid fa-bell"></i>
+              <span>Notifications</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-item" onclick="switchTab('purchase-orders', this)">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span>Purchase Orders</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-item" onclick="switchTab('quality-inspection', this)">
+              <i class="fa-solid fa-clipboard-check"></i>
+              <span>Quality Inspection</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-item" onclick="switchTab('analytics', this)">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Analytics</span>
+            </a>
+          </li>
+        </ul>
+        <div class="sidebar-footer">
+          <a class="nav-item logout-item" onclick="alert('Logged out successfully')">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        
+        <!-- TAB: DASHBOARD -->
+        <div id="dashboard" class="tab-content active">
+          <div class="page-header">
+            <h1 class="page-title">Supply Chain Manager Dashboard</h1>
+            <p class="page-subtitle">Monitor organizational spending, track purchase requisitions, and evaluate supplier reliability scoring.</p>
+          </div>
+
+          <!-- Metric Summary Cards -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-top">
+                <span class="metric-label">Active Purchase Orders</span>
+                <i class="fa-solid fa-cart-flatbed metric-icon text-blue"></i>
+              </div>
+              <div class="metric-value" id="dash-active-pos">17</div>
+              <div class="metric-footer text-blue-sub">
+                <i class="fa-solid fa-circle-info"></i> Based on contract status
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-top">
+                <span class="metric-label">Pending QC</span>
+                <i class="fa-solid fa-clock metric-icon text-orange"></i>
+              </div>
+              <div class="metric-value" id="dash-pending-qc">0</div>
+              <div class="metric-footer text-orange-sub">Action required</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-top">
+                <span class="metric-label">Passed QC</span>
+                <i class="fa-solid fa-circle-check metric-icon text-green"></i>
+              </div>
+              <div class="metric-value" id="dash-passed-qc">0</div>
+              <div class="metric-footer text-green-sub">
+                <i class="fa-solid fa-arrow-up"></i> Verified inspections
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-top">
+                <span class="metric-label">Failed QC</span>
+                <i class="fa-solid fa-circle-xmark metric-icon text-red"></i>
+              </div>
+              <div class="metric-value" id="dash-failed-qc">0</div>
+              <div class="metric-footer text-red-sub">
+                <i class="fa-solid fa-arrow-down"></i> Failed inspections
+              </div>
+            </div>
+          </div>
+
+          <!-- Returned Items Section -->
+          <div class="content-card">
+            <h2 class="card-title mb-4">Returned Items</h2>
+            <div style="overflow-x: auto;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>INVOICE ID</th>
+                    <th>VENDOR NAME</th>
+                    <th>PRODUCT NAME</th>
+                    <th>QUANTITY</th>
+                    <th>DEPARTMENT</th>
+                    <th>EXPIRY DATE</th>
+                    <th>RISK LEVEL</th>
+                  </tr>
+                </thead>
+                <tbody id="returned-items-tbody">
+                  <tr>
+                    <td colspan="7" style="text-align: center; color: #718096; padding: 2.5rem;">No returned orders found.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: NOTIFICATIONS -->
+        <div id="notifications" class="tab-content">
+          <div class="page-header">
+            <h1 class="page-title">Notifications</h1>
+            <p class="page-subtitle">Alerts regarding newly created purchase orders and deliveries.</p>
+          </div>
+          <div class="content-card" id="notifications-container">
+            <p style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading notifications...</p>
+          </div>
+        </div>
+
+        <!-- TAB: PURCHASE ORDERS -->
+        <div id="purchase-orders" class="tab-content">
+          <div class="page-header">
+            <h1 class="page-title">Purchase Orders</h1>
+            <p class="page-subtitle">Track and create purchase orders issued to vendors.</p>
+          </div>
+
+          <div class="content-card">
+            <div class="card-header">
+              <h2 class="card-title">All Purchase Orders</h2>
+              <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" onclick="exportPurchaseOrdersExcel()"><i class="fa-solid fa-file-excel"></i> Extract</button>
+              </div>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="data-table" id="poTable">
+                <thead>
+                  <tr>
+                    <th>INVOICE NO</th>
+                    <th>VENDOR</th>
+                    <th>PRODUCT NAME</th>
+                    <th>QUANTITY</th>
+                    <th>DEPARTMENT</th>
+                    <th>CREATION DATE</th>
+                    <th>EXPIRY DATE</th>
+                    <th>TOTAL VALUE</th>
+                  </tr>
+                </thead>
+                <tbody id="po-tbody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; color: #718096; padding: 2rem;">Loading purchase orders...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: QUALITY INSPECTION -->
+        <div id="quality-inspection" class="tab-content">
+          <div class="page-header">
+            <h1 class="page-title">Quality Inspection & Order Verification</h1>
+            <p class="page-subtitle">Inspect delivered vendor orders and update quality status.</p>
+          </div>
+
+          <div class="content-card">
+            <div class="card-header">
+              <h2 class="card-title">Inspection Queue</h2>
+              <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" onclick="exportInspectionOrdersExcel()"><i class="fa-solid fa-file-excel"></i> Extract</button>
+              </div>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="data-table" id="inspectionTable">
+                <thead>
+                  <tr>
+                    <th>Invoice / PO ID</th>
+                    <th>Vendor Name</th>
+                    <th>Product Name</th>
+                    <th>Order Status</th>
+                    <th>Inspection Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="inspection-tbody">
+                  <tr>
+                    <td colspan="6" style="text-align: center; color: #718096; padding: 2rem;">Loading orders for inspection...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: ANALYTICS -->
+        <div id="analytics" class="tab-content">
+          <div class="page-header">
+            <h1 class="page-title">Analytics & Spending</h1>
+            <p class="page-subtitle">Review vendor-specific order distribution via interactive pie charts.</p>
+          </div>
+          <div id="company-charts-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+            <!-- Dynamic Company Pie Charts injected here -->
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+</body>
+</html>
