@@ -26,6 +26,7 @@ import SupplyChainDashboard from './pages/SupplyChainDashboard'
 import ProcurementRequests from './pages/ProcurementRequests'
 import Contracts from './pages/Contracts'
 import AuditLogs from './pages/AuditLogs'
+import Invoices from './pages/Invoices'
 
 export default function App() {
   return (
@@ -45,6 +46,7 @@ export default function App() {
               <Route path="/my-vendor-profile" element={<VendorProfile />} />
               <Route path="/procurement" element={<ProcurementDashboard />} />
               <Route path="/purchase-orders" element={<PurchaseOrders />} />
+              <Route path="/invoices" element={<Invoices />} />
               <Route path="/vendor-performance" element={<VendorPerformance />} />
               <Route path="/analytics" element={<AnalyticsDashboard />} />
               <Route path="/reports" element={<ReportsDashboard />} />

@@ -32,6 +32,7 @@ from app.schemas.purchase_order import (
 from app.services.audit import format_status_change_description, record_audit_log
 from app.services.email import notify_po_issued
 from app.services.in_app_notifications import create_notification
+from app.services.invoices import INVOICE_TRIGGER_STATUSES, ensure_invoice_for_po
 from app.services.po_documents import ensure_po_upload_dir, save_po_document
 
 router = APIRouter(prefix="/purchase-orders", tags=["purchase-orders"])
@@ -321,6 +322,9 @@ def update_purchase_order_status(
     po.status = PurchaseOrderStatus(payload.status)
     if payload.notes is not None:
         po.notes = payload.notes
+
+    if payload.status in INVOICE_TRIGGER_STATUSES:
+        ensure_invoice_for_po(db, po)
 
     record_audit_log(
         db,

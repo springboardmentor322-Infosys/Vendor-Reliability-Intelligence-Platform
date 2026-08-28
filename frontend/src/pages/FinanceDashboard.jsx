@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchFinanceDashboard } from '../api/dashboard'
+import { fetchInvoiceSummary } from '../api/invoices'
 import { EmptyState, MetricCards, formatMoney, statusPillClass } from '../components/DashboardWidgets'
 import { getErrorMessage } from '../utils/auth'
 import '../dashboard-admin.css'
@@ -8,6 +9,7 @@ import '../dashboard-admin.css'
 export default function FinanceDashboard() {
   const navigate = useNavigate()
   const [data, setData] = useState(null)
+  const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -15,7 +17,12 @@ export default function FinanceDashboard() {
     setLoading(true)
     setError('')
     try {
-      setData(await fetchFinanceDashboard())
+      const [dashboard, invoiceSummary] = await Promise.all([
+        fetchFinanceDashboard(),
+        fetchInvoiceSummary(),
+      ])
+      setData(dashboard)
+      setSummary(invoiceSummary)
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to load finance dashboard'))
     } finally {
@@ -40,7 +47,7 @@ export default function FinanceDashboard() {
           <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={load} disabled={loading}>
             {loading ? 'Refreshing…' : 'Refresh'}
           </button>
-          <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary" onClick={() => navigate('/purchase-orders')}>
+          <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary" onClick={() => navigate('/invoices')}>
             Review Payments
           </button>
         </div>
@@ -48,7 +55,31 @@ export default function FinanceDashboard() {
 
       {error ? <div className="page-alert page-alert--error">{error}</div> : null}
 
-      <MetricCards cards={data?.cards || []} columns="cards-4" />
+      <MetricCards
+        cards={[
+          {
+            label: 'Total Invoiced',
+            value: formatMoney(summary?.total_invoiced ?? 0),
+            hint: `${summary?.invoice_count ?? 0} invoices`,
+          },
+          {
+            label: 'Pending',
+            value: formatMoney(summary?.pending_amount ?? 0),
+            hint: `${summary?.pending_count ?? 0} awaiting payment`,
+          },
+          {
+            label: 'Overdue',
+            value: formatMoney(summary?.overdue_amount ?? 0),
+            hint: `${summary?.overdue_count ?? 0} past due`,
+          },
+          {
+            label: 'Paid',
+            value: formatMoney(summary?.paid_amount ?? 0),
+            hint: `${summary?.paid_count ?? 0} settled`,
+          },
+        ]}
+        columns="cards-4"
+      />
 
       <section className="chart-card" style={{ marginTop: '1rem' }}>
         <div className="chart-card__header">
