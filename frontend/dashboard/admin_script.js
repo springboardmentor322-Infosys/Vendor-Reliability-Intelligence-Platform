@@ -5,6 +5,7 @@ let currentActiveView = 'home';
 function formatRoleName(role) {
   if (role === 'procurement_manager') return 'Procurement Manager';
   if (role === 'auditor' || role === 'finance_officer') return 'Finance Officer';
+  if (role === 'supply_chain_manager') return 'Supply Chain Manager';
   if (role === 'vendor') return 'Vendor';
   return role;
 }
@@ -37,7 +38,16 @@ function navigateTo(pageView, roleFilter = 'All', element = null) {
     renderNotificationsView(true);
   } else if (pageView === 'users') {
     document.getElementById('view-users').classList.add('active-view');
-    currentSelectedRole = roleFilter;
+    
+    // Map human-readable filter names to database role keys if needed by the backend
+    const reverseRoleMap = {
+      'Procurement Manager': 'procurement_manager',
+      'Finance Officer': 'finance_officer',
+      'Supply Chain Manager': 'supply_chain_manager',
+      'Vendor': 'vendor'
+    };
+    
+    currentSelectedRole = reverseRoleMap[roleFilter] || roleFilter;
     
     const pageHeading = document.getElementById('role-heading');
     pageHeading.innerText = roleFilter === 'All' ? 'All Registered Users' : `${roleFilter} List`;
@@ -56,6 +66,7 @@ async function loadDashboardData(isInitial = false) {
     updateTextIfChanged('stat-pending-approvals', metrics.pending_approvals);
     updateTextIfChanged('count-pm', metrics.pm_count);
     updateTextIfChanged('count-fo', metrics.fo_count);
+    updateTextIfChanged('count-scm', metrics.scm_count !== undefined ? metrics.scm_count : (metrics.supply_chain_manager_count !== undefined ? metrics.supply_chain_manager_count : 0));
     updateTextIfChanged('count-vendor', metrics.vendor_count);
 
     renderActivityLogs(isInitial);
@@ -137,6 +148,8 @@ function loginAsUser(userId, role) {
     window.location.href = './manager_dash.html';
   } else if (role === 'finance_officer' || role === 'auditor') {
     window.location.href = './finance_dash.html';
+  } else if (role === 'supply_chain_manager') {
+    window.location.href = './supply_chain_dash.html';
   } else if (role === 'vendor') {
     window.location.href = './vendor_dash.html';
   } else {
@@ -244,15 +257,6 @@ async function renderNotificationsView(isInitial = false) {
   }
 }
 
-async function markAllNotificationsRead() {
-  try {
-    await fetch(`${API_BASE}/admin/system-logs/read`, { method: 'PUT' });
-    renderNotificationsView(false);
-  } catch (err) {
-    console.error("Failed to mark notifications read:", err);
-  }
-}
-
 async function approveUserFromActivity(userId) {
   try {
     const res = await fetch(`${API_BASE}/admin/users/${userId}/approve`, { method: 'PUT' });
@@ -321,6 +325,7 @@ async function handleAddUserSubmit(event) {
   const roleMap = {
     'Procurement Manager': 'procurement_manager',
     'Finance Officer': 'finance_officer',
+    'Supply Chain Manager': 'supply_chain_manager',
     'Vendor': 'vendor'
   };
   
