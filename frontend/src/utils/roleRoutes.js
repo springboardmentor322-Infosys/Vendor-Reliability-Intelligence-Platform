@@ -256,47 +256,6 @@ export const COMMON_SIDEBAR_ITEMS = [
   { to: '/help-support', label: 'Help & Support' },
 ]
 
-export const DASHBOARD_SUMMARY_CARDS = {
-  Administrator: [
-    { label: 'Total Users', value: '184' },
-    { label: 'Total Vendors', value: '96' },
-    { label: 'Total Spend', value: '$4.8M' },
-    { label: 'Active Contracts', value: '73' },
-    { label: 'Compliance Score', value: '92%' },
-    { label: 'Total Purchase Orders', value: '1,248' },
-  ],
-  'Procurement Manager': [
-    { label: 'My Active POs', value: '46' },
-    { label: 'Pending Approvals', value: '12' },
-    { label: 'Vendors Assigned', value: '18' },
-    { label: 'Avg Order Completion', value: '7.4 days' },
-  ],
-  'Supply Chain Manager': [
-    { label: 'On-Time Delivery', value: '92%' },
-    { label: 'Inventory Coverage', value: '78%' },
-    { label: 'Lead Time', value: '12 days' },
-    { label: 'Shipment Variance', value: '-2%' },
-  ],
-  Vendor: [
-    { label: 'My Reliability Score', value: '4.7 / 5' },
-    { label: 'My Purchase Orders', value: '28' },
-    { label: 'On-Time Delivery %', value: '96%' },
-    { label: 'Pending Invoices', value: '6' },
-  ],
-  'Finance Officer': [
-    { label: 'Total Invoiced', value: '$1.24M' },
-    { label: 'Pending Payments', value: '$84K' },
-    { label: 'Overdue Payments', value: '4' },
-    { label: 'Spend This Month', value: '$482K' },
-  ],
-  Auditor: [
-    { label: 'Compliance Score', value: '88%' },
-    { label: 'Contracts Expiring', value: '9' },
-    { label: 'Flagged Vendors', value: '14' },
-    { label: 'Recent Audit Events', value: '7' },
-  ],
-}
-
 const ROLE_DASHBOARD_LABEL = {
   Administrator: 'Admin Dashboard',
   Vendor: 'Vendor Dashboard',

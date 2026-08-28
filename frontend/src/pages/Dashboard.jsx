@@ -1,233 +1,230 @@
-import { useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { fetchAdminDashboard } from '../api/dashboard'
+import { EmptyState, MetricCards, formatMoney, statusPillClass } from '../components/DashboardWidgets'
 import { useAuth } from '../context/AuthContext'
+import { getErrorMessage } from '../utils/auth'
 import '../dashboard-admin.css'
-
-const summaryCards = [
-  { label: 'Total Users', value: '184', hint: '+12% vs last month' },
-  { label: 'Total Vendors', value: '96', hint: '18 new this quarter' },
-  { label: 'Total Purchase Orders', value: '1,248', hint: '94 pending approvals' },
-  { label: 'Total Spend', value: '$4.8M', hint: 'Tracked across 34 categories' },
-  { label: 'Active Contracts', value: '73', hint: '6 expiring in 30 days' },
-  { label: 'Compliance Score', value: '92%', hint: 'Above target threshold' },
-]
-
-const topVendors = [
-  { name: 'Northstar Supply', score: '4.9', status: 'Excellent' },
-  { name: 'BluePeak Logistics', score: '4.7', status: 'Excellent' },
-  { name: 'Apex Industrial', score: '4.4', status: 'Strong' },
-  { name: 'Harbor Tech', score: '4.1', status: 'Stable' },
-  { name: 'Summit Parts', score: '3.9', status: 'Watch' },
-]
-
-const recentOrders = [
-  { po: 'PO-1042', vendor: 'Northstar Supply', amount: '$42,300', status: 'Approved' },
-  { po: 'PO-1043', vendor: 'BluePeak Logistics', amount: '$18,900', status: 'In Review' },
-  { po: 'PO-1044', vendor: 'Apex Industrial', amount: '$63,400', status: 'Pending' },
-  { po: 'PO-1045', vendor: 'Harbor Tech', amount: '$11,220', status: 'Approved' },
-]
-
-const activityFeed = [
-  { title: 'Contract renewed', detail: 'Apex Industrial • 2 hours ago' },
-  { title: 'Vendor onboarding', detail: 'Summit Parts • 5 hours ago' },
-  { title: 'Compliance review', detail: 'Finance team • Yesterday' },
-]
-
-const healthItems = [
-  { item: 'Database Cluster', status: 'Healthy' },
-  { item: 'API Gateway', status: 'Warning' },
-  { item: 'Document Storage', status: 'Healthy' },
-]
-
-const kpis = [
-  { label: 'On-Time Delivery', value: '87%' },
-  { label: 'Avg. Response Time', value: '1.8h' },
-  { label: 'Open Risks', value: '14' },
-  { label: 'Resolved Issues', value: '28' },
-  { label: 'Audit Findings', value: '3' },
-  { label: 'Renewal Coverage', value: '81%' },
-]
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      setData(await fetchAdminDashboard())
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to load dashboard'))
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  const sidebarItems = useMemo(
-    () => [
-      ['Dashboard', true],
-      ['User Management', false],
-      ['Vendor Management', false],
-      ['Procurement Overview', false],
-      ['Contracts & Compliance', false],
-      ['Invoices & Payments', false],
-      ['Communication', false],
-      ['Performance Analytics', false],
-      ['Reports & Exports', false],
-      ['Notifications', false],
-    ],
-    [],
-  )
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const donut = useMemo(() => {
+    const dist = data?.risk_distribution || {}
+    const total = dist.total || 0
+    if (!total) return { low: 0, medium: 0, high: 0, label: '—' }
+    const low = (dist.Low / total) * 100
+    const medium = (dist.Medium / total) * 100
+    return { low, medium, high: 100 - low - medium, label: `${Math.round(low)}%` }
+  }, [data])
+
+  const maxSpend = Math.max(...(data?.spend_points || []).map((point) => point.total_spend), 1)
 
   return (
-      <section className="dashboard-admin-main page-enter">
-        <header className="dashboard-admin-header">
-          <div>
-            <h1>Administration Dashboard</h1>
-            <p>Welcome back, {user?.name || 'Administrator'}.</p>
-          </div>
-          <div className="dashboard-admin-header__actions">
-            <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost">
-              Export Report
-            </button>
-            <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary" onClick={handleLogout}>
-              Sign Out
-            </button>
-          </div>
-        </header>
-
-        <div className="dashboard-admin-grid dashboard-admin-grid--cards">
-          {summaryCards.map((card) => (
-            <article key={card.label} className="dashboard-card">
-              <div className="dashboard-card__label">{card.label}</div>
-              <div className="dashboard-card__value">{card.value}</div>
-              <div className="dashboard-card__hint">{card.hint}</div>
-            </article>
-          ))}
+    <section className="dashboard-admin-main page-enter">
+      <header className="dashboard-admin-header">
+        <div>
+          <h1>Administration Dashboard</h1>
+          <p>Welcome back, {user?.name || 'Administrator'}.</p>
         </div>
+        <div className="dashboard-admin-header__actions">
+          <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={() => navigate('/reports')}>
+            Export Report
+          </button>
+          <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={load} disabled={loading}>
+            {loading ? 'Refreshing…' : 'Refresh'}
+          </button>
+          <button
+            type="button"
+            className="dashboard-admin-btn dashboard-admin-btn--primary"
+            onClick={() => {
+              logout()
+              navigate('/login')
+            }}
+          >
+            Sign Out
+          </button>
+        </div>
+      </header>
 
-        <div className="dashboard-row" style={{ marginTop: '1rem' }}>
-          <section className="chart-card">
-            <div className="chart-card__header">
-              <h3>Vendor Reliability Distribution</h3>
-              <span className="chart-card__meta">Current quarter</span>
+      {error ? <div className="page-alert page-alert--error">{error}</div> : null}
+
+      <MetricCards cards={data?.cards || []} />
+
+      <div className="dashboard-row" style={{ marginTop: '1rem' }}>
+        <section className="chart-card">
+          <div className="chart-card__header">
+            <h3>Vendor Reliability Distribution</h3>
+            <span className="chart-card__meta">Live risk levels</span>
+          </div>
+          <div className="donut-visual">
+            <div
+              className="donut-ring"
+              style={{
+                background: `conic-gradient(#22c55e 0 ${donut.low}%, #f59e0b ${donut.low}% ${donut.low + donut.medium}%, #ef4444 ${donut.low + donut.medium}% 100%)`,
+              }}
+            >
+              <span>{donut.label}</span>
             </div>
-            <div className="donut-visual">
-              <div className="donut-ring">
-                <span>58%</span>
+            <div className="legend-list">
+              <div className="legend-item">
+                <span className="legend-dot" style={{ background: '#22c55e' }} /> Low ({data?.risk_distribution?.Low ?? 0})
               </div>
-              <div className="legend-list">
-                <div className="legend-item">
-                  <span className="legend-dot" style={{ background: '#3b82f6' }} /> Excellent
-                </div>
-                <div className="legend-item">
-                  <span className="legend-dot" style={{ background: '#8b5cf6' }} /> Strong
-                </div>
-                <div className="legend-item">
-                  <span className="legend-dot" style={{ background: '#e2e8f0' }} /> Watch
-                </div>
+              <div className="legend-item">
+                <span className="legend-dot" style={{ background: '#f59e0b' }} /> Medium ({data?.risk_distribution?.Medium ?? 0})
+              </div>
+              <div className="legend-item">
+                <span className="legend-dot" style={{ background: '#ef4444' }} /> High ({data?.risk_distribution?.High ?? 0})
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <section className="chart-card">
-            <div className="chart-card__header">
-              <h3>Procurement Overview</h3>
-              <span className="chart-card__meta">6-month trend</span>
-            </div>
-            <div className="line-chart" />
-          </section>
+        <section className="chart-card">
+          <div className="chart-card__header">
+            <h3>Procurement Overview</h3>
+            <span className="chart-card__meta">Last 6 months of spend</span>
+          </div>
+          <div className="spark-bars">
+            {(data?.spend_points || []).length === 0 ? (
+              <EmptyState message="No purchase order spend yet." />
+            ) : (
+              data.spend_points.map((point) => (
+                <div key={point.period} className="spark-bar">
+                  <div className="spark-bar__fill" style={{ height: `${Math.max((point.total_spend / maxSpend) * 100, 6)}%` }} />
+                  <span>{point.period.slice(5)}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
 
-          <section className="table-card">
-            <div className="table-card__header">
-              <h3>Top 5 Vendors</h3>
-              <span className="table-card__meta">Reliability score</span>
-            </div>
+        <section className="table-card">
+          <div className="table-card__header">
+            <h3>Top 5 Vendors</h3>
+            <span className="table-card__meta">Reliability score</span>
+          </div>
+          {(data?.top_vendors || []).length === 0 ? (
+            <EmptyState />
+          ) : (
             <table>
               <thead>
                 <tr>
                   <th>Vendor</th>
                   <th>Score</th>
-                  <th>Status</th>
+                  <th>Risk</th>
                 </tr>
               </thead>
               <tbody>
-                {topVendors.map((vendor) => (
-                  <tr key={vendor.name}>
-                    <td>{vendor.name}</td>
-                    <td>{vendor.score}</td>
+                {data.top_vendors.map((vendor) => (
+                  <tr key={vendor.vendor_id}>
+                    <td>{vendor.vendor_name}</td>
+                    <td>{Number(vendor.overall_score).toFixed(1)}</td>
                     <td>
-                      <span className={`status-pill ${vendor.status === 'Excellent' ? 'status-pill--good' : vendor.status === 'Watch' ? 'status-pill--warn' : 'status-pill--good'}`}>
-                        {vendor.status}
-                      </span>
+                      <span className={`status-pill ${statusPillClass(vendor.risk_level)}`}>{vendor.risk_level}</span>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </section>
-        </div>
+          )}
+        </section>
+      </div>
 
-        <div className="dashboard-row dashboard-row--bottom" style={{ marginTop: '1rem' }}>
-          <section className="list-card">
-            <div className="list-card__header">
-              <h3>User Management</h3>
-              <span className="list-card__meta">Active roles</span>
-            </div>
-            <div className="activity-list">
-              <div className="activity-item">
-                <span>Procurement Managers</span>
-                <strong>24</strong>
-              </div>
-              <div className="activity-item">
-                <span>Finance Officers</span>
-                <strong>12</strong>
-              </div>
-              <div className="activity-item">
-                <span>Auditors</span>
-                <strong>8</strong>
-              </div>
-            </div>
-          </section>
-
-          <section className="list-card">
-            <div className="list-card__header">
-              <h3>Contract Alerts</h3>
-              <span className="list-card__meta">Needs attention</span>
-            </div>
-            <div className="activity-list">
-              <div className="activity-item">
-                <span>Renewal due in 7 days</span>
-                <span className="status-pill status-pill--warn">High</span>
-              </div>
-              <div className="activity-item">
-                <span>Missing SLA clause</span>
-                <span className="status-pill status-pill--danger">Urgent</span>
-              </div>
-            </div>
-          </section>
-
-          <section className="list-card">
-            <div className="list-card__header">
-              <h3>Compliance Overview</h3>
-              <span className="list-card__meta">Status by domain</span>
-            </div>
-            <div className="donut-visual">
-              <div className="donut-ring" style={{ background: 'conic-gradient(#10b981 0 72%, #e2e8f0 72% 100%)' }}>
-                <span>72%</span>
-              </div>
-              <div className="legend-list">
-                <div className="legend-item">
-                  <span className="legend-dot" style={{ background: '#10b981' }} /> Compliant
+      <div className="dashboard-row dashboard-row--bottom" style={{ marginTop: '1rem' }}>
+        <section className="list-card">
+          <div className="list-card__header">
+            <h3>User Management</h3>
+            <span className="list-card__meta">Active roles</span>
+          </div>
+          <div className="activity-list">
+            {(data?.role_counts || []).length === 0 ? (
+              <EmptyState />
+            ) : (
+              data.role_counts.map((role) => (
+                <div key={role.name} className="activity-item">
+                  <span>{role.name}</span>
+                  <strong>{role.count}</strong>
                 </div>
-                <div className="legend-item">
-                  <span className="legend-dot" style={{ background: '#f59e0b' }} /> Review
+              ))
+            )}
+          </div>
+        </section>
+
+        <section className="list-card">
+          <div className="list-card__header">
+            <h3>Contract Alerts</h3>
+            <span className="list-card__meta">Expiring in 30 days</span>
+          </div>
+          <div className="activity-list">
+            {(data?.contract_alerts || []).length === 0 ? (
+              <EmptyState message="No contracts expiring soon." />
+            ) : (
+              data.contract_alerts.map((alert) => (
+                <div key={alert.title} className="activity-item">
+                  <span>{alert.title}</span>
+                  <span className={`status-pill ${statusPillClass(alert.severity)}`}>{alert.severity}</span>
                 </div>
+              ))
+            )}
+          </div>
+        </section>
+
+        <section className="list-card">
+          <div className="list-card__header">
+            <h3>Compliance Overview</h3>
+            <span className="list-card__meta">Contract flags</span>
+          </div>
+          <div className="donut-visual">
+            <div
+              className="donut-ring"
+              style={{
+                background: `conic-gradient(#10b981 0 ${data?.compliance_pct ?? 0}%, #e2e8f0 ${data?.compliance_pct ?? 0}% 100%)`,
+              }}
+            >
+              <span>{data?.compliance_pct != null ? `${Number(data.compliance_pct).toFixed(0)}%` : '—'}</span>
+            </div>
+            <div className="legend-list">
+              <div className="legend-item">
+                <span className="legend-dot" style={{ background: '#10b981' }} /> Compliant
+              </div>
+              <div className="legend-item">
+                <span className="legend-dot" style={{ background: '#e2e8f0' }} /> Other
               </div>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
+      </div>
 
-        <div className="dashboard-row" style={{ marginTop: '1rem' }}>
-          <section className="table-card">
-            <div className="table-card__header">
-              <h3>Recent Purchase Orders</h3>
-              <span className="table-card__meta">Latest activity</span>
-            </div>
+      <div className="dashboard-row" style={{ marginTop: '1rem' }}>
+        <section className="table-card">
+          <div className="table-card__header">
+            <h3>Recent Purchase Orders</h3>
+            <span className="table-card__meta">Latest activity</span>
+          </div>
+          {(data?.recent_orders || []).length === 0 ? (
+            <EmptyState />
+          ) : (
             <table>
               <thead>
                 <tr>
@@ -238,65 +235,66 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {recentOrders.map((order) => (
-                  <tr key={order.po}>
-                    <td>{order.po}</td>
-                    <td>{order.vendor}</td>
-                    <td>{order.amount}</td>
+                {data.recent_orders.map((order) => (
+                  <tr key={order.po_number}>
+                    <td>{order.po_number}</td>
+                    <td>{order.vendor_name}</td>
+                    <td>{formatMoney(order.amount)}</td>
                     <td>
-                      <span className={`status-pill ${order.status === 'Approved' ? 'status-pill--good' : order.status === 'Pending' ? 'status-pill--warn' : 'status-pill--warn'}`}>
-                        {order.status}
-                      </span>
+                      <span className={`status-pill ${statusPillClass(order.status)}`}>{order.status}</span>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </section>
+          )}
+        </section>
 
-          <section className="list-card">
-            <div className="list-card__header">
-              <h3>System Activity</h3>
-              <span className="list-card__meta">Live feed</span>
-            </div>
-            <div className="activity-list">
-              {activityFeed.map((entry) => (
-                <div key={entry.title} className="activity-item">
+        <section className="list-card">
+          <div className="list-card__header">
+            <h3>System Activity</h3>
+            <span className="list-card__meta">Audit feed</span>
+          </div>
+          <div className="activity-list">
+            {(data?.activity || []).length === 0 ? (
+              <EmptyState message="No audit events yet." />
+            ) : (
+              data.activity.map((entry) => (
+                <div key={`${entry.title}-${entry.detail}`} className="activity-item">
                   <div>
                     <strong>{entry.title}</strong>
                     <div style={{ color: '#64748b', fontSize: '0.85rem' }}>{entry.detail}</div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
+              ))
+            )}
+          </div>
+        </section>
 
-          <section className="list-card">
-            <div className="list-card__header">
-              <h3>System Health</h3>
-              <span className="list-card__meta">Service status</span>
-            </div>
-            <div className="health-list">
-              {healthItems.map((item) => (
-                <div key={item.item} className="health-item">
-                  <span>{item.item}</span>
-                  <span className={`status-pill ${item.status === 'Healthy' ? 'status-pill--good' : 'status-pill--warn'}`}>
-                    {item.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
-        </div>
+        <section className="list-card">
+          <div className="list-card__header">
+            <h3>System Health</h3>
+            <span className="list-card__meta">Service status</span>
+          </div>
+          <div className="health-list">
+            {(data?.health || []).map((item) => (
+              <div key={item.label} className="health-item">
+                <span>{item.label}</span>
+                <span className={`status-pill ${statusPillClass(item.status)}`}>{item.status}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
 
-        <div className="kpi-grid">
-          {kpis.map((kpi) => (
-            <div key={kpi.label} className="kpi-widget">
-              <strong>{kpi.value}</strong>
-              <span>{kpi.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      <div className="kpi-grid">
+        {(data?.kpis || []).map((kpi) => (
+          <div key={kpi.label} className="kpi-widget">
+            <strong>{kpi.value}</strong>
+            <span>{kpi.label}</span>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }

@@ -17,6 +17,7 @@ const apiPrefixes = [
   '/notifications',
   '/support',
   '/uploads',
+  '/dashboard',
   '/analytics',
   '/reports',
   '/products',

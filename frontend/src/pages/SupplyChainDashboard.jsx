@@ -1,85 +1,110 @@
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { fetchSupplyChainDashboard } from '../api/dashboard'
+import { EmptyState, MetricCards, statusPillClass } from '../components/DashboardWidgets'
 import { useAuth } from '../context/AuthContext'
+import { getErrorMessage } from '../utils/auth'
 import '../dashboard-admin.css'
-
-const summaryCards = [
-  { label: 'My Procurement Requests', value: '18', hint: 'Across statuses' },
-  { label: 'Requests Pending Approval', value: '5', hint: 'Need attention' },
-  { label: 'Purchase Orders In Progress', value: '7', hint: 'Active orders' },
-  { label: 'Deliveries Due This Week', value: '4', hint: 'Upcoming' },
-]
-
-const recentRequests = [
-  { id: 'REQ-1001', title: 'Replacement bearings', status: 'Pending Approval' },
-  { id: 'REQ-1002', title: 'Filter stock replenishment', status: 'Approved' },
-  { id: 'REQ-1003', title: 'Packaging materials', status: 'In Progress' },
-]
 
 export default function SupplyChainDashboard() {
   const navigate = useNavigate()
   const { logout } = useAuth()
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      setData(await fetchSupplyChainDashboard())
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to load supply chain dashboard'))
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
 
   return (
-      <section className="dashboard-admin-main page-enter">
-        <header className="dashboard-admin-header">
-          <div>
-            <h1>Supply Chain Dashboard</h1>
-            <p>Overview of procurement requests, PO tracking and upcoming deliveries.</p>
-          </div>
-          <div className="dashboard-admin-header__actions">
-            <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost">Refresh</button>
-            <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary" onClick={() => { logout(); navigate('/login') }}>
-              Sign Out
-            </button>
-          </div>
-        </header>
-
-        <div className="dashboard-admin-grid dashboard-admin-grid--cards">
-          {summaryCards.map((card) => (
-            <article key={card.label} className="dashboard-card">
-              <div className="dashboard-card__label">{card.label}</div>
-              <div className="dashboard-card__value">{card.value}</div>
-              <div className="dashboard-card__hint">{card.hint}</div>
-            </article>
-          ))}
+    <section className="dashboard-admin-main page-enter">
+      <header className="dashboard-admin-header">
+        <div>
+          <h1>Supply Chain Dashboard</h1>
+          <p>Overview of procurement requests, PO tracking and upcoming deliveries.</p>
         </div>
+        <div className="dashboard-admin-header__actions">
+          <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={load} disabled={loading}>
+            {loading ? 'Refreshing…' : 'Refresh'}
+          </button>
+          <button
+            type="button"
+            className="dashboard-admin-btn dashboard-admin-btn--primary"
+            onClick={() => {
+              logout()
+              navigate('/login')
+            }}
+          >
+            Sign Out
+          </button>
+        </div>
+      </header>
 
-        <section className="table-card" style={{ marginTop: '1rem' }}>
-          <div className="table-card__header">
-            <h3>Recent Procurement Requests</h3>
-            <span className="table-card__meta">Your recent activity</span>
-          </div>
+      {error ? <div className="page-alert page-alert--error">{error}</div> : null}
+
+      <MetricCards cards={data?.cards || []} />
+
+      <section className="table-card" style={{ marginTop: '1rem' }}>
+        <div className="table-card__header">
+          <h3>Recent Procurement Requests</h3>
+          <span className="table-card__meta">Created by you</span>
+        </div>
+        {(data?.recent_requests || []).length === 0 ? (
+          <EmptyState message="No procurement requests yet." />
+        ) : (
           <table>
             <thead>
               <tr>
                 <th>Request</th>
-                <th>Title</th>
+                <th>Department</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {recentRequests.map((r) => (
-                <tr key={r.id}>
-                  <td>{r.id}</td>
-                  <td>{r.title}</td>
-                  <td>{r.status}</td>
+              {data.recent_requests.map((request) => (
+                <tr key={request.id}>
+                  <td>REQ-{request.id}</td>
+                  <td>{request.title}</td>
+                  <td>
+                    <span className={`status-pill ${statusPillClass(request.status)}`}>{request.status}</span>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </section>
-
-        <section className="list-card" style={{ marginTop: '1rem' }}>
-          <div className="list-card__header">
-            <h3>Quick Links</h3>
-            <span className="list-card__meta">Actions</span>
-          </div>
-          <div style={{ display: 'flex', gap: '0.6rem' }}>
-            <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary">Create Procurement Request</button>
-            <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost">View Vendor Directory</button>
-            <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost">Track Purchase Orders</button>
-          </div>
-        </section>
+        )}
       </section>
+
+      <section className="list-card" style={{ marginTop: '1rem' }}>
+        <div className="list-card__header">
+          <h3>Quick Links</h3>
+          <span className="list-card__meta">Actions</span>
+        </div>
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary" onClick={() => navigate('/procurement-requests')}>
+            Create Procurement Request
+          </button>
+          <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={() => navigate('/vendor-management')}>
+            View Vendor Directory
+          </button>
+          <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={() => navigate('/purchase-orders')}>
+            Track Purchase Orders
+          </button>
+        </div>
+      </section>
+    </section>
   )
 }
