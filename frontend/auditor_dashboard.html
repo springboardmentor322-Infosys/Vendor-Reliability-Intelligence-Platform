@@ -644,23 +644,11 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs font-sans">
-            <div class="glass-widget p-3.5 rounded-xl border-l-2 border-emerald-400">
-                <p class="text-white dark:text-white light:text-slate-800 font-medium">Vendor reliability increased by <strong class="text-emerald-400 light:text-emerald-600">6%</strong> this month.</p>
-            </div>
-            <div class="glass-widget p-3.5 rounded-xl border-l-2 border-emerald-400">
-                <p class="text-white dark:text-white light:text-slate-800 font-medium">On-time deliveries improved by <strong class="text-emerald-400 light:text-emerald-600">4%</strong> across logistics.</p>
-            </div>
-            <div class="glass-widget p-3.5 rounded-xl border-l-2 border-blue-400">
-                <p class="text-white dark:text-white light:text-slate-800 font-medium">High-risk vendors reduced by <strong class="text-blue-400 light:text-blue-600">12%</strong> quarter-over-quarter.</p>
-            </div>
-            <div class="glass-widget p-3.5 rounded-xl border-l-2 border-indigo-400">
-                <p class="text-white dark:text-white light:text-slate-800 font-medium">Three vendors qualify as <strong class="text-indigo-300 light:text-indigo-600">preferred suppliers</strong>.</p>
-            </div>
-            <div class="glass-widget p-3.5 rounded-xl border-l-2 border-amber-400">
-                <p class="text-white dark:text-white light:text-slate-800 font-medium">Two contracts require renewal within the next <strong class="text-amber-400 light:text-amber-600">30 days</strong>.</p>
-            </div>
-        </div>
-    </section>
+<div id="ai-insights-container" class="contents">
+<p class="text-xs text-slate-400 italic">Generating live AI insights...</p>
+</div>
+</div>
+</section>
 
     <!-- 7. Quick Actions Shortcut Toolbar -->
     <section class="glass-panel p-6 rounded-2xl border border-white/10 light:border-slate-200">
@@ -1066,6 +1054,7 @@
         event.preventDefault();
         const companyName = document.getElementById('add-company-name').value;
         const email = document.getElementById('add-email').value;
+            const category = document.getElementById('add-category') ? document.getElementById('add-category').value : "General";
         const status = document.getElementById('add-status').value;
 
         try {
@@ -1075,6 +1064,7 @@
                 body: JSON.stringify({
                     company_name: companyName,
                     contact_email: email,
+                        category: category,
                     status: status
                 })
             });
@@ -1125,6 +1115,32 @@
     }
 </script>
 
+
+<!-- Quality Alert Modal -->
+<div id="quality-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative">
+        <button onclick="closeQualityModal()" class="absolute top-4 right-4 text-tertiary-fixed-dim hover:text-white transition-colors">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-white"><span class="material-symbols-outlined text-rose-500">warning</span> Report Quality Issue</h2>
+        <form onsubmit="submitQualityAlert(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Select Vendor</label>
+                <select id="qa-vendor-id" required class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-rose-500 transition-colors">
+                    <option value="">Loading vendors...</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Issue Description</label>
+                <textarea id="qa-description" required rows="4" class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-rose-500 transition-colors" placeholder="Describe the product quality issues..."></textarea>
+            </div>
+            <button type="submit" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-rose-500/25 mt-2 flex justify-center items-center gap-2">
+                <span class="material-symbols-outlined">send</span> Notify Procurement & Admin
+            </button>
+        </form>
+    </div>
+</div>
+
 <!-- Add Vendor Modal -->
 <div id="add-vendor-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
     <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative">
@@ -1141,6 +1157,16 @@
                 <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Contact Email</label>
                 <input type="email" id="add-email" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="email@company.com">
             </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Category</label>
+                        <select id="add-category" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                            <option value="IT">IT</option>
+                            <option value="Logistics">Logistics</option>
+                            <option value="Materials">Materials</option>
+                            <option value="Services">Services</option>
+                            <option value="General">General</option>
+                        </select>
+                    </div>
             <div>
                 <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Status</label>
                 <select id="add-status" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
@@ -1297,7 +1323,7 @@
 <script>
     async function loadDashboardData() {
         try {
-            const resVendors = await fetch('http://localhost:8000/api/vendors');
+            const resVendors = await fetch('http://127.0.0.1:8000/api/vendors');
             const vendors = await resVendors.json();
             
             const total = vendors.length;
@@ -1312,7 +1338,7 @@
             document.getElementById('kpi-avg-rating').innerText = avgRating + ' / 5';
             document.getElementById('kpi-ontime-delivery').innerText = avgDelivery + '%';
             
-            const resContracts = await fetch('http://localhost:8000/api/contracts');
+            const resContracts = await fetch('http://127.0.0.1:8000/api/contracts');
             const contracts = await resContracts.json();
             document.getElementById('kpi-active-contracts').innerText = contracts.length;
             
@@ -1336,5 +1362,153 @@
     }
     document.addEventListener('DOMContentLoaded', loadDashboardData);
 </script>
+
+<script>
+let lastNotifId = null;
+
+function showToast(title, message, severity, type) {
+    const toast = document.createElement('div');
+    const borderClass = severity === 'Critical' ? 'border-rose-500' : 'border-blue-500';
+    const iconClass = severity === 'Critical' ? 'text-rose-500' : 'text-blue-500';
+    
+    
+    let onClickAttr = "";
+    let cursorClass = "";
+    if (type && type.startsWith("ChatMessage:")) {
+        const parts = type.split(":");
+        if(parts.length === 3 && typeof openChatModal === "function") {
+            onClickAttr = `onclick="openChatModal('${parts[1]}', ${parts[2]})"`;
+            cursorClass = "cursor-pointer hover:bg-slate-800/90 hover:scale-105";
+        }
+    }
+
+    toast.className = `fixed bottom-4 right-4 max-w-sm w-full bg-slate-900/90 backdrop-blur-md shadow-2xl rounded-xl border-l-4 p-4 z-50 transform transition-all duration-300 translate-y-full opacity-0 ${borderClass} ${cursorClass}`;
+    toast.innerHTML = `
+        <div class="flex justify-between items-start" ${onClickAttr}>
+            <div class="flex gap-3">
+                <span class="material-symbols-outlined ${iconClass}">notifications_active</span>
+                <div>
+                    <h4 class="text-sm font-bold text-white">${title}</h4>
+                    <p class="text-xs text-slate-300 mt-1">${message}</p>
+                </div>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="text-slate-400 hover:text-white"><span class="material-symbols-outlined text-sm">close</span></button>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('translate-y-full', 'opacity-0');
+    }, 100);
+    
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-full');
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
+}
+
+async function fetchUnreadCount() {
+    try {
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        if(!token) return;
+        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        if(res.ok) {
+            const notifs = await res.json();
+            const unread = notifs.filter(n => !n.is_read).length;
+            const badge = document.getElementById('global-notif-badge');
+            if(badge && unread > 0) {
+                badge.textContent = unread;
+                badge.classList.remove('hidden');
+            }
+            
+            if (notifs.length > 0) {
+                const latestId = Math.max(...notifs.map(n => n.id));
+                if (lastNotifId === null) {
+                    lastNotifId = latestId; // Initialize on first fetch
+                } else if (latestId > lastNotifId) {
+                    const newNotifs = notifs.filter(n => n.id > lastNotifId);
+                    newNotifs.forEach(n => showToast(n.title, n.message, n.severity, n.type));
+                    lastNotifId = latestId;
+                }
+            }
+        }
+    } catch(e) {}
+}
+document.addEventListener('DOMContentLoaded', () => {
+    fetchUnreadCount();
+    setInterval(fetchUnreadCount, 10000);
+});
+</script>
+
+<script>
+async function loadAIInsights() {
+    try {
+        const res = await fetch('http://127.0.0.1:8000/api/intelligence/insights');
+        if (res.ok) {
+            const insights = await res.json();
+            const container = document.getElementById('ai-insights-container');
+            if (container) {
+                container.innerHTML = '';
+                insights.forEach(insight => {
+                    container.innerHTML += `
+                        <div class="glass-widget p-3.5 rounded-xl border-l-2 border-${insight.color}-400">
+                            <p class="text-white dark:text-white light:text-slate-800 font-medium">${insight.message}</p>
+                        </div>
+                    `;
+                });
+            }
+        }
+    } catch(e) { console.error(e); }
+}
+document.addEventListener('DOMContentLoaded', loadAIInsights);
+</script>
+
+<script>
+    function openQualityModal() {
+        document.getElementById('quality-modal').classList.remove('hidden');
+        populateQAVendors();
+    }
+    function closeQualityModal() {
+        document.getElementById('quality-modal').classList.add('hidden');
+    }
+    async function populateQAVendors() {
+        const select = document.getElementById('qa-vendor-id');
+        try {
+            const res = await fetch('http://127.0.0.1:8000/api/vendors');
+            if (res.ok) {
+                const vendors = await res.json();
+                select.innerHTML = vendors.map(v => `<option value="${v.id}">${v.company_name}</option>`).join('');
+            }
+        } catch (e) { console.error(e); }
+    }
+    async function submitQualityAlert(e) {
+        e.preventDefault();
+        const vendor_id = document.getElementById('qa-vendor-id').value;
+        const issue_description = document.getElementById('qa-description').value;
+        const token = localStorage.getItem('token');
+        
+        try {
+            const res = await fetch('http://127.0.0.1:8000/api/intelligence/notify_quality', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ vendor_id: parseInt(vendor_id), issue_description })
+            });
+            if (res.ok) {
+                alert("Notification successfully sent to Procurement and Admin teams!");
+                closeQualityModal();
+                document.getElementById('qa-description').value = '';
+            } else {
+                alert("Failed to send notification.");
+            }
+        } catch(err) {
+            console.error(err);
+        }
+    }
+</script>
+
 </body>
+
 </html>

@@ -272,7 +272,7 @@
 </head>
 
 <body
-    class="bg-on-tertiary-fixed text-white font-sans selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen flex flex-col overflow-hidden">
+    class="bg-on-tertiary-fixed text-white font-sans selection:bg-primary-fixed selection:text-on-primary-fixed min-h-screen flex flex-col overflow-y-auto overflow-x-hidden">
     <script>
         if (localStorage.getItem('userRole') !== 'admin') {
             window.location.href = 'login.html';
@@ -321,10 +321,25 @@
             <!-- Header Actions -->
             <div class="flex items-center gap-3">
 
-                <a href="index.html"
+                <a href="vendor_management.html"
                     class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-tertiary-fixed-dim light:text-slate-700 hover:text-white light:hover:text-blue-600 px-3 py-2 transition-colors">
-                    <span class="material-symbols-outlined text-sm">home</span>
-                    Home Portal
+                    <span class="material-symbols-outlined text-sm">storefront</span>
+                    Vendors
+                </a>
+                <a href="procurement_requests.html"
+                    class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-tertiary-fixed-dim light:text-slate-700 hover:text-white light:hover:text-blue-600 px-3 py-2 transition-colors">
+                    <span class="material-symbols-outlined text-sm">shopping_cart</span>
+                    Procurement
+                </a>
+                <a href="supply_chain_dashboard.html"
+                    class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-tertiary-fixed-dim light:text-slate-700 hover:text-white light:hover:text-blue-600 px-3 py-2 transition-colors">
+                    <span class="material-symbols-outlined text-sm">local_shipping</span>
+                    Supply Chain
+                </a>
+                <a href="finance_dashboard.html"
+                    class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-tertiary-fixed-dim light:text-slate-700 hover:text-white light:hover:text-blue-600 px-3 py-2 transition-colors">
+                    <span class="material-symbols-outlined text-sm">account_balance</span>
+                    Finance
                 </a>
 
                 <!-- Admin Profile Indicator -->
@@ -335,6 +350,20 @@
                         AD</div>
                     <span id="header-name"
                         class="text-xs font-bold text-white dark:text-white light:text-slate-900">Admin</span>
+                </div>
+
+                <!-- Internal Chat Dropdown -->
+                <div class="relative group">
+                    <button class="p-2.5 rounded-xl glass-widget text-tertiary-fixed-dim hover:text-white transition-all flex items-center justify-center shadow-sm relative">
+                        <span class="material-symbols-outlined text-[20px] text-blue-400">forum</span>
+                    </button>
+                    <!-- Dropdown Content -->
+                    <div class="absolute right-0 mt-2 w-48 bg-[#0b1c30] border border-white/10 rounded-xl shadow-xl shadow-black/50 overflow-hidden hidden group-hover:block z-50">
+                        <div class="p-2 border-b border-white/10 text-[10px] font-mono-data text-white/50 uppercase tracking-wider">Internal Comms</div>
+                        <button onclick="openChatModal('Department', 1, 'Chat with Procurement')" class="w-full text-left px-4 py-3 hover:bg-white/5 text-sm font-semibold flex items-center gap-2 text-white"><span class="material-symbols-outlined text-indigo-400 text-sm">shopping_cart</span> Procurement Dept</button>
+                        <button onclick="openChatModal('Department', 2, 'Chat with Finance')" class="w-full text-left px-4 py-3 hover:bg-white/5 text-sm font-semibold flex items-center gap-2 text-white"><span class="material-symbols-outlined text-emerald-400 text-sm">account_balance</span> Finance Dept</button>
+                        <button onclick="openChatModal('Department', 3, 'Chat with Supply Chain')" class="w-full text-left px-4 py-3 hover:bg-white/5 text-sm font-semibold flex items-center gap-2 text-white"><span class="material-symbols-outlined text-amber-400 text-sm">local_shipping</span> Supply Chain Dept</button>
+                    </div>
                 </div>
 
                 <!-- Dark / Light Mode Toggle Button -->
@@ -356,7 +385,7 @@
 
         <!-- 1. Welcome Header Banner -->
         <section
-            class="glass-panel p-6 lg:p-8 rounded-2xl border border-white/10 light:border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+            class="glass-panel p-6 lg:p-8 rounded-2xl border border-white/10 light:border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-y-auto overflow-x-hidden">
             <div class="space-y-2">
                 <div id="banner-badge"
                     class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 light:bg-blue-100 border border-blue-500/20 text-blue-400 light:text-blue-700 text-xs font-mono-data font-bold uppercase tracking-wider">
@@ -564,10 +593,10 @@
         </section>
 
         <!-- 5. Recent Activities & Upcoming Tasks Grid -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
             <!-- Recent Activities Feed -->
-            <div class="glass-panel p-6 rounded-2xl border border-white/10 light:border-slate-200">
+            <div class="glass-panel p-6 rounded-2xl border border-white/10 light:border-slate-200 h-[400px] overflow-y-auto">
                 <h3
                     class="font-bold text-base text-white dark:text-white light:text-slate-900 flex items-center gap-2 mb-4">
                     <span class="material-symbols-outlined text-blue-400">history</span>
@@ -623,8 +652,34 @@
                 </ul>
             </div>
 
+            <!-- Recent Procurement Requests -->
+            <div class="glass-panel p-6 rounded-2xl border border-white/10 light:border-slate-200 flex flex-col h-[400px] overflow-y-auto">
+                <h3
+                    class="font-bold text-base text-white dark:text-white light:text-slate-900 flex items-center justify-between mb-4">
+                    <span class="flex items-center gap-2"><span class="material-symbols-outlined text-blue-400">receipt_long</span> Recent PRs</span>
+                    <a href="procurement_requests.html" class="text-xs text-blue-400 hover:text-blue-300 font-medium">View All →</a>
+                </h3>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs font-sans">
+                        <thead class="bg-white/5 light:bg-slate-100 text-tertiary-fixed-dim light:text-slate-500 uppercase font-mono-data text-[10px] border-b border-white/10 light:border-slate-200">
+                            <tr>
+                                <th class="p-3">Req #</th>
+                                <th class="p-3">Dept</th>
+                                <th class="p-3">Amount</th>
+                                <th class="p-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-recent-prs" class="divide-y divide-white/5 light:divide-slate-200 text-tertiary-fixed-dim light:text-slate-600">
+                            <!-- JS populated -->
+                            <tr><td colspan="4" class="p-3 text-center italic text-white/40">Loading PRs...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Upcoming Tasks Checklist -->
-            <div class="glass-panel p-6 rounded-2xl border border-white/10 light:border-slate-200">
+            <div class="glass-panel p-6 rounded-2xl border border-white/10 light:border-slate-200 h-[400px] overflow-y-auto">
                 <h3
                     class="font-bold text-base text-white dark:text-white light:text-slate-900 flex items-center gap-2 mb-4">
                     <span class="material-symbols-outlined text-emerald-400">playlist_add_check</span>
@@ -688,28 +743,11 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs font-sans">
-                <div class="glass-widget p-3.5 rounded-xl border-l-2 border-emerald-400">
-                    <p class="text-white dark:text-white light:text-slate-800 font-medium">Vendor reliability increased
-                        by <strong class="text-emerald-400 light:text-emerald-600">6%</strong> this month.</p>
-                </div>
-                <div class="glass-widget p-3.5 rounded-xl border-l-2 border-emerald-400">
-                    <p class="text-white dark:text-white light:text-slate-800 font-medium">On-time deliveries improved
-                        by <strong class="text-emerald-400 light:text-emerald-600">4%</strong> across logistics.</p>
-                </div>
-                <div class="glass-widget p-3.5 rounded-xl border-l-2 border-blue-400">
-                    <p class="text-white dark:text-white light:text-slate-800 font-medium">High-risk vendors reduced by
-                        <strong class="text-blue-400 light:text-blue-600">12%</strong> quarter-over-quarter.</p>
-                </div>
-                <div class="glass-widget p-3.5 rounded-xl border-l-2 border-indigo-400">
-                    <p class="text-white dark:text-white light:text-slate-800 font-medium">Three vendors qualify as
-                        <strong class="text-indigo-300 light:text-indigo-600">preferred suppliers</strong>.</p>
-                </div>
-                <div class="glass-widget p-3.5 rounded-xl border-l-2 border-amber-400">
-                    <p class="text-white dark:text-white light:text-slate-800 font-medium">Two contracts require renewal
-                        within the next <strong class="text-amber-400 light:text-amber-600">30 days</strong>.</p>
-                </div>
-            </div>
-        </section>
+<div id="ai-insights-container" class="contents">
+<p class="text-xs text-slate-400 italic">Generating live AI insights...</p>
+</div>
+</div>
+</section>
 
         <!-- 7. Quick Actions Shortcut Toolbar -->
         <section class="glass-panel p-6 rounded-2xl border border-white/10 light:border-slate-200">
@@ -937,7 +975,7 @@
                     opacity: 0, duration: 0.5, ease: "power2.inOut",
                     onComplete: () => {
                         entranceOverlay.style.display = 'none';
-                        document.body.classList.remove('overflow-hidden');
+                        document.body.classList.remove('overflow-y-auto overflow-x-hidden');
 
                         // Initialize VanillaTilt on Glass Widgets after overlay is gone
                         if (typeof VanillaTilt !== 'undefined') {
@@ -975,7 +1013,7 @@
             } else {
                 entranceOverlay.style.display = 'none';
                 mainContent.style.opacity = '1';
-                document.body.classList.remove('overflow-hidden');
+                document.body.classList.remove('overflow-y-auto overflow-x-hidden');
             }
         });
 
@@ -1045,6 +1083,29 @@
                     `;
                 });
                 
+                try {
+                    const resPRs = await fetch('http://127.0.0.1:8000/api/procurement_requests');
+                    const prs = await resPRs.json();
+                    const prBody = document.getElementById('admin-recent-prs');
+                    if (prBody) {
+                        prBody.innerHTML = '';
+                        prs.slice(-4).reverse().forEach(pr => {
+                            let prClass = pr.approval_status === 'Approved' ? 'text-emerald-400 bg-emerald-500/20' : (pr.approval_status === 'Rejected' ? 'text-rose-400 bg-rose-500/20' : 'text-amber-400 bg-amber-500/20');
+                            prBody.innerHTML += `
+                                <tr class="hover:bg-white/5 transition-colors">
+                                    <td class="p-3 font-bold text-white">${pr.request_number}</td>
+                                    <td class="p-3 text-xs">${pr.department || 'General'}</td>
+                                    <td class="p-3 font-mono-data text-sm">₹${(pr.total_cost / 100000).toFixed(1)}L</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded ${prClass} text-[10px] font-bold border border-current">${pr.approval_status}</span></td>
+                                </tr>
+                            `;
+                        });
+                        if (prs.length === 0) prBody.innerHTML = '<tr><td colspan="4" class="p-3 text-center italic text-white/40">No PRs found.</td></tr>';
+                    }
+                } catch(e) {
+                    console.error('Failed to load PRs', e);
+                }
+
                 // Fetch and render charts data
                 if (typeof renderCharts === 'function') {
                     try {
@@ -1078,6 +1139,7 @@
             event.preventDefault();
             const companyName = document.getElementById('add-company-name').value;
             const email = document.getElementById('add-email').value;
+            const category = document.getElementById('add-category') ? document.getElementById('add-category').value : "General";
             const status = document.getElementById('add-status').value;
             const riskLevel = document.getElementById('add-risk').value;
             const rating = parseFloat(document.getElementById('add-rating').value) || 0;
@@ -1097,6 +1159,7 @@
                     body: JSON.stringify({
                         company_name: companyName,
                         contact_email: email,
+                        category: category,
                         approval_status: status,
                         risk_level: riskLevel,
                         rating: rating,
@@ -1125,42 +1188,8 @@
 
             try {
                 const response = await fetch('http://127.0.0.1:8000/api/vendors');
-                const vendors = await response.json();
-                const tbody = document.getElementById('all-vendors-tbody');
-                tbody.innerHTML = '';
-
-                vendors.forEach(v => {
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-white/5 light:hover:bg-slate-50 transition-colors border-b border-white/5 light:border-slate-200 text-sm";
-
-                    let actions = '';
-                    if (v.approval_status === 'Pending') {
-                        actions = `
-                        <button onclick="updateVendorStatus(${v.id}, 'Approved')" class="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded hover:bg-emerald-500/40 mr-1 text-xs font-bold">Approve</button>
-                        <button onclick="updateVendorStatus(${v.id}, 'Rejected')" class="px-2 py-1 bg-rose-500/20 text-rose-400 rounded hover:bg-rose-500/40 text-xs font-bold">Reject</button>
-                    `;
-                    } else {
-                        actions = `<span class="text-xs text-slate-500">No actions</span>`;
-                    }
-
-                    tr.innerHTML = `
-                    <td class="p-3 font-bold">${v.company_name}</td>
-                    <td class="p-3">${v.category || 'N/A'}</td>
-                    <td class="p-3">${v.contact_email}</td>
-                    <td class="p-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${v.approval_status === 'Approved' ? 'bg-emerald-500/20 text-emerald-400' :
-                            v.approval_status === 'Rejected' ? 'bg-rose-500/20 text-rose-400' :
-                                'bg-amber-500/20 text-amber-400'
-                        }">
-                            ${v.approval_status}
-                        </span>
-                    </td>
-                    <td class="p-3">${v.risk_level}</td>
-                    <td class="p-3">⭐ ${v.rating.toFixed(1)}</td>
-                    <td class="p-3">${actions}</td>
-                `;
-                    tbody.appendChild(tr);
-                });
+                globalVendorsData = await response.json();
+                filterVendors();
             } catch (error) {
                 console.error("Error fetching all vendors:", error);
             }
@@ -1216,6 +1245,16 @@
                         <input type="email" id="add-email" required
                             class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
                             placeholder="email@company.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Category</label>
+                        <select id="add-category" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                            <option value="IT">IT</option>
+                            <option value="Logistics">Logistics</option>
+                            <option value="Materials">Materials</option>
+                            <option value="Services">Services</option>
+                            <option value="General">General</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Status</label>
@@ -1394,6 +1433,57 @@
     let trendChartInstance = null;
     let riskChartInstance = null;
 
+    function filterVendors() {
+        const searchQuery = document.getElementById('vendor-search').value.toLowerCase();
+        const categoryFilter = document.getElementById('vendor-category-filter').value;
+        const tbody = document.getElementById('all-vendors-tbody');
+        tbody.innerHTML = '';
+        
+        let filtered = globalVendorsData.filter(v => {
+            const matchesSearch = v.company_name.toLowerCase().includes(searchQuery) || (v.contact_email && v.contact_email.toLowerCase().includes(searchQuery));
+            const matchesCategory = !categoryFilter || categoryFilter === 'All' || v.category === categoryFilter;
+            return matchesSearch && matchesCategory;
+        });
+
+        filtered.forEach(v => {
+            let statusClass = 'text-amber-400 bg-amber-500/20';
+            if(v.status === 'Active' || v.approval_status === 'Active' || v.approval_status === 'Approved') statusClass = 'text-emerald-400 bg-emerald-500/20';
+            if(v.status === 'Suspended') statusClass = 'text-rose-400 bg-rose-500/20';
+            
+            let riskClass = 'text-blue-400 bg-blue-500/20';
+            if(v.risk_level === 'Medium') riskClass = 'text-amber-400 bg-amber-500/20';
+            if(v.risk_level === 'High') riskClass = 'text-rose-400 bg-rose-500/20';
+
+            const status = v.status || v.approval_status || 'Pending';
+
+            tbody.innerHTML += `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-3 font-bold text-white">${v.company_name}</td>
+                    <td class="p-3 text-tertiary-fixed-dim">${v.contact_email || 'N/A'}</td>
+                    <td class="p-3 text-tertiary-fixed-dim font-bold text-[10px] uppercase">${v.category || 'General'}</td>
+                    <td class="p-3">
+                        <select onchange="updateVendorStatus(${v.id}, this.value)" class="bg-[#1e293b] border border-white/20 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-blue-500 transition-colors">
+                            <option value="Active" ${status === 'Active' || status === 'Approved' ? 'selected' : ''}>Active</option>
+                            <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Suspended" ${status === 'Suspended' ? 'selected' : ''}>Suspended</option>
+                        </select>
+                    </td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded ${riskClass} text-[10px] font-bold">${v.risk_level}</span></td>
+                    <td class="p-3 font-mono-data font-bold">${(v.rating || 0).toFixed(1)}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="openChatModal('Vendor', ${v.id}, 'Chat with ${v.company_name}')" class="text-blue-400 hover:text-blue-300 transition-colors" title="Message Vendor">
+                            <span class="material-symbols-outlined text-[18px]">chat</span>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        if(filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center italic text-white/30">No vendors found matching your filters.</td></tr>';
+        }
+    }
+
+
 
     function openViewReportsModal() {
         document.getElementById('view-reports-modal').classList.remove('hidden');
@@ -1550,6 +1640,221 @@
             <!-- Logs injected here -->
         </div>
     </div>
+
+<script>
+let lastNotifId = null;
+
+function showToast(title, message, severity, type) {
+    const toast = document.createElement('div');
+    const borderClass = severity === 'Critical' ? 'border-rose-500' : 'border-blue-500';
+    const iconClass = severity === 'Critical' ? 'text-rose-500' : 'text-blue-500';
+    
+    
+    let onClickAttr = "";
+    let cursorClass = "";
+    if (type && type.startsWith("ChatMessage:")) {
+        const parts = type.split(":");
+        if(parts.length === 3 && typeof openChatModal === "function") {
+            onClickAttr = `onclick="openChatModal('${parts[1]}', ${parts[2]})"`;
+            cursorClass = "cursor-pointer hover:bg-slate-800/90 hover:scale-105";
+        }
+    }
+
+    toast.className = `fixed bottom-4 right-4 max-w-sm w-full bg-slate-900/90 backdrop-blur-md shadow-2xl rounded-xl border-l-4 p-4 z-50 transform transition-all duration-300 translate-y-full opacity-0 ${borderClass} ${cursorClass}`;
+    toast.innerHTML = `
+        <div class="flex justify-between items-start" ${onClickAttr}>
+            <div class="flex gap-3">
+                <span class="material-symbols-outlined ${iconClass}">notifications_active</span>
+                <div>
+                    <h4 class="text-sm font-bold text-white">${title}</h4>
+                    <p class="text-xs text-slate-300 mt-1">${message}</p>
+                </div>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="text-slate-400 hover:text-white"><span class="material-symbols-outlined text-sm">close</span></button>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('translate-y-full', 'opacity-0');
+    }, 100);
+    
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-full');
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
+}
+
+async function fetchUnreadCount() {
+    try {
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        if(!token) return;
+        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        if(res.ok) {
+            const notifs = await res.json();
+            const unread = notifs.filter(n => !n.is_read).length;
+            const badge = document.getElementById('global-notif-badge');
+            if(badge && unread > 0) {
+                badge.textContent = unread;
+                badge.classList.remove('hidden');
+            }
+            
+            if (notifs.length > 0) {
+                const latestId = Math.max(...notifs.map(n => n.id));
+                if (lastNotifId === null) {
+                    lastNotifId = latestId; // Initialize on first fetch
+                } else if (latestId > lastNotifId) {
+                    const newNotifs = notifs.filter(n => n.id > lastNotifId);
+                    newNotifs.forEach(n => showToast(n.title, n.message, n.severity, n.type));
+                    lastNotifId = latestId;
+                }
+            }
+        }
+    } catch(e) {}
+}
+document.addEventListener('DOMContentLoaded', () => {
+    fetchUnreadCount();
+    setInterval(fetchUnreadCount, 10000);
+});
+</script>
+
+<script>
+async function loadAIInsights() {
+    try {
+        const res = await fetch('http://127.0.0.1:8000/api/intelligence/insights');
+        if (res.ok) {
+            const insights = await res.json();
+            const container = document.getElementById('ai-insights-container');
+            if (container) {
+                container.innerHTML = '';
+                insights.forEach(insight => {
+                    container.innerHTML += `
+                        <div class="glass-widget p-3.5 rounded-xl border-l-2 border-${insight.color}-400">
+                            <p class="text-white dark:text-white light:text-slate-800 font-medium">${insight.message}</p>
+                        </div>
+                    `;
+                });
+            }
+        }
+    } catch(e) { console.error(e); }
+}
+document.addEventListener('DOMContentLoaded', loadAIInsights);
+</script>
+
+<!-- Chat Modal -->
+<div id="chat-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-lg rounded-2xl relative flex flex-col h-[600px] max-h-[90vh]">
+        <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5 rounded-t-2xl">
+            <h2 class="text-lg font-bold flex items-center gap-2 text-white"><span class="material-symbols-outlined text-indigo-400">forum</span> <span id="chat-modal-title">Communication</span></h2>
+            <button onclick="closeChatModal()" class="text-tertiary-fixed-dim hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-2">
+            <!-- Messages go here -->
+        </div>
+        <div class="p-4 border-t border-white/10 bg-[#0f172a]/50 rounded-b-2xl">
+            <form onsubmit="submitChatMessage(event)" class="flex gap-2">
+                <input type="text" id="chat-input" required class="flex-1 bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500" placeholder="Type your message...">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl transition-colors font-bold flex items-center justify-center">
+                    <span class="material-symbols-outlined">send</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentEntityType = null;
+    let currentEntityId = null;
+    let currentThreadId = null;
+    let chatPollInterval = null;
+    let currentMessageCount = 0;
+
+    async function fetchChatMessages() {
+        if (!currentEntityType || !currentEntityId) return;
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentEntityType}/${currentEntityId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const thread = await res.json();
+            currentThreadId = thread.id;
+            const messages = thread.messages || [];
+            if (messages.length > currentMessageCount || currentMessageCount === 0) {
+                renderMessages(messages);
+                currentMessageCount = messages.length;
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    async function openChatModal(entityType, entityId) {
+        currentEntityType = entityType;
+        currentEntityId = entityId;
+        currentMessageCount = 0;
+        document.getElementById('chat-modal-title').innerText = `${entityType} #${entityId} Communication`;
+        document.getElementById('chat-messages').innerHTML = '<p class="text-xs text-slate-400 italic">Loading messages...</p>';
+        document.getElementById('chat-modal').classList.remove('hidden');
+        
+        await fetchChatMessages();
+        if (chatPollInterval) clearInterval(chatPollInterval);
+        chatPollInterval = setInterval(fetchChatMessages, 3000);
+    }
+
+    function closeChatModal() {
+        document.getElementById('chat-modal').classList.add('hidden');
+        if (chatPollInterval) clearInterval(chatPollInterval);
+    }
+
+    function renderMessages(messages) {
+        const container = document.getElementById('chat-messages');
+        const currentUserId = parseInt(localStorage.getItem('userId'), 10);
+        container.innerHTML = '';
+        if (messages.length === 0) {
+            container.innerHTML = '<p class="text-xs text-slate-400 italic">No messages yet.</p>';
+            return;
+        }
+        messages.forEach(m => {
+            const isMe = m.sender_id === currentUserId;
+            const senderRole = m.sender_role ? m.sender_role.charAt(0).toUpperCase() + m.sender_role.slice(1) : 'Unknown';
+            const senderName = m.sender_name || 'User';
+            const senderInfo = isMe ? 'You' : `${senderName} (${senderRole})`;
+            container.innerHTML += `
+                <div class="mb-3 flex ${isMe ? 'justify-end' : 'justify-start'}">
+                    <div class="${isMe ? 'bg-indigo-600' : 'bg-[#1e293b] border border-white/10'} p-3 rounded-xl max-w-[80%]">
+                        <p class="text-[9px] font-bold ${isMe ? 'text-indigo-200' : 'text-blue-300'} mb-1">${senderInfo}</p>
+                        <p class="text-xs text-white">${m.content}</p>
+                        <p class="text-[9px] ${isMe ? 'text-indigo-200' : 'text-slate-400'} mt-1 text-right">${new Date(m.timestamp).toLocaleTimeString()}</p>
+                    </div>
+                </div>
+            `;
+        });
+        container.scrollTop = container.scrollHeight;
+    }
+
+    async function submitChatMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById('chat-input');
+        const content = input.value.trim();
+        if(!content || !currentThreadId) return;
+
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentThreadId}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ content })
+            });
+            input.value = '';
+            openChatModal(currentEntityType, currentEntityId);
+        } catch(err) {
+            console.error(err);
+        }
+    }
+</script>
 </body>
+
 
 </html>

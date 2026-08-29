@@ -228,116 +228,200 @@
             <span class="text-[10px] font-mono-data text-indigo-300 tracking-widest uppercase font-bold px-2 py-1 bg-indigo-500/10 rounded-md border border-indigo-500/20">Finance Console</span>
         </div>
         <div class="flex items-center gap-3">
+            <a href="dashboard.html" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-tertiary-fixed-dim hover:text-white px-3 py-2 transition-colors">
+                <span class="material-symbols-outlined text-sm">dashboard</span> Admin
+            </a>
+            <a href="supply_chain_dashboard.html" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-tertiary-fixed-dim hover:text-white px-3 py-2 transition-colors">
+                <span class="material-symbols-outlined text-sm">local_shipping</span> Supply Chain
+            </a>
+            <a href="#" onclick="openChatModal('Global', 1); return false;" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-tertiary-fixed-dim light:text-slate-700 hover:text-white light:hover:text-blue-600 px-3 py-2 transition-colors relative">
+                <span class="material-symbols-outlined text-sm">forum</span> Chat
+            </a>
+            <a href="#" onclick="openNotificationsModal(); return false;" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-tertiary-fixed-dim light:text-slate-700 hover:text-white light:hover:text-blue-600 px-3 py-2 transition-colors relative">
+    <span class="material-symbols-outlined text-sm">notifications</span> Notifications
+    <span id="global-notif-badge" class="absolute top-1 right-1 bg-rose-500 text-white text-[8px] px-1 rounded-full hidden">0</span>
+</a>
             <a href="login.html" onclick="localStorage.clear()" class="bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 px-3.5 py-2 rounded-xl text-xs font-bold font-mono-data border border-rose-500/30">Logout</a>
         </div>
     </div>
 </header>
 <main class="flex-grow relative z-10 max-w-7xl mx-auto px-6 py-10 space-y-10 w-full">
+    <!-- Header / Buttons -->
     <section class="glass-panel p-8 lg:p-10 rounded-3xl border border-white/5 flex flex-col relative overflow-hidden animate-float">
-        <!-- Shine effect -->
         <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] animate-[shimmer_3s_infinite]"></div>
         
-        <h1 class="text-4xl lg:text-5xl font-black text-white tracking-tight" id="welcome-message">👋 Welcome, Finance</h1>
-        <p class="text-base text-blue-200/80 max-w-2xl mt-3 font-medium">Approve PRs based on budget, track spending, and manage invoices effectively.</p>
-        <div class="mt-6 flex flex-wrap items-center gap-4">
-            <button onclick="openPerformanceModal()" class="btn-glow bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-500/25">
-                <span class="material-symbols-outlined">rate_review</span> Evaluate Performance
+        <h1 class="text-4xl lg:text-5xl font-black text-white tracking-tight flex items-center justify-between" id="welcome-message">
+            👋 Welcome, Finance
+            <span class="text-sm font-medium bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/30 flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">verified</span> Finance Officer</span>
+        </h1>
+        <p class="text-base text-blue-200/80 max-w-2xl mt-3 font-medium">Manage procurement spending, PO financials, evaluate PRs, and track budget utilization.</p>
+        
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+            <button onclick="openBudgetModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-500/50 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+                <span class="material-symbols-outlined text-[18px]">account_balance</span> Manage Budgets
             </button>
-            <a href="risk_analysis.html" class="bg-rose-600/20 text-rose-400 hover:bg-rose-600/30 border border-rose-500/30 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2">
-                <span class="material-symbols-outlined">grid_view</span> Risk Matrix
-            </a>
-            <a href="#" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 border border-emerald-500/30 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2">
-                <span class="material-symbols-outlined">shopping_cart</span> Financial Tracking
-            </a>
-            <a href="contracts.html" class="bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600/30 border border-indigo-500/30 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2">
-                <span class="material-symbols-outlined">description</span> Contracts
-            </a>
-            <button onclick="exportReport()" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2">
-                <span class="material-symbols-outlined">analytics</span> Advanced Analytics Export
+
+            <button onclick="window.open('http://127.0.0.1:8000/api/v1/reports/pdf', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+                <span class="material-symbols-outlined text-[18px] text-rose-400">picture_as_pdf</span> Export PDF
+            </button>
+            <button onclick="window.open('http://127.0.0.1:8000/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+                <span class="material-symbols-outlined text-[18px] text-emerald-400">table_view</span> Export Excel/CSV
+            </button>
+            <button onclick="window.open('http://127.0.0.1:8000/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+                <span class="material-symbols-outlined text-[18px] text-blue-400">calendar_month</span> Monthly Spending Report
+            </button>
+            <button onclick="window.open('http://127.0.0.1:8000/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+                <span class="material-symbols-outlined text-[18px] text-indigo-400">storefront</span> Vendor Spending Report
+            </button>
+            <button onclick="window.open('http://127.0.0.1:8000/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+                <span class="material-symbols-outlined text-[18px] text-purple-400">receipt_long</span> Invoice Report
+            </button>
+            <button onclick="window.open('http://127.0.0.1:8000/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+                <span class="material-symbols-outlined text-[18px] text-amber-400">account_balance_wallet</span> Procurement Expenditure Report
             </button>
         </div>
     </section>
 
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="glass-widget p-6 rounded-2xl flex flex-col justify-between">
-            <div class="flex items-center gap-2 mb-2">
-                <span class="material-symbols-outlined text-blue-500">groups</span>
-                <h3 class="font-bold text-sm text-tertiary-fixed-dim">Total Spending</h3>
-            </div>
-            <p class="text-4xl font-black text-blue-400" id="kpi-active-vendors">0</p>
-            <p class="text-[10px] text-blue-500/80 mt-2 font-mono-data">Registered & approved</p>
+    <!-- 1. Top KPI Cards -->
+    
+    <section class="grid grid-cols-2 lg:grid-cols-7 gap-4">
+        <div class="glass-widget p-5 rounded-2xl flex flex-col justify-between border-b-4 border-indigo-500">
+            <h3 class="font-bold text-xs text-tertiary-fixed-dim uppercase tracking-wider mb-2">Total Budget</h3>
+            <p class="text-2xl font-black text-indigo-400" id="kpi-total-budget">₹0</p>
         </div>
-        <div class="glass-widget p-6 rounded-2xl flex flex-col justify-between">
-            <div class="flex items-center gap-2 mb-2">
-                <span class="material-symbols-outlined text-emerald-500">speed</span>
-                <h3 class="font-bold text-sm text-tertiary-fixed-dim">Avg Reliability Score</h3>
-            </div>
-            <p class="text-4xl font-black text-emerald-400" id="kpi-avg-reliability">0%</p>
-            <p class="text-[10px] text-emerald-500/80 mt-2 font-mono-data">Platform-wide average</p>
+        <div class="glass-widget p-5 rounded-2xl flex flex-col justify-between border-b-4 border-blue-500">
+            <h3 class="font-bold text-xs text-tertiary-fixed-dim uppercase tracking-wider mb-2">Total Spend</h3>
+            <p class="text-2xl font-black text-blue-400" id="kpi-total-spend">₹0</p>
         </div>
-        <div class="glass-widget p-6 rounded-2xl flex flex-col justify-between">
-            <div class="flex items-center gap-2 mb-2">
-                <span class="material-symbols-outlined text-rose-500">warning</span>
-                <h3 class="font-bold text-sm text-tertiary-fixed-dim">Critical Risk Count</h3>
-            </div>
-            <p class="text-4xl font-black text-rose-400" id="kpi-critical-risk">0</p>
-            <p class="text-[10px] text-rose-500/80 mt-2 font-mono-data">Score < 50</p>
+        <div class="glass-widget p-5 rounded-2xl flex flex-col justify-between border-b-4 border-indigo-500">
+            <h3 class="font-bold text-xs text-tertiary-fixed-dim uppercase tracking-wider mb-2">PO Value</h3>
+            <p class="text-2xl font-black text-indigo-400" id="kpi-po-value">₹0</p>
         </div>
-        <div class="glass-widget p-6 rounded-2xl flex flex-col justify-between">
-            <div class="flex items-center gap-2 mb-2">
-                <span class="material-symbols-outlined text-amber-500">gavel</span>
-                <h3 class="font-bold text-sm text-tertiary-fixed-dim">Open Disputes</h3>
-            </div>
-            <p class="text-4xl font-black text-amber-400" id="kpi-open-disputes">0</p>
-            <p class="text-[10px] text-amber-500/80 mt-2 font-mono-data">Pending resolution</p>
+        <div class="glass-widget p-5 rounded-2xl flex flex-col justify-between border-b-4 border-amber-500">
+            <h3 class="font-bold text-xs text-tertiary-fixed-dim uppercase tracking-wider mb-2">Pending Invoices</h3>
+            <p class="text-2xl font-black text-amber-400" id="kpi-pending-invoices">0</p>
+        </div>
+        <div class="glass-widget p-5 rounded-2xl flex flex-col justify-between border-b-4 border-emerald-500">
+            <h3 class="font-bold text-xs text-tertiary-fixed-dim uppercase tracking-wider mb-2">Paid Invoices</h3>
+            <p class="text-2xl font-black text-emerald-400" id="kpi-paid-invoices">0</p>
+        </div>
+        <div class="glass-widget p-5 rounded-2xl flex flex-col justify-between border-b-4 border-purple-500">
+            <h3 class="font-bold text-xs text-tertiary-fixed-dim uppercase tracking-wider mb-2">Pending Approval</h3>
+            <p class="text-2xl font-black text-purple-400" id="kpi-pending-approval">0</p>
+        </div>
+        <div class="glass-widget p-5 rounded-2xl flex flex-col justify-between border-b-4 border-rose-500">
+            <h3 class="font-bold text-xs text-tertiary-fixed-dim uppercase tracking-wider mb-2">Overdue Payments</h3>
+            <p class="text-2xl font-black text-rose-400" id="kpi-overdue-payments">0</p>
         </div>
     </section>
 
-    <!-- Analytics Charts Section -->
+    <!-- 2. Spending Overview (Chart & Budgets) -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="glass-panel p-6 rounded-2xl border border-white/10">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-base text-white flex items-center gap-2">
-                    <span class="material-symbols-outlined text-blue-400">trending_up</span>
-                    Monthly Trend Analysis
-                </h3>
-            </div>
-            <div class="h-64 relative w-full">
-                <canvas id="trendChart"></canvas>
+        <!-- Monthly Spending Chart -->
+        <div class="glass-panel p-6 rounded-2xl border border-white/10 h-[350px] flex flex-col">
+            <h3 class="font-bold text-base text-white flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-blue-400">trending_up</span> Monthly Spending Chart
+            </h3>
+            <div class="flex-grow relative w-full h-full">
+                <canvas id="monthlySpendingChart"></canvas>
             </div>
         </div>
-        <div class="glass-panel p-6 rounded-2xl border border-white/10">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-base text-white flex items-center gap-2">
-                    <span class="material-symbols-outlined text-indigo-400">donut_large</span>
-                    Risk Category Distribution
-                </h3>
-            </div>
-            <div class="h-64 relative w-full flex justify-center">
-                <canvas id="riskChart"></canvas>
+
+        <!-- Budget Utilization -->
+        <div class="glass-panel p-6 rounded-2xl border border-white/10 h-[350px] flex flex-col overflow-y-auto">
+            <h3 class="font-bold text-base text-white flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-emerald-400">pie_chart</span> Budget Utilization & Spending by Dept
+            </h3>
+            <div class="space-y-4" id="budget-utilization-container">
+                <p class="text-xs text-white/50 italic">Loading budgets...</p>
             </div>
         </div>
     </section>
-
-    <section class="glass-panel p-6 rounded-2xl border border-white/10 mt-8">
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="font-bold text-base text-white flex items-center gap-2">
-                <span class="material-symbols-outlined text-indigo-400">receipt_long</span>
-                Recent Transaction Feed
-            </h3>
+    
+    <!-- 7. Financial Alerts -->
+    <section class="glass-panel p-5 rounded-2xl border border-rose-500/30 bg-rose-500/5">
+        <h3 class="font-bold text-sm text-rose-400 flex items-center gap-2 mb-3">
+            <span class="material-symbols-outlined">warning</span> Financial Alerts
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="financial-alerts-container">
+            <!-- Mock Alerts -->
+            <div class="bg-rose-500/10 border border-rose-500/20 px-3 py-2 rounded flex items-center gap-2 text-xs text-rose-300"><span class="material-symbols-outlined text-[16px]">error</span> 🔴 Invoice overdue (INV-PO-REQ-002)</div>
+            <div class="bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded flex items-center gap-2 text-xs text-amber-300"><span class="material-symbols-outlined text-[16px]">warning</span> 🟠 PO exceeds budget (IT Dept)</div>
+            <div class="bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded flex items-center gap-2 text-xs text-amber-300"><span class="material-symbols-outlined text-[16px]">warning</span> 🟠 Invoice amount differs from PO (PO-102)</div>
+            <div class="bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded flex items-center gap-2 text-xs text-emerald-300"><span class="material-symbols-outlined text-[16px]">check_circle</span> 🟢 Invoice paid (INV-101)</div>
         </div>
-        <div class="overflow-x-auto rounded-xl border border-white/10">
-            <table class="w-full text-left text-xs font-sans">
-                <thead class="bg-white/5 text-tertiary-fixed-dim uppercase font-mono-data text-[10px] border-b border-white/10">
+    </section>
+
+    <!-- 5. Pending Finance Approvals -->
+    <section class="glass-panel p-6 rounded-2xl border border-white/10 flex flex-col h-[400px]">
+        <h3 class="font-bold text-base text-white flex items-center justify-between mb-4">
+            <span class="flex items-center gap-2"><span class="material-symbols-outlined text-purple-400">gavel</span> Pending Finance Approvals</span>
+            <span class="text-xs font-mono-data bg-white/5 px-2 py-1 rounded text-tertiary-fixed-dim">Action Required</span>
+        </h3>
+        <div class="overflow-auto flex-1">
+            <table class="w-full text-left text-sm font-sans">
+                <thead class="bg-white/5 text-tertiary-fixed-dim uppercase font-mono-data text-[10px] sticky top-0 backdrop-blur-md z-10">
                     <tr>
-                        <th class="p-3.5">Vendor Name</th>
-                        <th class="p-3.5">Action / Type</th>
-                        <th class="p-3.5">Date</th>
-                        <th class="p-3.5">Status</th>
+                        <th class="p-3 rounded-tl-xl">Procurement Request</th>
+                        <th class="p-3">Requested Amount</th>
+                        <th class="p-3">Department</th>
+                        <th class="p-3">Vendor</th>
+                        <th class="p-3">Budget Status</th>
+                        <th class="p-3 rounded-tr-xl text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="transactions-table-body" class="divide-y divide-white/5 text-tertiary-fixed-dim">
-                    <!-- Dynamic data will be injected here -->
+                <tbody id="approval-queue-body" class="divide-y divide-white/5 text-slate-300 text-xs">
+                    <tr><td colspan="6" class="p-4 text-center italic text-white/30">Loading PRs...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 3. Purchase Order Financials Table -->
+    <section class="glass-panel p-6 rounded-2xl border border-white/10 flex flex-col h-[400px]">
+        <h3 class="font-bold text-base text-white flex items-center mb-4 gap-2">
+            <span class="material-symbols-outlined text-indigo-400">shopping_cart_checkout</span> Purchase Order Financials
+        </h3>
+        <div class="overflow-auto flex-1">
+            <table class="w-full text-left text-sm font-sans">
+                <thead class="bg-white/5 text-tertiary-fixed-dim uppercase font-mono-data text-[10px] sticky top-0 backdrop-blur-md z-10">
+                    <tr>
+                        <th class="p-3 rounded-tl-xl">PO Number</th>
+                        <th class="p-3">Vendor</th>
+                        <th class="p-3">PO Amount</th>
+                        <th class="p-3">Invoice Amount</th>
+                        <th class="p-3 rounded-tr-xl">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="po-financials-body" class="divide-y divide-white/5 text-slate-300 text-xs">
+                    <tr><td colspan="5" class="p-4 text-center italic text-white/30">Loading POs...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 4. Invoice Management Table -->
+    <section class="glass-panel p-6 rounded-2xl border border-white/10 flex flex-col h-[400px]">
+        <h3 class="font-bold text-base text-white flex items-center justify-between mb-4">
+            <span class="flex items-center gap-2"><span class="material-symbols-outlined text-amber-400">receipt</span> Recent Invoices</span>
+            <button class="text-xs bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1 rounded transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">upload</span> Upload Invoice</button>
+        </h3>
+        <div class="overflow-auto flex-1">
+            <table class="w-full text-left text-sm font-sans whitespace-nowrap">
+                <thead class="bg-white/5 text-tertiary-fixed-dim uppercase font-mono-data text-[10px] sticky top-0 backdrop-blur-md z-10">
+                    <tr>
+                        <th class="p-3 rounded-tl-xl">Invoice #</th>
+                        <th class="p-3">Vendor</th>
+                        <th class="p-3">PO #</th>
+                        <th class="p-3">Amount</th>
+                        <th class="p-3">Invoice Date</th>
+                        <th class="p-3">Due Date</th>
+                        <th class="p-3">Payment Status</th>
+                        <th class="p-3 rounded-tr-xl text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="invoice-management-body" class="divide-y divide-white/5 text-slate-300 text-xs">
+                    <tr><td colspan="8" class="p-4 text-center italic text-white/30">Loading Invoices...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -361,6 +445,16 @@
                     <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Contact Email</label>
                     <input type="email" id="add-email" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="email@company.com">
                 </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Category</label>
+                        <select id="add-category" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                            <option value="IT">IT</option>
+                            <option value="Logistics">Logistics</option>
+                            <option value="Materials">Materials</option>
+                            <option value="Services">Services</option>
+                            <option value="General">General</option>
+                        </select>
+                    </div>
                 <div>
                     <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Status</label>
                     <select id="add-status" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
@@ -460,9 +554,8 @@
 </div>
 
 <script>
-
     document.addEventListener("DOMContentLoaded", async () => {
-        document.getElementById('welcome-message').innerText = `👋 Welcome, ${localStorage.getItem('userName') || 'Finance'}!`;
+        document.getElementById('welcome-message').innerHTML = `👋 Welcome, ${localStorage.getItem('userName') || 'Finance'} <span class="text-sm font-medium bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/30 flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">verified</span> Finance Officer</span>`;
 
         window.approvePR = async function(prId) {
             try {
@@ -472,43 +565,602 @@
             } catch (e) { console.error(e); }
         };
 
+        window.rejectPR = async function(prId) {
+            let reason = prompt("Enter reason for rejection:");
+            if (reason === null) return;
+            try {
+                await fetch(`http://127.0.0.1:8000/api/procurement_requests/${prId}/reject`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({reason: reason})
+                });
+                alert("PR Rejected.");
+                window.location.reload();
+            } catch (e) { console.error(e); }
+        };
+
         try {
-            const analytics = await fetch('http://127.0.0.1:8000/api/analytics/finance').then(res => res.json());
-            
-            document.getElementById('kpi-total-spending').innerText = `$${analytics.total_procurement.toLocaleString()}`;
-            document.getElementById('kpi-pending-prs').innerText = `$${analytics.pending_approval.toLocaleString()}`;
-            document.getElementById('kpi-pending-invoices').innerText = `$${analytics.invoice_amount.toLocaleString()}`;
-            
-            const budgetUtilized = (analytics.approved_spending / (analytics.total_procurement || 1)) * 100;
-            document.getElementById('kpi-budget-utilized').innerText = `${budgetUtilized.toFixed(1)}%`;
-            
-            const prs = await fetch('http://127.0.0.1:8000/api/procurement_requests').then(res => res.json());
-            const tbody = document.getElementById('vendors-table-body');
-            if(tbody) {
-                tbody.innerHTML = '';
-                prs.forEach(pr => {
-                    let btn = pr.approval_status === 'Pending' 
-                        ? `<button class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded hover:bg-emerald-500/40" onclick="approvePR(${pr.id})">Approve</button>`
-                        : `<span class="text-xs text-slate-500 font-bold px-2 py-1">${pr.approval_status}</span>`;
-                    
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-white/5 transition-colors group">
-                            <td class="p-3.5 border-b border-white/5">
-                                <p class="font-bold text-white">${pr.request_number}</p>
-                                <p class="text-xs text-tertiary-fixed-dim">${pr.department}</p>
-                            </td>
-                            <td class="p-3.5 border-b border-white/5 font-mono-data text-sm">$${pr.total_cost.toLocaleString()}</td>
-                            <td class="p-3.5 border-b border-white/5">${pr.approval_status}</td>
-                            <td class="p-3.5 border-b border-white/5">${btn}</td>
-                        </tr>
-                    `;
+            // Fetch all data
+            const [analytics, prs, pos, invoices, vendorsData] = await Promise.all([
+                fetch('http://127.0.0.1:8000/api/analytics/finance').then(r => r.json()),
+                fetch('http://127.0.0.1:8000/api/procurement_requests').then(r => r.json()),
+                fetch('http://127.0.0.1:8000/api/purchase_orders').then(r => r.json()),
+                fetch('http://127.0.0.1:8000/api/invoices').then(r => r.json()),
+                fetch('http://127.0.0.1:8000/api/vendors').then(r => r.json())
+            ]);
+
+            const vendorMap = {};
+            vendorsData.forEach(v => vendorMap[v.id] = v.company_name);
+
+            // 1. Update KPIs
+            document.getElementById('kpi-total-budget').innerText = `₹${(analytics.total_budget || 0).toLocaleString()}`;
+            document.getElementById('kpi-total-spend').innerText = `₹${(analytics.total_procurement / 100000).toFixed(1)} L`;
+            document.getElementById('kpi-po-value').innerText = `₹${(analytics.total_po_value / 100000).toFixed(1)} L`;
+            document.getElementById('kpi-pending-invoices').innerText = analytics.pending_invoices_count || 0;
+            document.getElementById('kpi-paid-invoices').innerText = analytics.paid_invoices_count || 0;
+            document.getElementById('kpi-pending-approval').innerText = analytics.pending_approvals_count || 0;
+            document.getElementById('kpi-overdue-payments').innerText = analytics.overdue_payments_count || 0;
+
+            // 2. Budget Utilization Progress Bars
+            const budgetContainer = document.getElementById('budget-utilization-container');
+            budgetContainer.innerHTML = '';
+            analytics.department_budgets.forEach(b => {
+                const percent = Math.min(100, Math.round((b.used / b.limit) * 100));
+                let color = 'bg-emerald-500';
+                if (percent > 75) color = 'bg-amber-500';
+                if (percent > 90) color = 'bg-rose-500';
+                
+                budgetContainer.innerHTML += `
+                    <div class="flex flex-col gap-1 mb-3">
+                        <div class="flex justify-between text-xs font-bold text-white">
+                            <span>${b.department}</span>
+                            <span>₹${(b.used / 100000).toFixed(1)}L / ₹${(b.limit / 100000).toFixed(1)}L (${percent}%)</span>
+                        </div>
+                        <div class="w-full bg-white/10 rounded-full h-2">
+                            <div class="${color} h-2 rounded-full" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 3. Pending Finance Approvals Table
+            const approvalBody = document.getElementById('approval-queue-body');
+            approvalBody.innerHTML = '';
+            const pendingPRs = prs.filter(pr => pr.approval_status === 'Pending' || pr.approval_status === 'Rejected');
+            pendingPRs.forEach(pr => {
+                let btn = pr.approval_status === 'Pending' 
+                    ? `<button class="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 px-2 py-1 rounded text-xs font-bold" onclick="approvePR(${pr.id})">Approve</button>
+                       <button class="bg-rose-500/20 text-rose-400 hover:bg-rose-500/40 px-2 py-1 rounded text-xs font-bold ml-1" onclick="rejectPR(${pr.id})">Reject</button>`
+                    : `<span class="text-xs text-rose-500 font-bold px-2 py-1 flex flex-col">Rejected <span class="text-[9px] text-rose-500/50">${pr.justification || ''}</span></span>`;
+                
+                // Find if budget is safe
+                const deptBudget = analytics.department_budgets.find(d => d.department === pr.department);
+                let budgetStatus = '<span class="text-emerald-400">Within Limits</span>';
+                if (deptBudget && (deptBudget.used + pr.total_cost) > deptBudget.limit) {
+                    budgetStatus = '<span class="text-rose-400 font-bold">Exceeds Budget</span>';
+                }
+
+                approvalBody.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors group">
+                        <td class="p-3 border-b border-white/5 font-bold text-white">${pr.request_number}</td>
+                        <td class="p-3 border-b border-white/5 font-mono-data">₹${pr.total_cost.toLocaleString()}</td>
+                        <td class="p-3 border-b border-white/5 text-tertiary-fixed-dim">${pr.department || 'General'}</td>
+                        <td class="p-3 border-b border-white/5">${vendorMap[pr.vendor_id] || 'Vendor '+pr.vendor_id}</td>
+                        <td class="p-3 border-b border-white/5 text-xs">${budgetStatus}</td>
+                        <td class="p-3 border-b border-white/5 text-right">${btn}</td>
+                    </tr>
+                `;
+            });
+            if (pendingPRs.length === 0) approvalBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center italic text-white/30">No PRs pending approval.</td></tr>';
+
+            // 4. Purchase Order Financials
+            const poBody = document.getElementById('po-financials-body');
+            poBody.innerHTML = '';
+            pos.forEach(po => {
+                const inv = invoices.find(i => i.po_id === po.id);
+                const invAmount = inv ? `₹${inv.amount.toLocaleString()}` : '—';
+                const status = inv ? inv.status : 'Awaiting Invoice';
+                
+                let sClass = 'text-amber-400 bg-amber-500/20';
+                if (status === 'Paid') sClass = 'text-emerald-400 bg-emerald-500/20';
+                if (status === 'Overdue') sClass = 'text-rose-400 bg-rose-500/20';
+                if (status === 'Awaiting Invoice') sClass = 'text-slate-400 bg-slate-500/20';
+
+                poBody.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="p-3 border-b border-white/5 font-bold text-white">${po.po_number}</td>
+                        <td class="p-3 border-b border-white/5">${vendorMap[po.vendor_id] || 'Vendor '+po.vendor_id}</td>
+                        <td class="p-3 border-b border-white/5 font-mono-data">₹${po.total_amount.toLocaleString()}</td>
+                        <td class="p-3 border-b border-white/5 font-mono-data">${invAmount}</td>
+                        <td class="p-3 border-b border-white/5"><span class="px-2 py-0.5 rounded ${sClass} text-[10px] font-bold border border-current">${status}</span></td>
+                    </tr>
+                `;
+            });
+            if (pos.length === 0) poBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center italic text-white/30">No POs found.</td></tr>';
+
+            // 5. Recent Invoices Table
+            const invBody = document.getElementById('invoice-management-body');
+            invBody.innerHTML = '';
+            invoices.forEach(inv => {
+                const dDate = new Date(inv.invoice_date);
+                dDate.setDate(dDate.getDate() + 30); // Due in 30 days
+                
+                let sClass = 'text-amber-400';
+                if (inv.status === 'Paid') sClass = 'text-emerald-400';
+                if (inv.status === 'Overdue') sClass = 'text-rose-400';
+
+                const po = pos.find(p => p.id === inv.po_id);
+                const poNumber = po ? po.po_number : 'PO-'+inv.po_id;
+
+                invBody.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="p-3 border-b border-white/5 font-bold text-white">${inv.invoice_number}</td>
+                        <td class="p-3 border-b border-white/5">${vendorMap[inv.vendor_id] || 'Vendor '+inv.vendor_id}</td>
+                        <td class="p-3 border-b border-white/5">${poNumber}</td>
+                        <td class="p-3 border-b border-white/5 font-mono-data font-bold text-white">₹${inv.amount.toLocaleString()}</td>
+                        <td class="p-3 border-b border-white/5">${new Date(inv.invoice_date).toLocaleDateString()}</td>
+                        <td class="p-3 border-b border-white/5 text-rose-300">${dDate.toLocaleDateString()}</td>
+                        <td class="p-3 border-b border-white/5 font-bold ${sClass}">${inv.status}</td>
+                        <td class="p-3 border-b border-white/5 text-center">
+                            <button class="text-blue-400 hover:text-blue-300 material-symbols-outlined text-[18px]" onclick="downloadInvoice('${inv.document_path || ''}')">download</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            if (invoices.length === 0) invBody.innerHTML = '<tr><td colspan="8" class="p-4 text-center italic text-white/30">No Invoices found.</td></tr>';
+
+            // 6. Fetch and render charts dynamically
+            const chartData = await fetch('http://127.0.0.1:8000/api/dashboard/charts').then(res => res.json());
+
+            const trendCtx = document.getElementById('monthlySpendingChart');
+            if (trendCtx) {
+                new Chart(trendCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.trend_labels,
+                        datasets: [
+                            {
+                                label: 'Monthly Spending',
+                                data: chartData.quality_data, // Using mock data from charts endpoint
+                                backgroundColor: '#3b82f6',
+                                borderRadius: 4
+                            },
+                            {
+                                label: 'Budget Limit',
+                                data: chartData.quality_data.map(v => v + 10),
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                borderRadius: 4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#94a3b8' } } },
+                        scales: {
+                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                        }
+                    }
                 });
             }
+
         } catch (e) {
-            console.error('Error fetching finance data:', e);
+            console.error('Failed to load dashboard data:', e);
         }
+
     });
 
+    window.exportReport = function(e, type) {
+        e.preventDefault();
+        alert(`Generating ${type} report. Check your downloads shortly.`);
+    };
 </script>
+
+<script>
+let lastNotifId = null;
+
+function showToast(title, message, severity, type) {
+    const toast = document.createElement('div');
+    const borderClass = severity === 'Critical' ? 'border-rose-500' : 'border-blue-500';
+    const iconClass = severity === 'Critical' ? 'text-rose-500' : 'text-blue-500';
+    
+    
+    let onClickAttr = "";
+    let cursorClass = "";
+    if (type && type.startsWith("ChatMessage:")) {
+        const parts = type.split(":");
+        if(parts.length === 3 && typeof openChatModal === "function") {
+            onClickAttr = `onclick="openChatModal('${parts[1]}', ${parts[2]})"`;
+            cursorClass = "cursor-pointer hover:bg-slate-800/90 hover:scale-105";
+        }
+    }
+
+    toast.className = `fixed bottom-4 right-4 max-w-sm w-full bg-slate-900/90 backdrop-blur-md shadow-2xl rounded-xl border-l-4 p-4 z-50 transform transition-all duration-300 translate-y-full opacity-0 ${borderClass} ${cursorClass}`;
+    toast.innerHTML = `
+        <div class="flex justify-between items-start" ${onClickAttr}>
+            <div class="flex gap-3">
+                <span class="material-symbols-outlined ${iconClass}">notifications_active</span>
+                <div>
+                    <h4 class="text-sm font-bold text-white">${title}</h4>
+                    <p class="text-xs text-slate-300 mt-1">${message}</p>
+                </div>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="text-slate-400 hover:text-white"><span class="material-symbols-outlined text-sm">close</span></button>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('translate-y-full', 'opacity-0');
+    }, 100);
+    
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-full');
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
+}
+
+async function fetchUnreadCount() {
+    try {
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        if(!token) return;
+        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        if(res.ok) {
+            const notifs = await res.json();
+            const unread = notifs.filter(n => !n.is_read).length;
+            const badge = document.getElementById('global-notif-badge');
+            if(badge && unread > 0) {
+                badge.textContent = unread;
+                badge.classList.remove('hidden');
+            }
+            
+            if (notifs.length > 0) {
+                const latestId = Math.max(...notifs.map(n => n.id));
+                if (lastNotifId === null) {
+                    lastNotifId = latestId; // Initialize on first fetch
+                } else if (latestId > lastNotifId) {
+                    const newNotifs = notifs.filter(n => n.id > lastNotifId);
+                    newNotifs.forEach(n => showToast(n.title, n.message, n.severity, n.type));
+                    lastNotifId = latestId;
+                }
+            }
+        }
+    } catch(e) {}
+}
+document.addEventListener('DOMContentLoaded', () => {
+    fetchUnreadCount();
+    setInterval(fetchUnreadCount, 10000);
+});
+</script>
+
+<!-- Chat Modal -->
+<div id="chat-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-lg rounded-2xl relative flex flex-col h-[600px] max-h-[90vh]">
+        <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5 rounded-t-2xl">
+            <h2 class="text-lg font-bold flex items-center gap-2 text-white"><span class="material-symbols-outlined text-indigo-400">forum</span> <span id="chat-modal-title">Communication</span></h2>
+            <button onclick="closeChatModal()" class="text-tertiary-fixed-dim hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-2">
+            <!-- Messages go here -->
+        </div>
+        <div class="p-4 border-t border-white/10 bg-[#0f172a]/50 rounded-b-2xl">
+            <form onsubmit="submitChatMessage(event)" class="flex gap-2">
+                <input type="text" id="chat-input" required class="flex-1 bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500" placeholder="Type your message...">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl transition-colors font-bold flex items-center justify-center">
+                    <span class="material-symbols-outlined">send</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentEntityType = null;
+    let currentEntityId = null;
+    let currentThreadId = null;
+    let chatPollInterval = null;
+    let currentMessageCount = 0;
+
+    async function fetchChatMessages() {
+        if (!currentEntityType || !currentEntityId) return;
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentEntityType}/${currentEntityId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const thread = await res.json();
+            currentThreadId = thread.id;
+            const messages = thread.messages || [];
+            if (messages.length > currentMessageCount || currentMessageCount === 0) {
+                renderMessages(messages);
+                currentMessageCount = messages.length;
+            }
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    async function openChatModal(entityType, entityId) {
+        currentEntityType = entityType;
+        currentEntityId = entityId;
+        currentMessageCount = 0;
+        document.getElementById('chat-modal-title').innerText = `${entityType} #${entityId} Communication`;
+        document.getElementById('chat-messages').innerHTML = '<p class="text-xs text-slate-400 italic">Loading messages...</p>';
+        document.getElementById('chat-modal').classList.remove('hidden');
+        
+        await fetchChatMessages();
+        if (chatPollInterval) clearInterval(chatPollInterval);
+        chatPollInterval = setInterval(fetchChatMessages, 3000);
+    }
+
+    function closeChatModal() {
+        document.getElementById('chat-modal').classList.add('hidden');
+        if (chatPollInterval) clearInterval(chatPollInterval);
+    }
+
+    function renderMessages(messages) {
+        const container = document.getElementById('chat-messages');
+        const currentUserId = parseInt(localStorage.getItem('userId'), 10);
+        container.innerHTML = '';
+        if (messages.length === 0) {
+            container.innerHTML = '<p class="text-xs text-slate-400 italic">No messages yet.</p>';
+            return;
+        }
+        messages.forEach(m => {
+            const isMe = m.sender_id === currentUserId;
+            const senderRole = m.sender_role ? m.sender_role.charAt(0).toUpperCase() + m.sender_role.slice(1) : 'Unknown';
+            const senderName = m.sender_name || 'User';
+            const senderInfo = isMe ? 'You' : `${senderName} (${senderRole})`;
+            container.innerHTML += `
+                <div class="mb-3 flex ${isMe ? 'justify-end' : 'justify-start'}">
+                    <div class="${isMe ? 'bg-indigo-600' : 'bg-[#1e293b] border border-white/10'} p-3 rounded-xl max-w-[80%]">
+                        <p class="text-[9px] font-bold ${isMe ? 'text-indigo-200' : 'text-blue-300'} mb-1">${senderInfo}</p>
+                        <p class="text-xs text-white">${m.content}</p>
+                        <p class="text-[9px] ${isMe ? 'text-indigo-200' : 'text-slate-400'} mt-1 text-right">${new Date(m.timestamp).toLocaleTimeString()}</p>
+                    </div>
+                </div>
+            `;
+        });
+        container.scrollTop = container.scrollHeight;
+    }
+
+    async function submitChatMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById('chat-input');
+        const content = input.value.trim();
+        if(!content || !currentThreadId) return;
+
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentThreadId}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ content })
+            });
+            input.value = '';
+            openChatModal(currentEntityType, currentEntityId);
+        } catch(err) {
+            console.error(err);
+        }
+    }
+</script>
+
+<script>
+    async function approvePR(id) {
+        const token = localStorage.getItem('accessToken');
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/procurement_requests/${id}/approve`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                alert("PR Approved and PO Auto-generated.");
+                location.reload();
+            } else {
+                alert("Failed to approve PR.");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Error approving PR.");
+        }
+    }
+
+    async function rejectPR(id) {
+        const reason = prompt("Enter reason for rejection:");
+        if (reason === null) return;
+        const token = localStorage.getItem('accessToken');
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/procurement_requests/${id}/reject`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ reason: reason || "Rejected by Finance" })
+            });
+            if (res.ok) {
+                alert("PR Rejected.");
+                location.reload();
+            } else {
+                alert("Failed to reject PR.");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Error rejecting PR.");
+        }
+    }
+
+    function downloadInvoice(path) {
+        if (!path) {
+            alert("No document attached to this invoice.");
+            return;
+        }
+        window.open(path.startsWith('http') ? path : 'http://127.0.0.1:8000/' + path, '_blank');
+    }
+</script>
+
+
+<!-- Notifications Modal -->
+<div id="notif-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-lg rounded-2xl relative flex flex-col h-[600px] max-h-[90vh]">
+        <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5 rounded-t-2xl">
+            <h2 class="text-lg font-bold flex items-center gap-2 text-white">
+                <span class="material-symbols-outlined text-rose-400">notifications</span> 
+                Notifications
+            </h2>
+            <button onclick="closeNotificationsModal()" class="text-tertiary-fixed-dim hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="notif-messages" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <!-- Notifications go here -->
+        </div>
+        <div class="p-4 border-t border-white/10 bg-[#0f172a]/50 rounded-b-2xl flex justify-end">
+            <button onclick="closeNotificationsModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl transition-colors font-bold text-sm">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function openNotificationsModal() {
+        document.getElementById('notif-modal').classList.remove('hidden');
+        document.getElementById('notif-messages').innerHTML = '<p class="text-xs text-slate-400 italic">Loading notifications...</p>';
+        
+        try {
+            const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+            const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+            if(res.ok) {
+                const notifs = await res.json();
+                const container = document.getElementById('notif-messages');
+                container.innerHTML = '';
+                if(notifs.length === 0) {
+                    container.innerHTML = '<p class="text-xs text-slate-400 italic">No new notifications.</p>';
+                } else {
+                    notifs.sort((a,b) => b.id - a.id).forEach(n => {
+                        const borderClass = n.severity === 'Critical' ? 'border-rose-500' : 'border-blue-500';
+                        const iconClass = n.severity === 'Critical' ? 'text-rose-500' : 'text-blue-500';
+                        container.innerHTML += `
+                            <div class="bg-[#1e293b] p-3 rounded-xl border-l-4 ${borderClass} shadow-md mb-2">
+                                <div class="flex gap-3">
+                                    <span class="material-symbols-outlined ${iconClass}">notifications_active</span>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-white">${n.title}</h4>
+                                        <p class="text-xs text-slate-300 mt-1">${n.message}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+        } catch(e) {
+            document.getElementById('notif-messages').innerHTML = '<p class="text-xs text-rose-400 italic">Failed to load notifications</p>';
+        }
+    }
+    
+    function closeNotificationsModal() {
+        document.getElementById('notif-modal').classList.add('hidden');
+    }
+</script>
+
+
+<!-- Budget Modal -->
+<div id="budget-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-2xl rounded-2xl relative flex flex-col max-h-[90vh]">
+        <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5 rounded-t-2xl">
+            <h2 class="text-lg font-bold flex items-center gap-2 text-white">
+                <span class="material-symbols-outlined text-indigo-400">account_balance</span> 
+                Manage Department Budgets
+            </h2>
+            <button onclick="document.getElementById('budget-modal').classList.add('hidden')" class="text-tertiary-fixed-dim hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="p-4 overflow-y-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="text-xs uppercase text-tertiary-fixed-dim border-b border-white/10">
+                        <th class="p-3">Department</th>
+                        <th class="p-3">Current Budget (₹)</th>
+                        <th class="p-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="budget-table-body">
+                    <!-- Loaded via JS -->
+                </tbody>
+            </table>
+        </div>
+        <div class="p-4 border-t border-white/10 bg-[#0f172a]/50 flex gap-2 items-center rounded-b-2xl">
+            <input type="text" id="new-dept-name" placeholder="Department (e.g. R&D)" class="bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 w-1/3">
+            <input type="number" id="new-dept-limit" placeholder="Allocated Limit (₹)" class="bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 flex-1">
+            <button onclick="saveBudget()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold transition-all">Add / Update</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function openBudgetModal() {
+        document.getElementById('budget-modal').classList.remove('hidden');
+        loadBudgets();
+    }
+    
+    async function loadBudgets() {
+        const tbody = document.getElementById('budget-table-body');
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center p-4 text-white/50">Loading...</td></tr>';
+        try {
+            const token = localStorage.getItem('accessToken');
+            const res = await fetch('http://127.0.0.1:8000/api/budgets', { headers: { 'Authorization': `Bearer ${token}` } });
+            const budgets = await res.json();
+            tbody.innerHTML = '';
+            budgets.forEach(b => {
+                tbody.innerHTML += `
+                    <tr class="border-b border-white/5 hover:bg-white/5">
+                        <td class="p-3 font-bold text-white">${b.department}</td>
+                        <td class="p-3 font-mono-data">₹${b.allocated_limit.toLocaleString()}</td>
+                        <td class="p-3">
+                            <button onclick="editBudget('${b.department}', ${b.allocated_limit})" class="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-white">Edit</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        } catch(e) {
+            console.error(e);
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center p-4 text-rose-400">Failed to load</td></tr>';
+        }
+    }
+    
+    function editBudget(dept, limit) {
+        document.getElementById('new-dept-name').value = dept;
+        document.getElementById('new-dept-limit').value = limit;
+    }
+    
+    async function saveBudget() {
+        const dept = document.getElementById('new-dept-name').value.trim();
+        const limit = parseFloat(document.getElementById('new-dept-limit').value);
+        if(!dept || isNaN(limit)) return alert("Invalid inputs");
+        
+        try {
+            const token = localStorage.getItem('accessToken');
+            const res = await fetch('http://127.0.0.1:8000/api/budgets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ department: dept, limit: limit })
+            });
+            if(res.ok) {
+                document.getElementById('new-dept-name').value = '';
+                document.getElementById('new-dept-limit').value = '';
+                loadBudgets(); // reload table
+                loadDashboard(); // reload main dashboard stats
+            } else {
+                alert("Failed to update budget");
+            }
+        } catch(e) {
+            console.error(e);
+            alert("Error updating budget");
+        }
+    }
+</script>
+
 </body>
+
 </html>

@@ -51,6 +51,7 @@ class Dispute(Base):
     title = Column(String(255))
     description = Column(Text)
     status = Column(String(50), default="Open") # Open, Resolved
+    evidence_url = Column(String(255), nullable=True) # Added for evidence upload
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     vendor = relationship("Vendor", back_populates="disputes")
@@ -83,10 +84,13 @@ class ProcurementRequest(Base):
     id = Column(Integer, primary_key=True, index=True)
     request_number = Column(String(100), unique=True, index=True)
     department = Column(String(100))
+    vendor_id = Column(Integer, ForeignKey("vendors.id"), nullable=True)
     estimated_cost = Column(Float, default=0.0)
     total_cost = Column(Float, default=0.0)
     approval_status = Column(String(50), default="Pending") # Pending, Approved, Rejected
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    vendor = relationship("Vendor")
 
     items = relationship("PRItem", back_populates="procurement_request")
     purchase_orders = relationship("PurchaseOrder", back_populates="procurement_request")
@@ -185,6 +189,14 @@ class Message(Base):
     thread = relationship("MessageThread", back_populates="messages")
     sender = relationship("User")
 
+    @property
+    def sender_name(self):
+        return self.sender.name if self.sender else "Unknown"
+
+    @property
+    def sender_role(self):
+        return self.sender.role if self.sender else "Unknown"
+
 class Invoice(Base):
     __tablename__ = "invoices"
     
@@ -241,3 +253,9 @@ class Notification(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     user = relationship("User")
+
+class Budget(Base):
+    __tablename__ = "budgets"
+    id = Column(Integer, primary_key=True, index=True)
+    department = Column(String(100), unique=True, index=True)
+    allocated_limit = Column(Float, default=0.0)

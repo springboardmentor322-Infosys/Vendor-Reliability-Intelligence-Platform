@@ -17,6 +17,18 @@ class AuditService:
         )
         db.add(log_entry)
         db.commit()
+        
+        # Also generate a profile-specific notification for the user who did the action
+        if user_id:
+            from models import Notification
+            db.add(Notification(
+                user_id=user_id,
+                type="System Alert",
+                title="Action Confirmed",
+                message=action,
+                severity="Info"
+            ))
+            db.commit()
         db.refresh(log_entry)
         return log_entry
 

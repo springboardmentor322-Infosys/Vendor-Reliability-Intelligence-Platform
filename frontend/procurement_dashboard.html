@@ -228,6 +228,13 @@
             <span class="text-[10px] font-mono-data text-indigo-300 tracking-widest uppercase font-bold px-2 py-1 bg-indigo-500/10 rounded-md border border-indigo-500/20">Procurement Console</span>
         </div>
         <div class="flex items-center gap-3">
+            <a href="#" onclick="openChatModal('Global', 1); return false;" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-tertiary-fixed-dim light:text-slate-700 hover:text-white light:hover:text-blue-600 px-3 py-2 transition-colors relative">
+                <span class="material-symbols-outlined text-sm">forum</span> Chat
+            </a>
+            <a href="#" onclick="openNotificationsModal(); return false;" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-tertiary-fixed-dim light:text-slate-700 hover:text-white light:hover:text-blue-600 px-3 py-2 transition-colors relative">
+    <span class="material-symbols-outlined text-sm">notifications</span> Notifications
+    <span id="global-notif-badge" class="absolute top-1 right-1 bg-rose-500 text-white text-[8px] px-1 rounded-full hidden">0</span>
+</a>
             <a href="login.html" onclick="localStorage.clear()" class="bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 px-3.5 py-2 rounded-xl text-xs font-bold font-mono-data border border-rose-500/30">Logout</a>
         </div>
     </div>
@@ -334,6 +341,7 @@
                         <th class="p-3.5">Action / Type</th>
                         <th class="p-3.5">Date</th>
                         <th class="p-3.5">Status</th>
+                        <th class="p-3.5">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="transactions-table-body" class="divide-y divide-white/5 text-tertiary-fixed-dim">
@@ -361,6 +369,16 @@
                     <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Contact Email</label>
                     <input type="email" id="add-email" required class="w-full bg-white/5 border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors" placeholder="email@company.com">
                 </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Category</label>
+                        <select id="add-category" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                            <option value="IT">IT</option>
+                            <option value="Logistics">Logistics</option>
+                            <option value="Materials">Materials</option>
+                            <option value="Services">Services</option>
+                            <option value="General">General</option>
+                        </select>
+                    </div>
                 <div>
                     <label class="block text-xs font-bold mb-1 text-tertiary-fixed-dim">Status</label>
                     <select id="add-status" class="w-full bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
@@ -473,6 +491,7 @@
         event.preventDefault();
         const companyName = document.getElementById('add-company-name').value;
         const email = document.getElementById('add-email').value;
+            const category = document.getElementById('add-category') ? document.getElementById('add-category').value : "General";
         const status = document.getElementById('add-status').value;
         const riskLevel = document.getElementById('add-risk').value;
         const rating = parseFloat(document.getElementById('add-rating').value) || 0;
@@ -491,6 +510,7 @@
                 body: JSON.stringify({
                     company_name: companyName,
                     contact_email: email,
+                        category: category,
                     approval_status: status,
                     risk_level: riskLevel,
                     rating: rating,
@@ -594,6 +614,9 @@
                         <td class="p-3.5 text-blue-400 font-mono-data text-[11px]">${log.action}</td>
                         <td class="p-3.5 font-mono-data">${new Date(log.timestamp).toLocaleDateString()}</td>
                         <td class="p-3.5"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">Logged</span></td>
+                        <td class="p-3.5 border-b border-white/5 flex items-center gap-2">
+                            <button class="text-[10px] bg-indigo-500/20 text-indigo-400 px-2 py-1 rounded hover:bg-indigo-500/40 flex items-center gap-1" onclick="openChatModal('${log.entity_type}', ${log.entity_id})"><span class="material-symbols-outlined text-[10px]">chat</span> Chat</button>
+                        </td>
                     </tr>
                 `;
             });
@@ -670,5 +693,244 @@
 
     document.addEventListener('DOMContentLoaded', loadProcurementData);
 </script>
+
+<script>
+let lastNotifId = null;
+
+function showToast(title, message, severity, type) {
+    const toast = document.createElement('div');
+    const borderClass = severity === 'Critical' ? 'border-rose-500' : 'border-blue-500';
+    const iconClass = severity === 'Critical' ? 'text-rose-500' : 'text-blue-500';
+    
+    
+    let onClickAttr = "";
+    let cursorClass = "";
+    if (type && type.startsWith("ChatMessage:")) {
+        const parts = type.split(":");
+        if(parts.length === 3 && typeof openChatModal === "function") {
+            onClickAttr = `onclick="openChatModal('${parts[1]}', ${parts[2]})"`;
+            cursorClass = "cursor-pointer hover:bg-slate-800/90 hover:scale-105";
+        }
+    }
+
+    toast.className = `fixed bottom-4 right-4 max-w-sm w-full bg-slate-900/90 backdrop-blur-md shadow-2xl rounded-xl border-l-4 p-4 z-50 transform transition-all duration-300 translate-y-full opacity-0 ${borderClass} ${cursorClass}`;
+    toast.innerHTML = `
+        <div class="flex justify-between items-start" ${onClickAttr}>
+            <div class="flex gap-3">
+                <span class="material-symbols-outlined ${iconClass}">notifications_active</span>
+                <div>
+                    <h4 class="text-sm font-bold text-white">${title}</h4>
+                    <p class="text-xs text-slate-300 mt-1">${message}</p>
+                </div>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="text-slate-400 hover:text-white"><span class="material-symbols-outlined text-sm">close</span></button>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('translate-y-full', 'opacity-0');
+    }, 100);
+    
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-full');
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
+}
+
+async function fetchUnreadCount() {
+    try {
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        if(!token) return;
+        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        if(res.ok) {
+            const notifs = await res.json();
+            const unread = notifs.filter(n => !n.is_read).length;
+            const badge = document.getElementById('global-notif-badge');
+            if(badge && unread > 0) {
+                badge.textContent = unread;
+                badge.classList.remove('hidden');
+            }
+            
+            if (notifs.length > 0) {
+                const latestId = Math.max(...notifs.map(n => n.id));
+                if (lastNotifId === null) {
+                    lastNotifId = latestId; // Initialize on first fetch
+                } else if (latestId > lastNotifId) {
+                    const newNotifs = notifs.filter(n => n.id > lastNotifId);
+                    newNotifs.forEach(n => showToast(n.title, n.message, n.severity, n.type));
+                    lastNotifId = latestId;
+                }
+            }
+        }
+    } catch(e) {}
+}
+document.addEventListener('DOMContentLoaded', () => {
+    fetchUnreadCount();
+    setInterval(fetchUnreadCount, 10000);
+});
+</script>
+
+<!-- Chat Modal -->
+<div id="chat-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-lg rounded-2xl relative flex flex-col h-[600px] max-h-[90vh]">
+        <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5 rounded-t-2xl">
+            <h2 class="text-lg font-bold flex items-center gap-2 text-white"><span class="material-symbols-outlined text-indigo-400">forum</span> <span id="chat-modal-title">Communication</span></h2>
+            <button onclick="closeChatModal()" class="text-tertiary-fixed-dim hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-2">
+            <!-- Messages go here -->
+        </div>
+        <div class="p-4 border-t border-white/10 bg-[#0f172a]/50 rounded-b-2xl">
+            <form onsubmit="submitChatMessage(event)" class="flex gap-2">
+                <input type="text" id="chat-input" required class="flex-1 bg-[#1e293b] border border-white/20 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-indigo-500" placeholder="Type your message...">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 rounded-xl transition-colors font-bold flex items-center justify-center">
+                    <span class="material-symbols-outlined">send</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentEntityType = null;
+    let currentEntityId = null;
+    let currentThreadId = null;
+
+    async function openChatModal(entityType, entityId) {
+        currentEntityType = entityType;
+        currentEntityId = entityId;
+        document.getElementById('chat-modal-title').innerText = `${entityType} #${entityId} Communication`;
+        document.getElementById('chat-messages').innerHTML = '<p class="text-xs text-slate-400 italic">Loading messages...</p>';
+        document.getElementById('chat-modal').classList.remove('hidden');
+        
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/threads/${entityType}/${entityId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const thread = await res.json();
+            currentThreadId = thread.id;
+            renderMessages(thread.messages || []);
+        } catch(e) {
+            console.error(e);
+            document.getElementById('chat-messages').innerHTML = '<p class="text-xs text-rose-400 italic">Failed to load thread</p>';
+        }
+    }
+
+    function closeChatModal() {
+        document.getElementById('chat-modal').classList.add('hidden');
+    }
+
+    function renderMessages(messages) {
+        const container = document.getElementById('chat-messages');
+        const currentUserId = parseInt(localStorage.getItem('userId'), 10);
+        container.innerHTML = '';
+        if (messages.length === 0) {
+            container.innerHTML = '<p class="text-xs text-slate-400 italic">No messages yet.</p>';
+            return;
+        }
+        messages.forEach(m => {
+            const isMe = m.sender_id === currentUserId;
+            container.innerHTML += `
+                <div class="mb-3 flex ${isMe ? 'justify-end' : 'justify-start'}">
+                    <div class="${isMe ? 'bg-indigo-600' : 'bg-[#1e293b] border border-white/10'} p-3 rounded-xl max-w-[80%]">
+                        <p class="text-xs text-white">${m.content}</p>
+                        <p class="text-[9px] ${isMe ? 'text-indigo-200' : 'text-slate-400'} mt-1 text-right">${new Date(m.timestamp).toLocaleTimeString()}</p>
+                    </div>
+                </div>
+            `;
+        });
+        container.scrollTop = container.scrollHeight;
+    }
+
+    async function submitChatMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById('chat-input');
+        const content = input.value.trim();
+        if(!content || !currentThreadId) return;
+
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentThreadId}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ content })
+            });
+            input.value = '';
+            openChatModal(currentEntityType, currentEntityId);
+        } catch(err) {
+            console.error(err);
+        }
+    }
+</script>
+
+<!-- Notifications Modal -->
+<div id="notif-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="glass-panel w-full max-w-lg rounded-2xl relative flex flex-col h-[600px] max-h-[90vh]">
+        <div class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5 rounded-t-2xl">
+            <h2 class="text-lg font-bold flex items-center gap-2 text-white">
+                <span class="material-symbols-outlined text-rose-400">notifications</span> 
+                Notifications
+            </h2>
+            <button onclick="closeNotificationsModal()" class="text-tertiary-fixed-dim hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="notif-messages" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <!-- Notifications go here -->
+        </div>
+        <div class="p-4 border-t border-white/10 bg-[#0f172a]/50 rounded-b-2xl flex justify-end">
+            <button onclick="closeNotificationsModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl transition-colors font-bold text-sm">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function openNotificationsModal() {
+        document.getElementById('notif-modal').classList.remove('hidden');
+        document.getElementById('notif-messages').innerHTML = '<p class="text-xs text-slate-400 italic">Loading notifications...</p>';
+        
+        try {
+            const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+            const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+            if(res.ok) {
+                const notifs = await res.json();
+                const container = document.getElementById('notif-messages');
+                container.innerHTML = '';
+                if(notifs.length === 0) {
+                    container.innerHTML = '<p class="text-xs text-slate-400 italic">No new notifications.</p>';
+                } else {
+                    // Sort descending by ID
+                    notifs.sort((a,b) => b.id - a.id).forEach(n => {
+                        const borderClass = n.severity === 'Critical' ? 'border-rose-500' : 'border-blue-500';
+                        const iconClass = n.severity === 'Critical' ? 'text-rose-500' : 'text-blue-500';
+                        
+                        container.innerHTML += `
+                            <div class="bg-[#1e293b] p-3 rounded-xl border-l-4 ${borderClass} shadow-md mb-2">
+                                <div class="flex gap-3">
+                                    <span class="material-symbols-outlined ${iconClass}">notifications_active</span>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-white">${n.title}</h4>
+                                        <p class="text-xs text-slate-300 mt-1">${n.message}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+        } catch(e) {
+            document.getElementById('notif-messages').innerHTML = '<p class="text-xs text-rose-400 italic">Failed to load notifications</p>';
+        }
+    }
+    
+    function closeNotificationsModal() {
+        document.getElementById('notif-modal').classList.add('hidden');
+    }
+</script>
 </body>
+
 </html>
