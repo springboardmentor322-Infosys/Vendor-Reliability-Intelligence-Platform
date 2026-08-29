@@ -15,4 +15,7 @@ async def get_db():
 # Import all models to ensure SQLAlchemy registers them before any queries
 from app.modules.auth.models import User, Role
 from app.modules.vendors.models import Vendor, VendorCategory, VendorContact
+from app.modules.contracts.models import Contract, ContractDocument
 from app.modules.procurement.models import ProcurementRequest, PRItem, PurchaseOrder, POItem
+from app.modules.audit.models import AuditLog
+from app.modules.notifications.models import Notification

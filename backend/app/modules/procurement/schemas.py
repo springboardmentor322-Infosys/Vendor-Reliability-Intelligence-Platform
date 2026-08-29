@@ -37,3 +37,36 @@ class ProcurementRequestResponse(ProcurementRequestBase):
 
     class Config:
         from_attributes = True
+
+class POItemBase(BaseModel):
+    item_name: str
+    quantity: int
+    unit_price: float
+
+class POItemResponse(POItemBase):
+    id: int
+    po_id: int
+
+    class Config:
+        from_attributes = True
+
+class PurchaseOrderCreate(BaseModel):
+    vendor_id: int
+
+class PurchaseOrderUpdateStatus(BaseModel):
+    status: str
+
+class PurchaseOrderResponse(BaseModel):
+    id: int
+    po_number: Optional[str] = None
+    pr_id: Optional[int] = None
+    vendor_id: int
+    amount: float
+    status: str
+    invoice_file_path: Optional[str] = None
+    receipt_file_path: Optional[str] = None
+    created_at: datetime
+    items: List[POItemResponse] = []
+
+    class Config:
+        from_attributes = True

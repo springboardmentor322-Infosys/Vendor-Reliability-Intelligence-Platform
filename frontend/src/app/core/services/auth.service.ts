@@ -28,10 +28,23 @@ export class AuthService {
       tap((response: any) => {
         if (response.access_token) {
           localStorage.setItem('token', response.access_token);
+          this.decodeAndStoreRole(response.access_token);
           this.fetchCurrentUser().subscribe();
         }
       })
     );
+  }
+
+  private decodeAndStoreRole(token: string) {
+    try {
+      const payload = token.split('.')[1];
+      const decoded = JSON.parse(atob(payload));
+      if (decoded.role) {
+        localStorage.setItem('role', decoded.role);
+      }
+    } catch (e) {
+      console.error('Failed to parse JWT token');
+    }
   }
 
   fetchCurrentUser(): Observable<any> {
@@ -52,6 +65,7 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
     this.currentUserSubject.next(null);
   }
 

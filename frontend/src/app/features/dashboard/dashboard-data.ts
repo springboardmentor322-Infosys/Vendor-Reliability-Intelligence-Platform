@@ -102,6 +102,7 @@ export const roles = {
     label:"Supply Chain Manager", initials:"PN", name:"Priya Nair",
     groups:[{label:"Main", items:[
       {id:"dashboard", label:"Dashboard"},
+      {id:"pm_requests", label:"Procurement Requests"},
       {id:"performance", label:"Vendor Performance"},
       {id:"reliability", label:"Reliability Scoring"},
       {id:"delivery", label:"Delivery Tracking"},
@@ -115,6 +116,7 @@ export const roles = {
     label:"Finance Officer", initials:"DC", name:"Daniel Cho",
     groups:[{label:"Main", items:[
       {id:"dashboard", label:"Dashboard"},
+      {id:"pm_requests", label:"Procurement Requests"},
       {id:"invoices", label:"Invoices & Payments"},
       {id:"pos", label:"Purchase Orders"},
       {id:"payhistory", label:"Vendor Payment History"},

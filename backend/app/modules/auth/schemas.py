@@ -9,6 +9,7 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+    role_name: str
 
 class RoleResponse(BaseModel):
     id: int

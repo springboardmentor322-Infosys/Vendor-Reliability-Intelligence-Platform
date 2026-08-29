@@ -88,6 +88,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   goTo(pageId: string) {
+    if (pageId.includes('contracts')) {
+      this.router.navigate(['/contracts']);
+      return;
+    }
+    if (pageId.includes('communication')) {
+      this.router.navigate(['/communications']);
+      return;
+    }
     this.currentPage = pageId;
     this.renderPage();
   }

@@ -11,13 +11,14 @@ from app.modules.contracts.router import router as contracts_router
 from app.modules.notifications.router import router as notifications_router
 from app.modules.analytics.router import router as analytics_router
 from app.modules.reports.router import router as reports_router
+from app.modules.communications.router import router as communications_router
 
 app = FastAPI(title="Vendor Reliability Intelligence Platform API")
 
 # Configure CORS for Angular dev server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],
+    allow_origins=["http://localhost:4200", "http://127.0.0.1:4200"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -37,3 +38,4 @@ app.include_router(contracts_router, prefix="/contracts", tags=["Contracts"])
 app.include_router(notifications_router, prefix="/notifications", tags=["Notifications"])
 app.include_router(analytics_router, prefix="/analytics", tags=["Analytics"])
 app.include_router(reports_router, prefix="/reports", tags=["Reports"])
+app.include_router(communications_router, prefix="/communications", tags=["Communications"])

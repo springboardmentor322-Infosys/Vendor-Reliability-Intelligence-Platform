@@ -34,7 +34,7 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    this.authService.login({ email: this.email, password: this.password }).subscribe({
+    this.authService.login({ email: this.email, password: this.password, role_name: this.selectedRoleLabel }).subscribe({
       next: () => {
         this.router.navigate(['/dashboard']);
       },

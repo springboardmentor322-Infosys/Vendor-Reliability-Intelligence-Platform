@@ -1,0 +1,95 @@
+<div class="contract-details-container" *ngIf="contract">
+  <div class="page-head">
+    <div>
+      <h2>Contract: {{contract.contract_number}}</h2>
+      <span [ngClass]="getBadgeClass(contract.status)">{{contract.status}}</span>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-head">
+      <h3>{{contract.title}}</h3>
+      <p>Vendor ID: {{contract.vendor_id}}</p>
+      <p *ngIf="contract.purchase_order_id">
+        Linked PO: <a routerLink="/purchase-orders" class="text-[var(--primary)] hover:underline">PO-{{contract.purchase_order_id}}</a>
+      </p>
+    </div>
+    
+    <div class="card-body content-grid">
+      <div class="info-group">
+        <label>Type:</label>
+        <span>{{contract.contract_type || 'N/A'}}</span>
+      </div>
+      
+      <div class="info-group">
+        <label>Value:</label>
+        <span>{{contract.contract_value | currency:contract.currency}}</span>
+      </div>
+
+      <div class="info-group">
+        <label>Start Date:</label>
+        <span>{{contract.start_date | date}}</span>
+      </div>
+
+      <div class="info-group flex items-center gap-3">
+        <div>
+          <label>End Date:</label>
+          <span>{{contract.end_date | date}}</span>
+        </div>
+        <span *ngIf="daysUntilExpiry !== null && daysUntilExpiry > 0" [ngClass]="getExpiryBadgeClass()" class="text-xs px-2 py-1 rounded">
+          Expires in {{daysUntilExpiry}} days
+        </span>
+        <span *ngIf="daysUntilExpiry !== null && daysUntilExpiry <= 0" class="badge red text-xs px-2 py-1 rounded">
+          Expired
+        </span>
+      </div>
+      
+      <div class="info-group" *ngIf="contract.renewal_date">
+        <label>Renewal Date:</label>
+        <span>{{contract.renewal_date | date}}</span>
+      </div>
+
+      <div class="info-group" *ngIf="contract.compliance_flags">
+        <label>Compliance Flags:</label>
+        <ul>
+          <li *ngFor="let flag of contract.compliance_flags">{{flag}}</li>
+        </ul>
+      </div>
+
+      <div class="info-group">
+        <label>Renewal Required:</label>
+        <span>{{contract.renewal_required ? 'Yes' : 'No'}}</span>
+      </div>
+
+      <div class="document-section mt-6 p-4 bg-[var(--slate-border)] rounded">
+        <h3>Document Management</h3>
+        <div *ngIf="contract.uploaded_document_name" class="mb-4">
+          <p class="font-medium">Current Document: {{contract.uploaded_document_name}}</p>
+          <button class="btn btn-secondary mt-2" (click)="downloadDocument()">View Document</button>
+        </div>
+        
+        <div class="upload-area mt-4 pt-4 border-t border-[var(--slate-border)]">
+          <label class="block text-sm font-medium mb-2">Upload New PDF Contract</label>
+          <div class="flex gap-3 items-center">
+            <input type="file" (change)="onFileSelected($event)" accept="application/pdf" class="input-field max-w-sm">
+            <button class="btn btn-primary" [disabled]="!selectedFile || uploading" (click)="uploadContractPdf()">
+              {{ uploading ? 'Uploading...' : 'Upload PDF' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card-footer p-4 flex gap-4">
+      <button class="btn btn-primary" routerLink="/contracts">Back to List</button>
+      <div class="text-sm text-[var(--slate)] ml-auto flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        Contract expiry alerts are automatically generated.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!contract" class="p-4">
+  <p>Loading contract details...</p>
+</div>

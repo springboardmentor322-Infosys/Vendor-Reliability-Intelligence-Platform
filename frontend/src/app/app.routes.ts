@@ -15,5 +15,7 @@ export const routes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'contracts', loadChildren: () => import('./features/contracts/contracts.module').then(m => m.ContractsModule), canActivate: [authGuard] },
+  { path: 'communications', loadChildren: () => import('./features/communications/communications.module').then(m => m.CommunicationsModule), canActivate: [authGuard] },
   { path: '**', redirectTo: '' }
 ];

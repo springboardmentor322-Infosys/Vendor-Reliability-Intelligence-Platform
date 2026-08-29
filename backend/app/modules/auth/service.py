@@ -14,6 +14,8 @@ async def authenticate_user(db: AsyncSession, user: UserLogin):
         return False
     if not verify_password(user.password, db_user.password_hash):
         return False
+    if db_user.role.name != user.role_name:
+        raise HTTPException(status_code=403, detail="This account is not registered for the selected role.")
     if db_user.status != "active":
         raise HTTPException(status_code=403, detail="Account is pending approval")
     return db_user

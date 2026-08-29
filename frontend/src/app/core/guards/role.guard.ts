@@ -7,21 +7,14 @@ export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
     const authService = inject(AuthService);
     const router = inject(Router);
 
-    // In a real app, you would decode the JWT to check the role, 
-    // or fetch the profile. Since this is Milestone 1, we assume
-    // AuthService might have a currentUser object or we check localStorage.
-    
-    // For M1 gap analysis: we need to ensure users can't route to the wrong dashboard.
-    // We will just do a basic check here. If the authService doesn't have roles implemented on frontend yet, 
-    // we just return true. But this lays the architectural foundation!
-    
-    const userRole = localStorage.getItem('role'); // Simulate fetching role
+    const userRole = localStorage.getItem('role');
 
     if (userRole && allowedRoles.includes(userRole)) {
       return true;
     }
 
-    router.navigate(['/dashboard']); // Redirect to their default dashboard
+    alert('403 Forbidden: You do not have permission to access this dashboard.');
+    router.navigate(['/login']);
     return false;
   };
 };

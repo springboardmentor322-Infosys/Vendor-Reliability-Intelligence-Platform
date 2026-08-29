@@ -44,7 +44,7 @@ class VendorUpdateStatus(BaseModel):
 class VendorResponse(BaseModel):
     id: int
     name: str
-    contact_email: str
+    contact_email: Optional[str] = None
     category_id: Optional[int] = None
     status: str
     category: Optional[VendorCategoryResponse] = None

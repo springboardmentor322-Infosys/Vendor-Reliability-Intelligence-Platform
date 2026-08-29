@@ -15,6 +15,8 @@ export class PrDashboardComponent implements OnInit {
   
   showModal = false;
   selectedPR: any = null;
+  eligibleVendors: any[] = [];
+  selectedVendorId: any = '';
   
   showCreateModal = false;
   newPR: any = {
@@ -56,11 +58,31 @@ export class PrDashboardComponent implements OnInit {
   openPR(pr: any) {
     this.selectedPR = pr;
     this.showModal = true;
+    this.selectedVendorId = '';
+    this.eligibleVendors = [];
+    
+    if (pr.status === 'Approved' && (this.currentRoleKey === 'admin' || this.currentRoleKey === 'pm')) {
+        this.procurementService.getEligibleVendors(pr.department).subscribe(vendors => {
+            this.eligibleVendors = vendors;
+        });
+    }
   }
 
   closeModal() {
     this.showModal = false;
     this.selectedPR = null;
+    this.eligibleVendors = [];
+  }
+
+  generatePO() {
+    if (!this.selectedVendorId || !this.selectedPR) return;
+    this.procurementService.createPurchaseOrder(this.selectedPR.id, this.selectedVendorId).subscribe(po => {
+        this.selectedPR.status = 'Ordered';
+        const idx = this.prs.findIndex(p => p.id === this.selectedPR.id);
+        if (idx !== -1) this.prs[idx] = this.selectedPR;
+        alert(`Purchase Order ${po.po_number} generated successfully!`);
+        this.closeModal();
+    });
   }
 
   updateStatus(status: string) {

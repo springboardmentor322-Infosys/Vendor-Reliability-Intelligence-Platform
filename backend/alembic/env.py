@@ -23,6 +23,10 @@ from app.modules.auth.models import *
 from app.modules.vendors.models import *
 from app.modules.procurement.models import *
 from app.modules.contracts.models import *
+from app.modules.audit.models import *
+from app.modules.notifications.models import *
+from app.modules.communications.models import *
+from app.modules.inventory.models import *
 
 target_metadata = Base.metadata
 

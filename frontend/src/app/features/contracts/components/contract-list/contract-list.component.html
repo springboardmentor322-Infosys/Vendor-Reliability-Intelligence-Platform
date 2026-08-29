@@ -1,0 +1,70 @@
+<div class="page-head">
+  <div>
+    <h1>Contract Repository</h1>
+    <p>Manage and track vendor contracts.</p>
+  </div>
+  <button class="btn btn-primary" *ngIf="canUpload" (click)="openUploadDialog()">Upload Contract</button>
+</div>
+
+<div class="card mt-4">
+  <div class="card-head" style="display: flex; gap: 10px; align-items: center; padding-bottom: 10px;">
+    <input type="text" class="form-control" placeholder="Search Title or Contract No." [(ngModel)]="filterSearch">
+    <input type="number" class="form-control" placeholder="Vendor ID" [(ngModel)]="filterVendorId" style="max-width: 150px;">
+    
+    <select class="form-control" [(ngModel)]="filterStatus">
+      <option value="">All Statuses</option>
+      <option value="Draft">Draft</option>
+      <option value="Pending">Pending</option>
+      <option value="Active">Active</option>
+      <option value="Expiring Soon">Expiring Soon</option>
+      <option value="Expired">Expired</option>
+      <option value="Renewed">Renewed</option>
+      <option value="Cancelled">Cancelled</option>
+    </select>
+    
+    <select class="form-control" [(ngModel)]="filterCompliance">
+      <option value="">All Compliance Flags</option>
+      <option *ngFor="let flag of complianceFlags" [value]="flag">{{flag}}</option>
+    </select>
+    
+    <button class="btn btn-secondary" (click)="applyFilters()">Filter</button>
+    <button class="btn btn-secondary" (click)="clearFilters()">Clear</button>
+  </div>
+  <div class="card-body">
+    <table class="data-table w-full text-left">
+      <thead>
+        <tr>
+          <th>Contract No.</th>
+          <th>Vendor</th>
+          <th>Title</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let element of contracts">
+          <td>{{element.contract_number}}</td>
+          <td>{{element.vendor_id}}</td>
+          <td>{{element.title}}</td>
+          <td>{{element.start_date | date}}</td>
+          <td>{{element.end_date | date}}</td>
+          <td><span [ngClass]="getBadgeClass(element.status)">{{element.status}}</span></td>
+          <td>
+            <a class="btn btn-secondary btn-sm" [routerLink]="['/contracts', element.id]">View</a>
+          </td>
+        </tr>
+        <tr *ngIf="contracts.length === 0">
+          <td colspan="7" class="text-center py-4 text-[var(--slate)]">No contracts found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showUploadModal">
+  <div class="modal-content">
+    <app-contract-upload (closeModal)="closeUploadDialog()"></app-contract-upload>
+  </div>
+</div>

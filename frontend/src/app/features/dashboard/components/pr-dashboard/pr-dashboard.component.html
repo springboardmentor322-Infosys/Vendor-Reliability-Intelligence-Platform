@@ -98,8 +98,17 @@
       </ng-container>
       
       <ng-container *ngIf="selectedPR?.status === 'Approved' && (currentRoleKey === 'pm' || currentRoleKey === 'admin')">
-        <!-- Next steps: convert to PO, etc. -->
-        <button class="btn-secondary" (click)="updateStatus('Ordered')">Mark as Ordered</button>
+        <div class="flex items-center gap-3 w-full" *ngIf="eligibleVendors.length > 0">
+          <label class="text-sm text-[var(--slate)] whitespace-nowrap">Assign Vendor:</label>
+          <select class="input-field py-2 text-sm flex-1" [(ngModel)]="selectedVendorId">
+            <option value="">-- Select Vendor --</option>
+            <option *ngFor="let v of eligibleVendors" [value]="v.id">{{ v.name }} ({{ v.category }})</option>
+          </select>
+          <button class="btn-primary" [disabled]="!selectedVendorId" (click)="generatePO()">Generate PO</button>
+        </div>
+        <div class="flex items-center gap-3 w-full text-[var(--error)] text-sm" *ngIf="eligibleVendors.length === 0">
+          No eligible vendors found matching the category '{{ selectedPR?.department }}'. Please approve a vendor first.
+        </div>
       </ng-container>
     </div>
   </div>

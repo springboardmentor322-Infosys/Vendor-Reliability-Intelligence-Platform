@@ -63,7 +63,33 @@ import { CommonModule } from '@angular/common';
           <h3>Active Purchase Orders</h3>
         </div>
         <div class="card-body">
-          <div class="text-center py-8 text-[var(--slate)]">PO module coming in Phase 3</div>
+          <table class="data-table w-full text-left">
+            <thead>
+              <tr>
+                <th>PO Number</th>
+                <th>Vendor</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let po of data?.active_pos">
+                <td class="font-medium text-[var(--ink)]">{{ po.po_number }}</td>
+                <td>{{ po.vendor }}</td>
+                <td class="font-mono text-sm">\${{ po.amount | number:'1.2-2' }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="{
+                    'status-pending': po.status === 'Pending' || po.status === 'Accepted',
+                    'status-active': po.status === 'Completed' || po.status === 'Delivered',
+                    'status-warning': po.status === 'In Progress' || po.status === 'Partial Delivery' || po.status === 'Shipped'
+                  }">{{ po.status }}</span>
+                </td>
+              </tr>
+              <tr *ngIf="!data?.active_pos?.length">
+                <td colspan="4" class="text-center py-8 text-[var(--slate)]">No active Purchase Orders</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
