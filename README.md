@@ -1,7 +1,7 @@
 <div align="center">
   <h1>📊 VendorIntel</h1>
   <p><strong>Vendor Reliability Intelligence & Procurement Risk Management Platform</strong><br>
-  <em>Created by B P S KRUTHI</em></p>
+  <em> by B P S KRUTHI</em></p>
 
   <p>
     <a href="#-key-outcomes"><img src="https://img.shields.io/badge/Status-Active-success.svg" alt="Status" /></a>
