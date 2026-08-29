@@ -1,65 +1,212 @@
 # Vendor Reliability Intelligence & Procurement Risk Management Platform (VendorIQ)
 
-VendorIQ is a production-ready, full-stack enterprise web application designed to evaluate supplier reliability, track procurement transactions, monitor operational performance, handle contract compliance, and support data-driven procurement decision-making through dynamic analytics dashboards.
+VendorIQ is a full-stack web application designed to evaluate vendor reliability, monitor procurement operations, analyze supply-chain performance, manage contracts, and support data-driven procurement decision-making through centralized dashboards and analytics.
+
+The platform uses the **DataCo Supply Chain Dataset** as its primary operational data source and processes supply-chain transaction data using Python and Pandas before storing and serving the data through PostgreSQL and FastAPI.
 
 ---
 
 ## 1. Problem Statement
-Modern supply chains face persistent risks from delayed deliveries, low-quality shipments, and non-compliance with contracts. Organizations often lack central visibility to analyze and rate their vendors objectively. This platform addresses this gap by importing historical transaction logs, generating real-time performance scores, automating quality tracking, and securing operational workflows based on role permissions.
+
+Modern supply chains face persistent risks from delayed deliveries, unreliable suppliers, operational inefficiencies, and contract-related issues. Organizations often lack centralized visibility to analyze vendor performance objectively.
+
+This platform addresses these challenges by processing historical supply-chain transaction data, calculating vendor performance metrics, monitoring procurement activities, tracking deliveries, and providing role-based dashboards for different organizational users.
 
 ---
 
-## 2. Features
+## 2. Key Features
 
-* **JWT Authenticated Session Management**: Custom login, register, and admin approval gates.
-* **Role-Based Access Control (RBAC)**: Support for 6 distinct roles (Admin, Procurement Manager, Supply Chain Manager, Finance Officer, Auditor, Vendor).
-* **Vendor Data Isolation**: Vendor users are strictly restricted to viewing only their own transactions, invoices, quality inspections, and notifications.
-* **Procurement Operations**: Live tracking of purchase orders, contracts, and delivery timelines.
-* **Supply Chain Deliveries Dashboard**: Interactive KPIs for total shipments, on-time delivery rates, average delays, and monthly trend tracking.
-* **Invoices & Payment Actions**: Authorized mark-paid workflow updating PostgreSQL status and dates.
-* **Quality Inspections & Compliance**: Defect rates and quality scoring logged with input bounds validations.
-* **System Audit Logs**: Read-only chronological logs of system mutations with fuzzy email, action, and date filters.
-* **Notifications Center**: Active alerts of late deliveries or compliance notices with unread counts and read markers.
-* **Analytical Reports**: Fully functional, downloadable CSV reports for purchase orders and vendor reliability.
-
----
-
-## 3. Technology Stack
-
-* **Language**: Python 3.12, ES6 Vanilla JavaScript, HTML5, CSS3
-* **Backend Framework**: FastAPI (served via Uvicorn)
-* **Database**: PostgreSQL 15 (psycopg2-binary connection)
-* **Libraries**: PyJWT, passlib[bcrypt], pandas, openpyxl, reportlab
-* **Deployment**: Docker, Docker Compose
+* **JWT Authentication**: Secure login and registration with token-based authentication.
+* **Role-Based Access Control (RBAC)**: Role-specific access for Admin, Procurement Manager, Supply Chain Manager, Finance Officer, Auditor, and Vendor.
+* **Vendor Management**: Vendor registration, vendor mapping, vendor information, and performance monitoring.
+* **Vendor Reliability Analysis**: Calculates vendor-level delivery and reliability metrics from supply-chain transaction data.
+* **Procurement Management**: Procurement request and purchase order monitoring.
+* **Purchase Order Tracking**: Tracks order status, delivery information, and procurement activities.
+* **Supply Chain Dashboard**: Provides shipment, delivery, delay, and performance analytics.
+* **Contract Management**: Tracks contract information and compliance-related activities.
+* **Invoice Management**: Supports invoice monitoring and authorized payment-status updates.
+* **Quality Monitoring**: Records and analyzes quality inspection information.
+* **Notifications**: Provides alerts and notifications for relevant system events.
+* **Audit Logs**: Maintains records of important system activities.
+* **Reports**: Provides analytical reports for procurement and vendor performance.
+* **Interactive Dashboards**: Provides data-driven visualizations and KPIs using JavaScript and Chart.js.
 
 ---
 
-## 4. Architecture Blueprint
+## 3. Dataset
 
+The project uses the **DataCo Supply Chain Dataset** as the primary source of supply-chain transaction data.
+
+### Dataset Information
+
+| Attribute               |   Value |
+| ----------------------- | ------: |
+| Total Records           | 180,519 |
+| Total Columns           |      53 |
+| Unique Product Card IDs |     118 |
+| Categories              |      50 |
+| Order Status Types      |       9 |
+| Delivery Status Types   |       4 |
+
+### Important Dataset Fields
+
+The analysis uses fields including:
+
+* Order Id
+* Product Name
+* Category Name
+* Order Status
+* Delivery Status
+* Days for shipping (real)
+* Days for shipment (scheduled)
+* Late_delivery_risk
+* Order Item Quantity
+* Order Item Product Price
+* Sales
+* Order Item Total
+* Order Date
+* Shipping Date
+* Product Card Id
+
+The dataset is processed using Python/Pandas and imported into the PostgreSQL database through the project's data import pipeline.
+
+---
+
+## 4. Vendor Reliability Analysis
+
+The platform derives vendor-level performance information from the available supply-chain transaction data.
+
+The analysis includes:
+
+* Total Orders
+* Late Orders
+* Average Shipping Days
+* Average Scheduled Shipping Days
+* Total Sales
+* On-Time Delivery Rate
+* Late Delivery Rate
+* Reliability Score
+* Reliability Status
+
+The processed dataset currently represents approximately **118 vendor entities** and **180,519 supply-chain transaction records**.
+
+---
+
+## 5. Technology Stack
+
+### Backend
+
+* Python 3.12+
+* FastAPI
+* Uvicorn
+* SQLAlchemy
+* PostgreSQL
+* JWT Authentication
+* Password Hashing
+
+### Data Processing
+
+* Python
+* Pandas
+* CSV
+* DataCo Supply Chain Dataset
+
+### Frontend
+
+* HTML5
+* CSS3
+* Vanilla JavaScript
+* Chart.js
+
+### Export & Reporting
+
+* Pandas
+* OpenPyXL
+* ReportLab
+
+### Deployment
+
+* Docker
+* Docker Compose
+
+---
+
+## 6. Architecture
+
+```text
+                 +--------------------------------+
+                 |      DataCo CSV Dataset        |
+                 +---------------+----------------+
+                                 |
+                                 v
+                 +-------------------------------+
+                 |    Python / Pandas Processing  |
+                 +---------------+---------------+
+                                 |
+                                 v
+                 +-------------------------------+
+                 |       PostgreSQL Database      |
+                 +---------------+---------------+
+                                 |
+                                 v
+                 +-------------------------------+
+                 |       FastAPI Backend          |
+                 |          + Uvicorn             |
+                 +---------------+---------------+
+                                 |
+                           REST API / JSON
+                                 |
+                                 v
+                 +-------------------------------+
+                 |       HTML / CSS / JS          |
+                 |        Frontend Application    |
+                 +---------------+---------------+
+                                 |
+                                 v
+                 +-------------------------------+
+                 |      Role-Based Dashboards     |
+                 +-------------------------------+
 ```
-                     +----------------------------------+
-                     |    Web Browser (HTML/CSS/JS)    |
-                     +-----------------+----------------+
-                                       |
-                               REST API (JSON)
-                                       |
-                                       v
-                     +-----------------+----------------+
-                     |    FastAPI (Uvicorn Backend)     |
-                     +-----------------+----------------+
-                                       |
-                                  Connection
-                                       |
-                                       v
-                     +-----------------+----------------+
-                     |      PostgreSQL Database         |
-                     +----------------------------------+
-```
 
 ---
 
-## 5. Folder Structure
+## 7. Data Processing Pipeline
+
+```text
+DataCoSupplyChainDataset.csv
+            |
+            v
+     Data Validation
+            |
+            v
+     Data Cleaning
+            |
+            v
+    Pandas Transformation
+            |
+            v
+    Vendor-Level Analysis
+            |
+            v
+      PostgreSQL
+            |
+            v
+       FastAPI APIs
+            |
+            v
+    JavaScript fetch()
+            |
+            v
+     Frontend Dashboards
 ```
+
+The system is designed to process the large supply-chain dataset through the backend rather than loading all records directly into the browser.
+
+---
+
+## 8. Folder Structure
+
+```text
 Vendor-Reliability-Intelligence-Platform/
 │
 ├── backend/
@@ -83,122 +230,269 @@ Vendor-Reliability-Intelligence-Platform/
 │
 ├── frontend/
 │   ├── css/
-│   ├── js/
-│   │   ├── auth.js
-│   │   ├── login.js
-│   │   ├── invoices.js
-│   │   ├── quality.js
-│   │   ├── audit_logs.js
-│   │   ├── notifications.js
-│   │   └── supplychain_dashboard.js
-│   ├── dashboard.html
-│   ├── invoices.html
-│   ├── quality.html
-│   ├── audit_logs.html
-│   ├── notifications.html
-│   └── supplychain_dashboard.html
+│   └── js/
 │
 ├── Dockerfile
 ├── docker-compose.yml
 ├── .env.example
+├── LICENSE
+├── PHASE1_SUMMARY.md
+│
+├── check_data.py
+├── check_schema.py
+├── data_analysis.py
+├── fix_schema.py
+├── import_csv_pipeline.py
+├── import_vendor_data.py
+├── phase1_inspect.py
+├── phase2_3_products.py
+├── phase4_generate_vendors.py
+├── phase5_vendor_products.py
+├── phase6_deliveries.py
+├── vendor_analysis.py
+│
 └── README.md
 ```
 
 ---
 
-## 6. Database Setup
-1. Create a PostgreSQL database named `vendor_platform`.
-2. Configure credentials in your `.env` file (copied from `.env.example`).
-3. Run the import pipelines in sequence to import the DataCo dataset:
-   ```bash
-   python import_csv_pipeline.py
-   ```
-   This will reset and seed all raw transaction records (180,519 rows) and vendor metadata (118 vendors).
+## 9. Database Setup
 
----
+The project uses **PostgreSQL** as its database.
 
-## 7. Configuration & Running Locally
+### Step 1: Create Database
 
-### Prerequisites
-* Python 3.12+
-* PostgreSQL 15+
+Create a PostgreSQL database named:
 
-### Environment Variables
-Configure your environment using the provided template `.env.example`:
+```text
+vendor_platform
+```
+
+### Step 2: Configure Environment Variables
+
+Copy the provided environment template:
+
 ```bash
 cp .env.example .env
 ```
 
-### Installation
-1. Create a virtual environment and activate it:
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate
-   ```
-2. Install Python dependencies:
-   ```bash
-   pip install -r backend/requirements.txt
-   ```
-3. Start the FastAPI backend server:
-   ```bash
-   python -m uvicorn backend.main:app --reload --port 8000
-   ```
-4. Access the web interface in your browser:
-   `http://127.0.0.1:8000/frontend/login.html`
+Update the database credentials in `.env` according to your local PostgreSQL configuration.
+
+### Step 3: Import Dataset
+
+Run the CSV import pipeline:
+
+```bash
+python import_csv_pipeline.py
+```
+
+The pipeline processes the DataCo Supply Chain Dataset and imports the required records into PostgreSQL.
+
+The current dataset contains approximately **180,519 transaction records** and the project derives approximately **118 vendor entities** from the available data.
 
 ---
 
-## 8. Running with Docker (Containerized)
-To build and run the entire application container stack:
+## 10. Running the Project Locally
+
+### Prerequisites
+
+Make sure the following are installed:
+
+* Python 3.12+
+* PostgreSQL
+* Git
+
+### Step 1: Clone Repository
+
+```bash
+git clone <repository-url>
+cd Vendor-Reliability-Intelligence-Platform
+```
+
+### Step 2: Create Virtual Environment
+
+```bash
+python -m venv .venv
+```
+
+Activate it on Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+### Step 3: Install Dependencies
+
+```bash
+pip install -r backend/requirements.txt
+```
+
+### Step 4: Configure PostgreSQL
+
+Create the `vendor_platform` database and configure the database credentials in `.env`.
+
+### Step 5: Import Dataset
+
+```bash
+python import_csv_pipeline.py
+```
+
+### Step 6: Start FastAPI
+
+```bash
+python -m uvicorn backend.main:app --reload --port 8000
+```
+
+### Step 7: Open Swagger API Documentation
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### Step 8: Open the Frontend
+
+```text
+http://127.0.0.1:8000/frontend/login.html
+```
+
+---
+
+## 11. Running with Docker
+
+The project also supports containerized execution using Docker and Docker Compose.
+
+Build and start the application:
+
 ```bash
 docker-compose up --build
 ```
-This launches a PostgreSQL database and a FastAPI backend service automatically connected on port `8000`.
+
+Docker Compose starts the required application services and connects the backend with PostgreSQL according to the project configuration.
 
 ---
 
-## 9. User Roles Matrix
+## 12. User Roles
 
-| Role | Permitted Actions |
-|---|---|
-| **Admin** | Approves users, maps vendors, views system statistics, reads audit logs, records quality logs. |
-| **Procurement Manager** | Accesses active purchase orders, issues contract records, and writes quality inspection logs. |
-| **Supply Chain Manager** | Views deliveries summary, monthly trends, delayed alert list, and records quality logs. |
-| **Finance Officer** | Oversight on all billing invoices; marks pending invoices as paid. |
-| **Auditor** | Accesses read-only chronological system audit log entries and reports. |
-| **Vendor** | Strictly limited to viewing their own invoices, quality logs, and notifications. |
-
----
-
-## 10. API Route Registry
-
-| Method | Endpoint | Allowed Roles | Description |
-|---|---|---|---|
-| `POST` | `/login` | Public | Authenticates credentials and returns JWT token. |
-| `POST` | `/register` | Public | Submits registration details to the pending queue. |
-| `GET` | `/deliveries/summary` | Admin, SCM | Computes total deliveries, rates, delay aggregates. |
-| `GET` | `/invoices` | All | Returns invoices (scoped to vendor if Vendor role). |
-| `PUT` | `/invoices/{id}/pay` | Admin, Finance | Marks invoice status as 'Paid'. |
-| `GET` | `/quality-inspections` | All | Lists inspection logs (scoped if Vendor). |
-| `POST` | `/quality-inspections` | Admin, PM, SCM | Records new inspection details. |
-| `GET` | `/audit-logs` | Admin, Auditor | Lists chronological system logs. |
-| `GET` | `/notifications` | All | Returns notifications (scoped if Vendor). |
-| `POST` | `/notifications/read/{id}` | All | Marks alert notification as 'Read'. |
+| Role                     | Main Responsibilities                                                                               |
+| ------------------------ | --------------------------------------------------------------------------------------------------- |
+| **Admin**                | User approval, vendor mapping, system monitoring, audit logs, and administrative operations.        |
+| **Procurement Manager**  | Procurement requests, purchase orders, contracts, and vendor-related procurement activities.        |
+| **Supply Chain Manager** | Delivery monitoring, shipment analytics, delays, and supply-chain performance.                      |
+| **Finance Officer**      | Invoice monitoring and authorized payment-related operations.                                       |
+| **Auditor**              | Read-only access to audit information and analytical reports.                                       |
+| **Vendor**               | Access to vendor-specific procurement, performance, invoice, quality, and notification information. |
 
 ---
 
-## 11. Testing
-Comprehensive integration test scripts are available in the project. Run them directly against the running application:
-```bash
-# Verify invoices, quality logs, audit, and notifications
-python scratch/test_invoices_integration.py
-python scratch/test_quality_integration.py
-python scratch/test_audit_logs_integration.py
-python scratch/test_notifications_integration.py
+## 13. API Overview
+
+The FastAPI backend exposes REST APIs for the major application modules.
+
+| Module         | Purpose                                  |
+| -------------- | ---------------------------------------- |
+| Authentication | Login, registration, and authorization   |
+| Vendors        | Vendor management and vendor information |
+| Dashboard      | Dashboard statistics and KPIs            |
+| Procurement    | Procurement requests and purchase orders |
+| Contracts      | Contract management                      |
+| Deliveries     | Delivery and shipment analysis           |
+| Invoices       | Invoice management and payment status    |
+| Quality        | Quality inspection records               |
+| Notifications  | System notifications                     |
+| Audit Logs     | System activity monitoring               |
+| Reports        | Vendor and procurement reports           |
+
+Interactive API documentation is available through:
+
+```text
+http://127.0.0.1:8000/docs
 ```
 
 ---
 
-## 12. Future Scope & Limitations
-* **Calculation Load**: SCM and report aggregation queries read 180k+ rows on-demand. Future versions should use database views or materialization to speed up dashboard loads.
-* **Cloud File Storage**: Message attachment and documentation sharing are currently stored locally. S3 integration is suggested for scalability.
+## 14. Testing
+
+The application can be tested through the FastAPI Swagger interface and the main frontend workflows.
+
+### Backend Testing
+
+After starting the FastAPI server, open:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+The following functionality can be tested:
+
+* User registration
+* User login
+* JWT authentication
+* Role-based authorization
+* Vendor management
+* Procurement requests
+* Purchase orders
+* Contract management
+* Delivery APIs
+* Invoice operations
+* Quality inspection APIs
+* Notification APIs
+* Audit log APIs
+* Dashboard APIs
+* Reporting APIs
+
+### Data Validation
+
+The data-processing scripts can be used to inspect and validate the imported supply-chain dataset before and after database processing.
+
+---
+
+## 15. Performance Considerations
+
+The project works with a large dataset containing more than 180,000 transaction records.
+
+To improve application performance, the system should use:
+
+* Server-side pagination
+* Database-level filtering
+* Aggregated API responses
+* Efficient SQL queries
+* Backend data processing
+* Dashboard-specific queries
+
+Large datasets should not be unnecessarily transferred to the browser.
+
+---
+
+## 16. Future Scope & Limitations
+
+* **Database Optimization:** Frequently used aggregation queries can be optimized using database views, indexes, or materialized views.
+* **Scalable Storage:** Cloud object storage such as Amazon S3 can be integrated for scalable document and attachment storage.
+* **Advanced Prediction:** Machine-learning models can be integrated for predictive vendor-risk and delivery-delay prediction.
+* **Real-Time Alerts:** Real-time event-based alerts can be added for critical supply-chain risks.
+* **Cloud Deployment:** The application can be deployed on cloud infrastructure for production-scale usage.
+* **Advanced Analytics:** Additional forecasting and anomaly-detection models can be integrated into the platform.
+
+---
+
+## 17. Project Outcome
+
+The Vendor Reliability Intelligence Platform provides a centralized solution for combining supply-chain transaction data with procurement management and vendor performance analytics.
+
+The system helps organizations:
+
+* Monitor vendor reliability
+* Identify delivery risks
+* Analyze supply-chain performance
+* Manage procurement activities
+* Monitor purchase orders
+* Track contracts
+* Manage invoices
+* Monitor quality information
+* Generate reports
+* Support data-driven procurement decisions
+
+---
+
+## 18. License
+
+This project is licensed under the MIT License.
