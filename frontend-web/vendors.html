@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VendorIQ - Vendors</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark"></span> VendorIQ</div>
+      <nav>
+        <a class="nav-link" href="dashboard.html">Dashboard</a>
+        <a class="nav-link active" href="vendors.html">Vendors</a>
+        <a class="nav-link" href="purchase-orders.html">Purchase Orders</a>
+        <a class="nav-link" href="contracts.html">Contracts</a>
+        <a class="nav-link" href="reports.html">Reports</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="role-pill" id="user-role">—</div>
+        <a class="nav-link" href="#" id="logout-link">Sign out</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h2>Vendors</h2>
+          <p class="who">Signed in as <b id="user-name">…</b></p>
+        </div>
+        <button class="btn btn-accent" id="open-create-modal">+ Register vendor</button>
+      </div>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h3>All vendors</h3>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Vendor</th>
+              <th>Category</th>
+              <th>Contact</th>
+              <th>Status</th>
+              <th>Reliability</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="vendors-body"></tbody>
+        </table>
+        <div id="vendors-empty" class="empty-state" style="display:none">
+          <h4>No vendors registered yet</h4>
+          <p>Click "Register vendor" to add your first supplier.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Create vendor modal -->
+  <div class="modal-backdrop" id="create-modal-backdrop">
+    <div class="modal">
+      <h3>Register a new vendor</h3>
+      <div id="create-banner" class="banner banner-error"></div>
+      <form id="create-vendor-form" novalidate>
+        <div class="field">
+          <label for="company_name">Company name</label>
+          <input type="text" id="company_name" required />
+        </div>
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category" required>
+            <option value="raw_material_suppliers">Raw Material Supplier</option>
+            <option value="equipment_vendors">Equipment Vendor</option>
+            <option value="it_vendors">IT Vendor</option>
+            <option value="service_providers">Service Provider</option>
+            <option value="logistics_partners">Logistics Partner</option>
+            <option value="maintenance_vendors">Maintenance Vendor</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="contact_email">Contact email</label>
+          <input type="email" id="contact_email" placeholder="optional" />
+        </div>
+        <div class="field">
+          <label for="contact_phone">Contact phone</label>
+          <input type="text" id="contact_phone" placeholder="optional" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="close-create-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="create-submit-btn">Register vendor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/vendors.js"></script>
+</body>
+</html>

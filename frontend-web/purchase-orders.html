@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VendorIQ - Purchase Orders</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark"></span> VendorIQ</div>
+      <nav>
+        <a class="nav-link" href="dashboard.html">Dashboard</a>
+        <a class="nav-link" href="vendors.html">Vendors</a>
+        <a class="nav-link active" href="purchase-orders.html">Purchase Orders</a>
+        <a class="nav-link" href="contracts.html">Contracts</a>
+        <a class="nav-link" href="reports.html">Reports</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="role-pill" id="user-role">—</div>
+        <a class="nav-link" href="#" id="logout-link">Sign out</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h2>Purchase Orders</h2>
+          <p class="who">Signed in as <b id="user-name">…</b></p>
+        </div>
+        <button class="btn btn-accent" id="open-create-modal">+ New purchase order</button>
+      </div>
+
+      <section class="panel">
+        <div class="panel-header"><h3>All purchase orders</h3></div>
+        <table>
+          <thead>
+            <tr>
+              <th>PO Number</th>
+              <th>Vendor</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="po-body"></tbody>
+        </table>
+        <div id="po-empty" class="empty-state" style="display:none">
+          <h4>No purchase orders yet</h4>
+          <p>Create one to start tracking procurement.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="create-modal-backdrop">
+    <div class="modal">
+      <h3>New purchase order</h3>
+      <div id="create-banner" class="banner banner-error"></div>
+      <form id="create-po-form" novalidate>
+        <div class="field">
+          <label for="vendor_id">Vendor</label>
+          <select id="vendor_id" required></select>
+        </div>
+        <div class="field">
+          <label for="description">Description</label>
+          <input type="text" id="description" placeholder="e.g. 200 servo motors" required />
+        </div>
+        <div class="field">
+          <label for="quantity">Quantity</label>
+          <input type="number" id="quantity" min="1" value="1" required />
+        </div>
+        <div class="field">
+          <label for="unit_price">Unit price ($)</label>
+          <input type="number" id="unit_price" min="0" step="0.01" value="0" required />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="close-create-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="create-submit-btn">Create purchase order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/purchase-orders.js"></script>
+</body>
+</html>

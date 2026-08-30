@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VendorIQ - Contracts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark"></span> VendorIQ</div>
+      <nav>
+        <a class="nav-link" href="dashboard.html">Dashboard</a>
+        <a class="nav-link" href="vendors.html">Vendors</a>
+        <a class="nav-link" href="purchase-orders.html">Purchase Orders</a>
+        <a class="nav-link active" href="contracts.html">Contracts</a>
+        <a class="nav-link" href="reports.html">Reports</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="role-pill" id="user-role">—</div>
+        <a class="nav-link" href="#" id="logout-link">Sign out</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h2>Contracts &amp; Compliance</h2>
+          <p class="who">Signed in as <b id="user-name">…</b></p>
+        </div>
+        <button class="btn btn-accent" id="open-create-modal">+ New contract</button>
+      </div>
+
+      <section class="panel">
+        <div class="panel-header"><h3>All contracts</h3></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Contract</th>
+              <th>Vendor</th>
+              <th>End date</th>
+              <th>Compliance</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="contracts-body"></tbody>
+        </table>
+        <div id="contracts-empty" class="empty-state" style="display:none">
+          <h4>No contracts yet</h4>
+          <p>Add a contract to start tracking renewal and compliance.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="create-modal-backdrop">
+    <div class="modal">
+      <h3>New contract</h3>
+      <div id="create-banner" class="banner banner-error"></div>
+      <form id="create-contract-form" novalidate>
+        <div class="field">
+          <label for="vendor_id">Vendor</label>
+          <select id="vendor_id" required></select>
+        </div>
+        <div class="field">
+          <label for="title">Contract title</label>
+          <input type="text" id="title" placeholder="e.g. Annual Supply Agreement" required />
+        </div>
+        <div class="field">
+          <label for="contract_number">Contract number</label>
+          <input type="text" id="contract_number" placeholder="e.g. CT-1001" required />
+        </div>
+        <div class="field">
+          <label for="start_date">Start date</label>
+          <input type="date" id="start_date" required />
+        </div>
+        <div class="field">
+          <label for="end_date">End date</label>
+          <input type="date" id="end_date" required />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="close-create-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="create-submit-btn">Create contract</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/contracts.js"></script>
+</body>
+</html>
