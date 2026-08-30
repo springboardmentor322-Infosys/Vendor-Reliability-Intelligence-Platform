@@ -1,14 +1,6 @@
 # Vendor Pulse
 
-Lovable Build Prompt — Vendor Reliability Intelligence & Procurement Risk Management Platform
-
-
-
-
-Copy everything below the line into Lovable as your project prompt.
-
-
-
+ Vendor Reliability Intelligence & Procurement Risk Management Platform
 
 
 
