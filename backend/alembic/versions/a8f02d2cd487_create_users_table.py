@@ -21,6 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 USER_ROLE_VALUES = (
     "Administrator",
     "Procurement Manager",
+    "Supply Chain Manager",
     "Vendor",
     "Finance Officer",
     "Auditor",

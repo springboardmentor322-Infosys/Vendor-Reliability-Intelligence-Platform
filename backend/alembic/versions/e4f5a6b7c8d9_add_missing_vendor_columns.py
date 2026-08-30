@@ -4,6 +4,8 @@ Revision ID: e4f5a6b7c8d9
 Revises: d3e4f5a6b7c8
 Create Date: 2026-08-03 00:00:00.000000
 
+These columns are already added by c2d3e4f5a6b7 and d3e4f5a6b7c8.
+This revision only adds them when they are absent.
 """
 
 from typing import Sequence, Union
@@ -18,27 +20,37 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-def upgrade() -> None:
-    # Add rejection_reason column (nullable text, absent from the original migration)
-    op.add_column(
-        "vendors",
-        sa.Column("rejection_reason", sa.Text(), nullable=True),
-    )
+def _column_names(table: str) -> set[str]:
+    inspector = sa.inspect(op.get_bind())
+    return {column["name"] for column in inspector.get_columns(table)}
 
-    # Add user_id column linking the vendor record to the self-registering user
-    op.add_column(
-        "vendors",
-        sa.Column(
-            "user_id",
-            sa.Integer(),
-            sa.ForeignKey("users.id", ondelete="SET NULL"),
-            nullable=True,
-        ),
-    )
-    op.create_index("ix_vendors_user_id", "vendors", ["user_id"])
+
+def _index_names(table: str) -> set[str]:
+    inspector = sa.inspect(op.get_bind())
+    return {index["name"] for index in inspector.get_indexes(table) if index["name"]}
+
+
+def upgrade() -> None:
+    columns = _column_names("vendors")
+
+    if "rejection_reason" not in columns:
+        op.add_column("vendors", sa.Column("rejection_reason", sa.Text(), nullable=True))
+
+    if "user_id" not in columns:
+        op.add_column(
+            "vendors",
+            sa.Column(
+                "user_id",
+                sa.Integer(),
+                sa.ForeignKey("users.id", ondelete="SET NULL"),
+                nullable=True,
+            ),
+        )
+
+    if "ix_vendors_user_id" not in _index_names("vendors"):
+        op.create_index("ix_vendors_user_id", "vendors", ["user_id"])
 
 
 def downgrade() -> None:
-    op.drop_index("ix_vendors_user_id", table_name="vendors")
-    op.drop_column("vendors", "user_id")
-    op.drop_column("vendors", "rejection_reason")
+    # Columns and index are owned by c2d3e4f5a6b7 / d3e4f5a6b7c8.
+    return

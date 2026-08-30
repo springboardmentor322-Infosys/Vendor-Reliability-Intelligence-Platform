@@ -40,6 +40,10 @@ def upgrade() -> None:
     if old_schema and not new_schema:
         # Old schema exists — drop and recreate
         op.drop_table("contracts")
+        new_schema = None
+
+    if new_schema:
+        return
 
     # Create the new contracts table
     op.create_table(

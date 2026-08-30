@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import random
 import re
 import sys
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
+
+from faker import Faker
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
 if str(BACKEND_ROOT) not in sys.path:
@@ -27,16 +30,8 @@ from app.models.vendoriq import PurchaseOrder, PurchaseOrderStatus
 DEFAULT_CSV = BACKEND_ROOT / "data" / "dataco_supply_chain.csv"
 DEFAULT_LIMIT = 750
 CSV_ENCODINGS = ("utf-8-sig", "cp1252", "latin-1")
-
-DEPARTMENT_TO_CATEGORY = {
-    "clothing": "Raw Material Suppliers",
-    "sports": "Equipment",
-    "electronic": "IT",
-    "electronics": "IT",
-    "home": "Services",
-    "grocery": "Raw Material Suppliers",
-    "furniture": "Equipment",
-}
+VENDOR_POOL_SIZE = 12
+VENDOR_FAKER_SEED = 42
 
 ORDER_STATUS_MAP = {
     "complete": PurchaseOrderStatus.COMPLETED,
@@ -112,6 +107,56 @@ def slug_email(name: str, suffix: str) -> str:
     return f"{slug}-{suffix}@dataco-import.local"
 
 
+def vendor_mapping_key(row: dict[str, str]) -> str:
+    """Stable, non-geographic key so the same DataCo order always maps to the same vendor."""
+    order_id = row.get("order_id", "").strip()
+    if order_id:
+        return f"order:{order_id}"
+
+    product_card = (
+        row.get("product_card_id")
+        or row.get("order_item_cardprod_id")
+        or row.get("order_item_product_card_id")
+        or ""
+    ).strip()
+    if product_card:
+        return f"product_card:{product_card}"
+
+    product_name = row.get("product_name", "").strip()
+    if product_name:
+        return f"product:{product_name.lower()}"
+
+    department = (row.get("department_name") or row.get("category_name") or "default").strip().lower()
+    return f"fallback:{department}"
+
+
+def pick_vendor(vendors: list[Vendor], row: dict[str, str]) -> Vendor:
+    digest = hashlib.sha256(vendor_mapping_key(row).encode("utf-8")).hexdigest()
+    return vendors[int(digest, 16) % len(vendors)]
+
+
+def build_vendor_specs(count: int, seed: int) -> list[dict[str, str]]:
+    fake = Faker()
+    fake.seed_instance(seed)
+    Faker.seed(seed)
+    specs: list[dict[str, str]] = []
+    for index in range(count):
+        name = fake.unique.company()
+        try:
+            email = fake.unique.company_email()
+        except Exception:
+            email = slug_email(name, f"v{index:02d}")
+        specs.append(
+            {
+                "name": name,
+                "contact_email": email,
+                "contact_phone": fake.numerify("###-###-####"),
+                "address": fake.address().replace("\n", ", "),
+            }
+        )
+    return specs
+
+
 def read_csv_rows(csv_path: Path) -> tuple[list[dict[str, str]], str]:
     """Read all CSV rows, trying common encodings used by the DataCo export."""
     last_error: UnicodeDecodeError | None = None
@@ -154,69 +199,47 @@ def load_rows(csv_path: Path, limit: int, seed: int) -> list[dict[str, str]]:
     return rng.sample(rows, limit)
 
 
-def resolve_category_id(db, department_name: str, cache: dict[str, int]) -> int:
-    key = department_name.strip().lower() or "default"
-    if key in cache:
-        return cache[key]
-
-    mapped_name = DEPARTMENT_TO_CATEGORY.get(key)
-    if mapped_name:
-        category = db.scalar(select(VendorCategory).where(VendorCategory.name == mapped_name))
-        if category:
-            cache[key] = category.id
-            return category.id
-
-    fallback = db.scalar(select(VendorCategory).order_by(VendorCategory.id))
-    if fallback is None:
-        raise RuntimeError("No vendor categories found. Start the app once to seed categories.")
-    cache[key] = fallback.id
-    return fallback.id
-
-
-def get_or_create_vendor(
+def ensure_generated_vendors(
     db,
-    market_name: str,
-    department_name: str,
-    vendor_cache: dict[str, Vendor],
-    category_cache: dict[str, int],
+    count: int,
+    seed: int,
     counters: dict[str, int],
-) -> Vendor | None:
-    name = market_name.strip() or department_name.strip()
-    if not name:
-        return None
+) -> list[Vendor]:
+    categories = list(db.scalars(select(VendorCategory).order_by(VendorCategory.id)))
+    if not categories:
+        raise RuntimeError("No vendor categories found. Start the app once to seed categories.")
 
-    cache_key = name.lower()
-    if cache_key in vendor_cache:
-        return vendor_cache[cache_key]
-
-    existing = db.scalar(select(Vendor).where(func.lower(Vendor.name) == cache_key))
-    if existing:
-        vendor_cache[cache_key] = existing
-        return existing
-
-    category_id = resolve_category_id(db, department_name, category_cache)
-    suffix = re.sub(r"[^a-z0-9]+", "", cache_key)[:12] or "vendor"
-    vendor = Vendor(
-        name=name,
-        category_id=category_id,
-        contact_email=slug_email(name, suffix),
-        contact_phone="000-000-0000",
-        address=f"Imported from DataCo market: {name}",
-        status=VendorStatus.APPROVED,
-    )
-    db.add(vendor)
-    try:
-        db.flush()
-        vendor_cache[cache_key] = vendor
-        counters["vendors"] += 1
-        return vendor
-    except IntegrityError:
-        db.rollback()
+    vendors: list[Vendor] = []
+    for index, spec in enumerate(build_vendor_specs(count, seed)):
+        cache_key = spec["name"].lower()
         existing = db.scalar(select(Vendor).where(func.lower(Vendor.name) == cache_key))
         if existing:
-            vendor_cache[cache_key] = existing
-            return existing
-        return None
+            vendors.append(existing)
+            continue
+
+        vendor = Vendor(
+            name=spec["name"],
+            category_id=categories[index % len(categories)].id,
+            contact_email=spec["contact_email"],
+            contact_phone=spec["contact_phone"],
+            address=spec["address"],
+            status=VendorStatus.APPROVED,
+        )
+        try:
+            with db.begin_nested():
+                db.add(vendor)
+                db.flush()
+            counters["vendors"] += 1
+            vendors.append(vendor)
+        except IntegrityError:
+            existing = db.scalar(select(Vendor).where(func.lower(Vendor.name) == cache_key))
+            if existing is None:
+                raise RuntimeError(f"Could not create or load generated vendor {spec['name']}")
+            vendors.append(existing)
+
+    if not vendors:
+        raise RuntimeError("Failed to generate vendor pool for DataCo import.")
+    return vendors
 
 
 def get_or_create_product(
@@ -377,28 +400,14 @@ def import_dataco(
         if admin is None:
             raise RuntimeError("No administrator user found. Run the app once to seed admin account.")
 
-        vendor_cache: dict[str, Vendor] = {}
         product_cache: dict[tuple[str, int], Product] = {}
         po_cache: dict[str, PurchaseOrder] = {}
         delivery_cache: set[int] = set()
-        category_cache: dict[str, int] = {}
+        vendors = ensure_generated_vendors(db, VENDOR_POOL_SIZE, VENDOR_FAKER_SEED, counters)
 
         for row in rows:
             counters["rows_processed"] += 1
-            market_name = row.get("market") or row.get("order_region") or row.get("order_country") or ""
-            department_name = row.get("department_name") or row.get("category_name") or ""
-
-            vendor = get_or_create_vendor(
-                db,
-                market_name,
-                department_name,
-                vendor_cache,
-                category_cache,
-                counters,
-            )
-            if vendor is None:
-                counters["rows_skipped"] += 1
-                continue
+            vendor = pick_vendor(vendors, row)
 
             get_or_create_product(db, row, vendor, product_cache, counters)
             purchase_order = get_or_create_purchase_order(

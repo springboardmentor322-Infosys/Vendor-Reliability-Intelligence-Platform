@@ -39,6 +39,12 @@ def upgrade() -> None:
     vendor_status = postgresql.ENUM(*VENDOR_STATUS_VALUES, name="vendor_status")
     vendor_status.create(op.get_bind(), checkfirst=True)
 
+    vendor_status_column = postgresql.ENUM(
+        *VENDOR_STATUS_VALUES,
+        name="vendor_status",
+        create_type=False,
+    )
+
     op.create_table(
         "vendor_categories",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True, nullable=False),
@@ -59,7 +65,7 @@ def upgrade() -> None:
         sa.Column("contact_email", sa.String(length=255), nullable=False),
         sa.Column("contact_phone", sa.String(length=50), nullable=False),
         sa.Column("address", sa.Text(), nullable=False),
-        sa.Column("status", vendor_status, nullable=False, server_default="Pending"),
+        sa.Column("status", vendor_status_column, nullable=False, server_default="Pending"),
         sa.Column("created_by", sa.Integer(), sa.ForeignKey("users.id"), nullable=True),
         sa.Column(
             "created_at",

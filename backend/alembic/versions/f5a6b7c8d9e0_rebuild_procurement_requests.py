@@ -20,10 +20,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # 1. Drop the FK from purchase_orders -> procurement_requests so we can rebuild the table
-    op.drop_constraint(
-        "purchase_orders_procurement_request_id_fkey",
-        "purchase_orders",
-        type_="foreignkey",
+    op.execute(
+        "ALTER TABLE IF EXISTS purchase_orders "
+        "DROP CONSTRAINT IF EXISTS purchase_orders_procurement_request_id_fkey"
     )
 
     # 2. Drop existing procurement_request_items if it was auto-created by create_all()
@@ -34,7 +33,7 @@ def upgrade() -> None:
     op.execute("DROP TABLE IF EXISTS procurement_request_items")
 
     # 3. Drop the old procurement_requests table (schema mismatch with new model)
-    op.drop_table("procurement_requests")
+    op.execute("DROP TABLE IF EXISTS procurement_requests CASCADE")
 
     # 4. Create the new procurement_requests table
     op.create_table(
@@ -74,14 +73,19 @@ def upgrade() -> None:
         ["procurement_request_id"],
     )
 
-    # 5. Re-add FK on purchase_orders
-    op.create_foreign_key(
-        "purchase_orders_procurement_request_id_fkey",
-        "purchase_orders",
-        "procurement_requests",
-        ["procurement_request_id"],
-        ["id"],
-    )
+    # 5. Re-add FK on purchase_orders when that table already exists
+    inspector = sa.inspect(op.get_bind())
+    if "purchase_orders" in inspector.get_table_names():
+        columns = {column["name"] for column in inspector.get_columns("purchase_orders")}
+        fk_names = {fk["name"] for fk in inspector.get_foreign_keys("purchase_orders") if fk["name"]}
+        if "procurement_request_id" in columns and "purchase_orders_procurement_request_id_fkey" not in fk_names:
+            op.create_foreign_key(
+                "purchase_orders_procurement_request_id_fkey",
+                "purchase_orders",
+                "procurement_requests",
+                ["procurement_request_id"],
+                ["id"],
+            )
 
 
 def downgrade() -> None:

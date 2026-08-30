@@ -40,7 +40,13 @@ class Vendor(Base):
     contact_phone: Mapped[str] = mapped_column(String(50), nullable=False)
     address: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[VendorStatus] = mapped_column(
-        SQLEnum(VendorStatus, name="vendor_status"), nullable=False, default=VendorStatus.PENDING
+        SQLEnum(
+            VendorStatus,
+            name="vendor_status",
+            values_callable=lambda statuses: [status.value for status in statuses],
+        ),
+        nullable=False,
+        default=VendorStatus.PENDING,
     )
     rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
