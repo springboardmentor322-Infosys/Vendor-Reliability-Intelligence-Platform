@@ -210,7 +210,12 @@ export default function VendorPerformance() {
           {loading && !reliability ? (
             <div className="chart-panel chart-panel--loading">Loading…</div>
           ) : (
-            <ReliabilityGauge score={reliability?.overall_score ?? 0} riskLevel={reliability?.risk_level} />
+            <>
+              <ReliabilityGauge score={reliability?.overall_score ?? 0} riskLevel={reliability?.risk_level} />
+              {reliability?.recommendation ? (
+                <p className="reliability-recommendation">{reliability.recommendation}</p>
+              ) : null}
+            </>
           )}
         </section>
 

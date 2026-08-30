@@ -13,6 +13,7 @@ class VendorReliabilityScore(BaseModel):
     vendor_name: str
     overall_score: float = Field(ge=0, le=100)
     risk_level: str = Field(description="Low, Medium, or High")
+    recommendation: str = Field(description="Procurement action suggested from the risk level")
     factors: list[ReliabilityFactorBreakdown]
 
 

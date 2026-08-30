@@ -20,6 +20,12 @@ WEIGHTS = {
 
 NEUTRAL_SCORE = 50.0
 
+RECOMMENDATIONS = {
+    "High": "Consider alternate supplier, review delivery history",
+    "Medium": "Monitor delivery and quality",
+    "Low": "Suitable for continued procurement",
+}
+
 
 def _risk_level(score: float) -> str:
     if score >= 75:
@@ -27,6 +33,10 @@ def _risk_level(score: float) -> str:
     if score >= 50:
         return "Medium"
     return "High"
+
+
+def _recommendation(risk_level: str) -> str:
+    return RECOMMENDATIONS.get(risk_level, RECOMMENDATIONS["Medium"])
 
 
 def _response_time_score(hours: float | None) -> float:
@@ -100,12 +110,14 @@ def compute_vendor_reliability(db: Session, vendor: Vendor) -> VendorReliability
         )
 
     overall_score = round(overall, 2)
+    risk_level = _risk_level(overall_score)
 
     return VendorReliabilityScore(
         vendor_id=vendor.id,
         vendor_name=vendor.name,
         overall_score=overall_score,
-        risk_level=_risk_level(overall_score),
+        risk_level=risk_level,
+        recommendation=_recommendation(risk_level),
         factors=factors,
     )
 
