@@ -474,24 +474,30 @@ Large datasets should not be unnecessarily transferred to the browser.
 
 ---
 
-## 17. Project Outcome
+## 17. Project Demos
 
-The Vendor Reliability Intelligence Platform provides a centralized solution for combining supply-chain transaction data with procurement management and vendor performance analytics.
+### 📺 Project Demonstration
 
-The system helps organizations:
+* **Vendor Reliability Intelligence Platform – Project Demo**: [Watch Project Demo on Google Drive](https://drive.google.com/file/d/1yqcuSiCYRlpjdIz0smtO0putaDnRDdc0/view?usp=sharing)
+### 📋 Demo Coverage
 
-* Monitor vendor reliability
-* Identify delivery risks
-* Analyze supply-chain performance
-* Manage procurement activities
-* Monitor purchase orders
-* Track contracts
-* Manage invoices
-* Monitor quality information
-* Generate reports
-* Support data-driven procurement decisions
+The project demonstration covers the major functionalities of the Vendor Reliability Intelligence Platform, including:
 
----
+* User Registration and Login
+* Role-Based Access Control
+* Vendor Management
+* Vendor Reliability Analysis
+* Procurement Management
+* Purchase Order Monitoring
+* Supply Chain Dashboard
+* Delivery Performance Analysis
+* Contract Management
+* Invoice Management
+* Quality Monitoring
+* Notifications
+* Reports and Analytics
+* Role-specific Dashboards
+
 
 ## 18. License
 
