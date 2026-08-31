@@ -29,6 +29,8 @@ import AuditLogs from './pages/AuditLogs'
 import Invoices from './pages/Invoices'
 import DeliveryTracking from './pages/DeliveryTracking'
 import QualityInspection from './pages/QualityInspection'
+import CommunicationHistory from './pages/CommunicationHistory'
+import MyDocuments from './pages/MyDocuments'
 
 export default function App() {
   return (
@@ -58,6 +60,8 @@ export default function App() {
               <Route path="/supply-chain" element={<SupplyChainDashboard />} />
               <Route path="/procurement-requests" element={<ProcurementRequests />} />
               <Route path="/contracts" element={<Contracts />} />
+              <Route path="/communication" element={<CommunicationHistory />} />
+              <Route path="/my-documents" element={<MyDocuments />} />
               <Route path="/audit-logs" element={<AuditLogs />} />
               <Route path="/auditor-dashboard" element={<AuditorDashboard />} />
               <Route path="/profile" element={<Profile />} />

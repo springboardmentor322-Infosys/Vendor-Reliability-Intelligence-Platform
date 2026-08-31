@@ -332,7 +332,7 @@ def build_vendor_dashboard(db: Session, user: User) -> VendorDashboardResponse:
             name=Path(doc.file_url).name if doc.file_url else doc.doc_type,
             doc_type=doc.doc_type,
             uploaded_at=doc.uploaded_at,
-            file_url=doc.file_url,
+            file_url=f"/vendors/{vendor.id}/documents/{doc.id}/file",
         )
         for doc in vendor.documents[:8]
     ]

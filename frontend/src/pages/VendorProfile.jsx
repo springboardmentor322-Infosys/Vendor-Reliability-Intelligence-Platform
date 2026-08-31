@@ -8,6 +8,7 @@ import {
   uploadVendorDocument,
 } from '../api/vendors'
 import { getErrorMessage } from '../utils/auth'
+import DocumentViewLink from '../components/DocumentViewLink'
 import {
   APPROVAL_PIPELINE,
   DOCUMENT_TYPES,
@@ -307,7 +308,9 @@ export default function VendorProfile() {
               <textarea value={form.address} onChange={(event) => updateField('address', event.target.value)} required />
             </label>
             <p className="table-empty" style={{ padding: '0.5rem 0' }}>
-              After submitting your profile you can upload compliance documents from this page.
+              After submitting your profile you can upload registration documents from this page
+              for the vendor approval pipeline. Ongoing ISO/insurance certifications belong under
+              Contracts & Compliance / My Documents.
             </p>
             <div className="modal-panel__footer" style={{ borderTop: 0, paddingLeft: 0, paddingRight: 0 }}>
               <button type="submit" className="dashboard-admin-btn dashboard-admin-btn--primary" disabled={submitting}>
@@ -466,8 +469,11 @@ export default function VendorProfile() {
 
             <section className="table-card" style={{ marginTop: '1rem' }}>
               <div className="table-card__header">
-                <h3>My documents</h3>
+                <h3>Registration Documents</h3>
               </div>
+              <p className="table-empty" style={{ padding: '0 1rem' }}>
+                Used only for vendor approval (Pending → Under Review → Approved/Rejected).
+              </p>
               {vendor.documents?.length ? (
                 <div className="doc-list">
                   {vendor.documents.map((doc) => (
@@ -475,18 +481,16 @@ export default function VendorProfile() {
                       <strong>{doc.doc_type}</strong>
                       <span>Uploaded {formatDateTime(doc.uploaded_at)}</span>
                       <span>
-                        <a href={doc.file_url} target="_blank" rel="noreferrer" download>
-                          Download file
-                        </a>
+                        <DocumentViewLink href={doc.file_url} />
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="table-empty">No documents uploaded yet.</p>
+                <p className="table-empty">No registration documents uploaded yet.</p>
               )}
               <section className="vendor-section" style={{ marginTop: '1rem' }}>
-                <h3>Upload documentation</h3>
+                <h3>Upload registration document</h3>
                 <DocumentUploadPanel vendorId={vendor.id} onUploaded={loadProfile} />
               </section>
             </section>

@@ -107,9 +107,15 @@ class VendorDocumentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    vendor_id: int
     doc_type: str
     file_url: str
     uploaded_at: datetime
+
+    @model_validator(mode="after")
+    def serve_file_url(self):
+        self.file_url = f"/vendors/{self.vendor_id}/documents/{self.id}/file"
+        return self
 
 
 class VendorDocumentCreate(BaseModel):

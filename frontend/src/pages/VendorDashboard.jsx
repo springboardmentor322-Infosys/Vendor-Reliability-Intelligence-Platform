@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchVendorDashboard } from '../api/dashboard'
 import { EmptyState, MetricCards, formatMoney, statusPillClass } from '../components/DashboardWidgets'
+import DocumentViewLink from '../components/DocumentViewLink'
 import { useAuth } from '../context/AuthContext'
 import { getErrorMessage } from '../utils/auth'
 import '../dashboard-admin.css'
@@ -240,20 +241,18 @@ export default function VendorDashboard() {
 
         <section className="list-card">
           <div className="list-card__header">
-            <h3>Important Documents</h3>
-            <span className="list-card__meta">From your profile</span>
+            <h3>Registration Documents</h3>
+            <span className="list-card__meta">Vendor approval files</span>
           </div>
           <div className="activity-list">
             {(data?.documents || []).length === 0 ? (
-              <EmptyState message="No documents uploaded." />
+              <EmptyState message="No registration documents uploaded." />
             ) : (
               data.documents.map((doc) => (
                 <div key={`${doc.name}-${doc.uploaded_at}`} className="activity-item">
                   <span>{doc.name}</span>
                   {doc.file_url ? (
-                    <a href={doc.file_url} style={{ color: '#3b82f6' }}>
-                      Open
-                    </a>
+                    <DocumentViewLink href={doc.file_url}>Open</DocumentViewLink>
                   ) : (
                     <span>{doc.doc_type}</span>
                   )}

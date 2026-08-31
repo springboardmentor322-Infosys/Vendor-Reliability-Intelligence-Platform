@@ -7,6 +7,7 @@ import {
   updateVendorStatus,
 } from '../api/vendors'
 import { getErrorMessage } from '../utils/auth'
+import DocumentViewLink from '../components/DocumentViewLink'
 import {
   canManageApprovals,
   formatDateTime,
@@ -188,7 +189,11 @@ function VendorDetailModal({ vendorId, userRole, onClose, onUpdated }) {
               </section>
 
               <section className="vendor-section">
-                <h3>Documents</h3>
+                <h3>Registration Documents</h3>
+                <p className="table-empty" style={{ padding: '0 0 0.75rem' }}>
+                  These files support the vendor approval pipeline (Pending → Under Review → Approved/Rejected).
+                  They are separate from compliance certifications.
+                </p>
                 {vendor.documents?.length ? (
                   <div className="doc-list">
                     {vendor.documents.map((doc) => (
@@ -196,15 +201,13 @@ function VendorDetailModal({ vendorId, userRole, onClose, onUpdated }) {
                         <strong>{doc.doc_type}</strong>
                         <span>Uploaded {formatDateTime(doc.uploaded_at)}</span>
                         <span>
-                          <a href={doc.file_url} target="_blank" rel="noreferrer" download>
-                            Download file
-                          </a>
+                          <DocumentViewLink href={doc.file_url} />
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="table-empty">No documents uploaded yet.</p>
+                  <p className="table-empty">No registration documents uploaded yet.</p>
                 )}
               </section>
 

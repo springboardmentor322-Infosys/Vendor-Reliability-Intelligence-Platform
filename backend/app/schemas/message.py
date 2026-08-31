@@ -28,3 +28,9 @@ class MessageResponse(BaseModel):
     sender_name: str | None = None
     content: str
     created_at: datetime
+
+
+class MessageHistoryItem(MessageResponse):
+    vendor_id: int | None = None
+    vendor_name: str | None = None
+    reference_label: str

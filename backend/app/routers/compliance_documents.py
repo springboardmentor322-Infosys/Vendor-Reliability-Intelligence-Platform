@@ -1,6 +1,7 @@
 """CRUD for vendor compliance certifications (ISO, insurance, etc.)."""
 
 from datetime import datetime
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from sqlalchemy import select
@@ -14,11 +15,20 @@ from app.models.vendoriq import ComplianceDocument
 from app.schemas.vendor import ComplianceDocumentResponse, ComplianceDocumentUpdate
 from app.services.audit import format_status_change_description, record_audit_log
 from app.services.compliance_documents import save_compliance_document
+from app.services.stored_files import file_response
 
 router = APIRouter(prefix="/compliance-documents", tags=["compliance-documents"])
 
 WRITABLE_ROLES = {Role.ADMINISTRATOR, Role.PROCUREMENT_MANAGER}
-VALID_STATUSES = {"Pending", "Valid", "Expired", "Revoked"}
+VALID_STATUSES = {"Pending", "Approved", "Rejected"}
+STATUS_ALIASES = {
+    "Valid": "Approved",
+    "Revoked": "Rejected",
+    "Expired": "Approved",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+}
 
 
 def _vendor_for_user(user: User, db: Session) -> Vendor | None:
@@ -29,6 +39,12 @@ def _vendor_for_user(user: User, db: Session) -> Vendor | None:
     )
 
 
+def _normalize_status(value: str | None) -> str:
+    if not value:
+        return "Pending"
+    return STATUS_ALIASES.get(value, value)
+
+
 def _to_response(document: ComplianceDocument) -> ComplianceDocumentResponse:
     vendor = document.vendor
     return ComplianceDocumentResponse(
@@ -37,8 +53,8 @@ def _to_response(document: ComplianceDocument) -> ComplianceDocumentResponse:
         vendor_name=vendor.name if vendor else None,
         document_type=document.document_type,
         document_name=document.document_name,
-        file_url=document.file_url,
-        status=document.status,
+        file_url=f"/compliance-documents/{document.id}/file",
+        status=_normalize_status(document.status),
         uploaded_at=document.uploaded_at,
         expires_at=document.expires_at,
         notes=document.notes,
@@ -137,6 +153,18 @@ async def create_compliance_document(
     return _to_response(document)
 
 
+@router.get("/{document_id}/file")
+def download_compliance_document(
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    document = _get_document_or_404(document_id, db)
+    _ensure_can_view(document, current_user, db)
+    suffix = Path(document.file_url or "certificate.pdf").suffix
+    return file_response(document.file_url, download_name=f"{document.document_name}{suffix}")
+
+
 @router.put("/{document_id}", response_model=ComplianceDocumentResponse)
 def update_compliance_document(
     document_id: int,
@@ -153,7 +181,7 @@ def update_compliance_document(
     document = _get_document_or_404(document_id, db)
 
     if payload.status is not None:
-        status_value = payload.status.strip()
+        status_value = _normalize_status(payload.status.strip())
         if status_value not in VALID_STATUSES:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

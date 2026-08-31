@@ -27,7 +27,7 @@ api.interceptors.response.use(
     const status = error.response?.status
     const requestUrl = error.config?.url ?? ''
 
-    if ((status === 401 || status === 403) && !isPublicAuthRequest(requestUrl) && onUnauthorized) {
+    if ((status === 401 || (status === 403 && !String(requestUrl).includes('/file'))) && !isPublicAuthRequest(requestUrl) && onUnauthorized) {
       onUnauthorized(status)
     }
 

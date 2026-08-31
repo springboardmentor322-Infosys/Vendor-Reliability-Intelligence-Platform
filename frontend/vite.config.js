@@ -34,6 +34,14 @@ const proxy = Object.fromEntries(
       target: backendTarget,
       changeOrigin: true,
       bypass(req) {
+        const path = (req.url || '').split('?')[0]
+        const isFileRequest =
+          path.startsWith('/uploads') ||
+          path.includes('/file') ||
+          /\.(pdf|png|jpe?g|docx?)$/i.test(path)
+        if (isFileRequest) {
+          return undefined
+        }
         if (req.headers['sec-fetch-dest'] === 'document' || req.headers.accept?.includes('text/html')) {
           return req.url
         }

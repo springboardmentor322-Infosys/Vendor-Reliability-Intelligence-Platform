@@ -593,7 +593,7 @@ export default function Contracts() {
         <div>
           <h1>Contracts & Compliance</h1>
           <p>
-            {isVendor ? 'Your contracts' : 'Manage vendor contracts and track compliance'}
+            {isVendor ? 'Your contracts and compliance certifications' : 'Manage vendor contracts and monitor ongoing compliance certifications'}
           </p>
         </div>
         {canCreate && pageTab === 'contracts' && (
@@ -610,7 +610,7 @@ export default function Contracts() {
         onChange={setPageTab}
         tabs={[
           { id: 'contracts', label: 'Contracts' },
-          { id: 'documents', label: 'Compliance Documents' },
+          { id: 'documents', label: 'Compliance Certifications' },
         ]}
       />
 

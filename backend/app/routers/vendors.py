@@ -31,6 +31,7 @@ from app.services.email import notify_vendor_status_change
 from app.services.in_app_notifications import create_notification
 from app.services.performance import compute_all_vendors_performance, compute_vendor_performance
 from app.services.reliability import compute_vendor_ranking, compute_vendor_reliability
+from app.services.stored_files import file_response
 from app.services.vendor_documents import save_vendor_document
 
 router = APIRouter(prefix="/vendors", tags=["vendors"])
@@ -282,6 +283,26 @@ def list_vendor_documents(
             .order_by(VendorDocument.uploaded_at.desc())
         )
     )
+
+
+@router.get("/{vendor_id}/documents/{document_id}/file")
+def download_vendor_document(
+    vendor_id: int,
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    vendor = _get_vendor_or_404(vendor_id, db)
+    _ensure_owned_vendor(vendor, current_user)
+    document = db.scalar(
+        select(VendorDocument).where(
+            VendorDocument.id == document_id,
+            VendorDocument.vendor_id == vendor_id,
+        )
+    )
+    if document is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+    return file_response(document.file_url, download_name=f"{document.doc_type}{Path(document.file_url or '').suffix}")
 
 
 @router.post(

@@ -5,9 +5,10 @@ import {
   updateComplianceDocument,
 } from '../api/complianceDocuments'
 import { fetchMyVendor, fetchVendors } from '../api/vendors'
+import DocumentViewLink from '../components/DocumentViewLink'
 import { getErrorMessage } from '../utils/auth'
 
-const DOC_STATUSES = ['Pending', 'Valid', 'Expired', 'Revoked']
+const CERT_STATUSES = ['Pending', 'Approved', 'Rejected']
 
 function formatDate(value) {
   if (!value) return '—'
@@ -23,8 +24,8 @@ function expiryTone(expiresAt) {
 }
 
 function statusPill(status, tone) {
-  if (tone === 'expired' || status === 'Expired' || status === 'Revoked') return 'status-pill--danger'
-  if (tone === 'soon' || status === 'Pending') return 'status-pill--warn'
+  if (status === 'Rejected' || tone === 'expired') return 'status-pill--danger'
+  if (status === 'Pending' || tone === 'soon') return 'status-pill--warn'
   return 'status-pill--good'
 }
 
@@ -136,6 +137,11 @@ export default function ComplianceDocumentsPanel({ user }) {
 
   return (
     <div>
+      <p className="table-empty" style={{ padding: '0 0 1rem' }}>
+        Compliance Certifications are ongoing ISO, insurance, and similar certificates.
+        Approve or reject them here — this does not change vendor registration status
+        (Pending → Under Review → Approved/Rejected).
+      </p>
       <div className="dashboard-admin-grid dashboard-admin-grid--cards-4" style={{ marginBottom: '1rem' }}>
         <article className="dashboard-card">
           <div className="dashboard-card__label">Certifications</div>
@@ -157,7 +163,7 @@ export default function ComplianceDocumentsPanel({ user }) {
       {canUpload ? (
         <form className="table-card" style={{ marginBottom: '1rem', padding: '1rem' }} onSubmit={handleUpload}>
           <div className="table-card__header">
-            <h3>Upload certification</h3>
+            <h3>Upload compliance certification</h3>
           </div>
           <div className="page-toolbar" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
             {!isVendor ? (
@@ -220,7 +226,7 @@ export default function ComplianceDocumentsPanel({ user }) {
 
       <section className="table-card">
         <div className="table-card__header">
-          <h3>Compliance documents</h3>
+          <h3>Compliance Certifications</h3>
           <span className="table-card__meta">{loading ? 'Loading…' : `${documents.length} record${documents.length === 1 ? '' : 's'}`}</span>
         </div>
         {loading ? (
@@ -235,14 +241,14 @@ export default function ComplianceDocumentsPanel({ user }) {
                 <th>Status</th>
                 <th>Expiry</th>
                 <th>File</th>
-                {canUpdate ? <th>Update</th> : null}
+                {canUpdate ? <th>Certification decision</th> : null}
               </tr>
             </thead>
             <tbody>
               {documents.length === 0 ? (
                 <tr>
                   <td colSpan={canUpdate ? 7 : 6} className="table-empty">
-                    No compliance documents found.
+                    No compliance certifications found.
                   </td>
                 </tr>
               ) : (
@@ -260,27 +266,39 @@ export default function ComplianceDocumentsPanel({ user }) {
                       </td>
                       <td>{formatDate(doc.expires_at)}</td>
                       <td>
-                        {doc.file_url ? (
-                          <a href={doc.file_url} target="_blank" rel="noreferrer">
-                            View
-                          </a>
-                        ) : (
-                          '—'
-                        )}
+                        <DocumentViewLink href={doc.file_url} />
                       </td>
                       {canUpdate ? (
                         <td>
                           <select
-                            value={doc.status}
+                            value={CERT_STATUSES.includes(doc.status) ? doc.status : 'Pending'}
                             disabled={savingId === doc.id}
                             onChange={(event) => handleUpdate(doc.id, { status: event.target.value })}
                           >
-                            {DOC_STATUSES.map((status) => (
+                            {CERT_STATUSES.map((status) => (
                               <option key={status} value={status}>
                                 {status}
                               </option>
                             ))}
                           </select>
+                          <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.35rem' }}>
+                            <button
+                              type="button"
+                              className="dashboard-admin-btn dashboard-admin-btn--primary"
+                              disabled={savingId === doc.id || doc.status === 'Approved'}
+                              onClick={() => handleUpdate(doc.id, { status: 'Approved' })}
+                            >
+                              Approve
+                            </button>
+                            <button
+                              type="button"
+                              className="dashboard-admin-btn"
+                              disabled={savingId === doc.id || doc.status === 'Rejected'}
+                              onClick={() => handleUpdate(doc.id, { status: 'Rejected' })}
+                            >
+                              Reject
+                            </button>
+                          </div>
                           <input
                             type="date"
                             disabled={savingId === doc.id}
