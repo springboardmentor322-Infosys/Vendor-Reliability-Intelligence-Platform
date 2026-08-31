@@ -11,6 +11,7 @@ import { fetchVendors } from '../api/vendors'
 import { getErrorMessage } from '../utils/auth'
 import DetailTabBar from '../components/DetailTabBar'
 import DiscussionPanel from '../components/DiscussionPanel'
+import ComplianceDocumentsPanel from './ComplianceDocumentsPanel'
 import '../dashboard-admin.css'
 import '../vendor-management.css'
 
@@ -549,6 +550,7 @@ export default function Contracts() {
   const [filters, setFilters] = useState({ status: '', compliance_flag: '' })
   const [selectedId, setSelectedId] = useState(null)
   const [showCreate, setShowCreate] = useState(false)
+  const [pageTab, setPageTab] = useState('contracts')
 
   const role = user?.role
   const canCreate = role === 'Administrator' || role === 'Procurement Manager'
@@ -594,7 +596,7 @@ export default function Contracts() {
             {isVendor ? 'Your contracts' : 'Manage vendor contracts and track compliance'}
           </p>
         </div>
-        {canCreate && (
+        {canCreate && pageTab === 'contracts' && (
           <div className="dashboard-admin-header__actions">
             <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary" onClick={() => setShowCreate(true)}>
               + New Contract
@@ -603,6 +605,21 @@ export default function Contracts() {
         )}
       </header>
 
+      <DetailTabBar
+        activeTab={pageTab}
+        onChange={setPageTab}
+        tabs={[
+          { id: 'contracts', label: 'Contracts' },
+          { id: 'documents', label: 'Compliance Documents' },
+        ]}
+      />
+
+      {pageTab === 'documents' ? (
+        <div style={{ marginTop: '1rem' }}>
+          <ComplianceDocumentsPanel user={user} />
+        </div>
+      ) : (
+        <>
       <div className="dashboard-admin-grid dashboard-admin-grid--cards-4">
         <article className="dashboard-card">
           <div className="dashboard-card__label">Total Contracts</div>
@@ -736,6 +753,8 @@ export default function Contracts() {
           onClose={() => setShowCreate(false)}
           onCreated={load}
         />
+      )}
+        </>
       )}
     </section>
   )

@@ -25,14 +25,14 @@ export default function RoleSidebar() {
             const label = item.to === 'role-dashboard' ? dashboardLabel : item.label
             if (to && to.startsWith('#')) {
               return (
-                <a key={label} href={to} className="dashboard-admin-nav-item">
+                <a key={`${section.title}-${label}`} href={to} className="dashboard-admin-nav-item">
                   {label}
                 </a>
               )
             }
             return (
               <NavLink
-                key={label}
+                key={`${section.title}-${to}-${label}`}
                 to={to || '#'}
                 className={({ isActive }) => `dashboard-admin-nav-item ${isActive ? 'is-active' : ''}`}
               >

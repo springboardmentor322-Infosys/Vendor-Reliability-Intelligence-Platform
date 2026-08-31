@@ -24,6 +24,9 @@ class DeliveryResponse(BaseModel):
     shipping_mode: Optional[str] = None
     late_delivery_risk: bool
     delivery_status: str
+    po_number: Optional[str] = None
+    vendor_id: Optional[int] = None
+    vendor_name: Optional[str] = None
 
 
 class InvoiceResponse(BaseModel):
@@ -70,3 +73,5 @@ class QualityInspectionResponse(BaseModel):
     quality_score: float
     defects_found: int
     inspector_notes: Optional[str] = None
+    vendor_name: Optional[str] = None
+    po_number: Optional[str] = None

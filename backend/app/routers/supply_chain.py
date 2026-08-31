@@ -61,8 +61,48 @@ def _get_delivery_or_404(delivery_id: int, db: Session) -> Delivery:
     return delivery
 
 
+def _delivery_to_response(delivery: Delivery) -> DeliveryResponse:
+    po = delivery.purchase_order
+    vendor = po.vendor if po else None
+    return DeliveryResponse(
+        id=delivery.id,
+        purchase_order_id=delivery.purchase_order_id,
+        scheduled_shipping_days=delivery.scheduled_shipping_days,
+        actual_shipping_days=delivery.actual_shipping_days,
+        shipping_mode=delivery.shipping_mode,
+        late_delivery_risk=bool(delivery.late_delivery_risk),
+        delivery_status=delivery.delivery_status,
+        po_number=po.po_number if po else None,
+        vendor_id=po.vendor_id if po else None,
+        vendor_name=vendor.name if vendor else None,
+    )
+
+
+def _inspection_to_response(inspection: QualityInspection) -> QualityInspectionResponse:
+    vendor = inspection.vendor
+    po = inspection.purchase_order
+    return QualityInspectionResponse(
+        id=inspection.id,
+        vendor_id=inspection.vendor_id,
+        purchase_order_id=inspection.purchase_order_id,
+        inspection_date=inspection.inspection_date,
+        quality_score=float(inspection.quality_score or 0),
+        defects_found=int(inspection.defects_found or 0),
+        inspector_notes=inspection.inspector_notes,
+        vendor_name=vendor.name if vendor else None,
+        po_number=po.po_number if po else None,
+    )
+
+
 def _get_inspection_or_404(inspection_id: int, db: Session) -> QualityInspection:
-    inspection = db.scalar(select(QualityInspection).where(QualityInspection.id == inspection_id))
+    inspection = db.scalar(
+        select(QualityInspection)
+        .options(
+            selectinload(QualityInspection.vendor),
+            selectinload(QualityInspection.purchase_order),
+        )
+        .where(QualityInspection.id == inspection_id)
+    )
     if inspection is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -119,13 +159,13 @@ def list_deliveries(
     purchase_order_id: int | None = Query(None),
     delivery_status: str | None = Query(None, alias="status"),
     skip: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=200),
+    limit: int = Query(200, ge=1, le=500),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> list[Delivery]:
-    from app.models.vendoriq import PurchaseOrder
-
-    query = select(Delivery)
+) -> list[DeliveryResponse]:
+    query = select(Delivery).options(
+        selectinload(Delivery.purchase_order).selectinload(PurchaseOrder.vendor)
+    )
 
     if current_user.role == Role.VENDOR:
         vendor = _get_vendor_for_user(current_user, db)
@@ -138,8 +178,8 @@ def list_deliveries(
     if delivery_status:
         query = query.where(Delivery.delivery_status.ilike(f"%{delivery_status}%"))
 
-    query = query.order_by(Delivery.id).offset(skip).limit(limit)
-    return list(db.scalars(query))
+    deliveries = list(db.scalars(query.order_by(Delivery.id.desc()).offset(skip).limit(limit)).unique())
+    return [_delivery_to_response(delivery) for delivery in deliveries]
 
 
 @deliveries_router.get("/{delivery_id}", response_model=DeliveryResponse)
@@ -147,18 +187,20 @@ def get_delivery(
     delivery_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> Delivery:
-    from app.models.vendoriq import PurchaseOrder
-
-    delivery = _get_delivery_or_404(delivery_id, db)
+) -> DeliveryResponse:
+    delivery = db.scalar(
+        select(Delivery)
+        .options(selectinload(Delivery.purchase_order).selectinload(PurchaseOrder.vendor))
+        .where(Delivery.id == delivery_id)
+    )
+    if delivery is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Delivery not found")
     if current_user.role == Role.VENDOR:
         vendor = _get_vendor_for_user(current_user, db)
-        po = db.scalar(
-            select(PurchaseOrder).where(PurchaseOrder.id == delivery.purchase_order_id)
-        )
+        po = delivery.purchase_order
         if vendor is None or po is None or po.vendor_id != vendor.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-    return delivery
+    return _delivery_to_response(delivery)
 
 
 @invoices_router.get("", response_model=list[InvoiceResponse])
@@ -312,11 +354,14 @@ def list_quality_inspections(
     vendor_id: int | None = Query(None),
     purchase_order_id: int | None = Query(None),
     skip: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=200),
+    limit: int = Query(200, ge=1, le=500),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> list[QualityInspection]:
-    query = select(QualityInspection)
+) -> list[QualityInspectionResponse]:
+    query = select(QualityInspection).options(
+        selectinload(QualityInspection.vendor),
+        selectinload(QualityInspection.purchase_order),
+    )
 
     if current_user.role == Role.VENDOR:
         vendor = _get_vendor_for_user(current_user, db)
@@ -329,8 +374,10 @@ def list_quality_inspections(
     if purchase_order_id is not None:
         query = query.where(QualityInspection.purchase_order_id == purchase_order_id)
 
-    query = query.order_by(QualityInspection.id).offset(skip).limit(limit)
-    return list(db.scalars(query))
+    inspections = list(
+        db.scalars(query.order_by(QualityInspection.inspection_date.desc()).offset(skip).limit(limit))
+    )
+    return [_inspection_to_response(inspection) for inspection in inspections]
 
 
 @quality_inspections_router.get("/{inspection_id}", response_model=QualityInspectionResponse)
@@ -338,10 +385,10 @@ def get_quality_inspection(
     inspection_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> QualityInspection:
+) -> QualityInspectionResponse:
     inspection = _get_inspection_or_404(inspection_id, db)
     if current_user.role == Role.VENDOR:
         vendor = _get_vendor_for_user(current_user, db)
         if vendor is None or inspection.vendor_id != vendor.id:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-    return inspection
+    return _inspection_to_response(inspection)

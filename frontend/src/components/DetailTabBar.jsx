@@ -3,10 +3,10 @@ const TABS = [
   { id: 'discussion', label: 'Discussion' },
 ]
 
-export default function DetailTabBar({ activeTab, onChange }) {
+export default function DetailTabBar({ activeTab, onChange, tabs = TABS }) {
   return (
     <div className="detail-tabs" role="tablist">
-      {TABS.map((tab) => (
+      {tabs.map((tab) => (
         <button
           key={tab.id}
           type="button"

@@ -86,6 +86,8 @@ class ComplianceDocumentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    vendor_id: int
+    vendor_name: Optional[str] = None
     document_type: str
     document_name: str
     file_url: Optional[str]
@@ -93,6 +95,12 @@ class ComplianceDocumentResponse(BaseModel):
     uploaded_at: datetime
     expires_at: Optional[datetime]
     notes: Optional[str]
+
+
+class ComplianceDocumentUpdate(BaseModel):
+    status: Optional[str] = Field(default=None, min_length=1, max_length=50)
+    expires_at: Optional[datetime] = None
+    notes: Optional[str] = None
 
 
 class VendorDocumentResponse(BaseModel):

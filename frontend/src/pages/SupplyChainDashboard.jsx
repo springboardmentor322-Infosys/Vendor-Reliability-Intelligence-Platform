@@ -100,6 +100,12 @@ export default function SupplyChainDashboard() {
           <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={() => navigate('/vendor-management')}>
             View Vendor Directory
           </button>
+          <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={() => navigate('/deliveries')}>
+            Delivery Tracking
+          </button>
+          <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={() => navigate('/quality-inspections')}>
+            Quality Inspection
+          </button>
           <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={() => navigate('/purchase-orders')}>
             Track Purchase Orders
           </button>

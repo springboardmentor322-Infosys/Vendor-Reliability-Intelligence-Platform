@@ -24,6 +24,7 @@ const apiPrefixes = [
   '/deliveries',
   '/invoices',
   '/quality-inspections',
+  '/compliance-documents',
 ]
 
 const proxy = Object.fromEntries(
@@ -33,7 +34,7 @@ const proxy = Object.fromEntries(
       target: backendTarget,
       changeOrigin: true,
       bypass(req) {
-        if (req.headers.accept?.includes('text/html')) {
+        if (req.headers['sec-fetch-dest'] === 'document' || req.headers.accept?.includes('text/html')) {
           return req.url
         }
         return undefined

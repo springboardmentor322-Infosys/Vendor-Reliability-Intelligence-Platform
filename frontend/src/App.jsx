@@ -27,6 +27,8 @@ import ProcurementRequests from './pages/ProcurementRequests'
 import Contracts from './pages/Contracts'
 import AuditLogs from './pages/AuditLogs'
 import Invoices from './pages/Invoices'
+import DeliveryTracking from './pages/DeliveryTracking'
+import QualityInspection from './pages/QualityInspection'
 
 export default function App() {
   return (
@@ -47,6 +49,8 @@ export default function App() {
               <Route path="/procurement" element={<ProcurementDashboard />} />
               <Route path="/purchase-orders" element={<PurchaseOrders />} />
               <Route path="/invoices" element={<Invoices />} />
+              <Route path="/deliveries" element={<DeliveryTracking />} />
+              <Route path="/quality-inspections" element={<QualityInspection />} />
               <Route path="/vendor-performance" element={<VendorPerformance />} />
               <Route path="/analytics" element={<AnalyticsDashboard />} />
               <Route path="/reports" element={<ReportsDashboard />} />

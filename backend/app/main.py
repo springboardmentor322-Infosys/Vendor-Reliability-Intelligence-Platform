@@ -11,10 +11,11 @@ import app.models.supply_chain  # noqa: F401 — register products, deliveries, 
 from app.db.seed_admin import ensure_admin_account
 from app.db.seed_vendor_categories import ensure_vendor_categories
 from app.db.session import SessionLocal, engine
-from app.routers import admin, analytics, audit_logs, auth, contracts, dashboard, messages, notifications, procurement, purchase_orders, reports, supply_chain, support, vendors
+from app.routers import admin, analytics, audit_logs, auth, compliance_documents, contracts, dashboard, messages, notifications, procurement, purchase_orders, reports, supply_chain, support, vendors
 from app.services.vendor_documents import ensure_upload_dir
 from app.services.po_documents import ensure_po_upload_dir
 from app.services.contract_documents import ensure_contract_upload_dir
+from app.services.compliance_documents import ensure_compliance_upload_dir
 from app.services.vendor_profile import count_vendor_users_missing_profile
 
 app = FastAPI(title="Vendor Reliability Platform")
@@ -42,6 +43,7 @@ app.include_router(reports.router)
 app.include_router(procurement.router)
 app.include_router(purchase_orders.router)
 app.include_router(contracts.router)
+app.include_router(compliance_documents.router)
 app.include_router(messages.router)
 app.include_router(audit_logs.router)
 app.include_router(notifications.router)
@@ -54,6 +56,7 @@ app.include_router(supply_chain.quality_inspections_router)
 ensure_upload_dir()
 ensure_po_upload_dir()
 ensure_contract_upload_dir()
+ensure_compliance_upload_dir()
 uploads_path = Path(__file__).resolve().parent.parent / "uploads"
 app.mount("/uploads", StaticFiles(directory=str(uploads_path)), name="uploads")
 
