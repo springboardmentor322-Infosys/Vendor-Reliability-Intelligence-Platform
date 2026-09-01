@@ -1,0 +1,23 @@
+services:
+
+  backend:
+    build:
+      context: ./backend
+    container_name: vendoriq-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/vendoriq.db:/app/vendoriq.db
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: vendoriq-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

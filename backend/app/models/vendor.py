@@ -7,14 +7,79 @@ class Vendor(Base):
 
     __tablename__ = "vendors"
 
-    id = Column(Integer, primary_key=True, index=True)
 
-    vendor_name = Column(String)
+    # ==========================================
+    # PRIMARY KEY
+    # ==========================================
 
-    email = Column(String, unique=True)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
 
-    phone = Column(String)
 
-    address = Column(String)
+    # ==========================================
+    # BASIC INFORMATION
+    # ==========================================
 
-    gst_number = Column(String)
+    vendor_name = Column(
+        String
+    )
+
+    email = Column(
+        String,
+        unique=True
+    )
+
+    phone = Column(
+        String
+    )
+
+    address = Column(
+        String
+    )
+
+    gst_number = Column(
+        String
+    )
+
+
+    # ==========================================
+    # VENDOR CATEGORY
+    # ==========================================
+
+    category = Column(
+        String,
+        default="Service Provider"
+    )
+
+
+    # ==========================================
+    # CONTACT PERSON
+    # ==========================================
+
+    contact_person = Column(
+        String,
+        nullable=True
+    )
+
+
+    # ==========================================
+    # APPROVAL STATUS
+    # ==========================================
+
+    approval_status = Column(
+        String,
+        default="Pending"
+    )
+
+
+    # ==========================================
+    # VENDOR STATUS
+    # ==========================================
+
+    status = Column(
+        String,
+        default="Active"
+    )
