@@ -1,0 +1,537 @@
+<div class="user-page">
+
+
+    <!-- ========================================= -->
+    <!-- HEADER -->
+    <!-- ========================================= -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                User Management
+            </h1>
+
+            <p>
+                Manage system users and role-based access
+            </p>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="primary-btn"
+            (click)="openCreateForm()">
+
+            + Add User
+
+        </button>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- SUMMARY -->
+    <!-- ========================================= -->
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                👥
+            </div>
+
+            <div>
+
+                <span>
+                    Total Users
+                </span>
+
+                <strong>
+                    {{ users().length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                🛡️
+            </div>
+
+            <div>
+
+                <span>
+                    Administrators
+                </span>
+
+                <strong>
+
+                    {{
+                        users().filter(
+                            u =>
+                                u.role ===
+                                'Administrator'
+                        ).length
+                    }}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                🏢
+            </div>
+
+            <div>
+
+                <span>
+                    Vendors
+                </span>
+
+                <strong>
+
+                    {{
+                        users().filter(
+                            u =>
+                                u.role ===
+                                'Vendor'
+                        ).length
+                    }}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                💼
+            </div>
+
+            <div>
+
+                <span>
+                    Staff Users
+                </span>
+
+                <strong>
+
+                    {{
+                        users().filter(
+                            u =>
+                                u.role !==
+                                'Vendor'
+                        ).length
+                    }}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- USER FORM -->
+    <!-- ========================================= -->
+
+    @if (showForm()) {
+
+        <div class="section-card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+
+                        {{
+                            editingUserId
+                            ? 'Edit User'
+                            : 'Create User'
+                        }}
+
+                    </h2>
+
+                    <p>
+                        Manage user account information and role
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="close-btn"
+                    (click)="closeForm()">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="form-grid">
+
+
+                <!-- FULL NAME -->
+
+                <div class="form-group">
+
+                    <label>
+                        Full Name
+                    </label>
+
+                    <input
+                        type="text"
+                        [(ngModel)]="fullName"
+                        placeholder="Enter full name">
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <label>
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        [(ngModel)]="email"
+                        placeholder="Enter email address">
+
+                </div>
+
+
+                <!-- ROLE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Role
+                    </label>
+
+                    <select
+                        [(ngModel)]="role">
+
+                        @for (
+                            item of roles;
+                            track item
+                        ) {
+
+                            <option
+                                [value]="item">
+
+                                {{ item }}
+
+                            </option>
+
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="form-group">
+
+                    <label>
+
+                        Password
+
+                        @if (editingUserId) {
+                            <span class="optional">
+                                (leave blank to keep current)
+                            </span>
+                        }
+
+                    </label>
+
+                    <input
+                        type="password"
+                        [(ngModel)]="password"
+                        placeholder="Enter password">
+
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    (click)="closeForm()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="primary-btn"
+                    [disabled]="saving()"
+                    (click)="saveUser()">
+
+                    @if (saving()) {
+
+                        Saving...
+
+                    } @else if (editingUserId) {
+
+                        Update User
+
+                    } @else {
+
+                        Create User
+
+                    }
+
+                </button>
+
+            </div>
+
+        </div>
+
+    }
+
+
+    <!-- ========================================= -->
+    <!-- USERS TABLE -->
+    <!-- ========================================= -->
+
+    <div class="section-card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    System Users
+                </h2>
+
+                <p>
+                    View and manage registered users
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="refresh-btn"
+                (click)="loadUsers()">
+
+                🔄 Refresh
+
+            </button>
+
+        </div>
+
+
+        @if (loading()) {
+
+            <div class="loading">
+                Loading users...
+            </div>
+
+        }
+
+
+        @if (
+            !loading() &&
+            users().length === 0
+        ) {
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    👥
+                </div>
+
+                <strong>
+                    No users found
+                </strong>
+
+                <p>
+                    Create a user to get started.
+                </p>
+
+            </div>
+
+        }
+
+
+        @if (
+            !loading() &&
+            users().length > 0
+        ) {
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                User
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Role
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @for (
+                            user of users();
+                            track user.id
+                        ) {
+
+                            <tr>
+
+                                <td>
+                                    #{{ user.id }}
+                                </td>
+
+
+                                <td>
+
+                                    <div class="user-name">
+
+                                        <strong>
+                                            {{ user.full_name }}
+                                        </strong>
+
+                                        @if (
+                                            currentUser?.id ===
+                                            user.id
+                                        ) {
+
+                                            <span class="you-badge">
+                                                You
+                                            </span>
+
+                                        }
+
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+                                    {{ user.email }}
+                                </td>
+
+
+                                <td>
+
+                                    <span
+                                        class="role-badge"
+                                        [ngClass]="
+                                            getRoleClass(
+                                                user.role
+                                            )
+                                        ">
+
+                                        {{ user.role }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="action-buttons">
+
+                                        <button
+                                            type="button"
+                                            class="edit-btn"
+                                            (click)="
+                                                openEditForm(user)
+                                            ">
+
+                                            Edit
+
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="delete-btn"
+                                            [disabled]="
+                                                currentUser?.id ===
+                                                user.id
+                                            "
+                                            (click)="
+                                                deleteUser(user)
+                                            ">
+
+                                            Delete
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        }
+
+    </div>
+
+</div>

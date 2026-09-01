@@ -1,0 +1,699 @@
+<div class="audit-page">
+
+  <!-- ==========================================
+       PAGE HEADER
+       ========================================== -->
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>Audit Plan</h1>
+
+      <p>
+        Plan, schedule and monitor vendor audits
+      </p>
+
+    </div>
+
+    <button
+      class="create-btn"
+      (click)="createAudit()">
+
+      <span>＋</span>
+      Create Audit Plan
+
+    </button>
+
+  </div>
+
+
+  <!-- ==========================================
+       SUMMARY CARDS
+       ========================================== -->
+
+  <div class="summary-grid">
+
+    <!-- Total Audits -->
+
+    <div class="summary-card">
+
+      <div class="summary-icon purple">
+        📋
+      </div>
+
+      <div>
+
+        <div class="summary-label">
+          Total Audits
+        </div>
+
+        <div class="summary-value">
+          {{ totalAudits() }}
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Planned -->
+
+    <div class="summary-card">
+
+      <div class="summary-icon blue">
+        📅
+      </div>
+
+      <div>
+
+        <div class="summary-label">
+          Planned Audits
+        </div>
+
+        <div class="summary-value">
+          {{ plannedAudits() }}
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- In Progress -->
+
+    <div class="summary-card">
+
+      <div class="summary-icon orange">
+        ⏳
+      </div>
+
+      <div>
+
+        <div class="summary-label">
+          In Progress
+        </div>
+
+        <div class="summary-value">
+          {{ inProgressAudits() }}
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Completed -->
+
+    <div class="summary-card">
+
+      <div class="summary-icon green">
+        ✓
+      </div>
+
+      <div>
+
+        <div class="summary-label">
+          Completed
+        </div>
+
+        <div class="summary-value">
+          {{ completedAudits() }}
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- High Priority -->
+
+    <div class="summary-card">
+
+      <div class="summary-icon red">
+        ⚠
+      </div>
+
+      <div>
+
+        <div class="summary-label">
+          High Priority
+        </div>
+
+        <div class="summary-value">
+          {{ highPriorityAudits() }}
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       FILTER SECTION
+       ========================================== -->
+
+  <div class="filter-card">
+
+    <div class="search-box">
+
+      <span class="search-icon">
+        🔍
+      </span>
+
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Search audit, vendor or audit type..."
+      />
+
+    </div>
+
+
+    <select
+      [(ngModel)]="selectedStatus">
+
+      <option value="All">
+        All Status
+      </option>
+
+      <option value="Planned">
+        Planned
+      </option>
+
+      <option value="Scheduled">
+        Scheduled
+      </option>
+
+      <option value="In Progress">
+        In Progress
+      </option>
+
+      <option value="Completed">
+        Completed
+      </option>
+
+    </select>
+
+
+    <select
+      [(ngModel)]="selectedPriority">
+
+      <option value="All">
+        All Priority
+      </option>
+
+      <option value="High">
+        High
+      </option>
+
+      <option value="Medium">
+        Medium
+      </option>
+
+      <option value="Low">
+        Low
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <!-- ==========================================
+       AUDIT PLAN TABLE
+       ========================================== -->
+
+  <div class="table-card">
+
+    <div class="table-header">
+
+      <div>
+
+        <h2>
+          Audit Plans
+        </h2>
+
+        <p>
+          Scheduled and ongoing audit activities
+        </p>
+
+      </div>
+
+      <div class="record-count">
+
+        {{ filteredAudits.length }} audits
+
+      </div>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Audit ID
+            </th>
+
+            <th>
+              Audit
+            </th>
+
+            <th>
+              Vendor
+            </th>
+
+            <th>
+              Type
+            </th>
+
+            <th>
+              Priority
+            </th>
+
+            <th>
+              Start Date
+            </th>
+
+            <th>
+              Due Date
+            </th>
+
+            <th>
+              Progress
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Actions
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr
+            *ngFor="let audit of filteredAudits">
+
+            <td>
+
+              <span class="audit-id">
+                {{ audit.id }}
+              </span>
+
+            </td>
+
+
+            <td>
+
+              <div class="audit-title">
+                {{ audit.title }}
+              </div>
+
+              <div class="audit-scope">
+                {{ audit.scope }}
+              </div>
+
+            </td>
+
+
+            <td>
+
+              {{ audit.vendor }}
+
+            </td>
+
+
+            <td>
+
+              <span class="type-badge">
+                {{ audit.auditType }}
+              </span>
+
+            </td>
+
+
+            <td>
+
+              <span
+                class="priority-badge"
+                [ngClass]="getPriorityClass(audit.priority)">
+
+                {{ audit.priority }}
+
+              </span>
+
+            </td>
+
+
+            <td>
+
+              {{ audit.startDate }}
+
+            </td>
+
+
+            <td>
+
+              {{ audit.dueDate }}
+
+            </td>
+
+
+            <td>
+
+              <div class="progress-container">
+
+                <div class="progress-top">
+
+                  <span>
+                    {{ audit.progress }}%
+                  </span>
+
+                </div>
+
+                <div class="progress-bar">
+
+                  <div
+                    class="progress-fill"
+                    [style.width.%]="audit.progress">
+                  </div>
+
+                </div>
+
+              </div>
+
+            </td>
+
+
+            <td>
+
+              <span
+                class="status-badge"
+                [ngClass]="getStatusClass(audit.status)">
+
+                {{ audit.status }}
+
+              </span>
+
+            </td>
+
+
+            <td>
+
+              <button
+                class="view-btn"
+                (click)="viewAudit(audit)">
+
+                View
+
+              </button>
+
+            </td>
+
+          </tr>
+
+
+          <!-- EMPTY STATE -->
+
+          <tr
+            *ngIf="filteredAudits.length === 0">
+
+            <td
+              colspan="10"
+              class="empty-state">
+
+              <div class="empty-icon">
+                📋
+              </div>
+
+              <h3>
+                No audit plans found
+              </h3>
+
+              <p>
+                Try changing your search or filters.
+              </p>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       UPCOMING AUDITS
+       ========================================== -->
+
+  <div class="bottom-grid">
+
+    <div class="info-card">
+
+      <div class="card-title">
+
+        <div>
+
+          <h2>
+            Upcoming Audits
+          </h2>
+
+          <p>
+            Audits scheduled for the next few weeks
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="timeline">
+
+        <div class="timeline-item">
+
+          <div class="timeline-dot">
+            📋
+          </div>
+
+          <div class="timeline-content">
+
+            <strong>
+              Vendor Compliance Audit
+            </strong>
+
+            <span>
+              National Supplies
+            </span>
+
+            <small>
+              05 Sep 2026
+            </small>
+
+          </div>
+
+        </div>
+
+
+        <div class="timeline-item">
+
+          <div class="timeline-dot">
+            📋
+          </div>
+
+          <div class="timeline-content">
+
+            <strong>
+              Procurement Process Audit
+            </strong>
+
+            <span>
+              Western Solutions
+            </span>
+
+            <small>
+              08 Sep 2026
+            </small>
+
+          </div>
+
+        </div>
+
+
+        <div class="timeline-item">
+
+          <div class="timeline-dot">
+            📋
+          </div>
+
+          <div class="timeline-content">
+
+            <strong>
+              Vendor Performance Review
+            </strong>
+
+            <span>
+              Apex Logistics
+            </span>
+
+            <small>
+              10 Sep 2026
+            </small>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- AUDIT FOCUS -->
+
+    <div class="info-card">
+
+      <div class="card-title">
+
+        <div>
+
+          <h2>
+            Audit Focus Areas
+          </h2>
+
+          <p>
+            Current audit coverage
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="focus-item">
+
+        <div class="focus-info">
+
+          <span>
+            Compliance
+          </span>
+
+          <strong>
+            42%
+          </strong>
+
+        </div>
+
+        <div class="focus-bar">
+
+          <div
+            class="focus-fill"
+            style="width: 42%">
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="focus-item">
+
+        <div class="focus-info">
+
+          <span>
+            Procurement
+          </span>
+
+          <strong>
+            28%
+          </strong>
+
+        </div>
+
+        <div class="focus-bar">
+
+          <div
+            class="focus-fill"
+            style="width: 28%">
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="focus-item">
+
+        <div class="focus-info">
+
+          <span>
+            Vendor Performance
+          </span>
+
+          <strong>
+            20%
+          </strong>
+
+        </div>
+
+        <div class="focus-bar">
+
+          <div
+            class="focus-fill"
+            style="width: 20%">
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="focus-item">
+
+        <div class="focus-info">
+
+          <span>
+            Risk Assessment
+          </span>
+
+          <strong>
+            10%
+          </strong>
+
+        </div>
+
+        <div class="focus-bar">
+
+          <div
+            class="focus-fill"
+            style="width: 10%">
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

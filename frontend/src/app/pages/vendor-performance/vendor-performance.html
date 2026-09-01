@@ -1,0 +1,2163 @@
+<div class="performance-page">
+
+    <!-- ================================= -->
+    <!-- HEADER -->
+    <!-- ================================= -->
+
+    <div class="performance-header">
+
+        <div>
+
+            <h1>
+                Vendor Performance
+            </h1>
+
+            <p>
+                Monitor vendor delivery, quality and service performance
+            </p>
+
+        </div>
+
+
+        <button
+            *appHasRole="['Administrator', 'Supply Chain Manager']"
+            class="primary-btn"
+            type="button"
+            (click)="openForm()">
+
+            + Add Performance
+
+        </button>
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- ADD PERFORMANCE FORM -->
+    <!-- ================================= -->
+
+    @if (showForm()) {
+
+        <div class="form-card">
+
+            <div class="form-header">
+
+                <div>
+
+                    <h2>
+                        Add Performance Record
+                    </h2>
+
+                    <p>
+                        Enter the vendor's performance details
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="close-btn"
+                    type="button"
+                    (click)="closeForm()">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label for="vendor">
+                        Vendor
+                    </label>
+
+                    <select
+                        id="vendor"
+                        [(ngModel)]="selectedVendorId">
+
+                        <option [ngValue]="null">
+                            Select Vendor
+                        </option>
+
+                        @for (
+                            vendor of vendors();
+                            track vendor.id
+                        ) {
+
+                            <option
+                                [ngValue]="vendor.id">
+
+                                {{ vendor.vendor_name }}
+
+                            </option>
+
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="performanceDate">
+                        Performance Date
+                    </label>
+
+                    <input
+                        id="performanceDate"
+                        type="date"
+                        [(ngModel)]="performanceDate">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="onTimeDeliveries">
+                        On-Time Deliveries
+                    </label>
+
+                    <input
+                        id="onTimeDeliveries"
+                        type="number"
+                        min="0"
+                        [(ngModel)]="onTimeDeliveries">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="delayedDeliveries">
+                        Delayed Deliveries
+                    </label>
+
+                    <input
+                        id="delayedDeliveries"
+                        type="number"
+                        min="0"
+                        [(ngModel)]="delayedDeliveries">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="qualityRating">
+
+                        Quality Rating
+
+                        <span>
+                            (0 - 5)
+                        </span>
+
+                    </label>
+
+                    <input
+                        id="qualityRating"
+                        type="number"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        [(ngModel)]="qualityRating">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="serviceRating">
+
+                        Service Rating
+
+                        <span>
+                            (0 - 5)
+                        </span>
+
+                    </label>
+
+                    <input
+                        id="serviceRating"
+                        type="number"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        [(ngModel)]="serviceRating">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="responseTime">
+
+                        Response Time
+
+                        <span>
+                            (hours)
+                        </span>
+
+                    </label>
+
+                    <input
+                        id="responseTime"
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        [(ngModel)]="responseTime">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="issueResolutionTime">
+
+                        Issue Resolution Time
+
+                        <span>
+                            (hours)
+                        </span>
+
+                    </label>
+
+                    <input
+                        id="issueResolutionTime"
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        [(ngModel)]="issueResolutionTime">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="orderCompletionRate">
+
+                        Order Completion Rate
+
+                        <span>
+                            (%)
+                        </span>
+
+                    </label>
+
+                    <input
+                        id="orderCompletionRate"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        [(ngModel)]="orderCompletionRate">
+
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <button
+                    class="secondary-btn"
+                    type="button"
+                    (click)="closeForm()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    class="primary-btn"
+                    type="button"
+                    (click)="savePerformance()">
+
+                    Save Performance
+
+                </button>
+
+            </div>
+
+        </div>
+
+    }
+
+
+    <!-- ================================= -->
+    <!-- SUMMARY -->
+    <!-- ================================= -->
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📊
+            </div>
+
+            <div>
+
+                <h2>
+                    {{ performanceRecords().length }}
+                </h2>
+
+                <p>
+                    Performance Records
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                🏢
+            </div>
+
+            <div>
+
+                <h2>
+                    {{ vendors().length }}
+                </h2>
+
+                <p>
+                    Total Vendors
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                🚚
+            </div>
+
+            <div>
+
+                <h2>
+                    {{ loading() ? '...' : 'Ready' }}
+                </h2>
+
+                <p>
+                    Performance Status
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- SUPPLIER RANKING -->
+    <!-- ================================= -->
+
+    <div class="reliability-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Supplier Ranking
+                </h2>
+
+                <p>
+                    Vendor reliability and procurement risk
+                </p>
+
+            </div>
+
+        </div>
+
+
+        @if (reliabilityLoading()) {
+
+            <div class="loading">
+                Loading reliability data...
+            </div>
+
+        }
+
+
+        @if (!reliabilityLoading()) {
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Rank
+                            </th>
+
+                            <th>
+                                Vendor
+                            </th>
+
+                            <th>
+                                Reliability Score
+                            </th>
+
+                            <th>
+                                Risk Level
+                            </th>
+
+                            <th>
+                                Delivery
+                            </th>
+
+                            <th>
+                                Quality
+                            </th>
+
+                            <th>
+                                Completion
+                            </th>
+
+                            <th>
+                                Procurement Recommendation
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @for (
+                            record of reliabilityRecords();
+                            track record.id;
+                            let i = $index
+                        ) {
+
+                            <tr>
+
+                                <td>
+
+                                    @if (i === 0) {
+
+                                        🥇
+
+                                    } @else if (i === 1) {
+
+                                        🥈
+
+                                    } @else if (i === 2) {
+
+                                        🥉
+
+                                    } @else {
+
+                                        <strong>
+                                            #{{ i + 1 }}
+                                        </strong>
+
+                                    }
+
+                                </td>
+
+
+                                <td>
+
+                                    <strong>
+                                        {{ record.vendor_name }}
+                                    </strong>
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="score-cell">
+
+                                        <strong class="score">
+                                            {{ record.reliability_score }}
+                                        </strong>
+
+                                        <span>
+                                            / 100
+                                        </span>
+
+
+                                        <div class="progress-bar">
+
+                                            <div
+                                                class="progress-fill"
+                                                [style.width.%]="
+                                                    record.reliability_score
+                                                ">
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span
+                                        class="risk-badge"
+
+                                        [class.low-risk]="
+                                            record.risk_level === 'Low Risk'
+                                        "
+
+                                        [class.medium-risk]="
+                                            record.risk_level === 'Medium Risk'
+                                        "
+
+                                        [class.high-risk]="
+                                            record.risk_level === 'High Risk'
+                                        ">
+
+                                        {{ record.risk_level }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ getOnTimePercentage(record) }}%
+
+                                </td>
+
+
+                                <td>
+
+                                    ★
+
+                                    {{
+                                        formatRating(
+                                            record.quality_rating
+                                        )
+                                    }}
+
+                                    / 5
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ record.order_completion_rate }}%
+
+                                </td>
+
+
+                                <!-- ================================= -->
+                                <!-- PROCUREMENT RECOMMENDATION -->
+                                <!-- ================================= -->
+
+                                <td>
+
+                                    <div class="recommendation-cell">
+
+                                        <span
+                                            class="recommendation-action"
+
+                                            [class.recommendation-low]="
+                                                record.recommendation_priority === 'Low'
+                                            "
+
+                                            [class.recommendation-medium]="
+                                                record.recommendation_priority === 'Medium'
+                                            "
+
+                                            [class.recommendation-high]="
+                                                record.recommendation_priority === 'High'
+                                            ">
+
+                                            {{ record.recommendation_action }}
+
+                                        </span>
+
+
+                                        <span class="recommendation-text">
+
+                                            {{ record.procurement_recommendation }}
+
+                                        </span>
+
+
+                                        <span class="recommendation-reason">
+
+                                            {{ record.recommendation_reason }}
+
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+
+                        @if (
+                            reliabilityRecords().length === 0
+                        ) {
+
+                            <tr>
+
+                                <td
+                                    colspan="8"
+                                    class="empty">
+
+                                    No reliability data available.
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        }
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- PERFORMANCE TREND -->
+    <!-- ================================= -->
+
+    <div class="trend-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Performance Trend Analysis
+                </h2>
+
+                <p>
+                    Track vendor performance over time
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="trend-controls">
+
+            <div class="form-group">
+
+                <label for="trendVendor">
+                    Select Vendor
+                </label>
+
+                <select
+                    id="trendVendor"
+                    [ngModel]="selectedTrendVendorId"
+                    (ngModelChange)="selectTrendVendor($event)">
+
+                    <option [ngValue]="null">
+                        Select a vendor
+                    </option>
+
+                    @for (
+                        vendor of vendors();
+                        track vendor.id
+                    ) {
+
+                        <option
+                            [ngValue]="vendor.id">
+
+                            {{ vendor.vendor_name }}
+
+                        </option>
+
+                    }
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        @if (trendLoading()) {
+
+            <div class="loading">
+                Loading performance trend...
+            </div>
+
+        }
+
+
+        @if (
+            !trendLoading() &&
+            selectedTrendVendorId !== null
+        ) {
+
+            @if (trendRecords().length > 0) {
+
+                <div class="trend-chart-card">
+
+                    <div class="trend-chart-header">
+
+                        <div>
+
+                            <h3>
+                                Overall Performance Trend
+                            </h3>
+
+                            <p>
+                                Average performance score across
+                                delivery, quality, completion and service
+                            </p>
+
+                        </div>
+
+
+                        <div class="trend-chart-legend">
+
+                            <span class="legend-item">
+
+                                <span class="legend-dot"></span>
+
+                                Performance Score
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="trend-chart-wrapper">
+
+                        <svg
+                            class="trend-chart"
+                            viewBox="0 0 800 280"
+                            preserveAspectRatio="none">
+
+                            <line
+                                x1="40"
+                                y1="20"
+                                x2="780"
+                                y2="20"
+                                class="chart-grid-line">
+                            </line>
+
+
+                            <line
+                                x1="40"
+                                y1="75"
+                                x2="780"
+                                y2="75"
+                                class="chart-grid-line">
+                            </line>
+
+
+                            <line
+                                x1="40"
+                                y1="130"
+                                x2="780"
+                                y2="130"
+                                class="chart-grid-line">
+                            </line>
+
+
+                            <line
+                                x1="40"
+                                y1="185"
+                                x2="780"
+                                y2="185"
+                                class="chart-grid-line">
+                            </line>
+
+
+                            <line
+                                x1="40"
+                                y1="250"
+                                x2="780"
+                                y2="250"
+                                class="chart-grid-line">
+                            </line>
+
+
+                            <text
+                                x="5"
+                                y="25"
+                                class="chart-axis-label">
+
+                                100
+
+                            </text>
+
+
+                            <text
+                                x="10"
+                                y="80"
+                                class="chart-axis-label">
+
+                                75
+
+                            </text>
+
+
+                            <text
+                                x="10"
+                                y="135"
+                                class="chart-axis-label">
+
+                                50
+
+                            </text>
+
+
+                            <text
+                                x="10"
+                                y="190"
+                                class="chart-axis-label">
+
+                                25
+
+                            </text>
+
+
+                            <text
+                                x="15"
+                                y="255"
+                                class="chart-axis-label">
+
+                                0
+
+                            </text>
+
+
+                            <path
+                                [attr.d]="getTrendSmoothPath()"
+                                class="trend-line"
+                                fill="none">
+                            </path>
+
+
+                            @for (
+                                record of trendRecords();
+                                track record.id;
+                                let i = $index
+                            ) {
+
+                                <circle
+                                    [attr.cx]="
+                                        getTrendPointX(i)
+                                    "
+
+                                    [attr.cy]="
+                                        getTrendPointY(record)
+                                    "
+
+                                    r="6"
+
+                                    class="trend-point">
+
+                                    <title>
+                                        {{ getTrendTooltip(record) }}
+                                    </title>
+
+                                </circle>
+
+
+                                <text
+                                    [attr.x]="
+                                        getTrendPointX(i)
+                                    "
+
+                                    [attr.y]="
+                                        getTrendPointY(record) - 14
+                                    "
+
+                                    text-anchor="middle"
+
+                                    class="trend-point-label">
+
+                                    {{ getTrendAverage(record) }}%
+
+                                </text>
+
+                            }
+
+
+                            <line
+                                x1="40"
+                                y1="250"
+                                x2="780"
+                                y2="250"
+                                class="chart-axis-line">
+                            </line>
+
+
+                            @for (
+                                record of trendRecords();
+                                track record.id;
+                                let i = $index
+                            ) {
+
+                                <text
+                                    [attr.x]="
+                                        getTrendPointX(i)
+                                    "
+
+                                    y="272"
+
+                                    text-anchor="middle"
+
+                                    class="chart-date-label">
+
+                                    {{ getTrendDate(record) }}
+
+                                </text>
+
+                            }
+
+                        </svg>
+
+                    </div>
+
+
+                    <div class="trend-metrics">
+
+                        <div class="trend-metric">
+
+                            <span>
+                                Latest Score
+                            </span>
+
+                            <strong>
+
+                                {{
+                                    getTrendAverage(
+                                        trendRecords()[
+                                            trendRecords().length - 1
+                                        ]
+                                    )
+                                }}%
+
+                            </strong>
+
+                        </div>
+
+
+                        <div class="trend-metric">
+
+                            <span>
+                                Delivery
+                            </span>
+
+                            <strong>
+
+                                {{
+                                    getTrendDelivery(
+                                        trendRecords()[
+                                            trendRecords().length - 1
+                                        ]
+                                    )
+                                }}%
+
+                            </strong>
+
+                        </div>
+
+
+                        <div class="trend-metric">
+
+                            <span>
+                                Quality
+                            </span>
+
+                            <strong>
+
+                                {{
+                                    formatRating(
+                                        trendRecords()[
+                                            trendRecords().length - 1
+                                        ].quality_rating
+                                    )
+                                }}/5
+
+                            </strong>
+
+                        </div>
+
+
+                        <div class="trend-metric">
+
+                            <span>
+                                Completion
+                            </span>
+
+                            <strong>
+
+                                {{
+                                    trendRecords()[
+                                        trendRecords().length - 1
+                                    ].order_completion_rate
+                                }}%
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TREND TABLE -->
+
+                <div class="trend-table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Delivery
+                                </th>
+
+                                <th>
+                                    Quality
+                                </th>
+
+                                <th>
+                                    Completion
+                                </th>
+
+                                <th>
+                                    Service
+                                </th>
+
+                                <th>
+                                    Response Time
+                                </th>
+
+                                <th>
+                                    Issue Resolution
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @for (
+                                record of trendRecords();
+                                track record.id
+                            ) {
+
+                                <tr>
+
+                                    <td>
+
+                                        {{
+                                            record.performance_date
+                                            | date:'dd MMM yyyy'
+                                        }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="trend-value">
+
+                                            <strong>
+
+                                                {{
+                                                    getOnTimePercentage(
+                                                        record
+                                                    )
+                                                }}%
+
+                                            </strong>
+
+
+                                            <div class="progress-bar">
+
+                                                <div
+                                                    class="progress-fill"
+
+                                                    [style.width.%]="
+                                                        getOnTimePercentage(
+                                                            record
+                                                        )
+                                                    ">
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        ★
+
+                                        {{
+                                            formatRating(
+                                                record.quality_rating
+                                            )
+                                        }}
+
+                                        / 5
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <strong>
+
+                                            {{
+                                                record.order_completion_rate
+                                            }}%
+
+                                        </strong>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        ★
+
+                                        {{
+                                            formatRating(
+                                                record.service_rating
+                                            )
+                                        }}
+
+                                        / 5
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ record.response_time }}
+                                        hrs
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ record.issue_resolution_time }}
+                                        hrs
+
+                                    </td>
+
+                                </tr>
+
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            } @else {
+
+                <div class="empty trend-empty">
+
+                    No performance trend data available
+                    for this vendor.
+
+                </div>
+
+            }
+
+        }
+
+
+        @if (
+            !trendLoading() &&
+            selectedTrendVendorId === null
+        ) {
+
+            <div class="empty trend-empty">
+
+                Select a vendor to view performance trends.
+
+            </div>
+
+        }
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- VENDOR COMPARISON -->
+    <!-- ================================= -->
+
+    <div class="comparison-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Vendor Comparison
+                </h2>
+
+                <p>
+                    Compare two vendors using their latest performance data
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="comparison-controls">
+
+            <div class="form-group">
+
+                <label for="comparisonVendorA">
+                    Vendor A
+                </label>
+
+                <select
+                    id="comparisonVendorA"
+                    [(ngModel)]="selectedComparisonVendorAId">
+
+                    <option [ngValue]="null">
+                        Select Vendor A
+                    </option>
+
+                    @for (
+                        vendor of vendors();
+                        track vendor.id
+                    ) {
+
+                        <option
+                            [ngValue]="vendor.id">
+
+                            {{ vendor.vendor_name }}
+
+                        </option>
+
+                    }
+
+                </select>
+
+            </div>
+
+
+            <div class="comparison-vs">
+                VS
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="comparisonVendorB">
+                    Vendor B
+                </label>
+
+                <select
+                    id="comparisonVendorB"
+                    [(ngModel)]="selectedComparisonVendorBId">
+
+                    <option [ngValue]="null">
+                        Select Vendor B
+                    </option>
+
+                    @for (
+                        vendor of vendors();
+                        track vendor.id
+                    ) {
+
+                        <option
+                            [ngValue]="vendor.id">
+
+                            {{ vendor.vendor_name }}
+
+                        </option>
+
+                    }
+
+                </select>
+
+            </div>
+
+
+            <button
+                *appHasRole="['Administrator', 'Procurement Manager', 'Supply Chain Manager', 'Finance Officer', 'Auditor']"
+                type="button"
+                class="primary-btn"
+                (click)="compareVendors()">
+
+                Compare Vendors
+
+            </button>
+
+
+            <button
+                type="button"
+                class="secondary-btn"
+                (click)="resetComparison()">
+
+                Reset
+
+            </button>
+
+        </div>
+
+
+        @if (comparisonLoading()) {
+
+            <div class="loading">
+                Comparing vendor performance...
+            </div>
+
+        }
+
+
+        @if (
+            !comparisonLoading() &&
+            comparisonData()
+        ) {
+
+            <div class="comparison-card">
+
+                <div class="comparison-header">
+
+                    <div class="comparison-vendor">
+
+                        <span class="vendor-label">
+                            Vendor A
+                        </span>
+
+                        <h3>
+
+                            {{
+                                getComparisonVendor('a')
+                                    ?.vendor_name
+                            }}
+
+                        </h3>
+
+                    </div>
+
+
+                    <div class="comparison-badge">
+                        VS
+                    </div>
+
+
+                    <div class="comparison-vendor right">
+
+                        <span class="vendor-label">
+                            Vendor B
+                        </span>
+
+                        <h3>
+
+                            {{
+                                getComparisonVendor('b')
+                                    ?.vendor_name
+                            }}
+
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="comparison-table-container">
+
+                    <table class="comparison-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Metric
+                                </th>
+
+                                <th>
+
+                                    {{
+                                        getComparisonVendor('a')
+                                            ?.vendor_name
+                                    }}
+
+                                </th>
+
+                                <th>
+
+                                    {{
+                                        getComparisonVendor('b')
+                                            ?.vendor_name
+                                    }}
+
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            <!-- RELIABILITY -->
+
+                            <tr>
+
+                                <td>
+                                    Reliability Score
+                                </td>
+
+                                <td
+                                    [class.better-value]="
+                                        isHigher(
+                                            'a',
+                                            'reliability_score'
+                                        )
+                                    ">
+
+                                    <strong>
+
+                                        {{
+                                            getComparisonVendor('a')
+                                                ?.reliability_score
+                                        }}
+
+                                    </strong>
+
+                                    / 100
+
+                                </td>
+
+                                <td
+                                    [class.better-value]="
+                                        isHigher(
+                                            'b',
+                                            'reliability_score'
+                                        )
+                                    ">
+
+                                    <strong>
+
+                                        {{
+                                            getComparisonVendor('b')
+                                                ?.reliability_score
+                                        }}
+
+                                    </strong>
+
+                                    / 100
+
+                                </td>
+
+                            </tr>
+
+
+                            <!-- RISK -->
+
+                            <tr>
+
+                                <td>
+                                    Risk Level
+                                </td>
+
+                                <td>
+
+                                    <span
+                                        class="risk-badge"
+
+                                        [class.low-risk]="
+                                            getComparisonVendor('a')
+                                                ?.risk_level === 'Low Risk'
+                                        "
+
+                                        [class.medium-risk]="
+                                            getComparisonVendor('a')
+                                                ?.risk_level === 'Medium Risk'
+                                        "
+
+                                        [class.high-risk]="
+                                            getComparisonVendor('a')
+                                                ?.risk_level === 'High Risk'
+                                        ">
+
+                                        {{
+                                            getComparisonVendor('a')
+                                                ?.risk_level
+                                        }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span
+                                        class="risk-badge"
+
+                                        [class.low-risk]="
+                                            getComparisonVendor('b')
+                                                ?.risk_level === 'Low Risk'
+                                        "
+
+                                        [class.medium-risk]="
+                                            getComparisonVendor('b')
+                                                ?.risk_level === 'Medium Risk'
+                                        "
+
+                                        [class.high-risk]="
+                                            getComparisonVendor('b')
+                                                ?.risk_level === 'High Risk'
+                                        ">
+
+                                        {{
+                                            getComparisonVendor('b')
+                                                ?.risk_level
+                                        }}
+
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+
+                            <!-- DELIVERY -->
+
+                            <tr>
+
+                                <td>
+                                    Delivery
+                                </td>
+
+                                <td
+                                    [class.better-value]="
+                                        isHigher(
+                                            'a',
+                                            'delivery_percentage'
+                                        )
+                                    ">
+
+                                    {{
+                                        getComparisonDeliveryPercentage(
+                                            'a'
+                                        )
+                                    }}%
+
+                                </td>
+
+                                <td
+                                    [class.better-value]="
+                                        isHigher(
+                                            'b',
+                                            'delivery_percentage'
+                                        )
+                                    ">
+
+                                    {{
+                                        getComparisonDeliveryPercentage(
+                                            'b'
+                                        )
+                                    }}%
+
+                                </td>
+
+                            </tr>
+
+
+                            <!-- QUALITY -->
+
+                            <tr>
+
+                                <td>
+                                    Quality
+                                </td>
+
+                                <td
+                                    [class.better-value]="
+                                        isHigher(
+                                            'a',
+                                            'quality_rating'
+                                        )
+                                    ">
+
+                                    ★
+
+                                    {{
+                                        formatRating(
+                                            getComparisonVendor('a')
+                                                ?.quality_rating
+                                        )
+                                    }}
+
+                                    / 5
+
+                                </td>
+
+
+                                <td
+                                    [class.better-value]="
+                                        isHigher(
+                                            'b',
+                                            'quality_rating'
+                                        )
+                                    ">
+
+                                    ★
+
+                                    {{
+                                        formatRating(
+                                            getComparisonVendor('b')
+                                                ?.quality_rating
+                                        )
+                                    }}
+
+                                    / 5
+
+                                </td>
+
+                            </tr>
+
+
+                            <!-- RESPONSE TIME -->
+
+                            <tr>
+
+                                <td>
+                                    Response Time
+                                </td>
+
+                                <td
+                                    [class.better-value]="
+                                        isLower(
+                                            'a',
+                                            'response_time'
+                                        )
+                                    ">
+
+                                    {{
+                                        getComparisonVendor('a')
+                                            ?.response_time
+                                    }}
+
+                                    hrs
+
+                                </td>
+
+
+                                <td
+                                    [class.better-value]="
+                                        isLower(
+                                            'b',
+                                            'response_time'
+                                        )
+                                    ">
+
+                                    {{
+                                        getComparisonVendor('b')
+                                            ?.response_time
+                                    }}
+
+                                    hrs
+
+                                </td>
+
+                            </tr>
+
+
+                            <!-- ISSUE RESOLUTION -->
+
+                            <tr>
+
+                                <td>
+                                    Issue Resolution
+                                </td>
+
+                                <td
+                                    [class.better-value]="
+                                        isLower(
+                                            'a',
+                                            'issue_resolution_time'
+                                        )
+                                    ">
+
+                                    {{
+                                        getComparisonVendor('a')
+                                            ?.issue_resolution_time
+                                    }}
+
+                                    hrs
+
+                                </td>
+
+
+                                <td
+                                    [class.better-value]="
+                                        isLower(
+                                            'b',
+                                            'issue_resolution_time'
+                                        )
+                                    ">
+
+                                    {{
+                                        getComparisonVendor('b')
+                                            ?.issue_resolution_time
+                                    }}
+
+                                    hrs
+
+                                </td>
+
+                            </tr>
+
+
+                            <!-- COMPLETION -->
+
+                            <tr>
+
+                                <td>
+                                    Completion
+                                </td>
+
+                                <td
+                                    [class.better-value]="
+                                        isHigher(
+                                            'a',
+                                            'order_completion_rate'
+                                        )
+                                    ">
+
+                                    {{
+                                        getComparisonVendor('a')
+                                            ?.order_completion_rate
+                                    }}%
+
+                                </td>
+
+
+                                <td
+                                    [class.better-value]="
+                                        isHigher(
+                                            'b',
+                                            'order_completion_rate'
+                                        )
+                                    ">
+
+                                    {{
+                                        getComparisonVendor('b')
+                                            ?.order_completion_rate
+                                    }}%
+
+                                </td>
+
+                            </tr>
+
+
+                            <!-- SERVICE -->
+
+                            <tr>
+
+                                <td>
+                                    Service Rating
+                                </td>
+
+                                <td
+                                    [class.better-value]="
+                                        isHigher(
+                                            'a',
+                                            'service_rating'
+                                        )
+                                    ">
+
+                                    ★
+
+                                    {{
+                                        formatRating(
+                                            getComparisonVendor('a')
+                                                ?.service_rating
+                                        )
+                                    }}
+
+                                    / 5
+
+                                </td>
+
+
+                                <td
+                                    [class.better-value]="
+                                        isHigher(
+                                            'b',
+                                            'service_rating'
+                                        )
+                                    ">
+
+                                    ★
+
+                                    {{
+                                        formatRating(
+                                            getComparisonVendor('b')
+                                                ?.service_rating
+                                        )
+                                    }}
+
+                                    / 5
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        }
+
+
+        @if (
+            !comparisonLoading() &&
+            !comparisonData()
+        ) {
+
+            <div class="empty comparison-empty">
+
+                Select two vendors and click
+                <strong>Compare Vendors</strong>
+                to view their performance.
+
+            </div>
+
+        }
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- PERFORMANCE HISTORY -->
+    <!-- ================================= -->
+
+    <div class="performance-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Performance History
+                </h2>
+
+                <p>
+                    Review vendor performance records
+                </p>
+
+            </div>
+
+        </div>
+
+
+        @if (loading()) {
+
+            <div class="loading">
+                Loading performance data...
+            </div>
+
+        }
+
+
+        @if (!loading()) {
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Vendor
+                            </th>
+
+                            <th>
+                                On-Time Deliveries
+                            </th>
+
+                            <th>
+                                Delayed Deliveries
+                            </th>
+
+                            <th>
+                                Delivery Rate
+                            </th>
+
+                            <th>
+                                Quality
+                            </th>
+
+                            <th>
+                                Response Time
+                            </th>
+
+                            <th>
+                                Issue Resolution
+                            </th>
+
+                            <th>
+                                Completion
+                            </th>
+
+                            <th>
+                                Service
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @for (
+                            record of performanceRecords();
+                            track record.id
+                        ) {
+
+                            <tr>
+
+                                <td>
+
+                                    <strong>
+
+                                        {{
+                                            getVendorName(
+                                                record.vendor_id
+                                            )
+                                        }}
+
+                                    </strong>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="positive">
+                                        {{ record.on_time_deliveries }}
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="negative">
+                                        {{ record.delayed_deliveries }}
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="rate-cell">
+
+                                        <strong>
+
+                                            {{
+                                                getOnTimePercentage(
+                                                    record
+                                                )
+                                            }}%
+
+                                        </strong>
+
+
+                                        <div class="progress-bar">
+
+                                            <div
+                                                class="progress-fill"
+
+                                                [style.width.%]="
+                                                    getOnTimePercentage(
+                                                        record
+                                                    )
+                                                ">
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="rating">
+
+                                        ★
+
+                                        {{
+                                            formatRating(
+                                                record.quality_rating
+                                            )
+                                        }}
+
+                                    </span>
+
+                                    <span class="rating-max">
+                                        / 5
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ record.response_time }}
+                                    hrs
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ record.issue_resolution_time }}
+                                    hrs
+
+                                </td>
+
+
+                                <td>
+
+                                    <strong>
+
+                                        {{
+                                            record.order_completion_rate
+                                        }}%
+
+                                    </strong>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="rating">
+
+                                        ★
+
+                                        {{
+                                            formatRating(
+                                                record.service_rating
+                                            )
+                                        }}
+
+                                    </span>
+
+                                    <span class="rating-max">
+                                        / 5
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    {{
+                                        record.performance_date
+                                        | date:'dd MMM yyyy'
+                                    }}
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+
+                        @if (
+                            performanceRecords().length === 0
+                        ) {
+
+                            <tr>
+
+                                <td
+                                    colspan="10"
+                                    class="empty">
+
+                                    No performance records available.
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        }
+
+    </div>
+
+</div>

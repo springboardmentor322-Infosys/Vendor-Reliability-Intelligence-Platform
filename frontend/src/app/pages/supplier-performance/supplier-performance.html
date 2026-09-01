@@ -1,0 +1,180 @@
+<div class="supplier-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <span class="eyebrow">SUPPLY CHAIN MANAGEMENT</span>
+      <h1>Supplier Performance</h1>
+      <p>Monitor supplier delivery, quality and reliability performance.</p>
+    </div>
+
+    <button class="refresh-btn" type="button">
+      ↻ Refresh Data
+    </button>
+  </div>
+
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+
+    <div class="kpi-card">
+      <div class="kpi-icon">🏢</div>
+      <div>
+        <span class="kpi-label">Total Suppliers</span>
+        <h2>{{ suppliers.length }}</h2>
+        <small>Active suppliers</small>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">🚚</div>
+      <div>
+        <span class="kpi-label">On-Time Delivery</span>
+        <h2>{{ averageDelivery }}%</h2>
+        <small>Average performance</small>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">✓</div>
+      <div>
+        <span class="kpi-label">Quality Score</span>
+        <h2>{{ averageQuality }}%</h2>
+        <small>Average quality rating</small>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">⭐</div>
+      <div>
+        <span class="kpi-label">Reliability Score</span>
+        <h2>{{ averageReliability }}%</h2>
+        <small>Overall supplier reliability</small>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- Performance Overview -->
+  <div class="section-card">
+
+    <div class="section-header">
+      <div>
+        <h2>Supplier Performance Overview</h2>
+        <p>Compare supplier performance across key metrics.</p>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Supplier</th>
+            <th>Category</th>
+            <th>Orders</th>
+            <th>On-Time Delivery</th>
+            <th>Quality</th>
+            <th>Reliability</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @for (supplier of suppliers; track supplier.name) {
+
+            <tr>
+
+              <td>
+                <div class="supplier-name">
+                  <div class="supplier-avatar">
+                    {{ supplier.name.charAt(0) }}
+                  </div>
+
+                  <strong>{{ supplier.name }}</strong>
+                </div>
+              </td>
+
+              <td>{{ supplier.category }}</td>
+
+              <td>{{ supplier.orders }}</td>
+
+              <td>
+                <div class="metric">
+                  <span>{{ supplier.delivery }}%</span>
+                  <div class="progress">
+                    <div
+                      class="progress-fill"
+                      [style.width.%]="supplier.delivery">
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="metric">
+                  <span>{{ supplier.quality }}%</span>
+                  <div class="progress">
+                    <div
+                      class="progress-fill"
+                      [style.width.%]="supplier.quality">
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <strong>{{ supplier.reliability }}%</strong>
+              </td>
+
+              <td>
+                <span
+                  class="status"
+                  [ngClass]="getStatusClass(supplier.status)">
+                  {{ supplier.status }}
+                </span>
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- Bottom Cards -->
+  <div class="bottom-grid">
+
+    <div class="info-card">
+      <span class="card-icon">🏆</span>
+      <h3>Top Performing Supplier</h3>
+      <strong>TechSource Solutions</strong>
+      <p>95% overall reliability score</p>
+    </div>
+
+    <div class="info-card">
+      <span class="card-icon">⚠️</span>
+      <h3>Supplier Needing Attention</h3>
+      <strong>Metro Supplies</strong>
+      <p>76% reliability score</p>
+    </div>
+
+    <div class="info-card">
+      <span class="card-icon">📦</span>
+      <h3>Total Orders</h3>
+      <strong>{{ suppliers.length > 0 ? 156 : 0 }}</strong>
+      <p>Orders across active suppliers</p>
+    </div>
+
+  </div>
+
+</div>

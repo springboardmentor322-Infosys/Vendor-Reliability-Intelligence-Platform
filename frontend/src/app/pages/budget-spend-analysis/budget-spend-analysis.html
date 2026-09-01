@@ -1,0 +1,817 @@
+<div class="analysis-page">
+
+  <!-- ========================================= -->
+  <!-- PAGE HEADER -->
+  <!-- ========================================= -->
+
+  <div class="page-header">
+
+    <div>
+
+      <span class="eyebrow">
+        PROCUREMENT ANALYTICS
+      </span>
+
+      <h1>
+        Budget &amp; Spend Analysis
+      </h1>
+
+      <p>
+        Monitor procurement spending and budget utilization.
+      </p>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="refresh-btn"
+      (click)="refresh()">
+
+      ↻ Refresh
+
+    </button>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- FILTERS -->
+  <!-- ========================================= -->
+
+  <div class="filter-card">
+
+    <div class="filter-group">
+
+      <label>
+        Search
+      </label>
+
+      <input
+        type="text"
+        placeholder="Search vendor or product..."
+        [(ngModel)]="searchText">
+
+    </div>
+
+
+    <div class="filter-group">
+
+      <label>
+        Vendor
+      </label>
+
+      <select
+        [(ngModel)]="selectedVendor">
+
+        <option value="All">
+          All Vendors
+        </option>
+
+        @for (
+          vendor of vendors();
+          track vendor.id
+        ) {
+
+          <option
+            [value]="vendor.id">
+
+            {{ vendor.vendor_name }}
+
+          </option>
+
+        }
+
+      </select>
+
+    </div>
+
+
+    <div class="filter-group">
+
+      <label>
+        Status
+      </label>
+
+      <select
+        [(ngModel)]="selectedStatus">
+
+        <option value="All">
+          All Status
+        </option>
+
+        <option value="Pending">
+          Pending
+        </option>
+
+        <option value="Approved">
+          Approved
+        </option>
+
+        <option value="Ordered">
+          Ordered
+        </option>
+
+        <option value="Delivered">
+          Delivered
+        </option>
+
+        <option value="Completed">
+          Completed
+        </option>
+
+        <option value="Cancelled">
+          Cancelled
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- KPI CARDS -->
+  <!-- ========================================= -->
+
+  <div class="stats-grid">
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon budget">
+        ₹
+      </div>
+
+      <div>
+
+        <span>
+          Total Budget
+        </span>
+
+        <strong>
+          ₹{{ formatCurrency(budget) }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon spend">
+        ₹
+      </div>
+
+      <div>
+
+        <span>
+          Total Spend
+        </span>
+
+        <strong>
+          ₹{{ formatCurrency(totalSpend) }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon remaining">
+        ✓
+      </div>
+
+      <div>
+
+        <span>
+          Remaining Budget
+        </span>
+
+        <strong>
+          ₹{{ formatCurrency(remainingBudget) }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+      <div class="stat-icon utilization">
+        %
+      </div>
+
+      <div>
+
+        <span>
+          Budget Utilization
+        </span>
+
+        <strong>
+          {{ budgetUtilization | number:'1.1-1' }}%
+        </strong>
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- BUDGET UTILIZATION -->
+  <!-- ========================================= -->
+
+  <div class="content-grid">
+
+
+    <div class="card budget-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <h2>
+            Budget Utilization
+          </h2>
+
+          <p>
+            Current spending against allocated budget.
+          </p>
+
+        </div>
+
+
+        <span
+          class="budget-status"
+          [ngClass]="getBudgetStatusClass()">
+
+          {{ getBudgetStatus() }}
+
+        </span>
+
+      </div>
+
+
+      <div class="utilization-value">
+
+        <strong>
+          {{ budgetUtilization | number:'1.1-1' }}%
+        </strong>
+
+        <span>
+          utilized
+        </span>
+
+      </div>
+
+
+      <div class="progress-track">
+
+        <div
+          class="progress-fill"
+          [style.width.%]="budgetUtilization">
+        </div>
+
+      </div>
+
+
+      <div class="budget-details">
+
+        <div>
+
+          <span>
+            Spent
+          </span>
+
+          <strong>
+            ₹{{ formatCurrency(totalSpend) }}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Remaining
+          </span>
+
+          <strong>
+            ₹{{ formatCurrency(remainingBudget) }}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Budget
+          </span>
+
+          <strong>
+            ₹{{ formatCurrency(budget) }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================= -->
+    <!-- BUDGET SETTINGS -->
+    <!-- ======================================= -->
+
+    <div class="card">
+
+      <div class="card-header">
+
+        <div>
+
+          <h2>
+            Budget Configuration
+          </h2>
+
+          <p>
+            Set the procurement budget used for analysis.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="budget-input">
+
+        <label>
+          Annual Budget
+        </label>
+
+        <div class="currency-input">
+
+          <span>
+            ₹
+          </span>
+
+          <input
+            type="number"
+            min="0"
+            [ngModel]="budget"
+            (ngModelChange)="updateBudget($event)">
+
+        </div>
+
+      </div>
+
+
+      <div class="info-box">
+
+        <span>ℹ</span>
+
+        <p>
+          Spend is calculated from the purchase-order
+          amounts currently available in the system.
+        </p>
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- SPEND SUMMARY -->
+  <!-- ========================================= -->
+
+  <div class="card">
+
+    <div class="card-header">
+
+      <div>
+
+        <h2>
+          Spend Summary
+        </h2>
+
+        <p>
+          Breakdown of procurement spend by order status.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="status-grid">
+
+
+      <div class="status-item">
+
+        <div class="status-title">
+
+          <span class="dot pending"></span>
+
+          <span>
+            Pending
+          </span>
+
+          <strong>
+            ₹{{ formatCurrency(pendingSpend) }}
+          </strong>
+
+        </div>
+
+        <div class="mini-track">
+
+          <div
+            class="mini-fill pending-fill"
+            [style.width.%]="
+              getStatusPercentage('Pending')
+            ">
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="status-item">
+
+        <div class="status-title">
+
+          <span class="dot approved"></span>
+
+          <span>
+            Approved
+          </span>
+
+          <strong>
+            ₹{{ formatCurrency(approvedSpend) }}
+          </strong>
+
+        </div>
+
+        <div class="mini-track">
+
+          <div
+            class="mini-fill approved-fill"
+            [style.width.%]="
+              getStatusPercentage('Approved')
+            ">
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="status-item">
+
+        <div class="status-title">
+
+          <span class="dot ordered"></span>
+
+          <span>
+            Ordered
+          </span>
+
+          <strong>
+            ₹{{ formatCurrency(orderedSpend) }}
+          </strong>
+
+        </div>
+
+        <div class="mini-track">
+
+          <div
+            class="mini-fill ordered-fill"
+            [style.width.%]="
+              getStatusPercentage('Ordered')
+            ">
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="status-item">
+
+        <div class="status-title">
+
+          <span class="dot completed"></span>
+
+          <span>
+            Completed
+          </span>
+
+          <strong>
+            ₹{{ formatCurrency(completedSpend) }}
+          </strong>
+
+        </div>
+
+        <div class="mini-track">
+
+          <div
+            class="mini-fill completed-fill"
+            [style.width.%]="
+              getStatusPercentage('Completed')
+            ">
+          </div>
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- VENDOR ANALYSIS -->
+  <!-- ========================================= -->
+
+  <div class="card">
+
+    <div class="card-header">
+
+      <div>
+
+        <h2>
+          Spend by Vendor
+        </h2>
+
+        <p>
+          Vendors ranked by total procurement spend.
+        </p>
+
+      </div>
+
+      <span class="record-count">
+        {{ vendorSpend.length }} vendors
+      </span>
+
+    </div>
+
+
+    @if (vendorSpend.length > 0) {
+
+      <div class="vendor-table-wrapper">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Vendor
+              </th>
+
+              <th>
+                Orders
+              </th>
+
+              <th>
+                Total Spend
+              </th>
+
+              <th>
+                Share of Spend
+              </th>
+
+              <th>
+                Distribution
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            @for (
+              vendor of vendorSpend;
+              track vendor.vendorId
+            ) {
+
+              <tr>
+
+                <td>
+
+                  <strong>
+                    {{ vendor.vendorName }}
+                  </strong>
+
+                </td>
+
+
+                <td>
+                  {{ vendor.orders }}
+                </td>
+
+
+                <td>
+
+                  <strong>
+                    ₹{{ formatCurrency(vendor.spend) }}
+                  </strong>
+
+                </td>
+
+
+                <td>
+
+                  {{ vendor.percentage | number:'1.1-1' }}%
+
+                </td>
+
+
+                <td>
+
+                  <div class="table-progress">
+
+                    <div
+                      class="table-progress-fill"
+                      [style.width.%]="
+                        vendor.percentage
+                      ">
+                    </div>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    }
+
+    @else {
+
+      <div class="empty-state">
+
+        <div>
+          📊
+        </div>
+
+        <strong>
+          No spend data found
+        </strong>
+
+        <p>
+          Try changing your filters.
+        </p>
+
+      </div>
+
+    }
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- ORDER METRICS -->
+  <!-- ========================================= -->
+
+  <div class="metric-grid">
+
+
+    <div class="metric-card">
+
+      <span>
+        Total Orders
+      </span>
+
+      <strong>
+        {{ totalOrders }}
+      </strong>
+
+      <small>
+        Current filtered orders
+      </small>
+
+    </div>
+
+
+    <div class="metric-card">
+
+      <span>
+        Average Order Value
+      </span>
+
+      <strong>
+        ₹{{ formatCurrency(averageOrderValue) }}
+      </strong>
+
+      <small>
+        Average procurement value
+      </small>
+
+    </div>
+
+
+    <div class="metric-card">
+
+      <span>
+        Completed Spend
+      </span>
+
+      <strong>
+        ₹{{ formatCurrency(completedSpend) }}
+      </strong>
+
+      <small>
+        Completed purchase orders
+      </small>
+
+    </div>
+
+
+    <div class="metric-card">
+
+      <span>
+        Top Vendor
+      </span>
+
+      <strong>
+
+        @if (topVendors.length > 0) {
+
+          {{ topVendors[0].vendorName }}
+
+        }
+
+        @else {
+
+          —
+
+        }
+
+      </strong>
+
+      <small>
+
+        @if (topVendors.length > 0) {
+
+          ₹{{ formatCurrency(topVendors[0].spend) }}
+
+        }
+
+        @else {
+
+          No data
+
+        }
+
+      </small>
+
+    </div>
+
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- LOADING -->
+  <!-- ========================================= -->
+
+  @if (loading()) {
+
+    <div class="loading-overlay">
+
+      <div class="loader"></div>
+
+      <span>
+        Loading procurement data...
+      </span>
+
+    </div>
+
+  }
+
+
+</div>

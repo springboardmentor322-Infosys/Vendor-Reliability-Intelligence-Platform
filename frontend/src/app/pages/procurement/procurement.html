@@ -1,0 +1,474 @@
+<div class="top-bar">
+
+    <div>
+
+        <h1>Procurement</h1>
+
+        <p>
+            Manage procurement requests and purchase orders
+        </p>
+
+    </div>
+
+    <button
+        *appHasRole="['Administrator', 'Procurement Manager']"
+        class="add-btn"
+        (click)="openCreateForm()">
+
+        + New Request
+
+    </button>
+
+</div>
+
+
+<!-- STATUS FILTERS -->
+
+<div class="status-filters">
+
+    <button
+        [class.active]="selectedStatus === 'All'"
+        (click)="selectedStatus = 'All'">
+
+        All
+
+    </button>
+
+
+    <button
+        [class.active]="selectedStatus === 'Pending'"
+        (click)="selectedStatus = 'Pending'">
+
+        Pending
+
+    </button>
+
+
+    <button
+        [class.active]="selectedStatus === 'Approved'"
+        (click)="selectedStatus = 'Approved'">
+
+        Approved
+
+    </button>
+
+
+    <button
+        [class.active]="selectedStatus === 'Rejected'"
+        (click)="selectedStatus = 'Rejected'">
+
+        Rejected
+
+    </button>
+
+
+    <button
+        [class.active]="selectedStatus === 'Ordered'"
+        (click)="selectedStatus = 'Ordered'">
+
+        Ordered
+
+    </button>
+
+</div>
+
+
+<!-- SEARCH -->
+
+<div class="search-box">
+
+    <input
+        type="text"
+        placeholder="Search product or vendor..."
+        [(ngModel)]="searchText">
+
+</div>
+
+
+<!-- PROCUREMENT TABLE -->
+
+<div class="table-card">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>ID</th>
+
+                <th>Vendor</th>
+
+                <th>Product</th>
+
+                <th>Quantity</th>
+
+                <th>Estimated Amount</th>
+
+                <th>Status</th>
+
+                <th>Actions</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            @for (
+                request of filteredRequests;
+                track request.id
+            ) {
+
+                <tr>
+
+                    <td>
+                        #{{ request.id }}
+                    </td>
+
+
+                    <td>
+                        {{ getVendorName(request.vendor_id) }}
+                    </td>
+
+
+                    <td>
+                        {{ request.product_name }}
+                    </td>
+
+
+                    <td>
+                        {{ request.quantity }}
+                    </td>
+
+
+                    <td>
+                        ₹{{ request.estimated_amount }}
+                    </td>
+
+
+                    <td>
+
+                        <span
+                            class="status"
+                            [class.pending]="request.status === 'Pending'"
+                            [class.approved]="request.status === 'Approved'"
+                            [class.rejected]="request.status === 'Rejected'"
+                            [class.ordered]="request.status === 'Ordered'">
+
+                            {{ request.status }}
+
+                        </span>
+
+                    </td>
+
+
+                    <td class="actions">
+
+
+                        <!-- PENDING -->
+
+                        @if (request.status === 'Pending') {
+
+                            <button
+                                *appHasRole="['Administrator', 'Procurement Manager']"
+                                class="approve"
+                                (click)="approveRequest(request)">
+
+                                Approve
+
+                            </button>
+
+
+                            <button
+                                *appHasRole="['Administrator', 'Procurement Manager']"
+                                class="reject"
+                                (click)="rejectRequest(request)">
+
+                                Reject
+
+                            </button>
+
+
+                            <button
+                                *appHasRole="['Administrator', 'Procurement Manager']"
+                                class="edit"
+                                (click)="editRequest(request)">
+
+                                Edit
+
+                            </button>
+
+
+                            <button
+                                *appHasRole="['Administrator']"
+                                class="delete"
+                                (click)="deleteRequest(request.id)">
+
+                                Delete
+
+                            </button>
+
+                        }
+
+
+                        <!-- APPROVED -->
+
+                        @if (request.status === 'Approved') {
+
+                            <button
+                                *appHasRole="['Administrator', 'Procurement Manager']"
+                                class="order-btn"
+                                (click)="createOrder(request)">
+
+                                Create Order
+
+                            </button>
+
+
+                            <button
+                                class="edit"
+                                (click)="editRequest(request)">
+
+                                Edit
+
+                            </button>
+
+                        }
+
+
+                        <!-- REJECTED -->
+
+                        @if (request.status === 'Rejected') {
+
+                            <button
+                                class="delete"
+                                (click)="deleteRequest(request.id)">
+
+                                Delete
+
+                            </button>
+
+                        }
+
+
+                        <!-- ORDERED -->
+
+                        @if (request.status === 'Ordered') {
+
+                            <span class="completed-label">
+
+                                Purchase Order Created
+
+                            </span>
+
+                        }
+
+                    </td>
+
+                </tr>
+
+            }
+
+
+            @if (filteredRequests.length === 0) {
+
+                <tr>
+
+                    <td
+                        colspan="7"
+                        class="empty">
+
+                        @if (loading) {
+
+                            Loading procurement requests...
+
+                        } @else {
+
+                            No procurement requests found.
+
+                        }
+
+                    </td>
+
+                </tr>
+
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<!-- CREATE / EDIT FORM -->
+
+@if (showForm) {
+
+    <div
+        class="modal-backdrop"
+        (click)="closeForm()">
+
+
+        <div
+            class="modal"
+            (click)="$event.stopPropagation()">
+
+
+            <div class="modal-header">
+
+                <div>
+
+                    <h2>
+                        {{
+                            editingRequest
+                            ? 'Edit Procurement Request'
+                            : 'New Procurement Request'
+                        }}
+                    </h2>
+
+                    <p>
+                        Enter procurement details
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="close-btn"
+                    (click)="closeForm()">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="form-body">
+
+
+                <!-- VENDOR -->
+
+                <div class="form-group">
+
+                    <label>
+                        Vendor
+                    </label>
+
+
+                    <select
+                        [(ngModel)]="form.vendor_id">
+
+                        <option
+                            [ngValue]="null">
+
+                            Select Vendor
+
+                        </option>
+
+
+                        @for (
+                            vendor of vendors;
+                            track vendor.id
+                        ) {
+
+                            <option
+                                [ngValue]="vendor.id">
+
+                                {{ vendor.vendor_name }}
+
+                            </option>
+
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- PRODUCT -->
+
+                <div class="form-group">
+
+                    <label>
+                        Product Name
+                    </label>
+
+
+                    <input
+                        type="text"
+                        [(ngModel)]="form.product_name"
+                        placeholder="Enter product name">
+
+                </div>
+
+
+                <!-- QUANTITY -->
+
+                <div class="form-group">
+
+                    <label>
+                        Quantity
+                    </label>
+
+
+                    <input
+                        type="number"
+                        min="1"
+                        [(ngModel)]="form.quantity">
+
+                </div>
+
+
+                <!-- AMOUNT -->
+
+                <div class="form-group">
+
+                    <label>
+                        Estimated Amount
+                    </label>
+
+
+                    <input
+                        type="number"
+                        min="0"
+                        [(ngModel)]="form.estimated_amount">
+
+                </div>
+
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    class="cancel-btn"
+                    (click)="closeForm()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    class="save-btn"
+                    (click)="saveRequest()">
+
+                    {{
+                        editingRequest
+                        ? 'Update Request'
+                        : 'Create Request'
+                    }}
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+}

@@ -1,0 +1,526 @@
+<div class="quality-page">
+
+  <!-- ========================================= -->
+  <!-- HEADER -->
+  <!-- ========================================= -->
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>
+        Quality Evaluation
+      </h1>
+
+      <p>
+        Evaluate product quality and track inspection results.
+      </p>
+
+    </div>
+
+
+    <button
+      class="primary-button"
+      type="button"
+      (click)="openForm()">
+
+      + Add Inspection
+
+    </button>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- MESSAGES -->
+  <!-- ========================================= -->
+
+  <div
+    class="message success"
+    *ngIf="successMessage">
+
+    {{ successMessage }}
+
+  </div>
+
+
+  <div
+    class="message error"
+    *ngIf="errorMessage">
+
+    {{ errorMessage }}
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- SUMMARY -->
+  <!-- ========================================= -->
+
+  <div class="summary-grid">
+
+    <div class="summary-card">
+
+      <span>
+        Total Inspections
+      </span>
+
+      <strong>
+        {{ loading ? '...' : inspections.length }}
+      </strong>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <span>
+        Passed
+      </span>
+
+      <strong>
+        {{
+          loading
+            ? '...'
+            : inspections.filter(
+                i => i.result === 'Passed'
+              ).length
+        }}
+      </strong>
+
+    </div>
+
+
+    <div class="summary-card danger-card">
+
+      <span>
+        Failed
+      </span>
+
+      <strong>
+        {{
+          loading
+            ? '...'
+            : inspections.filter(
+                i => i.result === 'Failed'
+              ).length
+        }}
+      </strong>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <span>
+        Average Quality
+      </span>
+
+      <strong>
+        {{
+            loading || inspections.length === 0
+            ? '0'
+            : (
+                inspections.reduce(
+                    (sum, i) =>
+                    sum + (i.quality_score || 0),
+                    0
+                ) / inspections.length
+                ).toFixed(1)
+        }}
+        / 5
+        </strong>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- CREATE FORM -->
+  <!-- ========================================= -->
+
+  <div
+    class="form-card"
+    *ngIf="showForm">
+
+    <div class="form-header">
+
+      <h2>
+        Add Quality Inspection
+      </h2>
+
+
+      <button
+        class="close-button"
+        type="button"
+        (click)="closeForm()">
+
+        ✕
+
+      </button>
+
+    </div>
+
+
+    <div class="form-grid">
+
+      <div class="form-group">
+
+        <label>
+          Order ID *
+        </label>
+
+        <input
+          type="number"
+          [(ngModel)]="newInspection.order_id"
+          placeholder="Enter order ID">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Vendor ID *
+        </label>
+
+        <input
+          type="number"
+          [(ngModel)]="newInspection.vendor_id"
+          placeholder="Enter vendor ID">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Inspection Date *
+        </label>
+
+        <input
+          type="date"
+          [(ngModel)]="newInspection.inspection_date">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Inspector Name *
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="newInspection.inspector_name"
+          placeholder="Enter inspector name">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Quality Score (0 - 5) *
+        </label>
+
+        <input
+          type="number"
+          min="0"
+          max="5"
+          step="0.1"
+          [(ngModel)]="newInspection.quality_score"
+          placeholder="Enter score">
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Result *
+        </label>
+
+        <select
+          [(ngModel)]="newInspection.result">
+
+          <option value="Passed">
+            Passed
+          </option>
+
+          <option value="Failed">
+            Failed
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label>
+          Defect Count
+        </label>
+
+        <input
+          type="number"
+          min="0"
+          [(ngModel)]="newInspection.defect_count"
+          placeholder="Enter defect count">
+
+      </div>
+
+
+      <div class="form-group full-width">
+
+        <label>
+          Notes
+        </label>
+
+        <textarea
+          rows="3"
+          [(ngModel)]="newInspection.notes"
+          placeholder="Additional inspection notes">
+        </textarea>
+
+      </div>
+
+    </div>
+
+
+    <div class="form-actions">
+
+      <button
+        class="secondary-button"
+        type="button"
+        (click)="closeForm()">
+
+        Cancel
+
+      </button>
+
+
+      <button
+        class="primary-button"
+        type="button"
+        (click)="createInspection()">
+
+        Create Inspection
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- LOADING -->
+  <!-- ========================================= -->
+
+  <div
+    class="loading"
+    *ngIf="loading">
+
+    Loading quality inspections...
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- TABLE -->
+  <!-- ========================================= -->
+
+  <div
+    class="table-card"
+    *ngIf="!loading">
+
+    <div class="table-header">
+
+      <div>
+
+        <h2>
+          Inspection History
+        </h2>
+
+        <p>
+          Review product quality inspection results.
+        </p>
+
+      </div>
+
+
+      <button
+        class="secondary-button"
+        type="button"
+        (click)="loadInspections()">
+
+        ↻ Refresh
+
+      </button>
+
+    </div>
+
+
+    <div
+      class="empty-state"
+      *ngIf="inspections.length === 0">
+
+      <h3>
+        No quality inspections found
+      </h3>
+
+      <p>
+        Create your first inspection to start evaluating product quality.
+      </p>
+
+    </div>
+
+
+    <div
+      class="table-wrapper"
+      *ngIf="inspections.length > 0">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              ID
+            </th>
+
+            <th>
+              Order
+            </th>
+
+            <th>
+              Vendor
+            </th>
+
+            <th>
+              Inspection Date
+            </th>
+
+            <th>
+              Inspector
+            </th>
+
+            <th>
+              Quality Score
+            </th>
+
+            <th>
+              Result
+            </th>
+
+            <th>
+              Defects
+            </th>
+
+            <th>
+              Notes
+            </th>
+
+            <th>
+              Actions
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr
+            *ngFor="let inspection of inspections">
+
+            <td>
+              #{{ inspection.id }}
+            </td>
+
+            <td>
+              #{{ inspection.order_id }}
+            </td>
+
+            <td>
+              #{{ inspection.vendor_id }}
+            </td>
+
+            <td>
+              {{ inspection.inspection_date }}
+            </td>
+
+            <td>
+              {{ inspection.inspector_name }}
+            </td>
+
+            <td>
+
+              <span
+                class="quality-score"
+                [ngClass]="
+                  getQualityClass(
+                    inspection.quality_score
+                  )
+                ">
+
+                {{ inspection.quality_score }} / 5
+
+              </span>
+
+            </td>
+
+            <td>
+
+              <span
+                class="result"
+                [ngClass]="
+                  getResultClass(
+                    inspection.result
+                  )
+                ">
+
+                {{ inspection.result }}
+
+              </span>
+
+            </td>
+
+            <td>
+              {{ inspection.defect_count }}
+            </td>
+
+            <td>
+              {{ inspection.notes || '—' }}
+            </td>
+
+            <td>
+
+              <button
+                class="delete-button"
+                type="button"
+                (click)="deleteInspection(inspection)">
+
+                Delete
+
+              </button>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

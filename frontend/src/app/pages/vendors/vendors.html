@@ -1,0 +1,293 @@
+<div class="top-bar">
+
+    <div>
+
+        <h1>Vendor Management</h1>
+
+        <p>
+            Manage your vendors
+        </p>
+
+    </div>
+
+
+    <button
+        *appHasRole="['Administrator', 'Procurement Manager']"
+        class="add-btn"
+        type="button"
+        (click)="addVendor()">
+
+        + Add Vendor
+
+    </button>
+
+</div>
+
+
+<div class="search-box">
+
+    <input
+        type="text"
+        placeholder="Search vendor..."
+        [(ngModel)]="searchText"
+        (input)="searchVendors()">
+
+</div>
+
+
+<p>
+    Total Vendors: {{ vendors.length }}
+</p>
+
+
+<div class="table-wrapper">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Name</th>
+
+                <th>Email</th>
+
+                <th>Phone</th>
+
+                <th>GST</th>
+
+                <th>Category</th>
+
+                <th>Contact Person</th>
+
+                <th>Approval Status</th>
+
+                <th>Status</th>
+
+                <th>Actions</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            @for (
+                vendor of filteredVendors;
+                track vendor.id
+            ) {
+
+                <tr>
+
+                    <td>
+                        {{ vendor.vendor_name }}
+                    </td>
+
+
+                    <td>
+                        {{ vendor.email }}
+                    </td>
+
+
+                    <td>
+                        {{ vendor.phone }}
+                    </td>
+
+
+                    <td>
+                        {{ vendor.gst_number }}
+                    </td>
+
+
+                    <td>
+                        {{ vendor.category || 'N/A' }}
+                    </td>
+
+
+                    <td>
+                        {{ vendor.contact_person || 'N/A' }}
+                    </td>
+
+
+                    <td>
+
+                        <span
+                            class="status-badge"
+                            [class.approved]="
+                                vendor.approval_status === 'Approved'
+                            "
+                            [class.pending]="
+                                vendor.approval_status === 'Pending'
+                            "
+                            [class.rejected]="
+                                vendor.approval_status === 'Rejected'
+                            ">
+
+                            {{
+                                vendor.approval_status ||
+                                'Pending'
+                            }}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <span
+                            class="status-badge"
+                            [class.active]="
+                                vendor.status === 'Active'
+                            "
+                            [class.inactive]="
+                                vendor.status === 'Inactive'
+                            "
+                            [class.suspended]="
+                                vendor.status === 'Suspended'
+                            ">
+
+                            {{
+                                vendor.status ||
+                                'Active'
+                            }}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <div class="action-buttons">
+
+
+                            <!-- EDIT -->
+
+                            <button
+                                *appHasRole="['Administrator', 'Procurement Manager', 'Supply Chain Manager']"
+                                class="edit"
+                                type="button"
+                                (click)="editVendor(vendor)">
+
+                                Edit
+
+                            </button>
+
+
+                            <!-- APPROVE -->
+
+                            @if (
+                                vendor.approval_status === 'Pending'
+                            ) {
+
+                                <button
+                                    *appHasRole="['Administrator', 'Procurement Manager']"
+                                    class="approve"
+                                    type="button"
+                                    (click)="approveVendor(vendor)">
+
+                                    Approve
+
+                                </button>
+
+
+                                <button
+                                    *appHasRole="['Administrator', 'Procurement Manager']"
+                                    class="reject"
+                                    type="button"
+                                    (click)="rejectVendor(vendor)">
+
+                                    Reject
+
+                                </button>
+
+                            }
+
+
+                            <!-- ACTIVATE -->
+
+                            @if (
+                                vendor.status === 'Inactive' ||
+                                vendor.status === 'Suspended'
+                            ) {
+
+                                <button
+                                    *appHasRole="['Administrator', 'Procurement Manager', 'Supply Chain Manager']"
+                                    class="activate"
+                                    type="button"
+                                    (click)="activateVendor(vendor)">
+
+                                    Activate
+
+                                </button>
+
+                            }
+
+
+                            <!-- SUSPEND -->
+
+                            @if (
+                                vendor.status === 'Active' &&
+                                vendor.approval_status === 'Approved'
+                            ) {
+
+                                <button
+                                    *appHasRole="['Administrator', 'Procurement Manager', 'Supply Chain Manager']"
+                                    class="suspend"
+                                    type="button"
+                                    (click)="suspendVendor(vendor)">
+
+                                    Suspend
+
+                                </button>
+
+                            }
+
+
+                            <!-- DELETE -->
+
+                            <button
+                                *appHasRole="['Administrator']"
+                                class="delete"
+                                type="button"
+                                (click)="deleteVendor(vendor)">
+
+                                Delete
+
+                            </button>
+
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            }
+
+
+            @if (
+                filteredVendors.length === 0
+            ) {
+
+                <tr>
+
+                    <td
+                        colspan="9"
+                        class="empty">
+
+                        No vendors found.
+
+                    </td>
+
+                </tr>
+
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

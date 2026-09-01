@@ -1,0 +1,648 @@
+<div class="invoice-page">
+
+    <!-- ========================================== -->
+    <!-- HEADER -->
+    <!-- ========================================== -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>Invoices</h1>
+
+            <p>
+                Manage vendor invoices and payment status
+            </p>
+
+        </div>
+
+
+        <button
+            *appHasRole="['Administrator', 'Finance Officer']"
+            class="primary-btn"
+            (click)="openAddForm()">
+
+            + Create Invoice
+
+        </button>
+
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- SUMMARY -->
+    <!-- ========================================== -->
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📄
+            </div>
+
+            <div>
+
+                <span>Total Invoices</span>
+
+                <strong>
+                    {{ totalInvoices() }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                ⏳
+            </div>
+
+            <div>
+
+                <span>Pending</span>
+
+                <strong>
+                    {{ pendingInvoices() }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                ✓
+            </div>
+
+            <div>
+
+                <span>Paid</span>
+
+                <strong>
+                    {{ paidInvoices() }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                ⚠
+            </div>
+
+            <div>
+
+                <span>Overdue</span>
+
+                <strong>
+                    {{ overdueInvoices() }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- CREATE INVOICE FORM -->
+    <!-- ========================================== -->
+
+    @if (showForm()) {
+
+        <div class="section-card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>Create Invoice</h2>
+
+                    <p>
+                        Enter the invoice details
+                    </p>
+
+                </div>
+
+
+                <button
+                    class="close-btn"
+                    (click)="closeForm()">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="form-grid">
+
+                <!-- INVOICE NUMBER -->
+
+                <div class="form-group">
+
+                    <label>
+                        Invoice Number
+                    </label>
+
+                    <input
+                        type="text"
+                        [(ngModel)]="invoiceNumber"
+                        placeholder="INV-001">
+
+                </div>
+
+
+                <!-- ORDER -->
+
+                <div class="form-group">
+
+                    <label>
+                        Order
+                    </label>
+
+                    <select
+                        [(ngModel)]="selectedOrderId">
+
+                        <option
+                            [ngValue]="null">
+
+                            Select Order
+
+                        </option>
+
+
+                        @for (
+                            order of orders();
+                            track order.id
+                        ) {
+
+                            <option
+                                [ngValue]="order.id">
+
+                                #{{ order.id }}
+                                -
+                                {{ order.product_name }}
+
+                            </option>
+
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- VENDOR -->
+
+                <div class="form-group">
+
+                    <label>
+                        Vendor
+                    </label>
+
+                    <select
+                        [(ngModel)]="selectedVendorId">
+
+                        <option
+                            [ngValue]="null">
+
+                            Select Vendor
+
+                        </option>
+
+
+                        @for (
+                            vendor of vendors();
+                            track vendor.id
+                        ) {
+
+                            <option
+                                [ngValue]="vendor.id">
+
+                                {{ vendor.vendor_name }}
+
+                            </option>
+
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- AMOUNT -->
+
+                <div class="form-group">
+
+                    <label>
+                        Amount
+                    </label>
+
+                    <input
+                        type="number"
+                        min="0"
+                        [(ngModel)]="amount"
+                        placeholder="0">
+
+                </div>
+
+
+                <!-- INVOICE DATE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Invoice Date
+                    </label>
+
+                    <input
+                        type="date"
+                        [(ngModel)]="invoiceDate">
+
+                </div>
+
+
+                <!-- DUE DATE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Due Date
+                    </label>
+
+                    <input
+                        type="date"
+                        [(ngModel)]="dueDate">
+
+                </div>
+
+            </div>
+
+
+            <!-- FORM ACTIONS -->
+
+            <div class="form-actions">
+
+                <button
+                    class="secondary-btn"
+                    (click)="closeForm()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    class="primary-btn"
+                    (click)="saveInvoice()">
+
+                    Create Invoice
+
+                </button>
+
+            </div>
+
+        </div>
+
+    }
+
+
+    <!-- ========================================== -->
+    <!-- INVOICE LIST -->
+    <!-- ========================================== -->
+
+    <div class="section-card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>Invoice Records</h2>
+
+                <p>
+                    View and manage all vendor invoices
+                </p>
+
+            </div>
+
+        </div>
+
+
+        @if (loading()) {
+
+            <div class="loading">
+
+                Loading invoices...
+
+            </div>
+
+        }
+
+
+        @if (!loading() && invoices().length === 0) {
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    📄
+                </div>
+
+                <strong>
+                    No invoices found
+                </strong>
+
+                <p>
+                    Create your first invoice to get started.
+                </p>
+
+            </div>
+
+        }
+
+
+        @if (!loading() && invoices().length > 0) {
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Invoice
+                            </th>
+
+                            <th>
+                                Order
+                            </th>
+
+                            <th>
+                                Vendor
+                            </th>
+
+                            <th>
+                                Amount
+                            </th>
+
+                            <th>
+                                Invoice Date
+                            </th>
+
+                            <th>
+                                Due Date
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @for (
+                            invoice of invoices();
+                            track invoice.id
+                        ) {
+
+                            <tr>
+
+                                <!-- INVOICE -->
+
+                                <td>
+
+                                    <div class="invoice-name">
+
+                                        <strong>
+                                            {{ invoice.invoice_number }}
+                                        </strong>
+
+                                        <span>
+                                            #{{ invoice.id }}
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- ORDER -->
+
+                                <td>
+
+                                    {{ getOrderName(
+                                        invoice.order_id
+                                    ) }}
+
+                                </td>
+
+
+                                <!-- VENDOR -->
+
+                                <td>
+
+                                    {{ getVendorName(
+                                        invoice.vendor_id
+                                    ) }}
+
+                                </td>
+
+
+                                <!-- AMOUNT -->
+
+                                <td>
+
+                                    ₹{{ formatAmount(
+                                        invoice.amount
+                                    ) }}
+
+                                </td>
+
+
+                                <!-- INVOICE DATE -->
+
+                                <td>
+
+                                    {{ invoice.invoice_date }}
+
+                                </td>
+
+
+                                <!-- DUE DATE -->
+
+                                <td>
+
+                                    {{ invoice.due_date }}
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    <span
+                                        class="status-badge"
+                                        [class]="
+                                            getStatusClass(
+                                                invoice.status
+                                            )
+                                        ">
+
+                                        {{ invoice.status }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- ACTIONS -->
+
+                                <td>
+
+                                    <div class="action-buttons">
+
+
+                                        <!-- PENDING -->
+
+                                        @if (
+                                            invoice.status === 'Pending'
+                                        ) {
+
+                                            <button
+                                                *appHasRole="['Administrator', 'Finance Officer']"
+                                                class="paid-btn"
+                                                (click)="updateStatus(
+                                                    invoice.id,
+                                                    'Paid'
+                                                )">
+
+                                                Mark Paid
+
+                                            </button>
+
+
+                                            <button
+                                                *appHasRole="['Administrator', 'Finance Officer']"
+                                                class="overdue-btn"
+                                                (click)="updateStatus(
+                                                    invoice.id,
+                                                    'Overdue'
+                                                )">
+
+                                                Overdue
+
+                                            </button>
+
+                                        }
+
+
+                                        <!-- OVERDUE -->
+
+                                        @if (
+                                            invoice.status === 'Overdue'
+                                        ) {
+
+                                            <button
+                                                class="paid-btn"
+                                                (click)="updateStatus(
+                                                    invoice.id,
+                                                    'Paid'
+                                                )">
+
+                                                Mark Paid
+
+                                            </button>
+
+                                        }
+
+
+                                        <!-- PAID -->
+
+                                        @if (
+                                            invoice.status === 'Paid'
+                                        ) {
+
+                                            <span
+                                                class="paid-label">
+
+                                                Paid
+
+                                            </span>
+
+                                        }
+
+
+                                        <!-- CANCEL -->
+
+                                        @if (
+                                            invoice.status !== 'Cancelled'
+                                        ) {
+
+                                            <button
+                                                *appHasRole="['Administrator', 'Finance Officer']"
+                                                class="cancel-btn"
+                                                (click)="updateStatus(
+                                                    invoice.id,
+                                                    'Cancelled'
+                                                )">
+
+                                                Cancel
+
+                                            </button>
+
+                                        }
+
+
+                                        <!-- DELETE -->
+
+                                        <button
+                                            *appHasRole="['Administrator']"
+                                            class="delete-btn"
+                                            (click)="deleteInvoice(
+                                                invoice.id
+                                            )">
+
+                                            Delete
+
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        }
+
+    </div>
+
+</div>

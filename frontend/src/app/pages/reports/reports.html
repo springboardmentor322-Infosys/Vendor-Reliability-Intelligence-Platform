@@ -1,0 +1,1178 @@
+<div class="reports">
+
+    <!-- ========================================= -->
+    <!-- HEADER -->
+    <!-- ========================================= -->
+
+    <div class="reports-header">
+
+        <div>
+
+            <h1>
+                Reports
+            </h1>
+
+            <p>
+                Overview of your orders and revenue
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- LOADING -->
+    <!-- ========================================= -->
+
+    @if (loading()) {
+
+        <div class="loading">
+
+            Loading reports...
+
+        </div>
+
+    }
+
+
+    <!-- ========================================= -->
+    <!-- SUMMARY CARDS -->
+    <!-- ========================================= -->
+
+    <div class="summary-grid">
+
+
+        <!-- REVENUE -->
+
+        <div class="summary-card revenue-card">
+
+            <div class="summary-icon">
+                ₹
+            </div>
+
+            <div>
+
+                <h2>
+                    ₹{{ totalRevenue() | number }}
+                </h2>
+
+                <p>
+                    Total Revenue
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- TOTAL ORDERS -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📦
+            </div>
+
+            <div>
+
+                <h2>
+                    {{ totalOrders() }}
+                </h2>
+
+                <p>
+                    Total Orders
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- PENDING -->
+
+        <div class="summary-card pending-summary">
+
+            <div class="summary-icon">
+                ⏳
+            </div>
+
+            <div>
+
+                <h2>
+                    {{ pendingOrders() }}
+                </h2>
+
+                <p>
+                    Pending Orders
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- COMPLETED -->
+
+        <div class="summary-card completed-summary">
+
+            <div class="summary-icon">
+                ✓
+            </div>
+
+            <div>
+
+                <h2>
+                    {{ completedOrders() }}
+                </h2>
+
+                <p>
+                    Completed Orders
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- STATUS BREAKDOWN -->
+    <!-- ========================================= -->
+
+    <div class="report-section">
+
+        <h2>
+            Order Status Breakdown
+        </h2>
+
+        <p class="section-description">
+            Current distribution of orders
+        </p>
+
+
+        <div class="status-grid">
+
+
+            <div class="status-box pending">
+
+                <span>
+                    Pending
+                </span>
+
+                <strong>
+                    {{ pendingOrders() }}
+                </strong>
+
+            </div>
+
+
+            <div class="status-box approved">
+
+                <span>
+                    Approved
+                </span>
+
+                <strong>
+                    {{ approvedOrders() }}
+                </strong>
+
+            </div>
+
+
+            <div class="status-box ordered">
+
+                <span>
+                    Ordered
+                </span>
+
+                <strong>
+                    {{ orderedOrders() }}
+                </strong>
+
+            </div>
+
+
+            <div class="status-box delivered">
+
+                <span>
+                    Delivered
+                </span>
+
+                <strong>
+                    {{ deliveredOrders() }}
+                </strong>
+
+            </div>
+
+
+            <div class="status-box completed">
+
+                <span>
+                    Completed
+                </span>
+
+                <strong>
+                    {{ completedOrders() }}
+                </strong>
+
+            </div>
+
+
+            <div class="status-box cancelled">
+
+                <span>
+                    Cancelled
+                </span>
+
+                <strong>
+                    {{ cancelledOrders() }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- ORDER ANALYTICS -->
+    <!-- ========================================= -->
+
+    <div class="analytics-section">
+
+        <div class="analytics-header">
+
+            <div>
+
+                <h2>
+                    Order Analytics
+                </h2>
+
+                <p>
+                    Visual overview of order distribution
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="analytics-grid">
+
+
+            <!-- STATUS DISTRIBUTION -->
+
+            <div class="analytics-card">
+
+                <h3>
+                    Order Status Distribution
+                </h3>
+
+                <p class="analytics-description">
+                    Percentage of orders by status
+                </p>
+
+
+                <!-- PENDING -->
+
+                <div class="chart-row">
+
+                    <div class="chart-label">
+
+                        <span>
+                            Pending
+                        </span>
+
+                        <strong>
+                            {{ getStatusPercentage(pendingOrders()) }}%
+                        </strong>
+
+                    </div>
+
+                    <div class="bar-background">
+
+                        <div
+                            class="bar pending-bar"
+                            [style.width]="
+                                getBarWidth(pendingOrders())
+                            ">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- APPROVED -->
+
+                <div class="chart-row">
+
+                    <div class="chart-label">
+
+                        <span>
+                            Approved
+                        </span>
+
+                        <strong>
+                            {{ getStatusPercentage(approvedOrders()) }}%
+                        </strong>
+
+                    </div>
+
+                    <div class="bar-background">
+
+                        <div
+                            class="bar approved-bar"
+                            [style.width]="
+                                getBarWidth(approvedOrders())
+                            ">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ORDERED -->
+
+                <div class="chart-row">
+
+                    <div class="chart-label">
+
+                        <span>
+                            Ordered
+                        </span>
+
+                        <strong>
+                            {{ getStatusPercentage(orderedOrders()) }}%
+                        </strong>
+
+                    </div>
+
+                    <div class="bar-background">
+
+                        <div
+                            class="bar ordered-bar"
+                            [style.width]="
+                                getBarWidth(orderedOrders())
+                            ">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DELIVERED -->
+
+                <div class="chart-row">
+
+                    <div class="chart-label">
+
+                        <span>
+                            Delivered
+                        </span>
+
+                        <strong>
+                            {{ getStatusPercentage(deliveredOrders()) }}%
+                        </strong>
+
+                    </div>
+
+                    <div class="bar-background">
+
+                        <div
+                            class="bar delivered-bar"
+                            [style.width]="
+                                getBarWidth(deliveredOrders())
+                            ">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- COMPLETED -->
+
+                <div class="chart-row">
+
+                    <div class="chart-label">
+
+                        <span>
+                            Completed
+                        </span>
+
+                        <strong>
+                            {{ getStatusPercentage(completedOrders()) }}%
+                        </strong>
+
+                    </div>
+
+                    <div class="bar-background">
+
+                        <div
+                            class="bar completed-bar"
+                            [style.width]="
+                                getBarWidth(completedOrders())
+                            ">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CANCELLED -->
+
+                <div class="chart-row">
+
+                    <div class="chart-label">
+
+                        <span>
+                            Cancelled
+                        </span>
+
+                        <strong>
+                            {{ getStatusPercentage(cancelledOrders()) }}%
+                        </strong>
+
+                    </div>
+
+                    <div class="bar-background">
+
+                        <div
+                            class="bar cancelled-bar"
+                            [style.width]="
+                                getBarWidth(cancelledOrders())
+                            ">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- REVENUE -->
+
+            <div class="analytics-card revenue-analytics">
+
+                <h3>
+                    Revenue Overview
+                </h3>
+
+                <p class="analytics-description">
+                    Total value of orders in current report
+                </p>
+
+
+                <div class="revenue-display">
+
+                    <div class="revenue-symbol">
+                        ₹
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            ₹{{ totalRevenue() | number }}
+                        </h2>
+
+                        <p>
+                            Total Order Value
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="revenue-details">
+
+                    <div>
+
+                        <span>
+                            Total Orders
+                        </span>
+
+                        <strong>
+                            {{ totalOrders() }}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Average Order Value
+                        </span>
+
+                        <strong>
+                            ₹{{ getAverageOrderValue() | number:'1.0-0' }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- ORDER REPORT -->
+    <!-- ========================================= -->
+
+    <div class="report-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Order Report
+                </h2>
+
+                <p class="section-description">
+                    View and filter your purchase orders
+                </p>
+
+            </div>
+
+
+            <!-- ================================= -->
+            <!-- FILTERS -->
+            <!-- ================================= -->
+
+            <div
+                style="
+                    display: flex;
+                    gap: 12px;
+                    align-items: flex-end;
+                    flex-wrap: wrap;
+                ">
+
+
+                <!-- STATUS -->
+
+                <div class="filter-box">
+
+                    <label for="statusFilter">
+                        Filter by Status
+                    </label>
+
+                    <select
+                        id="statusFilter"
+                        [(ngModel)]="selectedStatus"
+                        (change)="filterOrders()">
+
+                        <option value="All">
+                            All Orders
+                        </option>
+
+                        <option value="Pending">
+                            Pending
+                        </option>
+
+                        <option value="Approved">
+                            Approved
+                        </option>
+
+                        <option value="Ordered">
+                            Ordered
+                        </option>
+
+                        <option value="Delivered">
+                            Delivered
+                        </option>
+
+                        <option value="Completed">
+                            Completed
+                        </option>
+
+                        <option value="Cancelled">
+                            Cancelled
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- VENDOR -->
+
+                <div class="filter-box">
+
+                    <label for="vendorFilter">
+                        Filter by Vendor
+                    </label>
+
+                    <select
+                        id="vendorFilter"
+                        [(ngModel)]="selectedVendor"
+                        (change)="filterOrders()">
+
+                        <option value="All">
+                            All Vendors
+                        </option>
+
+
+                        @for (
+                            vendor of vendors();
+                            track vendor.id
+                        ) {
+
+                            <option
+                                [value]="vendor.id">
+
+                                {{ vendor.vendor_name }}
+
+                            </option>
+
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- RESET -->
+
+                <button
+                    type="button"
+                    class="refresh-btn"
+                    (click)="resetFilters()">
+
+                    🔄 Reset
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- FILTER RESULT -->
+        <!-- ========================================= -->
+
+        <div class="filter-info">
+
+            Showing
+
+            <strong>
+                {{ filteredOrders().length }}
+            </strong>
+
+            order(s)
+
+
+            @if (
+                selectedStatus !== 'All'
+            ) {
+
+                <span>
+
+                    with status
+
+                    <strong>
+                        {{ selectedStatus }}
+                    </strong>
+
+                </span>
+
+            }
+
+
+            @if (
+                selectedVendor !== 'All'
+            ) {
+
+                <span>
+
+                    for
+
+                    <strong>
+                        {{ getVendorName(+selectedVendor) }}
+                    </strong>
+
+                </span>
+
+            }
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- TABLE -->
+        <!-- ========================================= -->
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Order ID
+                        </th>
+
+                        <th>
+                            Vendor
+                        </th>
+
+                        <th>
+                            Product
+                        </th>
+
+                        <th>
+                            Quantity
+                        </th>
+
+                        <th>
+                            Amount
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                    @for (
+                        order of filteredOrders();
+                        track order.id
+                    ) {
+
+                        <tr>
+
+                            <td>
+                                #{{ order.id }}
+                            </td>
+
+
+                            <td>
+                                {{ getVendorName(order.vendor_id) }}
+                            </td>
+
+
+                            <td>
+                                {{ order.product_name }}
+                            </td>
+
+
+                            <td>
+                                {{ order.quantity }}
+                            </td>
+
+
+                            <td>
+                                ₹{{ order.amount | number }}
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="status-badge"
+
+                                    [class.pending]="
+                                        order.status === 'Pending'
+                                    "
+
+                                    [class.approved]="
+                                        order.status === 'Approved'
+                                    "
+
+                                    [class.ordered]="
+                                        order.status === 'Ordered'
+                                    "
+
+                                    [class.delivered]="
+                                        order.status === 'Delivered'
+                                    "
+
+                                    [class.completed]="
+                                        order.status === 'Completed'
+                                    "
+
+                                    [class.cancelled]="
+                                        order.status === 'Cancelled'
+                                    ">
+
+                                    {{ order.status }}
+
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+
+                    <!-- NO ORDERS -->
+
+                    @if (
+                        filteredOrders().length === 0
+                    ) {
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="empty">
+
+                                No orders found for the selected filters.
+
+                            </td>
+
+                        </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- REPORT EXPORT -->
+    <!-- ========================================= -->
+
+    <div class="report-section export-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Reports & Export
+                </h2>
+
+                <p class="section-description">
+                    Generate and download detailed reports
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="export-grid">
+
+
+            <!-- ORDERS -->
+
+            <div class="export-card">
+
+                <div class="export-icon">
+                    📦
+                </div>
+
+                <div class="export-content">
+
+                    <h3>
+                        Purchase Orders
+                    </h3>
+
+                    <p>
+                        Export purchase order details,
+                        vendors, quantities and amounts.
+                    </p>
+
+                    <div class="export-buttons">
+
+                        <button
+                            type="button"
+                            class="excel-btn"
+                            [disabled]="exporting()"
+                            (click)="exportExcel('orders')">
+
+                            📊 Excel
+
+                        </button>
+
+                        <button
+                            type="button"
+                            class="pdf-btn"
+                            [disabled]="exporting()"
+                            (click)="exportPdf('orders')">
+
+                            📄 PDF
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- VENDOR PERFORMANCE -->
+
+            <div class="export-card">
+
+                <div class="export-icon">
+                    ⭐
+                </div>
+
+                <div class="export-content">
+
+                    <h3>
+                        Vendor Performance
+                    </h3>
+
+                    <p>
+                        Export vendor reliability and
+                        performance information.
+                    </p>
+
+                    <div class="export-buttons">
+
+                        <button
+                            type="button"
+                            class="excel-btn"
+                            [disabled]="exporting()"
+                            (click)="exportExcel('vendor-performance')">
+
+                            📊 Excel
+
+                        </button>
+
+                        <button
+                            type="button"
+                            class="pdf-btn"
+                            [disabled]="exporting()"
+                            (click)="exportPdf('vendor-performance')">
+
+                            📄 PDF
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PROCUREMENT -->
+
+            <div class="export-card">
+
+                <div class="export-icon">
+                    🛒
+                </div>
+
+                <div class="export-content">
+
+                    <h3>
+                        Procurement
+                    </h3>
+
+                    <p>
+                        Export procurement requests
+                        and estimated values.
+                    </p>
+
+                    <div class="export-buttons">
+
+                        <button
+                            type="button"
+                            class="excel-btn"
+                            [disabled]="exporting()"
+                            (click)="exportExcel('procurement')">
+
+                            📊 Excel
+
+                        </button>
+
+                        <button
+                            type="button"
+                            class="pdf-btn"
+                            [disabled]="exporting()"
+                            (click)="exportPdf('procurement')">
+
+                            📄 PDF
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONTRACTS -->
+
+            <div class="export-card">
+
+                <div class="export-icon">
+                    📑
+                </div>
+
+                <div class="export-content">
+
+                    <h3>
+                        Contracts
+                    </h3>
+
+                    <p>
+                        Export contract details,
+                        values and expiry information.
+                    </p>
+
+                    <div class="export-buttons">
+
+                        <button
+                            type="button"
+                            class="excel-btn"
+                            [disabled]="exporting()"
+                            (click)="exportExcel('contracts')">
+
+                            📊 Excel
+
+                        </button>
+
+                        <button
+                            type="button"
+                            class="pdf-btn"
+                            [disabled]="exporting()"
+                            (click)="exportPdf('contracts')">
+
+                            � PDF
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- COMPLIANCE -->
+
+            <div class="export-card">
+
+                <div class="export-icon">
+                    ✅
+                </div>
+
+                <div class="export-content">
+
+                    <h3>
+                        Compliance
+                    </h3>
+
+                    <p>
+                        Export vendor compliance
+                        information and status.
+                    </p>
+
+                    <div class="export-buttons">
+
+                        <button
+                            type="button"
+                            class="excel-btn"
+                            [disabled]="exporting()"
+                            (click)="exportExcel('compliance')">
+
+                            📊 Excel
+
+                        </button>
+
+                        <button
+                            type="button"
+                            class="pdf-btn"
+                            [disabled]="exporting()"
+                            (click)="exportPdf('compliance')">
+
+                            📄 PDF
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- INVOICES -->
+
+            <div class="export-card">
+
+                <div class="export-icon">
+                    🧾
+                </div>
+
+                <div class="export-content">
+
+                    <h3>
+                        Invoices
+                    </h3>
+
+                    <p>
+                        Export invoice records,
+                        amounts and payment status.
+                    </p>
+
+                    <div class="export-buttons">
+
+                        <button
+                            type="button"
+                            class="excel-btn"
+                            [disabled]="exporting()"
+                            (click)="exportExcel('invoices')">
+
+                            📊 Excel
+
+                        </button>
+
+                        <button
+                            type="button"
+                            class="pdf-btn"
+                            [disabled]="exporting()"
+                            (click)="exportPdf('invoices')">
+
+                            📄 PDF
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,279 @@
+<div class="audit-trails-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+
+    <div>
+      <h1>Audit Trails</h1>
+      <p>
+        Track and review system activity and audit history
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- SUMMARY CARDS -->
+  <div class="summary-grid">
+
+    <div class="summary-card">
+
+      <div class="icon-box purple">
+        📋
+      </div>
+
+      <div>
+        <span>Total Activities</span>
+        <strong>{{ totalActivities }}</strong>
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="icon-box green">
+        ✓
+      </div>
+
+      <div>
+        <span>Successful</span>
+        <strong>{{ successfulActivities }}</strong>
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="icon-box yellow">
+        ⚠
+      </div>
+
+      <div>
+        <span>Warnings</span>
+        <strong>{{ warningActivities }}</strong>
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="icon-box red">
+        !
+      </div>
+
+      <div>
+        <span>Failed</span>
+        <strong>{{ failedActivities }}</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- FILTER SECTION -->
+  <div class="filter-card">
+
+    <div class="search-box">
+
+      <span>🔍</span>
+
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Search activity, user, module..."
+      />
+
+    </div>
+
+
+    <select [(ngModel)]="selectedModule">
+
+      <option>All Modules</option>
+      <option>Audit Plan</option>
+      <option>Audit Findings</option>
+      <option>Purchase Orders</option>
+      <option>Procurement</option>
+      <option>Vendors</option>
+      <option>Contracts</option>
+      <option>User Management</option>
+
+    </select>
+
+
+    <select [(ngModel)]="selectedStatus">
+
+      <option>All Status</option>
+      <option>Success</option>
+      <option>Warning</option>
+      <option>Failed</option>
+
+    </select>
+
+
+    <button
+      class="clear-btn"
+      (click)="clearFilters()"
+    >
+      Clear
+    </button>
+
+  </div>
+
+
+  <!-- AUDIT TRAIL TABLE -->
+  <div class="table-card">
+
+    <div class="table-header">
+
+      <div>
+        <h2>Activity Log</h2>
+        <p>Complete record of system activities</p>
+      </div>
+
+      <span class="record-count">
+        {{ filteredTrails.length }} activities
+      </span>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Log ID</th>
+
+            <th>Date & Time</th>
+
+            <th>User</th>
+
+            <th>Action</th>
+
+            <th>Module</th>
+
+            <th>Description</th>
+
+            <th>Status</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr *ngFor="let log of filteredTrails">
+
+            <td>
+              <span class="log-id">
+                {{ log.id }}
+              </span>
+            </td>
+
+
+            <td>
+              <span class="timestamp">
+                {{ log.timestamp }}
+              </span>
+            </td>
+
+
+            <td>
+
+              <div class="user-info">
+
+                <div class="avatar">
+                  {{ log.user.charAt(0) }}
+                </div>
+
+                <div>
+                  <strong>{{ log.user }}</strong>
+                  <small>{{ log.role }}</small>
+                </div>
+
+              </div>
+
+            </td>
+
+
+            <td>
+              <span class="action">
+                {{ log.action }}
+              </span>
+            </td>
+
+
+            <td>
+              <span class="module-badge">
+                {{ log.module }}
+              </span>
+            </td>
+
+
+            <td>
+              <span class="description">
+                {{ log.description }}
+              </span>
+            </td>
+
+
+            <td>
+
+              <span
+                class="status-badge"
+                [class.success]="log.status === 'Success'"
+                [class.warning]="log.status === 'Warning'"
+                [class.failed]="log.status === 'Failed'"
+              >
+
+                <span class="status-dot"></span>
+
+                {{ log.status }}
+
+              </span>
+
+            </td>
+
+          </tr>
+
+
+          <!-- EMPTY STATE -->
+
+          <tr *ngIf="filteredTrails.length === 0">
+
+            <td
+              colspan="7"
+              class="empty-state"
+            >
+
+              <div class="empty-icon">
+                🔍
+              </div>
+
+              <strong>No audit activities found</strong>
+
+              <p>
+                Try changing your search or filters.
+              </p>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

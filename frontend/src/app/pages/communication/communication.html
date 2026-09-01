@@ -1,0 +1,776 @@
+<div class="communication-page">
+
+
+    <!-- ========================================= -->
+    <!-- PAGE HEADER -->
+    <!-- ========================================= -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Communication
+            </h1>
+
+            <p>
+                Manage vendor messages and procurement discussions
+            </p>
+
+        </div>
+
+
+        <button
+            *appHasRole="[
+                'Administrator',
+                'Procurement Manager',
+                'Supply Chain Manager',
+                'Vendor'
+            ]"
+            type="button"
+            class="primary-btn"
+            (click)="openForm()">
+
+            + New Message
+
+        </button>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- SUMMARY -->
+    <!-- ========================================= -->
+
+    <div class="summary-grid">
+
+
+        <!-- TOTAL -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                💬
+            </div>
+
+            <div>
+
+                <span>
+                    Total Messages
+                </span>
+
+                <strong>
+                    {{ getTotalMessages() }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- VENDORS -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                🏢
+            </div>
+
+            <div>
+
+                <span>
+                    Vendors
+                </span>
+
+                <strong>
+                    {{ vendors().length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- PROCUREMENT -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📦
+            </div>
+
+            <div>
+
+                <span>
+                    Procurement
+                </span>
+
+                <strong>
+                    {{ getProcurementCount() }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- VENDOR MESSAGES -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📝
+            </div>
+
+            <div>
+
+                <span>
+                    Vendor Messages
+                </span>
+
+                <strong>
+                    {{ getVendorMessageCount() }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- NEW COMMUNICATION FORM -->
+    <!-- ========================================= -->
+
+    @if (showForm()) {
+
+        <div class="section-card form-card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        New Communication
+                    </h2>
+
+                    <p>
+                        Send a message to a vendor
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="close-btn"
+                    (click)="closeForm()">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="form-grid">
+
+
+                <!-- VENDOR -->
+
+                <div class="form-group">
+
+                    <label>
+                        Vendor
+                    </label>
+
+                    <select
+                        [(ngModel)]="selectedVendorId">
+
+                        <option
+                            [ngValue]="null">
+
+                            Select Vendor
+
+                        </option>
+
+
+                        @for (
+                            vendor of vendors();
+                            track vendor.id
+                        ) {
+
+                            <option
+                                [ngValue]="vendor.id">
+
+                                {{ vendor.vendor_name }}
+
+                            </option>
+
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <!-- COMMUNICATION TYPE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Communication Type
+                    </label>
+
+                    <select
+                        [(ngModel)]="communicationType">
+
+                        <option
+                            value="Vendor Message">
+
+                            Vendor Message
+
+                        </option>
+
+                        <option
+                            value="Procurement Discussion">
+
+                            Procurement Discussion
+
+                        </option>
+
+                        <option
+                            value="Activity Log">
+
+                            Activity Log
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- SUBJECT -->
+
+                <div class="form-group full-width">
+
+                    <label>
+                        Subject
+                    </label>
+
+                    <input
+                        type="text"
+                        [(ngModel)]="subject"
+                        placeholder="Enter subject">
+
+                </div>
+
+
+                <!-- MESSAGE -->
+
+                <div class="form-group full-width">
+
+                    <label>
+                        Message
+                    </label>
+
+                    <textarea
+                        rows="6"
+                        [(ngModel)]="message"
+                        placeholder="Write your message here...">
+                    </textarea>
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- FILE ATTACHMENT -->
+                <!-- ================================= -->
+
+                <div class="form-group full-width">
+
+                    <label>
+                        Attachment
+                    </label>
+
+
+                    <input
+                        type="file"
+                        (change)="onFileSelected($event)"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.png,.jpg,.jpeg">
+
+
+                    @if (selectedFile) {
+
+                        <div class="selected-file">
+
+                            <span>
+                                📎
+                                {{ selectedFile.name }}
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="upload-file-btn"
+                                [disabled]="sending()"
+                                (click)="uploadSelectedFile()">
+
+                                @if (sending()) {
+
+                                    Uploading...
+
+                                } @else {
+
+                                    Upload File
+
+                                }
+
+                            </button>
+
+                        </div>
+
+                    }
+
+
+                    @if (filePath) {
+
+                        <div class="uploaded-file">
+
+                            ✓ File uploaded successfully
+
+                        </div>
+
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- FORM ACTIONS -->
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    (click)="closeForm()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="primary-btn"
+                    [disabled]="sending()"
+                    (click)="sendCommunication()">
+
+                    @if (sending()) {
+
+                        Sending...
+
+                    } @else {
+
+                        Send Message
+
+                    }
+
+                </button>
+
+            </div>
+
+        </div>
+
+    }
+
+
+    <!-- ========================================= -->
+    <!-- FILTERS -->
+    <!-- ========================================= -->
+
+    <div class="section-card filter-card">
+
+        <div class="filter-row">
+
+
+            <!-- TYPE FILTER -->
+
+            <div class="filter-group">
+
+                <label>
+                    Communication Type
+                </label>
+
+                <select
+                    [(ngModel)]="selectedFilter"
+                    (change)="
+                        onTypeFilterChange(
+                            $any($event.target).value
+                        )
+                    ">
+
+                    <option value="All">
+                        All Communications
+                    </option>
+
+                    <option value="Vendor Message">
+                        Vendor Messages
+                    </option>
+
+                    <option value="Procurement Discussion">
+                        Procurement Discussions
+                    </option>
+
+                    <option value="Activity Log">
+                        Activity Logs
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- VENDOR FILTER -->
+
+            <div class="filter-group">
+
+                <label>
+                    Vendor
+                </label>
+
+                <select
+                    [(ngModel)]="selectedVendorFilter"
+                    (change)="
+                        onVendorFilterChange(
+                            $any($event.target).value
+                        )
+                    ">
+
+                    <option value="all">
+                        All Vendors
+                    </option>
+
+
+                    @for (
+                        vendor of vendors();
+                        track vendor.id
+                    ) {
+
+                        <option
+                            [value]="vendor.id">
+
+                            {{ vendor.vendor_name }}
+
+                        </option>
+
+                    }
+
+                </select>
+
+            </div>
+
+
+            <!-- REFRESH -->
+
+            <button
+                type="button"
+                class="refresh-btn"
+                (click)="
+                    selectedFilter = 'All';
+                    selectedVendorFilter = 'all';
+                    loadCommunications()
+                ">
+
+                🔄 Refresh
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- COMMUNICATION HISTORY -->
+    <!-- ========================================= -->
+
+    <div class="section-card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Communication History
+                </h2>
+
+                <p>
+                    Previous vendor and procurement communications
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        @if (loading()) {
+
+            <div class="loading">
+
+                Loading communications...
+
+            </div>
+
+        }
+
+
+        <!-- EMPTY -->
+
+        @if (
+            !loading() &&
+            communications().length === 0
+        ) {
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    💬
+                </div>
+
+                <strong>
+                    No communications found
+                </strong>
+
+                <p>
+                    Start a conversation with a vendor.
+                </p>
+
+            </div>
+
+        }
+
+
+        <!-- COMMUNICATION LIST -->
+
+        @if (
+            !loading() &&
+            communications().length > 0
+        ) {
+
+            <div class="communication-list">
+
+
+                @for (
+                    communication of communications();
+                    track communication.id
+                ) {
+
+                    <div class="communication-item">
+
+
+                        <!-- ICON -->
+
+                        <div
+                            class="communication-icon"
+                            [ngClass]="
+                                getTypeClass(
+                                    communication.communication_type
+                                )
+                            ">
+
+                            @if (
+                                communication.communication_type ===
+                                'Vendor Message'
+                            ) {
+
+                                💬
+
+                            } @else if (
+                                communication.communication_type ===
+                                'Procurement Discussion'
+                            ) {
+
+                                📦
+
+                            } @else {
+
+                                📝
+
+                            }
+
+                        </div>
+
+
+                        <!-- CONTENT -->
+
+                        <div class="communication-content">
+
+
+                            <div class="communication-top">
+
+                                <div>
+
+                                    <h3>
+
+                                        {{
+                                            communication.subject
+                                            || 'No Subject'
+                                        }}
+
+                                    </h3>
+
+
+                                    <div class="communication-meta">
+
+                                        <span>
+
+                                            🏢
+
+                                            {{
+                                                getVendorName(
+                                                    communication.vendor_id
+                                                )
+                                            }}
+
+                                        </span>
+
+                                        <span>
+                                            •
+                                        </span>
+
+                                        <span>
+
+                                            ✉️
+
+                                            {{
+                                                communication.sender_email
+                                                || 'No sender'
+                                            }}
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <span
+                                    class="type-badge"
+                                    [ngClass]="
+                                        getTypeClass(
+                                            communication.communication_type
+                                        )
+                                    ">
+
+                                    {{
+                                        communication.communication_type
+                                    }}
+
+                                </span>
+
+                            </div>
+
+
+                            <!-- MESSAGE -->
+
+                            <p class="message-text">
+
+                                {{
+                                    communication.message
+                                }}
+
+                            </p>
+
+
+                            <!-- FOOTER -->
+
+                            <div class="communication-footer">
+
+
+                                <span class="date">
+
+                                    🕒
+
+                                    {{
+                                        formatDate(
+                                            communication.created_at
+                                        )
+                                    }}
+
+                                </span>
+
+
+                                <!-- ATTACHMENT -->
+
+                                @if (
+                                    communication.file_name
+                                ) {
+
+                                    <button
+                                        type="button"
+                                        class="file-badge"
+                                        (click)="
+                                            downloadFile(
+                                                communication.file_path
+                                            )
+                                        ">
+
+                                        📎
+
+                                        {{
+                                            communication.file_name
+                                        }}
+
+                                    </button>
+
+                                }
+
+
+                                <span class="sent-badge">
+
+                                    ✓
+
+                                    {{
+                                        communication.status
+                                        || 'Sent'
+                                    }}
+
+                                </span>
+
+
+                                <button
+                                    *appHasRole="['Administrator']"
+                                    type="button"
+                                    class="delete-btn"
+                                    (click)="
+                                        deleteCommunication(
+                                            communication.id
+                                        )
+                                    ">
+
+                                    Delete
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                }
+
+            </div>
+
+        }
+
+    </div>
+
+</div>

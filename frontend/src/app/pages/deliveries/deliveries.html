@@ -1,0 +1,721 @@
+<div class="deliveries-page">
+
+
+  <!-- ========================================= -->
+  <!-- HEADER -->
+  <!-- ========================================= -->
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>
+        Delivery Management
+      </h1>
+
+      <p>
+        Track deliveries, monitor delays and manage delivery status.
+      </p>
+
+    </div>
+
+
+    <button
+      class="primary-button"
+      type="button"
+      (click)="openForm()">
+
+      + Add Delivery
+
+    </button>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- MESSAGES -->
+  <!-- ========================================= -->
+
+  <div
+    class="message success"
+    *ngIf="successMessage">
+
+    {{ successMessage }}
+
+  </div>
+
+
+  <div
+    class="message error"
+    *ngIf="errorMessage">
+
+    {{ errorMessage }}
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- SUMMARY -->
+  <!-- ========================================= -->
+
+  <div class="summary-grid">
+
+
+    <!-- TOTAL -->
+
+    <div class="summary-card">
+
+      <span>
+        Total Deliveries
+      </span>
+
+      <strong>
+
+        {{
+          summaryLoading
+            ? '...'
+            : totalDeliveries
+        }}
+
+      </strong>
+
+    </div>
+
+
+    <!-- PENDING -->
+
+    <div class="summary-card">
+
+      <span>
+        Pending
+      </span>
+
+      <strong>
+
+        {{
+          summaryLoading
+            ? '...'
+            : pendingDeliveries
+        }}
+
+      </strong>
+
+    </div>
+
+
+    <!-- IN TRANSIT -->
+
+    <div class="summary-card">
+
+      <span>
+        In Transit
+      </span>
+
+      <strong>
+
+        {{
+          summaryLoading
+            ? '...'
+            : inTransitDeliveries
+        }}
+
+      </strong>
+
+    </div>
+
+
+    <!-- DELAYED -->
+
+    <div class="summary-card danger-card">
+
+      <span>
+        Delayed
+      </span>
+
+      <strong>
+
+        {{
+          summaryLoading
+            ? '...'
+            : delayedCount
+        }}
+
+      </strong>
+
+    </div>
+
+
+    <!-- DELIVERED -->
+
+    <div class="summary-card">
+
+      <span>
+        Delivered
+      </span>
+
+      <strong>
+
+        {{
+          summaryLoading
+            ? '...'
+            : deliveredDeliveries
+        }}
+
+      </strong>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- CREATE FORM -->
+  <!-- ========================================= -->
+
+  <div
+    class="form-card"
+    *ngIf="showForm">
+
+
+    <div class="form-header">
+
+      <h2>
+        Add Delivery
+      </h2>
+
+
+      <button
+        class="close-button"
+        type="button"
+        (click)="closeForm()">
+
+        ✕
+
+      </button>
+
+    </div>
+
+
+    <div class="form-grid">
+
+
+      <!-- ORDER -->
+
+      <div class="form-group">
+
+        <label>
+          Order ID
+        </label>
+
+        <input
+          type="number"
+          [(ngModel)]="newDelivery.order_id"
+          placeholder="Enter order ID">
+
+      </div>
+
+
+      <!-- VENDOR -->
+
+      <div class="form-group">
+
+        <label>
+          Vendor ID
+        </label>
+
+        <input
+          type="number"
+          [(ngModel)]="newDelivery.vendor_id"
+          placeholder="Enter vendor ID">
+
+      </div>
+
+
+      <!-- EXPECTED DATE -->
+
+      <div class="form-group">
+
+        <label>
+          Expected Delivery Date
+        </label>
+
+        <input
+          type="date"
+          [(ngModel)]="newDelivery.expected_delivery_date">
+
+      </div>
+
+
+      <!-- TRACKING -->
+
+      <div class="form-group">
+
+        <label>
+          Tracking Number
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="newDelivery.tracking_number"
+          placeholder="Tracking number">
+
+      </div>
+
+
+      <!-- STATUS -->
+
+      <div class="form-group">
+
+        <label>
+          Status
+        </label>
+
+        <select
+          [(ngModel)]="newDelivery.status">
+
+          <option value="Pending">
+            Pending
+          </option>
+
+          <option value="In Transit">
+            In Transit
+          </option>
+
+          <option value="Delivered">
+            Delivered
+          </option>
+
+          <option value="Completed">
+            Completed
+          </option>
+
+          <option value="Cancelled">
+            Cancelled
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- NOTES -->
+
+      <div class="form-group full-width">
+
+        <label>
+          Notes
+        </label>
+
+        <textarea
+          rows="3"
+          [(ngModel)]="newDelivery.notes"
+          placeholder="Additional notes">
+        </textarea>
+
+      </div>
+
+    </div>
+
+
+    <!-- FORM ACTIONS -->
+
+    <div class="form-actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        (click)="closeForm()">
+
+        Cancel
+
+      </button>
+
+
+      <button
+        type="button"
+        class="primary-button"
+        (click)="createDelivery()">
+
+        Create Delivery
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- LOADING -->
+  <!-- ========================================= -->
+
+  <div
+    class="loading"
+    *ngIf="loading">
+
+    Loading deliveries...
+
+  </div>
+
+
+  <!-- ========================================= -->
+  <!-- TABLE -->
+  <!-- ========================================= -->
+
+  <div
+    class="table-card"
+    *ngIf="!loading">
+
+
+    <!-- TABLE HEADER -->
+
+    <div class="table-header">
+
+      <div>
+
+        <h2>
+          Delivery History
+        </h2>
+
+        <p>
+          Track expected and actual delivery dates.
+        </p>
+
+      </div>
+
+
+      <button
+        class="secondary-button"
+        type="button"
+        (click)="refreshData()">
+
+        ↻ Refresh
+
+      </button>
+
+    </div>
+
+
+    <!-- ======================================= -->
+    <!-- EMPTY -->
+    <!-- ======================================= -->
+
+    <div
+      class="empty-state"
+      *ngIf="deliveries.length === 0">
+
+      <h3>
+        No deliveries found
+      </h3>
+
+      <p>
+        Create your first delivery to start tracking.
+      </p>
+
+    </div>
+
+
+    <!-- ======================================= -->
+    <!-- TABLE -->
+    <!-- ======================================= -->
+
+    <div
+      class="table-wrapper"
+      *ngIf="deliveries.length > 0">
+
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              ID
+            </th>
+
+            <th>
+              Order
+            </th>
+
+            <th>
+              Vendor
+            </th>
+
+            <th>
+              Expected
+            </th>
+
+            <th>
+              Actual
+            </th>
+
+            <th>
+              Tracking
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Delay
+            </th>
+
+            <th>
+              Actions
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr
+            *ngFor="let delivery of deliveries">
+
+
+            <!-- ID -->
+
+            <td>
+              #{{ delivery.id }}
+            </td>
+
+
+            <!-- ORDER -->
+
+            <td>
+              #{{ delivery.order_id }}
+            </td>
+
+
+            <!-- VENDOR -->
+
+            <td>
+              #{{ delivery.vendor_id }}
+            </td>
+
+
+            <!-- EXPECTED -->
+
+            <td>
+              {{ delivery.expected_delivery_date }}
+            </td>
+
+
+            <!-- ACTUAL -->
+
+            <td>
+
+              {{
+                delivery.actual_delivery_date
+                  || '—'
+              }}
+
+            </td>
+
+
+            <!-- TRACKING -->
+
+            <td>
+
+              {{
+                delivery.tracking_number
+                  || '—'
+              }}
+
+            </td>
+
+
+            <!-- STATUS -->
+
+            <td>
+
+              <span
+                class="status"
+                [ngClass]="
+                  getStatusClass(
+                    delivery.status
+                  )
+                ">
+
+                {{ delivery.status }}
+
+              </span>
+
+            </td>
+
+
+            <!-- DELAY -->
+
+            <td>
+
+              <span
+                *ngIf="isDelayed(delivery)"
+                class="delay-badge">
+
+                Delayed
+
+              </span>
+
+
+              <span
+                *ngIf="!isDelayed(delivery)"
+                class="on-time-badge">
+
+                On Track
+
+              </span>
+
+            </td>
+
+
+            <!-- ACTIONS -->
+
+            <td>
+
+              <div class="actions">
+
+
+                <!-- MARK DELIVERED -->
+
+                <button
+                  *ngIf="
+                    delivery.status !== 'Delivered' &&
+                    delivery.status !== 'Completed' &&
+                    delivery.status !== 'Cancelled'
+                  "
+                  class="deliver-button"
+                  type="button"
+                  (click)="markDelivered(delivery)">
+
+                  Mark Delivered
+
+                </button>
+
+
+                <!-- DELETE -->
+
+                <button
+                  class="delete-button"
+                  type="button"
+                  (click)="deleteDelivery(delivery)">
+
+                  Delete
+
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- ======================================= -->
+    <!-- PAGINATION -->
+    <!-- ======================================= -->
+
+    <div
+      class="pagination"
+      *ngIf="
+        totalPages > 1 &&
+        deliveries.length > 0
+      ">
+
+
+      <div class="pagination-info">
+
+        Showing
+
+        <strong>
+          {{
+            ((currentPage - 1) * pageSize) + 1
+          }}
+        </strong>
+
+        -
+
+        <strong>
+          {{
+            Math.min(
+              currentPage * pageSize,
+              totalRecords
+            )
+          }}
+        </strong>
+
+        of
+
+        <strong>
+          {{ totalRecords }}
+        </strong>
+
+        deliveries
+
+      </div>
+
+
+      <div class="pagination-buttons">
+
+
+        <!-- PREVIOUS -->
+
+        <button
+          type="button"
+          class="secondary-button"
+          [disabled]="currentPage === 1"
+          (click)="previousPage()">
+
+          ← Previous
+
+        </button>
+
+
+        <!-- PAGE NUMBERS -->
+
+        <button
+          *ngFor="
+            let page of getPageNumbers()
+          "
+          type="button"
+          class="page-button"
+          [class.active-page]="
+            page === currentPage
+          "
+          (click)="goToPage(page)">
+
+          {{ page }}
+
+        </button>
+
+
+        <!-- NEXT -->
+
+        <button
+          type="button"
+          class="secondary-button"
+          [disabled]="
+            currentPage === totalPages
+          "
+          (click)="nextPage()">
+
+          Next →
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

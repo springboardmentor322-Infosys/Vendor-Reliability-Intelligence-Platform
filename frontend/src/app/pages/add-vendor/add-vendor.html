@@ -1,0 +1,215 @@
+<div class="form-container">
+
+    <!-- ================================ -->
+    <!-- HEADER -->
+    <!-- ================================ -->
+
+    <h2>
+        {{ vendorId !== null
+            ? 'Edit Vendor'
+            : 'Add Vendor'
+        }}
+    </h2>
+
+
+    <p class="form-description">
+
+        {{ vendorId !== null
+            ? 'Update vendor information'
+            : 'Add a new vendor to VendorIQ'
+        }}
+
+    </p>
+
+
+    <!-- ================================ -->
+    <!-- VENDOR NAME -->
+    <!-- ================================ -->
+
+    <div class="form-group">
+
+        <label>
+            Vendor Name *
+        </label>
+
+        <input
+            type="text"
+            placeholder="Enter vendor name"
+            [(ngModel)]="vendor_name"
+        >
+
+    </div>
+
+
+    <!-- ================================ -->
+    <!-- CONTACT PERSON -->
+    <!-- ================================ -->
+
+    <div class="form-group">
+
+        <label>
+            Contact Person *
+        </label>
+
+        <input
+            type="text"
+            placeholder="Enter contact person name"
+            [(ngModel)]="contact_person"
+        >
+
+    </div>
+
+
+    <!-- ================================ -->
+    <!-- EMAIL -->
+    <!-- ================================ -->
+
+    <div class="form-group">
+
+        <label>
+            Email *
+        </label>
+
+        <input
+            type="email"
+            placeholder="Enter vendor email"
+            [(ngModel)]="email"
+        >
+
+    </div>
+
+
+    <!-- ================================ -->
+    <!-- PHONE -->
+    <!-- ================================ -->
+
+    <div class="form-group">
+
+        <label>
+            Phone *
+        </label>
+
+        <input
+            type="text"
+            placeholder="Enter phone number"
+            [(ngModel)]="phone"
+        >
+
+    </div>
+
+
+    <!-- ================================ -->
+    <!-- CATEGORY -->
+    <!-- ================================ -->
+
+    <div class="form-group">
+
+        <label>
+            Vendor Category *
+        </label>
+
+        <select
+            [(ngModel)]="category">
+
+            <option
+                value=""
+                disabled>
+
+                Select vendor category
+
+            </option>
+
+
+            @for (
+                item of categories;
+                track item
+            ) {
+
+                <option
+                    [value]="item">
+
+                    {{ item }}
+
+                </option>
+
+            }
+
+        </select>
+
+    </div>
+
+
+    <!-- ================================ -->
+    <!-- GST -->
+    <!-- ================================ -->
+
+    <div class="form-group">
+
+        <label>
+            GST Number *
+        </label>
+
+        <input
+            type="text"
+            placeholder="Enter GST number"
+            [(ngModel)]="gst_number"
+        >
+
+    </div>
+
+
+    <!-- ================================ -->
+    <!-- ADDRESS -->
+    <!-- ================================ -->
+
+    <div class="form-group">
+
+        <label>
+            Address *
+        </label>
+
+        <textarea
+            placeholder="Enter vendor address"
+            [(ngModel)]="address">
+        </textarea>
+
+    </div>
+
+
+    <!-- ================================ -->
+    <!-- BUTTONS -->
+    <!-- ================================ -->
+
+    <div class="buttons">
+
+        <button
+            type="button"
+            class="cancel"
+            (click)="cancel()"
+            [disabled]="loading">
+
+            Cancel
+
+        </button>
+
+
+        <button
+            type="button"
+            class="save"
+            (click)="saveVendor()"
+            [disabled]="loading">
+
+            {{ loading
+                ? 'Saving...'
+                : (
+                    vendorId !== null
+                        ? 'Update Vendor'
+                        : 'Save Vendor'
+                )
+            }}
+
+        </button>
+
+    </div>
+
+</div>

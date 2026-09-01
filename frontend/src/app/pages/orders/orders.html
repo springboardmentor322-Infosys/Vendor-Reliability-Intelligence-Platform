@@ -1,0 +1,329 @@
+<div class="top-bar">
+
+    <div>
+
+        <h1>
+            Orders
+        </h1>
+
+        <p>
+            Manage your purchase orders
+        </p>
+
+    </div>
+
+
+    <button
+        *appHasRole="['Administrator', 'Procurement Manager']"
+        class="add-btn"
+        type="button"
+        (click)="router.navigate(['/add-order'])">
+
+        + Add Order
+
+    </button>
+
+</div>
+
+
+<!-- ================================ -->
+<!-- STATUS FILTERS -->
+<!-- ================================ -->
+
+<div class="status-filters">
+
+    <button
+        type="button"
+        [class.active]="selectedStatus === 'All'"
+        (click)="selectedStatus = 'All'; onFilterChange()">
+
+        All
+
+    </button>
+
+
+    <button
+        type="button"
+        [class.active]="selectedStatus === 'Pending'"
+        (click)="selectedStatus = 'Pending'; onFilterChange()">
+
+        Pending
+
+    </button>
+
+
+    <button
+        type="button"
+        [class.active]="selectedStatus === 'Approved'"
+        (click)="selectedStatus = 'Approved'; onFilterChange()">
+
+        Approved
+
+    </button>
+
+
+    <button
+        type="button"
+        [class.active]="selectedStatus === 'Ordered'"
+        (click)="selectedStatus = 'Ordered'; onFilterChange()">
+
+        Ordered
+
+    </button>
+
+
+    <button
+        type="button"
+        [class.active]="selectedStatus === 'Delivered'"
+        (click)="selectedStatus = 'Delivered'; onFilterChange()">
+
+        Delivered
+
+    </button>
+
+
+    <button
+        type="button"
+        [class.active]="selectedStatus === 'Completed'"
+        (click)="selectedStatus = 'Completed'; onFilterChange()">
+
+        Completed
+
+    </button>
+
+
+    <button
+        type="button"
+        [class.active]="selectedStatus === 'Cancelled'"
+        (click)="selectedStatus = 'Cancelled'; onFilterChange()">
+
+        Cancelled
+
+    </button>
+
+</div>
+
+
+<!-- ================================ -->
+<!-- SEARCH -->
+<!-- ================================ -->
+
+<div class="search-box">
+
+    <input
+        type="text"
+        placeholder="Search product or vendor..."
+        [(ngModel)]="searchText"
+        (ngModelChange)="onFilterChange()">
+
+</div>
+
+
+<!-- ================================ -->
+<!-- ORDERS TABLE -->
+<!-- ================================ -->
+
+<div class="table-card">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    ID
+                </th>
+
+                <th>
+                    Vendor
+                </th>
+
+                <th>
+                    Product
+                </th>
+
+                <th>
+                    Quantity
+                </th>
+
+                <th>
+                    Amount
+                </th>
+
+                <th>
+                    Status
+                </th>
+
+                <th>
+                    Expected Delivery
+                </th>
+
+                <th>
+                    Actions
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            @for (
+                order of filteredOrders;
+                track order.id
+            ) {
+
+                <tr
+                    [class.overdue-row]="isOverdue(order)">
+
+                    <td>
+                        #{{ order.id }}
+                    </td>
+
+
+                    <td>
+                        {{ getVendorName(order.vendor_id) }}
+                    </td>
+
+
+                    <td>
+                        {{ order.product_name }}
+                    </td>
+
+
+                    <td>
+                        {{ order.quantity }}
+                    </td>
+
+
+                    <td>
+                        ₹{{ order.amount | number:'1.0-2' }}
+                    </td>
+
+
+                    <td>
+
+                        <span
+                            class="status"
+                            [ngClass]="
+                                getStatusClass(
+                                    order.status
+                                )
+                            ">
+
+                            {{ order.status }}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <span
+                            [class.overdue-date]="
+                                isOverdue(order)
+                            ">
+
+                            {{ formatDeliveryDate(
+                                order.expected_delivery_date
+                            ) }}
+
+                        </span>
+
+
+                        @if (isOverdue(order)) {
+
+                            <small class="overdue-label">
+
+                                Overdue
+
+                            </small>
+
+                        }
+
+                    </td>
+
+
+                    <td>
+
+                        <button
+                            *appHasRole="['Administrator', 'Procurement Manager', 'Supply Chain Manager']"
+                            type="button"
+                            class="edit"
+                            (click)="editOrder(order)">
+
+                            Edit
+
+                        </button>
+
+
+                        <button
+                            *appHasRole="['Administrator']"
+                            type="button"
+                            class="delete"
+                            (click)="deleteOrder(order.id)">
+
+                            Delete
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            }
+
+
+            @if (
+                filteredOrders.length === 0
+            ) {
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="empty">
+
+                        No orders found.
+
+                    </td>
+
+                </tr>
+
+            }
+
+        </tbody>
+
+    </table>
+
+    @if (totalMatchingOrders > 0) {
+
+        <div class="pagination">
+
+            <button
+                type="button"
+                (click)="goToPage(currentPage - 1)"
+                [disabled]="currentPage === 1">
+                Previous
+            </button>
+
+            <span>
+                Page {{ currentPage }} of {{ totalPages }}
+                · {{ totalMatchingOrders }} orders
+            </span>
+
+            <button
+                type="button"
+                (click)="goToPage(currentPage + 1)"
+                [disabled]="currentPage === totalPages">
+                Next
+            </button>
+
+        </div>
+
+    }
+
+</div>

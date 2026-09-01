@@ -1,0 +1,1691 @@
+<div class="contract-page">
+
+
+    <!-- ========================================= -->
+    <!-- PAGE HEADER -->
+    <!-- ========================================= -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Contract Management
+            </h1>
+
+            <p>
+                Manage vendor contracts, compliance, expiry dates and renewals
+            </p>
+
+        </div>
+
+
+        <button
+            *appHasRole="['Administrator', 'Procurement Manager']"
+            type="button"
+            class="primary-btn"
+            (click)="openAddForm()">
+
+            + Add Contract
+
+        </button>
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- SUMMARY CARDS -->
+    <!-- ========================================= -->
+
+    <div class="summary-grid">
+
+
+        <!-- TOTAL CONTRACTS -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                📄
+            </div>
+
+            <div>
+
+                <span>
+                    Total Contracts
+                </span>
+
+                @if (summaryLoading()) {
+
+                    <strong>
+                        ...
+                    </strong>
+
+                } @else {
+
+                    <strong>
+                        {{
+                            contractSummary().total_contracts
+                        }}
+                    </strong>
+
+                }
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ACTIVE CONTRACTS -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                ✅
+            </div>
+
+            <div>
+
+                <span>
+                    Active Contracts
+                </span>
+
+                @if (summaryLoading()) {
+
+                    <strong>
+                        ...
+                    </strong>
+
+                } @else {
+
+                    <strong>
+                        {{
+                            contractSummary().active_contracts
+                        }}
+                    </strong>
+
+                }
+
+            </div>
+
+        </div>
+
+
+
+        <!-- EXPIRING SOON -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                ⚠️
+            </div>
+
+            <div>
+
+                <span>
+                    Expiring Soon
+                </span>
+
+                @if (summaryLoading()) {
+
+                    <strong>
+                        ...
+                    </strong>
+
+                } @else {
+
+                    <strong>
+                        {{
+                            contractSummary().expiring_soon
+                        }}
+                    </strong>
+
+                }
+
+            </div>
+
+        </div>
+
+
+
+        <!-- COMPLIANT -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                🛡️
+            </div>
+
+            <div>
+
+                <span>
+                    Compliant
+                </span>
+
+                @if (summaryLoading()) {
+
+                    <strong>
+                        ...
+                    </strong>
+
+                } @else {
+
+                    <strong>
+                        {{
+                            contractSummary().compliant_contracts
+                        }}
+                    </strong>
+
+                }
+
+            </div>
+
+        </div>
+
+
+
+        <!-- PENDING RENEWALS -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                🔄
+            </div>
+
+            <div>
+
+                <span>
+                    Pending Renewals
+                </span>
+
+                @if (summaryLoading()) {
+
+                    <strong>
+                        ...
+                    </strong>
+
+                } @else {
+
+                    <strong>
+                        {{
+                            contractSummary().pending_renewals
+                        }}
+                    </strong>
+
+                }
+
+            </div>
+
+        </div>
+
+
+
+        <!-- RENEWED CONTRACTS -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                ♻️
+            </div>
+
+            <div>
+
+                <span>
+                    Renewed Contracts
+                </span>
+
+                @if (summaryLoading()) {
+
+                    <strong>
+                        ...
+                    </strong>
+
+                } @else {
+
+                    <strong>
+                        {{
+                            contractSummary().renewed_contracts
+                        }}
+                    </strong>
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- EXPIRY ALERTS -->
+    <!-- ========================================= -->
+
+    <div class="section-card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Contract Expiry Alerts
+                </h2>
+
+                <p>
+                    Contracts expiring within the next 30 days
+                </p>
+
+            </div>
+
+        </div>
+
+
+        @if (alertLoading()) {
+
+            <div class="loading">
+                Loading expiry alerts...
+            </div>
+
+        }
+
+
+        @if (
+            !alertLoading() &&
+            expiryAlerts().length === 0
+        ) {
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    ✓
+                </div>
+
+                <strong>
+                    No upcoming contract expiries
+                </strong>
+
+                <p>
+                    There are no active contracts expiring
+                    within the next 30 days.
+                </p>
+
+            </div>
+
+        }
+
+
+        @if (
+            !alertLoading() &&
+            expiryAlerts().length > 0
+        ) {
+
+            <div class="alert-list">
+
+                @for (
+                    alert of expiryAlerts();
+                    track alert.contract_id
+                ) {
+
+                    <div
+                        class="alert-item"
+                        [ngClass]="
+                            getExpiryClass(
+                                alert.days_remaining
+                            )
+                        ">
+
+                        <div class="alert-icon">
+                            ⚠️
+                        </div>
+
+
+                        <div class="alert-content">
+
+                            <strong>
+                                {{ alert.contract_name }}
+                            </strong>
+
+                            <span>
+
+                                {{ alert.vendor_name }}
+
+                                ·
+
+                                {{ alert.contract_number }}
+
+                            </span>
+
+                            <small>
+
+                                Expiry:
+
+                                {{
+                                    alert.expiry_date
+                                    | date:'dd MMM yyyy'
+                                }}
+
+                            </small>
+
+
+                            @if (alert.renewal_status) {
+
+                                <small>
+
+                                    Renewal:
+
+                                    {{ alert.renewal_status }}
+
+                                    @if (alert.renewal_date) {
+
+                                        -
+
+                                        {{
+                                            alert.renewal_date
+                                            | date:'dd MMM yyyy'
+                                        }}
+
+                                    }
+
+                                </small>
+
+                            }
+
+                        </div>
+
+
+                        <div class="alert-days">
+
+                            <strong>
+                                {{ alert.days_remaining }}
+                            </strong>
+
+                            <span>
+                                days remaining
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                }
+
+            </div>
+
+        }
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- COMPLIANCE ALERTS -->
+    <!-- ========================================= -->
+
+    @if (
+        contractSummary().non_compliant_contracts > 0
+        ||
+        contractSummary().pending_compliance > 0
+    ) {
+
+        <div class="section-card compliance-alert-card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Compliance Alerts
+                    </h2>
+
+                    <p>
+                        Contracts requiring compliance attention
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="compliance-alert-grid">
+
+
+                @if (
+                    contractSummary().non_compliant_contracts > 0
+                ) {
+
+                    <div class="compliance-alert danger">
+
+                        <div class="alert-icon">
+                            ❌
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Non-Compliant Contracts
+                            </strong>
+
+                            <span>
+
+                                {{
+                                    contractSummary()
+                                        .non_compliant_contracts
+                                }}
+
+                                contract(s) require attention.
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                }
+
+
+                @if (
+                    contractSummary().pending_compliance > 0
+                ) {
+
+                    <div class="compliance-alert warning">
+
+                        <div class="alert-icon">
+                            ⏳
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Pending Compliance
+                            </strong>
+
+                            <span>
+
+                                {{
+                                    contractSummary()
+                                        .pending_compliance
+                                }}
+
+                                contract(s) are pending review.
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                }
+
+            </div>
+
+        </div>
+
+    }
+
+
+
+    <!-- ========================================= -->
+    <!-- ADD / EDIT CONTRACT FORM -->
+    <!-- ========================================= -->
+
+    @if (showForm()) {
+
+        <div class="section-card form-card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+
+                        {{
+                            editingContractId !== null
+                                ? 'Edit Contract'
+                                : 'Add Contract'
+                        }}
+
+                    </h2>
+
+                    <p>
+                        Enter contract details below
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="close-btn"
+                    (click)="closeForm()">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <div class="form-grid">
+
+
+                <!-- VENDOR -->
+
+                <div class="form-group">
+
+                    <label>
+                        Vendor
+                    </label>
+
+                    <select
+                        [(ngModel)]="selectedVendorId">
+
+                        <option
+                            [ngValue]="null">
+
+                            Select Vendor
+
+                        </option>
+
+
+                        @for (
+                            vendor of vendors();
+                            track vendor.id
+                        ) {
+
+                            <option
+                                [ngValue]="vendor.id">
+
+                                {{ vendor.vendor_name }}
+
+                            </option>
+
+                        }
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- CONTRACT NAME -->
+
+                <div class="form-group">
+
+                    <label>
+                        Contract Name
+                    </label>
+
+                    <input
+                        type="text"
+                        [(ngModel)]="contractName"
+                        placeholder="Enter contract name">
+
+                </div>
+
+
+
+                <!-- CONTRACT NUMBER -->
+
+                <div class="form-group">
+
+                    <label>
+                        Contract Number
+                    </label>
+
+                    <input
+                        type="text"
+                        [(ngModel)]="contractNumber"
+                        placeholder="CNT-2026-001">
+
+                </div>
+
+
+
+                <!-- CONTRACT VALUE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Contract Value
+                    </label>
+
+                    <input
+                        type="number"
+                        min="0"
+                        [(ngModel)]="contractValue"
+                        placeholder="0">
+
+                </div>
+
+
+
+                <!-- START DATE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Start Date
+                    </label>
+
+                    <input
+                        type="date"
+                        [(ngModel)]="startDate">
+
+                </div>
+
+
+
+                <!-- EXPIRY DATE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Expiry Date
+                    </label>
+
+                    <input
+                        type="date"
+                        [(ngModel)]="expiryDate">
+
+                </div>
+
+
+
+                <!-- STATUS -->
+
+                <div class="form-group">
+
+                    <label>
+                        Status
+                    </label>
+
+                    <select
+                        [(ngModel)]="status">
+
+                        <option value="Active">
+                            Active
+                        </option>
+
+                        <option value="Expired">
+                            Expired
+                        </option>
+
+                        <option value="Suspended">
+                            Suspended
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- RENEWAL STATUS -->
+
+                <div class="form-group">
+
+                    <label>
+                        Renewal Status
+                    </label>
+
+                    <select
+                        [(ngModel)]="renewalStatus">
+
+                        <option value="Pending">
+                            Pending
+                        </option>
+
+                        <option value="Renewed">
+                            Renewed
+                        </option>
+
+                        <option value="Not Renewing">
+                            Not Renewing
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- RENEWAL DATE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Renewal Date
+                    </label>
+
+                    <input
+                        type="date"
+                        [(ngModel)]="renewalDate">
+
+                </div>
+
+
+
+                <!-- COMPLIANCE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Compliance Status
+                    </label>
+
+                    <select
+                        [(ngModel)]="complianceStatus">
+
+                        <option value="Compliant">
+                            Compliant
+                        </option>
+
+                        <option value="Non-Compliant">
+                            Non-Compliant
+                        </option>
+
+                        <option value="Pending">
+                            Pending
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-group full-width">
+
+                    <label>
+                        Description
+                    </label>
+
+                    <textarea
+                        rows="4"
+                        [(ngModel)]="description"
+                        placeholder="Enter contract description">
+                    </textarea>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- FORM ACTIONS -->
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    (click)="closeForm()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="primary-btn"
+                    (click)="saveContract()">
+
+                    {{
+                        editingContractId !== null
+                            ? 'Update Contract'
+                            : 'Save Contract'
+                    }}
+
+                </button>
+
+            </div>
+
+        </div>
+
+    }
+
+
+
+    <!-- ========================================= -->
+    <!-- CONTRACT LIST -->
+    <!-- ========================================= -->
+
+    <div class="section-card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Contracts
+                </h2>
+
+                <p>
+                    All vendor contracts
+                </p>
+
+            </div>
+
+        </div>
+
+
+        @if (loading()) {
+
+            <div class="loading">
+                Loading contracts...
+            </div>
+
+        }
+
+
+        @if (
+            !loading() &&
+            contracts().length === 0
+        ) {
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    📄
+                </div>
+
+                <strong>
+                    No contracts found
+                </strong>
+
+                <p>
+                    Add your first vendor contract.
+                </p>
+
+            </div>
+
+        }
+
+
+        @if (
+            !loading() &&
+            contracts().length > 0
+        ) {
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Contract
+                            </th>
+
+                            <th>
+                                Vendor
+                            </th>
+
+                            <th>
+                                Value
+                            </th>
+
+                            <th>
+                                Start Date
+                            </th>
+
+                            <th>
+                                Expiry Date
+                            </th>
+
+                            <th>
+                                Renewal
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Compliance
+                            </th>
+
+                            <th>
+                                Documents
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @for (
+                            contract of contracts();
+                            track contract.id
+                        ) {
+
+                            <tr>
+
+
+                                <!-- CONTRACT -->
+
+                                <td>
+
+                                    <div class="contract-name">
+
+                                        <strong>
+
+                                            {{
+                                                contract.contract_name
+                                            }}
+
+                                        </strong>
+
+                                        <span>
+
+                                            {{
+                                                contract.contract_number
+                                            }}
+
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+
+                                <!-- VENDOR -->
+
+                                <td>
+
+                                    {{
+                                        getVendorName(
+                                            contract.vendor_id
+                                        )
+                                    }}
+
+                                </td>
+
+
+
+                                <!-- VALUE -->
+
+                                <td>
+
+                                    ₹
+
+                                    {{
+                                        formatValue(
+                                            contract.contract_value
+                                        )
+                                    }}
+
+                                </td>
+
+
+
+                                <!-- START DATE -->
+
+                                <td>
+
+                                    {{
+                                        contract.start_date
+                                        | date:'dd MMM yyyy'
+                                    }}
+
+                                </td>
+
+
+
+                                <!-- EXPIRY DATE -->
+
+                                <td>
+
+                                    {{
+                                        contract.expiry_date
+                                        | date:'dd MMM yyyy'
+                                    }}
+
+                                </td>
+
+
+
+                                <!-- RENEWAL -->
+
+                                <td>
+
+                                    <div class="renewal-info">
+
+                                        <span
+                                            class="status-badge"
+                                            [ngClass]="
+                                                getRenewalClass(
+                                                    contract.renewal_status
+                                                )
+                                            ">
+
+                                            {{
+                                                contract.renewal_status
+                                            }}
+
+                                        </span>
+
+
+                                        @if (
+                                            contract.renewal_date
+                                        ) {
+
+                                            <small>
+
+                                                {{
+                                                    contract.renewal_date
+                                                    | date:'dd MMM yyyy'
+                                                }}
+
+                                            </small>
+
+                                        }
+
+                                    </div>
+
+                                </td>
+
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    <span
+                                        class="status-badge"
+                                        [ngClass]="
+                                            getStatusClass(
+                                                contract.status
+                                            )
+                                        ">
+
+                                        {{ contract.status }}
+
+                                    </span>
+
+                                </td>
+
+
+
+                                <!-- COMPLIANCE -->
+
+                                <td>
+
+                                    <span
+                                        class="status-badge"
+                                        [ngClass]="
+                                            getComplianceClass(
+                                                contract.compliance_status
+                                            )
+                                        ">
+
+                                        {{
+                                            contract.compliance_status
+                                        }}
+
+                                    </span>
+
+                                </td>
+
+
+
+                                <!-- DOCUMENTS -->
+
+                                <td>
+
+                                    <button
+                                        type="button"
+                                        class="document-btn"
+                                        (click)="
+                                            openDocumentForm(
+                                                contract.id
+                                            )
+                                        ">
+
+                                        📎 Documents
+
+                                    </button>
+
+                                </td>
+
+
+
+                                <!-- ACTIONS -->
+
+                                <td>
+
+                                    <div class="action-buttons">
+
+
+                                        <button
+                                            *appHasRole="[
+                                                'Administrator',
+                                                'Procurement Manager',
+                                                'Supply Chain Manager'
+                                            ]"
+                                            type="button"
+                                            class="edit-btn"
+                                            (click)="
+                                                openEditForm(
+                                                    contract
+                                                )
+                                            ">
+
+                                            Edit
+
+                                        </button>
+
+
+                                        <button
+                                            *appHasRole="[
+                                                'Administrator'
+                                            ]"
+                                            type="button"
+                                            class="delete-btn"
+                                            (click)="
+                                                deleteContract(
+                                                    contract.id
+                                                )
+                                            ">
+
+                                            Delete
+
+                                        </button>
+
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        }
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- CERTIFICATION / DOCUMENT MODAL -->
+    <!-- ========================================= -->
+
+    @if (showDocumentForm()) {
+
+        <div class="document-modal-overlay">
+
+
+            <div class="document-modal">
+
+
+                <!-- MODAL HEADER -->
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Certifications & Documents
+                        </h2>
+
+                        <p>
+
+                            Manage certifications and
+                            supporting documents for this contract.
+
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="close-btn"
+                        (click)="closeDocumentForm()">
+
+                        ×
+
+                    </button>
+
+                </div>
+
+
+
+                <!-- ================================= -->
+                <!-- ADD CERTIFICATION -->
+                <!-- ================================= -->
+
+                <div class="document-form">
+
+
+                    <h3>
+                        Add Certification
+                    </h3>
+
+
+                    <div class="form-grid">
+
+
+                        <!-- CERTIFICATION NAME -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Certification Name
+                            </label>
+
+                            <input
+                                type="text"
+                                [(ngModel)]="certificationName"
+                                placeholder="ISO 9001">
+
+                        </div>
+
+
+
+                        <!-- CERTIFICATION NUMBER -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Certification Number
+                            </label>
+
+                            <input
+                                type="text"
+                                [(ngModel)]="certificationNumber"
+                                placeholder="Certificate number">
+
+                        </div>
+
+
+
+                        <!-- ISSUE DATE -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Issue Date
+                            </label>
+
+                            <input
+                                type="date"
+                                [(ngModel)]="certificationIssueDate">
+
+                        </div>
+
+
+
+                        <!-- EXPIRY DATE -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Certification Expiry Date
+                            </label>
+
+                            <input
+                                type="date"
+                                [(ngModel)]="certificationExpiryDate">
+
+                        </div>
+
+
+
+                        <!-- STATUS -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Certification Status
+                            </label>
+
+                            <select
+                                [(ngModel)]="certificationStatus">
+
+                                <option value="Active">
+                                    Active
+                                </option>
+
+                                <option value="Expired">
+                                    Expired
+                                </option>
+
+                                <option value="Pending">
+                                    Pending
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- FILE -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Certification Document
+                            </label>
+
+                            <input
+                                type="file"
+                                (change)="onFileSelected($event)">
+
+                            @if (selectedFile) {
+
+                                <small>
+
+                                    Selected:
+
+                                    {{ selectedFile.name }}
+
+                                </small>
+
+                            }
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- CREATE BUTTON -->
+
+                    <div class="form-actions">
+
+                        <button
+                            type="button"
+                            class="secondary-btn"
+                            (click)="resetDocumentForm()">
+
+                            Clear
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="primary-btn"
+                            [disabled]="documentLoading()"
+                            (click)="createCertification()">
+
+                            @if (documentLoading()) {
+
+                                Saving...
+
+                            } @else {
+
+                                Add Certification
+
+                            }
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ================================= -->
+                <!-- EXISTING DOCUMENTS -->
+                <!-- ================================= -->
+
+                <div class="documents-list">
+
+
+                    <div class="section-header">
+
+                        <div>
+
+                            <h3>
+                                Existing Certifications
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+
+                    @if (documentLoading()) {
+
+                        <div class="loading">
+
+                            Loading documents...
+
+                        </div>
+
+                    }
+
+
+                    @if (
+                        !documentLoading() &&
+                        contractDocuments().length === 0
+                    ) {
+
+                        <div class="empty-state">
+
+                            <div class="empty-icon">
+                                📎
+                            </div>
+
+                            <strong>
+                                No certifications found
+                            </strong>
+
+                            <p>
+                                Add a certification or
+                                supporting document above.
+                            </p>
+
+                        </div>
+
+                    }
+
+
+                    @if (
+                        !documentLoading() &&
+                        contractDocuments().length > 0
+                    ) {
+
+                        <div class="document-list">
+
+
+                            @for (
+                                document of contractDocuments();
+                                track document.id
+                            ) {
+
+                                <div class="document-item">
+
+
+                                    <!-- DOCUMENT ICON -->
+
+                                    <div class="document-icon">
+
+                                        📜
+
+                                    </div>
+
+
+
+                                    <!-- DOCUMENT INFORMATION -->
+
+                                    <div class="document-info">
+
+                                        <strong>
+
+                                            {{
+                                                document.certification_name
+                                            }}
+
+                                        </strong>
+
+
+                                        @if (
+                                            document.certification_number
+                                        ) {
+
+                                            <span>
+
+                                                Certificate No:
+
+                                                {{
+                                                    document.certification_number
+                                                }}
+
+                                            </span>
+
+                                        }
+
+
+                                        <span>
+
+                                            Status:
+
+                                            <b
+                                                [ngClass]="
+                                                    getDocumentStatusClass(
+                                                        document.status
+                                                    )
+                                                ">
+
+                                                {{
+                                                    document.status
+                                                }}
+
+                                            </b>
+
+                                        </span>
+
+
+                                        @if (
+                                            document.issue_date
+                                        ) {
+
+                                            <span>
+
+                                                Issue Date:
+
+                                                {{
+                                                    document.issue_date
+                                                    | date:'dd MMM yyyy'
+                                                }}
+
+                                            </span>
+
+                                        }
+
+
+                                        @if (
+                                            document.expiry_date
+                                        ) {
+
+                                            <span>
+
+                                                Expiry Date:
+
+                                                {{
+                                                    document.expiry_date
+                                                    | date:'dd MMM yyyy'
+                                                }}
+
+                                            </span>
+
+                                        }
+
+
+                                        @if (
+                                            document.document_name
+                                        ) {
+
+                                            <span>
+
+                                                📎
+
+                                                {{
+                                                    document.document_name
+                                                }}
+
+                                            </span>
+
+                                        } @else {
+
+                                            <span>
+
+                                                No document uploaded
+
+                                            </span>
+
+                                        }
+
+                                    </div>
+
+
+
+                                    <!-- ACTIONS -->
+
+                                    <div class="document-actions">
+
+
+                                        <button
+                                            *appHasRole="[
+                                                'Administrator'
+                                            ]"
+                                            type="button"
+                                            class="delete-btn"
+                                            (click)="
+                                                deleteContractDocument(
+                                                    document.id
+                                                )
+                                            ">
+
+                                            Delete
+
+                                        </button>
+
+
+                                    </div>
+
+
+                                </div>
+
+                            }
+
+                        </div>
+
+                    }
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    }
+
+</div>

@@ -1,0 +1,166 @@
+<div class="assessment-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Control Assessment</h1>
+      <p>Evaluate vendor controls and monitor compliance performance.</p>
+    </div>
+
+    <button class="primary-btn">
+      + New Assessment
+    </button>
+  </div>
+
+
+  <!-- SUMMARY CARDS -->
+
+  <div class="summary-grid">
+
+    <div class="summary-card">
+      <div class="card-label">Total Controls</div>
+      <div class="card-value">{{ totalControls }}</div>
+    </div>
+
+    <div class="summary-card success">
+      <div class="card-label">Passed</div>
+      <div class="card-value">{{ passedControls }}</div>
+    </div>
+
+    <div class="summary-card warning">
+      <div class="card-label">Needs Review</div>
+      <div class="card-value">{{ reviewControls }}</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-label">Average Score</div>
+      <div class="card-value">{{ averageScore }}%</div>
+    </div>
+
+  </div>
+
+
+  <!-- FILTERS -->
+
+  <div class="filter-card">
+
+    <input
+      type="text"
+      placeholder="Search control, vendor..."
+    />
+
+    <select>
+      <option>All Categories</option>
+      <option>Compliance</option>
+      <option>Procurement</option>
+      <option>Contracts</option>
+      <option>Supply Chain</option>
+      <option>Quality</option>
+    </select>
+
+    <select>
+      <option>All Status</option>
+      <option>Passed</option>
+      <option>Needs Review</option>
+    </select>
+
+    <button class="refresh-btn" (click)="refresh()">
+      ↻ Refresh
+    </button>
+
+  </div>
+
+
+  <!-- CONTROL TABLE -->
+
+  <div class="table-card">
+
+    <div class="table-header">
+      <div>
+        <h2>Control Assessments</h2>
+        <p>Review and evaluate vendor control performance.</p>
+      </div>
+
+      <span>{{ totalControls }} controls</span>
+    </div>
+
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Control ID</th>
+            <th>Control</th>
+            <th>Category</th>
+            <th>Vendor</th>
+            <th>Auditor</th>
+            <th>Score</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @for (control of controls; track control.id) {
+
+            <tr>
+
+              <td>{{ control.id }}</td>
+
+              <td class="control-name">
+                {{ control.control }}
+              </td>
+
+              <td>
+                <span class="category">
+                  {{ control.category }}
+                </span>
+              </td>
+
+              <td>{{ control.vendor }}</td>
+
+              <td>{{ control.auditor }}</td>
+
+              <td>
+                <span class="score">
+                  {{ control.score }}%
+                </span>
+              </td>
+
+              <td>
+
+                @if (control.status === 'Passed') {
+                  <span class="status passed">
+                    ● Passed
+                  </span>
+                }
+
+                @if (control.status === 'Needs Review') {
+                  <span class="status review">
+                    ● Needs Review
+                  </span>
+                }
+
+              </td>
+
+              <td>
+                <button class="view-btn">
+                  View
+                </button>
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

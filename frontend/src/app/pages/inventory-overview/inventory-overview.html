@@ -1,0 +1,187 @@
+<div class="page-container">
+
+  <div class="page-header">
+    <div>
+      <span class="eyebrow">SUPPLY CHAIN ANALYTICS</span>
+      <h1>Inventory Overview</h1>
+      <p>Monitor inventory levels, stock availability and replenishment needs.</p>
+    </div>
+
+    <button class="refresh-btn">↻ Refresh</button>
+  </div>
+
+
+  <!-- SUMMARY CARDS -->
+
+  <div class="summary-grid">
+
+    <div class="summary-card">
+      <div class="icon blue">📦</div>
+      <div>
+        <span>Total Items</span>
+        <strong>{{ totalItems }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="icon green">✓</div>
+      <div>
+        <span>In Stock</span>
+        <strong>{{ inStockItems }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card warning">
+      <div class="icon orange">⚠</div>
+      <div>
+        <span>Low Stock</span>
+        <strong>{{ lowStockItems }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="icon purple">📊</div>
+      <div>
+        <span>Total Stock Units</span>
+        <strong>{{ totalStock }}</strong>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- INVENTORY STATUS -->
+
+  <div class="section-card">
+
+    <div class="section-header">
+      <div>
+        <h2>Inventory Status</h2>
+        <p>Current inventory levels across suppliers.</p>
+      </div>
+
+      <span class="item-count">
+        {{ totalItems }} items
+      </span>
+    </div>
+
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Vendor</th>
+            <th>Stock</th>
+            <th>Reorder Level</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @for (item of inventoryItems; track item.product) {
+
+            <tr>
+
+              <td>
+                <strong>{{ item.product }}</strong>
+              </td>
+
+              <td>
+                <span class="category">
+                  {{ item.category }}
+                </span>
+              </td>
+
+              <td>{{ item.vendor }}</td>
+
+              <td>
+                <strong>{{ item.stock }}</strong>
+              </td>
+
+              <td>{{ item.reorderLevel }}</td>
+
+              <td>
+                <span
+                  class="status"
+                  [class.success]="item.status === 'In Stock'"
+                  [class.warning]="item.status === 'Low Stock'"
+                >
+                  ● {{ item.status }}
+                </span>
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- STOCK HEALTH -->
+
+  <div class="bottom-grid">
+
+    <div class="section-card">
+
+      <h2>Stock Health</h2>
+      <p>Overall inventory availability.</p>
+
+      <div class="health-value">
+        {{ ((inStockItems / totalItems) * 100).toFixed(0) }}%
+      </div>
+
+      <div class="progress">
+        <div
+          class="progress-bar"
+          [style.width.%]="(inStockItems / totalItems) * 100">
+        </div>
+      </div>
+
+      <div class="health-footer">
+        <span>Healthy inventory</span>
+        <strong>{{ inStockItems }} / {{ totalItems }}</strong>
+      </div>
+
+    </div>
+
+
+    <div class="section-card">
+
+      <h2>Replenishment Alerts</h2>
+      <p>Items that may require restocking.</p>
+
+      @for (item of inventoryItems; track item.product) {
+
+        @if (item.status === 'Low Stock') {
+
+          <div class="alert-item">
+            <span class="alert-icon">⚠</span>
+
+            <div>
+              <strong>{{ item.product }}</strong>
+              <small>
+                Stock {{ item.stock }} · Reorder at {{ item.reorderLevel }}
+              </small>
+            </div>
+          </div>
+
+        }
+
+      }
+
+    </div>
+
+  </div>
+
+</div>

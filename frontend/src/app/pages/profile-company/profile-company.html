@@ -1,0 +1,462 @@
+<div class="profile-page">
+
+  <!-- ========================================== -->
+  <!-- HEADER -->
+  <!-- ========================================== -->
+
+  <div class="page-header">
+
+    <div>
+      <h1>Profile &amp; Company</h1>
+
+      <p>
+        Manage your personal and company information.
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- SUCCESS MESSAGE -->
+  <!-- ========================================== -->
+
+  <div
+    class="message success"
+    *ngIf="successMessage">
+
+    {{ successMessage }}
+
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- ERROR MESSAGE -->
+  <!-- ========================================== -->
+
+  <div
+    class="message error"
+    *ngIf="errorMessage">
+
+    {{ errorMessage }}
+
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- LOADING -->
+  <!-- ========================================== -->
+
+  <div
+    class="loading"
+    *ngIf="loading">
+
+    Loading profile...
+
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- PROFILE CONTENT -->
+  <!-- ========================================== -->
+
+  <div
+    class="profile-content"
+    *ngIf="!loading">
+
+
+    <!-- ======================================== -->
+    <!-- PERSONAL INFORMATION -->
+    <!-- ======================================== -->
+
+    <div class="form-card">
+
+      <div class="card-header">
+
+        <div class="header-icon">
+          👤
+        </div>
+
+        <div>
+          <h2>Personal Information</h2>
+
+          <p>
+            Your personal contact information.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <!-- FULL NAME -->
+
+        <div class="form-group">
+
+          <label>
+            Full Name
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="profile.full_name"
+            placeholder="Enter your full name">
+
+        </div>
+
+
+        <!-- EMAIL -->
+
+        <div class="form-group">
+
+          <label>
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            [(ngModel)]="profile.email"
+            placeholder="Enter your email">
+
+        </div>
+
+
+        <!-- PHONE -->
+
+        <div class="form-group">
+
+          <label>
+            Phone Number
+          </label>
+
+          <input
+            type="tel"
+            [(ngModel)]="profile.phone"
+            placeholder="Enter phone number">
+
+        </div>
+
+
+        <!-- ROLE -->
+
+        <div class="form-group">
+
+          <label>
+            Role
+          </label>
+
+          <input
+            type="text"
+            [value]="currentUser?.role || 'Vendor'"
+            disabled>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================== -->
+    <!-- COMPANY INFORMATION -->
+    <!-- ======================================== -->
+
+    <div class="form-card">
+
+      <div class="card-header">
+
+        <div class="header-icon">
+          🏢
+        </div>
+
+        <div>
+          <h2>Company Information</h2>
+
+          <p>
+            Information about your organization.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <!-- COMPANY NAME -->
+
+        <div class="form-group">
+
+          <label>
+            Company Name
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="profile.company_name"
+            placeholder="Enter company name">
+
+        </div>
+
+
+        <!-- COMPANY EMAIL -->
+
+        <div class="form-group">
+
+          <label>
+            Company Email
+          </label>
+
+          <input
+            type="email"
+            [(ngModel)]="profile.company_email"
+            placeholder="Enter company email">
+
+        </div>
+
+
+        <!-- COMPANY PHONE -->
+
+        <div class="form-group">
+
+          <label>
+            Company Phone
+          </label>
+
+          <input
+            type="tel"
+            [(ngModel)]="profile.company_phone"
+            placeholder="Enter company phone">
+
+        </div>
+
+
+        <!-- WEBSITE -->
+
+        <div class="form-group">
+
+          <label>
+            Website
+          </label>
+
+          <input
+            type="url"
+            [(ngModel)]="profile.website"
+            placeholder="https://example.com">
+
+        </div>
+
+
+        <!-- GST -->
+
+        <div class="form-group">
+
+          <label>
+            GST Number
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="profile.gst_number"
+            placeholder="Enter GST number">
+
+        </div>
+
+
+        <!-- PAN -->
+
+        <div class="form-group">
+
+          <label>
+            PAN Number
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="profile.pan_number"
+            placeholder="Enter PAN number">
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================== -->
+    <!-- COMPANY ADDRESS -->
+    <!-- ======================================== -->
+
+    <div class="form-card">
+
+      <div class="card-header">
+
+        <div class="header-icon">
+          📍
+        </div>
+
+        <div>
+          <h2>Company Address</h2>
+
+          <p>
+            Registered business address.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="form-grid">
+
+        <!-- ADDRESS -->
+
+        <div class="form-group full-width">
+
+          <label>
+            Address
+          </label>
+
+          <textarea
+            rows="3"
+            [(ngModel)]="profile.address"
+            placeholder="Enter company address">
+          </textarea>
+
+        </div>
+
+
+        <!-- CITY -->
+
+        <div class="form-group">
+
+          <label>
+            City
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="profile.city"
+            placeholder="Enter city">
+
+        </div>
+
+
+        <!-- STATE -->
+
+        <div class="form-group">
+
+          <label>
+            State
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="profile.state"
+            placeholder="Enter state">
+
+        </div>
+
+
+        <!-- COUNTRY -->
+
+        <div class="form-group">
+
+          <label>
+            Country
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="profile.country"
+            placeholder="Enter country">
+
+        </div>
+
+
+        <!-- POSTAL CODE -->
+
+        <div class="form-group">
+
+          <label>
+            Postal Code
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="profile.postal_code"
+            placeholder="Enter postal code">
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================== -->
+    <!-- COMPANY DESCRIPTION -->
+    <!-- ======================================== -->
+
+    <div class="form-card">
+
+      <div class="card-header">
+
+        <div class="header-icon">
+          📝
+        </div>
+
+        <div>
+          <h2>Company Description</h2>
+
+          <p>
+            Brief description of your company.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <textarea
+          rows="5"
+          [(ngModel)]="profile.company_description"
+          placeholder="Describe your company, products and services...">
+        </textarea>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================== -->
+    <!-- ACTIONS -->
+    <!-- ======================================== -->
+
+    <div class="form-actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        (click)="resetChanges()">
+
+        Reset
+
+      </button>
+
+
+      <button
+        type="button"
+        class="primary-button"
+        [disabled]="saving"
+        (click)="saveProfile()">
+
+        {{ saving ? 'Saving...' : 'Save Changes' }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

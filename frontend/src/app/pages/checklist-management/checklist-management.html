@@ -1,0 +1,187 @@
+<div class="checklist-page">
+
+  <div class="page-header">
+
+    <div>
+      <h1>Checklist Management</h1>
+      <p>Create, manage and track audit checklists.</p>
+    </div>
+
+    <button class="primary-btn">
+      + Create Checklist
+    </button>
+
+  </div>
+
+
+  <!-- SUMMARY -->
+
+  <div class="summary-grid">
+
+    <div class="summary-card">
+      <div class="card-label">Total Checklists</div>
+      <div class="card-value">{{ totalChecklists }}</div>
+    </div>
+
+    <div class="summary-card success">
+      <div class="card-label">Completed</div>
+      <div class="card-value">{{ completedChecklists }}</div>
+    </div>
+
+    <div class="summary-card warning">
+      <div class="card-label">In Progress</div>
+      <div class="card-value">{{ inProgressChecklists }}</div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-label">Total Checklist Items</div>
+      <div class="card-value">{{ totalItems }}</div>
+    </div>
+
+  </div>
+
+
+  <!-- FILTER -->
+
+  <div class="filter-card">
+
+    <input
+      type="text"
+      placeholder="Search checklist or vendor..."
+    />
+
+    <select>
+      <option>All Categories</option>
+      <option>Compliance</option>
+      <option>Procurement</option>
+      <option>Contracts</option>
+      <option>Quality</option>
+    </select>
+
+    <select>
+      <option>All Status</option>
+      <option>Completed</option>
+      <option>In Progress</option>
+    </select>
+
+    <button class="refresh-btn" (click)="refresh()">
+      ↻ Refresh
+    </button>
+
+  </div>
+
+
+  <!-- TABLE -->
+
+  <div class="table-card">
+
+    <div class="table-header">
+
+      <div>
+        <h2>Audit Checklists</h2>
+        <p>Track checklist completion and audit readiness.</p>
+      </div>
+
+      <span>{{ totalChecklists }} checklists</span>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Checklist ID</th>
+            <th>Checklist</th>
+            <th>Category</th>
+            <th>Vendor</th>
+            <th>Items</th>
+            <th>Progress</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          @for (checklist of checklists; track checklist.id) {
+
+            <tr>
+
+              <td>{{ checklist.id }}</td>
+
+              <td class="checklist-name">
+                {{ checklist.name }}
+              </td>
+
+              <td>
+                <span class="category">
+                  {{ checklist.category }}
+                </span>
+              </td>
+
+              <td>{{ checklist.vendor }}</td>
+
+              <td>
+                {{ checklist.completed }} /
+                {{ checklist.items }}
+              </td>
+
+              <td>
+
+                <div class="progress-container">
+
+                  <div class="progress-bar">
+                    <div
+                      class="progress-fill"
+                      [style.width.%]="getProgress(checklist)">
+                    </div>
+                  </div>
+
+                  <span>
+                    {{ getProgress(checklist) }}%
+                  </span>
+
+                </div>
+
+              </td>
+
+              <td>
+
+                @if (checklist.status === 'Completed') {
+                  <span class="status completed">
+                    ● Completed
+                  </span>
+                }
+
+                @if (checklist.status === 'In Progress') {
+                  <span class="status progress">
+                    ● In Progress
+                  </span>
+                }
+
+              </td>
+
+              <td>
+                <button class="view-btn">
+                  View
+                </button>
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

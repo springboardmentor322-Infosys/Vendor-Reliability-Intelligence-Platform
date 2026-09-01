@@ -1,0 +1,493 @@
+/* =========================================================
+   VendorIQ Application Shell
+   ========================================================= */
+
+:host {
+  display: block;
+  height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 80% 0%, rgba(79, 70, 199, .045), transparent 25%),
+    #f6f8fc;
+}
+
+/* Sidebar */
+.sidebar {
+  position: relative;
+  width: 262px;
+  flex: 0 0 262px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #eef2ff;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(122, 113, 230, .18), transparent 28%),
+    linear-gradient(180deg, #1d2542 0%, #151b33 100%);
+  box-shadow: 8px 0 30px rgba(22, 29, 55, .10);
+}
+
+.sidebar::after {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  right: -100px;
+  bottom: 100px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 28px rgba(255,255,255,.018),
+    0 0 0 56px rgba(255,255,255,.012);
+  pointer-events: none;
+}
+
+.logo {
+  position: relative;
+  padding: 25px 22px 21px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.logo::before {
+  content: "✓";
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 13px;
+  border-radius: 11px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  background: linear-gradient(145deg, #7168dc, #4038aa);
+  box-shadow: 0 9px 22px rgba(67, 59, 174, .32);
+}
+
+.logo h2 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -.5px;
+}
+
+.logo p {
+  margin: 5px 0 0;
+  color: #9da7c2;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.role-badge {
+  display: flex;
+  align-items: center;
+  margin: 15px 17px 6px;
+  padding: 9px 11px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 10px;
+  color: #cbd3e8;
+  background: rgba(255,255,255,.055);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+.role-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: #5ed29d;
+  box-shadow: 0 0 0 4px rgba(94,210,157,.10);
+}
+
+nav {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  padding: 12px 13px;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.14) transparent;
+}
+
+nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: #aeb8d0;
+  text-decoration: none;
+  font-size: 12.5px;
+  transition: .18s ease;
+}
+
+nav a:hover {
+  color: #fff;
+  background: rgba(255,255,255,.075);
+  border-color: rgba(255,255,255,.045);
+  transform: translateX(2px);
+}
+
+nav a.active {
+  color: #fff;
+  background: linear-gradient(90deg, rgba(96,88,208,.88), rgba(75,67,177,.76));
+  border-color: rgba(151,145,244,.18);
+  box-shadow: 0 7px 18px rgba(29,24,92,.22);
+}
+
+.nav-icon {
+  width: 21px;
+  flex: 0 0 21px;
+  text-align: center;
+  font-size: 14px;
+  opacity: .9;
+}
+
+.user-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 5px 14px 0;
+  padding: 13px 5px 12px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  flex: 0 0 35px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(145deg, #424b70, #303853);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.user-info {
+  min-width: 0;
+}
+
+.user-info strong,
+.user-info small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-info strong {
+  color: #eef2ff;
+  font-size: 11.5px;
+}
+
+.user-info small {
+  margin-top: 2px;
+  color: #8e99b5;
+  font-size: 9.5px;
+}
+
+.logout {
+  position: relative;
+  z-index: 1;
+  padding: 11px 14px 15px;
+}
+
+.logout button {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(248,113,113,.14);
+  border-radius: 10px;
+  color: #fecaca;
+  background: rgba(239,68,68,.08);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.logout button:hover {
+  color: #fff;
+  background: rgba(239,68,68,.16);
+  transform: translateY(-1px);
+}
+
+/* Main content */
+.main {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* Animated background graphics */
+.main::before,
+.main::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+.main::before {
+  width: 430px;
+  height: 430px;
+  top: 70px;
+  right: -130px;
+  background: radial-gradient(circle, rgba(99, 102, 241, .12) 0%, rgba(99, 102, 241, .055) 30%, transparent 70%);
+  animation: viqFloatOne 12s ease-in-out infinite;
+}
+
+.main::after {
+  width: 360px;
+  height: 360px;
+  left: 8%;
+  bottom: -180px;
+  background: radial-gradient(circle, rgba(45, 212, 191, .10) 0%, rgba(45, 212, 191, .045) 34%, transparent 72%);
+  animation: viqFloatTwo 15s ease-in-out infinite;
+}
+
+.page {
+  position: relative;
+  isolation: isolate;
+}
+
+.page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: .34;
+  background-image:
+    linear-gradient(rgba(99, 102, 241, .026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, .026) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: viqDriftGrid 18s linear infinite;
+}
+
+.page::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  top: 16%;
+  left: 42%;
+  pointer-events: none;
+  z-index: -1;
+  border: 1px solid rgba(99, 102, 241, .055);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 26px rgba(99, 102, 241, .018),
+    0 0 0 52px rgba(45, 212, 191, .012);
+  animation: viqFloatOne 20s ease-in-out infinite reverse;
+}
+
+.navbar {
+  position: relative;
+  z-index: 5;
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 30px;
+  border-bottom: 1px solid #e7eaf2;
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 5px 22px rgba(26,35,67,.045);
+  backdrop-filter: blur(16px);
+}
+
+.navbar::after {
+  content: "";
+  position: absolute;
+  right: 28px;
+  bottom: -1px;
+  width: 110px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #8179df);
+  opacity: .65;
+}
+
+.navbar h2 {
+  margin: 2px 0 0;
+  color: #1b2544;
+  font-size: 18px;
+  letter-spacing: -.25px;
+}
+
+.eyebrow {
+  color: #7770bd;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.25px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: #56617c;
+  font-size: 12px;
+}
+
+.profile span:first-child {
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 33px;
+  border: 1px solid #e4e7f0;
+  border-radius: 50%;
+  background: #f8f9fd;
+}
+
+.page {
+  min-height: 0;
+  flex: 1;
+  padding: 25px 29px;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d4d9e6 transparent;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  min-width: 280px;
+  max-width: 420px;
+  padding: 13px 17px;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 12px;
+  color: white;
+  background: rgba(31, 39, 68, .94);
+  box-shadow: 0 18px 42px rgba(22,29,55,.22);
+  backdrop-filter: blur(12px);
+  font-size: 13px;
+}
+
+.success {
+  background: rgba(47,157,112,.96);
+}
+
+.error {
+  background: rgba(205,65,75,.96);
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 220px;
+    flex-basis: 220px;
+  }
+
+  
+
+.navbar {
+    padding: 0 20px;
+  }
+
+  .page {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    width: 72px;
+    flex-basis: 72px;
+  }
+
+  .logo {
+    padding: 18px 10px;
+    text-align: center;
+  }
+
+  .logo::before {
+    margin: 0 auto 10px;
+  }
+
+  .logo h2 {
+    font-size: 0;
+  }
+
+  .logo h2::after {
+    content: "VIQ";
+    font-size: 13px;
+    letter-spacing: .8px;
+  }
+
+  .logo p,
+  .role-badge,
+  .user-info,
+  .logout button {
+    font-size: 0;
+  }
+
+  nav {
+    padding: 10px 8px;
+  }
+
+  nav a {
+    justify-content: center;
+    padding: 11px 6px;
+  }
+
+  nav a .nav-icon {
+    margin: 0;
+  }
+
+  .user-card {
+    justify-content: center;
+    margin-inline: 8px;
+  }
+
+  .logout {
+    padding-inline: 8px;
+  }
+
+  .logout button {
+    padding: 11px 4px;
+  }
+
+  .logout button::first-letter {
+    font-size: 15px;
+  }
+
+  .profile span:last-child {
+    display: none;
+  }
+}
+
+/* Readability refinement — typography only. */
+.logo h2 { font-size: 26px; }
+.logo p { font-size: 12px; }
+.role-badge { font-size: 11px; }
+nav a { font-size: 14px; }
+.nav-icon { font-size: 15px; }
+.user-info strong { font-size: 12.5px; }
+.user-info small { font-size: 10.5px; }
+.logout button { font-size: 13px; }

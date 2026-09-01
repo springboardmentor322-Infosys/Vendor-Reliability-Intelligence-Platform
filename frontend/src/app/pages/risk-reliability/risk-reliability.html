@@ -1,0 +1,312 @@
+<div class="risk-page">
+
+  <!-- Header -->
+  <div class="page-header">
+
+    <div>
+      <span class="eyebrow">SUPPLY CHAIN MANAGEMENT</span>
+      <h1>Risk &amp; Reliability</h1>
+      <p>Identify supplier risks and monitor operational reliability.</p>
+    </div>
+
+    <button class="refresh-btn" type="button">
+      ↻ Refresh Data
+    </button>
+
+  </div>
+
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+
+    <div class="kpi-card">
+      <div class="kpi-icon">⚠️</div>
+
+      <div>
+        <span class="kpi-label">Average Risk Score</span>
+        <h2>{{ averageRisk }}</h2>
+        <small>Across all suppliers</small>
+      </div>
+    </div>
+
+
+    <div class="kpi-card danger">
+      <div class="kpi-icon">🔴</div>
+
+      <div>
+        <span class="kpi-label">High Risk Suppliers</span>
+        <h2>{{ highRiskCount }}</h2>
+        <small>Require immediate attention</small>
+      </div>
+    </div>
+
+
+    <div class="kpi-card warning">
+      <div class="kpi-icon">🟠</div>
+
+      <div>
+        <span class="kpi-label">Medium Risk</span>
+        <h2>{{ mediumRiskCount }}</h2>
+        <small>Require monitoring</small>
+      </div>
+    </div>
+
+
+    <div class="kpi-card safe">
+      <div class="kpi-icon">🟢</div>
+
+      <div>
+        <span class="kpi-label">Low Risk Suppliers</span>
+        <h2>{{ lowRiskCount }}</h2>
+        <small>Stable suppliers</small>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- Risk Distribution -->
+  <div class="content-grid">
+
+    <div class="section-card">
+
+      <div class="section-header">
+        <h2>Risk Distribution</h2>
+        <p>Current supplier risk classification.</p>
+      </div>
+
+      <div class="risk-distribution">
+
+        <div class="distribution-row">
+
+          <div class="distribution-label">
+            <span>High Risk</span>
+            <strong>{{ highRiskCount }}</strong>
+          </div>
+
+          <div class="distribution-bar">
+            <div
+              class="bar high"
+              [style.width.%]="(highRiskCount / suppliers.length) * 100">
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="distribution-row">
+
+          <div class="distribution-label">
+            <span>Medium Risk</span>
+            <strong>{{ mediumRiskCount }}</strong>
+          </div>
+
+          <div class="distribution-bar">
+            <div
+              class="bar medium"
+              [style.width.%]="(mediumRiskCount / suppliers.length) * 100">
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="distribution-row">
+
+          <div class="distribution-label">
+            <span>Low Risk</span>
+            <strong>{{ lowRiskCount }}</strong>
+          </div>
+
+          <div class="distribution-bar">
+            <div
+              class="bar low"
+              [style.width.%]="(lowRiskCount / suppliers.length) * 100">
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Reliability -->
+    <div class="section-card">
+
+      <div class="section-header">
+        <h2>Reliability Overview</h2>
+        <p>Supplier reliability indicators.</p>
+      </div>
+
+      <div class="reliability-box">
+
+        <div class="reliability-score">
+          <strong>87%</strong>
+          <span>Overall Reliability</span>
+        </div>
+
+        <div class="reliability-item">
+          <span>Delivery Reliability</span>
+          <strong>88%</strong>
+        </div>
+
+        <div class="reliability-item">
+          <span>Quality Reliability</span>
+          <strong>91%</strong>
+        </div>
+
+        <div class="reliability-item">
+          <span>Order Reliability</span>
+          <strong>84%</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Supplier Risk Table -->
+  <div class="section-card table-card">
+
+    <div class="section-header">
+
+      <div>
+        <h2>Supplier Risk Assessment</h2>
+        <p>Detailed risk and reliability assessment by supplier.</p>
+      </div>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Supplier</th>
+            <th>Category</th>
+            <th>Risk Score</th>
+            <th>Reliability</th>
+            <th>Delivery Risk</th>
+            <th>Quality Risk</th>
+            <th>Status</th>
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          @for (supplier of suppliers; track supplier.name) {
+
+            <tr>
+
+              <td>
+                <div class="supplier-name">
+
+                  <div class="supplier-avatar">
+                    {{ supplier.name.charAt(0) }}
+                  </div>
+
+                  <strong>{{ supplier.name }}</strong>
+
+                </div>
+              </td>
+
+
+              <td>{{ supplier.category }}</td>
+
+
+              <td>
+
+                <div class="risk-score">
+
+                  <strong>{{ supplier.riskScore }}</strong>
+
+                  <div class="risk-progress">
+
+                    <div
+                      class="risk-fill"
+                      [ngClass]="getRiskClass(supplier.riskScore)"
+                      [style.width.%]="getRiskWidth(supplier.riskScore)">
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </td>
+
+
+              <td>
+                <strong>{{ supplier.reliability }}%</strong>
+              </td>
+
+
+              <td>
+                <span
+                  class="risk-tag"
+                  [ngClass]="supplier.deliveryRisk.toLowerCase()">
+                  {{ supplier.deliveryRisk }}
+                </span>
+              </td>
+
+
+              <td>
+                <span
+                  class="risk-tag"
+                  [ngClass]="supplier.qualityRisk.toLowerCase()">
+                  {{ supplier.qualityRisk }}
+                </span>
+              </td>
+
+
+              <td>
+
+                <span
+                  class="status"
+                  [ngClass]="getStatusClass(supplier.status)">
+                  {{ supplier.status }}
+                </span>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- Recommendations -->
+  <div class="recommendation">
+
+    <div class="recommendation-icon">💡</div>
+
+    <div>
+
+      <h3>Recommended Action</h3>
+
+      <p>
+        Metro Supplies has the highest risk score.
+        Review delivery performance and quality issues,
+        and consider creating a supplier improvement plan.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>

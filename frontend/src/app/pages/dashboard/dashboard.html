@@ -1,0 +1,117 @@
+<div class="role-dashboard">
+  <div class="dashboard-header">
+    <div>
+      <span class="section-kicker">{{ role | uppercase }}</span>
+      <h1>Welcome back, {{ user?.full_name || 'User' }} 👋</h1>
+      <p class="subtitle">Here’s your {{ role.toLowerCase() }} overview and latest activity.</p>
+    </div>
+    <div class="date-chip">📅 Today</div>
+  </div>
+
+  @if (isVendor) {
+    <div class="kpi-grid six">
+      <div class="kpi"><span class="kpi-icon purple">★</span><div><strong>{{ averageReliability() }}<small>/100</small></strong><span>Reliability Score</span></div></div>
+      <div class="kpi"><span class="kpi-icon green">✓</span><div><strong>{{ averageReliability() }}%</strong><span>On-Time Deliveries</span></div></div>
+      <div class="kpi"><span class="kpi-icon blue">▣</span><div><strong>{{ pendingOrders() }}</strong><span>Active Purchase Orders</span></div></div>
+      <div class="kpi"><span class="kpi-icon green">✓</span><div><strong>{{ totalOrders() }}</strong><span>Total Orders Completed</span></div></div>
+      <div class="kpi"><span class="kpi-icon orange">₹</span><div><strong>₹{{ revenue() | number:'1.0-0' }}</strong><span>Total Revenue</span></div></div>
+      <div class="kpi"><span class="kpi-icon cyan">◷</span><div><strong>—</strong><span>Average Payment Time</span></div></div>
+    </div>
+  } @else if (isSupplyChainManager) {
+    <div class="kpi-grid six">
+      <div class="kpi"><span class="kpi-icon purple">👥</span><div><strong>{{ vendorCount() }}</strong><span>Total Suppliers</span></div></div>
+      <div class="kpi"><span class="kpi-icon blue">▣</span><div><strong>{{ pendingOrders() }}</strong><span>Active Purchase Orders</span></div></div>
+      <div class="kpi"><span class="kpi-icon green">🚚</span><div><strong>{{ averageReliability() }}%</strong><span>On-Time Delivery</span></div></div>
+      <div class="kpi"><span class="kpi-icon orange">⚠</span><div><strong>{{ highRiskVendors() > 0 ? 'High' : 'Low' }}</strong><span>Supply Chain Risk</span></div></div>
+      <div class="kpi"><span class="kpi-icon purple">▣</span><div><strong>₹{{ procurementValue() | number:'1.0-0' }}</strong><span>Procurement Value</span></div></div>
+      <div class="kpi"><span class="kpi-icon red">₹</span><div><strong>₹{{ revenue() | number:'1.0-0' }}</strong><span>Supply Chain Cost</span></div></div>
+    </div>
+  } @else if (isProcurementManager) {
+    <div class="kpi-grid six">
+      <div class="kpi"><span class="kpi-icon purple">🛒</span><div><strong>{{ totalOrders() }}</strong><span>Total POs</span></div></div>
+      <div class="kpi"><span class="kpi-icon green">✓</span><div><strong>{{ pendingOrders() }}</strong><span>Active POs</span></div></div>
+      <div class="kpi"><span class="kpi-icon blue">🚚</span><div><strong>{{ orderStatusSummary()['Ordered'] || 0 }}</strong><span>Orders in Transit</span></div></div>
+      <div class="kpi"><span class="kpi-icon orange">₹</span><div><strong>₹{{ procurementValue() | number:'1.0-0' }}</strong><span>Total Spend</span></div></div>
+      <div class="kpi"><span class="kpi-icon red">!</span><div><strong>{{ highRiskVendors() }}</strong><span>Delayed / Risk Vendors</span></div></div>
+      <div class="kpi"><span class="kpi-icon cyan">★</span><div><strong>{{ averageReliability() }}/100</strong><span>Avg. Reliability Score</span></div></div>
+    </div>
+  } @else if (isAuditor) {
+    <div class="kpi-grid six">
+      <div class="kpi"><span class="kpi-icon purple">▣</span><div><strong>{{ totalContracts() }}</strong><span>Contracts Reviewed</span></div></div>
+      <div class="kpi"><span class="kpi-icon green">✓</span><div><strong>{{ averageReliability() }}%</strong><span>Compliance Overview</span></div></div>
+      <div class="kpi"><span class="kpi-icon orange">⚠</span><div><strong>{{ highRiskVendors() }}</strong><span>High Risk Vendors</span></div></div>
+      <div class="kpi"><span class="kpi-icon red">!</span><div><strong>{{ highRiskVendorList().length }}</strong><span>Audit Findings</span></div></div>
+      <div class="kpi"><span class="kpi-icon blue">◷</span><div><strong>{{ totalOrders() }}</strong><span>Procurement Records</span></div></div>
+      <div class="kpi"><span class="kpi-icon cyan">✓</span><div><strong>{{ activeContracts() }}</strong><span>Active Controls</span></div></div>
+    </div>
+  } @else {
+    <div class="kpi-grid six">
+      <div class="kpi"><span class="kpi-icon purple">👥</span><div><strong>{{ vendorCount() }}</strong><span>Total Vendors</span></div></div>
+      <div class="kpi"><span class="kpi-icon blue">▣</span><div><strong>{{ totalOrders() }}</strong><span>Total Orders</span></div></div>
+      <div class="kpi"><span class="kpi-icon orange">◷</span><div><strong>{{ pendingOrders() }}</strong><span>Pending Orders</span></div></div>
+      <div class="kpi"><span class="kpi-icon green">₹</span><div><strong>₹{{ revenue() | number:'1.0-0' }}</strong><span>Total Spend / Revenue</span></div></div>
+      <div class="kpi"><span class="kpi-icon cyan">★</span><div><strong>{{ averageReliability() }}%</strong><span>Average Reliability</span></div></div>
+      <div class="kpi"><span class="kpi-icon red">!</span><div><strong>{{ highRiskVendors() }}</strong><span>High Risk Vendors</span></div></div>
+    </div>
+  }
+
+  <div class="dashboard-grid">
+    <section class="panel wide">
+      <div class="panel-head"><div><h2>{{ isAuditor ? 'Audit & Compliance Overview' : isSupplyChainManager ? 'Supply Chain Visibility' : isVendor ? 'Performance Overview' : 'Procurement Overview' }}</h2><p>Current operational status</p></div><span class="filter-chip">This Month ▾</span></div>
+      <div class="overview-content">
+        <div class="donut"><div><strong>{{ averageReliability() }}%</strong><small>Overall Score</small></div></div>
+        <div class="legend-list">
+          <div><i class="dot green"></i><span>Low Risk / Good</span><b>{{ lowRiskVendors() }}</b></div>
+          <div><i class="dot blue"></i><span>Medium Risk / Attention</span><b>{{ mediumRiskVendors() }}</b></div>
+          <div><i class="dot red"></i><span>High Risk / Critical</span><b>{{ highRiskVendors() }}</b></div>
+          <div><i class="dot purple"></i><span>Active Contracts</span><b>{{ activeContracts() }}</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><h2>{{ isAuditor ? 'Risk Assessment' : 'Performance Trend' }}</h2><p>Reliability over time</p></div><span class="filter-chip">Last 6 Months</span></div>
+      <div class="trend-chart">
+        @for (item of vendorReliability().slice(0, 6); track $index) {
+          <div class="bar" [style.height.%]="Math.max(18, Number(item.reliability_score || item.score || 0))"><span>{{ item.reliability_score || item.score || 0 }}</span></div>
+        }
+        @if (vendorReliability().length === 0) { <div class="empty">No trend data available</div> }
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><h2>{{ isSupplyChainManager ? 'Top Supply Chain Risks' : isAuditor ? 'Recent Audit Findings' : 'Order Status Summary' }}</h2><p>Latest records</p></div><button (click)="viewAllOrders()">View All →</button></div>
+      <div class="list">
+        @for (order of recentOrders().slice(0, 5); track order.id || $index) {
+          <div class="list-row"><span class="status-dot" [class.warn]="order.status === 'Pending'" [class.good]="order.status === 'Delivered' || order.status === 'Completed'"></span><div><strong>{{ order.po_number || order.order_number || ('PO-' + order.id) }}</strong><small>{{ getVendorName(order.vendor_id) }}</small></div><b>{{ order.status || 'Pending' }}</b></div>
+        }
+        @if (recentOrders().length === 0) { <div class="empty">No recent records available.</div> }
+      </div>
+    </section>
+
+    <section class="panel wide">
+      <div class="panel-head"><div><h2>{{ isVendor ? 'Recent Purchase Orders' : isAuditor ? 'Upcoming Audit Activities' : 'Recent Purchase Orders' }}</h2><p>Latest activity across the platform</p></div><button (click)="viewAllOrders()">View All →</button></div>
+      <div class="table-wrap">
+        <table><thead><tr><th>Order</th><th>Vendor</th><th>Status</th><th>Amount</th></tr></thead>
+        <tbody>
+          @for (order of recentOrders(); track order.id || $index) {
+            <tr><td>{{ order.po_number || order.order_number || ('PO-' + order.id) }}</td><td>{{ getVendorName(order.vendor_id) }}</td><td><span class="status-pill">{{ order.status || 'Pending' }}</span></td><td>₹{{ (order.amount || 0) | number:'1.0-0' }}</td></tr>
+          }
+          @if (recentOrders().length === 0) { <tr><td colspan="4" class="empty">No orders available.</td></tr> }
+        </tbody></table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><h2>{{ isAuditor ? 'Contracts Expiring Soon' : 'Recent Alerts' }}</h2><p>Items requiring attention</p></div><button (click)="viewContracts()">View All →</button></div>
+      <div class="list">
+        @for (alert of contractExpiryAlerts().slice(0, 5); track alert.id || $index) {
+          <div class="list-row"><span class="alert-icon">⚠</span><div><strong>{{ alert.contract_name || alert.vendor_name || 'Contract alert' }}</strong><small>{{ alert.expiry_date || alert.message || 'Review required' }}</small></div></div>
+        }
+        @if (contractExpiryAlerts().length === 0) { <div class="empty">No urgent alerts.</div> }
+      </div>
+    </section>
+  </div>
+
+  <div class="insight-banner">✨ <div><strong>Platform Insight</strong><span>Review high-risk vendors and upcoming contract expiries to keep procurement operations reliable.</span></div></div>
+</div>

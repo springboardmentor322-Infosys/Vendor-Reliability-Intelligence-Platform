@@ -1,0 +1,54 @@
+<app-toast></app-toast>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>VendorIQ</h2>
+      <p>Vendor Reliability &amp;<br>Procurement Platform</p>
+    </div>
+
+    <div class="role-badge">
+      <span class="role-dot"></span>
+      {{ currentUser?.role || 'User' }}
+    </div>
+
+    <nav>
+      @for (item of navItems; track item.route + item.label) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }">
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="user-card">
+      <div class="avatar">{{ (currentUser?.full_name || 'U').charAt(0).toUpperCase() }}</div>
+      <div class="user-info">
+        <strong>{{ currentUser?.full_name || 'User' }}</strong>
+        <small>{{ currentUser?.role || 'User' }}</small>
+      </div>
+    </div>
+
+    <div class="logout">
+      <button type="button" (click)="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="navbar">
+      <div>
+        <span class="eyebrow">VENDOR RELIABILITY INTELLIGENCE</span>
+        <h2>{{ currentUser?.role || 'User' }} Workspace</h2>
+      </div>
+      <div class="profile">
+        <span>🔔</span>
+        <span>👤 {{ currentUser?.full_name || 'User' }}</span>
+      </div>
+    </header>
+    <div class="page">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

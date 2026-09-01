@@ -1,0 +1,636 @@
+<div class="documents-page">
+
+  <!-- ==========================================
+       HEADER
+  =========================================== -->
+
+  <div class="page-header">
+
+    <div>
+      <h1>Contract Documentation</h1>
+
+      <p>
+        Manage contract certifications and supporting documents
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       MESSAGES
+  =========================================== -->
+
+  <div
+    *ngIf="successMessage"
+    class="success-message"
+  >
+    {{ successMessage }}
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="error-message"
+  >
+    {{ errorMessage }}
+  </div>
+
+
+  <!-- ==========================================
+       CONTRACT SEARCH
+  ========================================== -->
+
+  <div class="search-card">
+
+    <div class="search-content">
+
+      <div class="form-group">
+
+        <label>
+          Contract ID
+        </label>
+
+        <input
+          type="number"
+          [(ngModel)]="contractId"
+          placeholder="Enter Contract ID"
+          min="1"
+        />
+
+      </div>
+
+      <button
+        class="load-button"
+        (click)="loadDocuments()"
+      >
+        Load Documents
+      </button>
+
+      <button
+        class="add-button"
+        (click)="openAddForm()"
+        [disabled]="!contractId"
+      >
+        + Add Document
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       SUMMARY
+  =========================================== -->
+
+  <div
+    *ngIf="contractId"
+    class="summary-grid"
+  >
+
+    <div class="summary-card">
+
+      <div class="summary-title">
+        Total Documents
+      </div>
+
+      <div class="summary-value">
+        {{ documents().length }}
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-title">
+        Active
+      </div>
+
+      <div class="summary-value">
+        {{
+          documents().filter(
+            document =>
+              getExpiryStatus(
+                document.expiry_date
+              ) === 'Active'
+          ).length
+        }}
+      </div>
+
+    </div>
+
+
+    <div class="summary-card warning">
+
+      <div class="summary-title">
+        Expiring Soon
+      </div>
+
+      <div class="summary-value">
+        {{
+          documents().filter(
+            document =>
+              getExpiryStatus(
+                document.expiry_date
+              ) === 'Expiring Soon'
+          ).length
+        }}
+      </div>
+
+    </div>
+
+
+    <div class="summary-card danger">
+
+      <div class="summary-title">
+        Expired
+      </div>
+
+      <div class="summary-value">
+        {{
+          documents().filter(
+            document =>
+              getExpiryStatus(
+                document.expiry_date
+              ) === 'Expired'
+          ).length
+        }}
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       ADD / EDIT FORM
+  =========================================== -->
+
+  <div
+    *ngIf="showForm()"
+    class="form-card"
+  >
+
+    <div class="form-header">
+
+      <h2>
+        {{
+          editMode()
+            ? 'Edit Document'
+            : 'Add Contract Document'
+        }}
+      </h2>
+
+      <button
+        class="close-button"
+        (click)="closeForm()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="form-grid">
+
+      <!-- CERTIFICATION NAME -->
+
+      <div class="form-group">
+
+        <label>
+          Certification Name *
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="certificationName"
+          placeholder="e.g. ISO 9001:2015"
+        />
+
+      </div>
+
+
+      <!-- CERTIFICATION NUMBER -->
+
+      <div class="form-group">
+
+        <label>
+          Certification Number
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="certificationNumber"
+          placeholder="Enter certification number"
+        />
+
+      </div>
+
+
+      <!-- ISSUE DATE -->
+
+      <div class="form-group">
+
+        <label>
+          Issue Date
+        </label>
+
+        <input
+          type="date"
+          [(ngModel)]="issueDate"
+        />
+
+      </div>
+
+
+      <!-- EXPIRY DATE -->
+
+      <div class="form-group">
+
+        <label>
+          Expiry Date
+        </label>
+
+        <input
+          type="date"
+          [(ngModel)]="expiryDate"
+        />
+
+      </div>
+
+
+      <!-- STATUS -->
+
+      <div class="form-group">
+
+        <label>
+          Status
+        </label>
+
+        <select
+          [(ngModel)]="status"
+        >
+
+          <option value="Active">
+            Active
+          </option>
+
+          <option value="Inactive">
+            Inactive
+          </option>
+
+          <option value="Suspended">
+            Suspended
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- FILE -->
+
+      <div class="form-group">
+
+        <label>
+          Document File
+        </label>
+
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.txt"
+        />
+
+        <small
+          *ngIf="selectedFile"
+        >
+          Selected:
+          {{ selectedFile.name }}
+        </small>
+
+      </div>
+
+    </div>
+
+
+    <!-- FORM ACTIONS -->
+
+    <div class="form-actions">
+
+      <button
+        class="cancel-button"
+        (click)="closeForm()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="save-button"
+        (click)="saveDocument()"
+      >
+        {{
+          editMode()
+            ? 'Update Document'
+            : 'Save Document'
+        }}
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       LOADING
+  =========================================== -->
+
+  <div
+    *ngIf="loading()"
+    class="loading"
+  >
+    Loading documents...
+  </div>
+
+
+  <!-- ==========================================
+       DOCUMENT TABLE
+  =========================================== -->
+
+  <div
+    *ngIf="
+      !loading() &&
+      contractId &&
+      documents().length > 0
+    "
+    class="table-card"
+  >
+
+    <div class="table-header">
+
+      <div>
+
+        <h2>
+          Contract Documents
+        </h2>
+
+        <p>
+          Documents associated with Contract #{{ contractId }}
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>ID</th>
+
+            <th>Certification</th>
+
+            <th>Certificate No.</th>
+
+            <th>Issue Date</th>
+
+            <th>Expiry Date</th>
+
+            <th>Status</th>
+
+            <th>File</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr
+            *ngFor="
+              let document
+              of documents()
+            "
+          >
+
+            <td>
+              {{ document.id }}
+            </td>
+
+
+            <td>
+              {{ document.certification_name }}
+            </td>
+
+
+            <td>
+              {{
+                document.certification_number
+                || '-'
+              }}
+            </td>
+
+
+            <td>
+              {{
+                document.issue_date
+                || '-'
+              }}
+            </td>
+
+
+            <td>
+              {{
+                document.expiry_date
+                || '-'
+              }}
+            </td>
+
+
+            <td>
+
+              <span
+                class="status-badge"
+                [ngClass]="{
+
+                  'active':
+                    getExpiryStatus(
+                      document.expiry_date
+                    ) === 'Active',
+
+                  'warning':
+                    getExpiryStatus(
+                      document.expiry_date
+                    ) === 'Expiring Soon',
+
+                  'expired':
+                    getExpiryStatus(
+                      document.expiry_date
+                    ) === 'Expired'
+
+                }"
+              >
+
+                {{
+                  getExpiryStatus(
+                    document.expiry_date
+                  )
+                }}
+
+              </span>
+
+            </td>
+
+
+            <td>
+
+              <span
+                *ngIf="document.document_name"
+                class="file-name"
+              >
+                📄
+                {{ document.document_name }}
+              </span>
+
+              <span
+                *ngIf="!document.document_name"
+                class="no-file"
+              >
+                No file
+              </span>
+
+            </td>
+
+
+            <td>
+
+              <div class="action-buttons">
+
+                <button
+                  class="download-button"
+                  *ngIf="document.document_name"
+                  (click)="
+                    downloadDocument(document)
+                  "
+                >
+                  Download
+                </button>
+
+
+                <button
+                  class="edit-button"
+                  (click)="
+                    openEditForm(document)
+                  "
+                >
+                  Edit
+                </button>
+
+
+                <button
+                  class="delete-button"
+                  (click)="
+                    deleteDocument(document.id)
+                  "
+                >
+                  Delete
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       EMPTY STATE
+  =========================================== -->
+
+  <div
+    *ngIf="
+      !loading() &&
+      contractId &&
+      documents().length === 0
+    "
+    class="empty-state"
+  >
+
+    <div class="empty-icon">
+      📁
+    </div>
+
+    <h3>
+      No Documents Found
+    </h3>
+
+    <p>
+      No documents are currently associated
+      with Contract #{{ contractId }}.
+    </p>
+
+    <button
+      class="add-button"
+      (click)="openAddForm()"
+    >
+      + Add First Document
+    </button>
+
+  </div>
+
+
+  <!-- ==========================================
+       INITIAL STATE
+  =========================================== -->
+
+  <div
+    *ngIf="!contractId"
+    class="initial-state"
+  >
+
+    <div class="empty-icon">
+      📋
+    </div>
+
+    <h3>
+      Select a Contract
+    </h3>
+
+    <p>
+      Enter a Contract ID above and click
+      <strong>Load Documents</strong>
+      to view its documentation.
+    </p>
+
+  </div>
+
+
+  <!-- ==========================================
+       UPLOAD INDICATOR
+  =========================================== -->
+
+  <div
+    *ngIf="uploading()"
+    class="uploading-message"
+  >
+    Uploading document...
+  </div>
+
+</div>

@@ -1,0 +1,552 @@
+<div class="certification-page">
+
+  <!-- ==========================================
+       HEADER
+  =========================================== -->
+
+  <div class="page-header">
+
+    <div>
+      <h1>Certification Management</h1>
+
+      <p>
+        Manage vendor certifications and compliance status
+      </p>
+    </div>
+
+    <button
+      class="add-button"
+      (click)="openAddForm()"
+    >
+      + Add Certification
+    </button>
+
+  </div>
+
+
+  <!-- ==========================================
+       MESSAGES
+  =========================================== -->
+
+  <div
+    *ngIf="successMessage"
+    class="success-message"
+  >
+    {{ successMessage }}
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="error-message"
+  >
+    {{ errorMessage }}
+  </div>
+
+
+  <!-- ==========================================
+       SUMMARY CARDS
+  =========================================== -->
+
+  <div class="summary-grid">
+
+    <div class="summary-card">
+
+      <div class="summary-title">
+        Total Certifications
+      </div>
+
+      <div class="summary-value">
+        {{ certifications().length }}
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-title">
+        Active
+      </div>
+
+      <div class="summary-value">
+        {{
+          certifications().filter(
+            certification =>
+              getExpiryStatus(
+                certification.expiry_date
+              ) === 'Active'
+          ).length
+        }}
+      </div>
+
+    </div>
+
+
+    <div class="summary-card warning">
+
+      <div class="summary-title">
+        Expiring Soon
+      </div>
+
+      <div class="summary-value">
+        {{ getExpiringCount() }}
+      </div>
+
+    </div>
+
+
+    <div class="summary-card danger">
+
+      <div class="summary-title">
+        Expired
+      </div>
+
+      <div class="summary-value">
+        {{ getExpiredCount() }}
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       ADD / EDIT FORM
+  =========================================== -->
+
+  <div
+    *ngIf="showForm()"
+    class="form-card"
+  >
+
+    <div class="form-header">
+
+      <h2>
+        {{
+          editMode()
+            ? 'Edit Certification'
+            : 'Add Certification'
+        }}
+      </h2>
+
+      <button
+        class="close-button"
+        (click)="closeForm()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="form-grid">
+
+      <!-- VENDOR -->
+
+      <div class="form-group">
+
+        <label>
+          Vendor *
+        </label>
+
+        <select
+          [(ngModel)]="selectedVendorId"
+        >
+
+          <option [ngValue]="null">
+            Select Vendor
+          </option>
+
+          <option
+            *ngFor="let vendor of vendors()"
+            [ngValue]="vendor.id"
+          >
+            {{ vendor.name || vendor.vendor_name }}
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- CERTIFICATION NAME -->
+
+      <div class="form-group">
+
+        <label>
+          Certification Name *
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="certificationName"
+          placeholder="e.g. ISO 9001:2015"
+        />
+
+      </div>
+
+
+      <!-- CERTIFICATE NUMBER -->
+
+      <div class="form-group">
+
+        <label>
+          Certificate Number *
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="certificateNumber"
+          placeholder="Enter certificate number"
+        />
+
+      </div>
+
+
+      <!-- ISSUING AUTHORITY -->
+
+      <div class="form-group">
+
+        <label>
+          Issuing Authority
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="issuingAuthority"
+          placeholder="e.g. ISO"
+        />
+
+      </div>
+
+
+      <!-- ISSUE DATE -->
+
+      <div class="form-group">
+
+        <label>
+          Issue Date *
+        </label>
+
+        <input
+          type="date"
+          [(ngModel)]="issueDate"
+        />
+
+      </div>
+
+
+      <!-- EXPIRY DATE -->
+
+      <div class="form-group">
+
+        <label>
+          Expiry Date *
+        </label>
+
+        <input
+          type="date"
+          [(ngModel)]="expiryDate"
+        />
+
+      </div>
+
+
+      <!-- STATUS -->
+
+      <div class="form-group">
+
+        <label>
+          Status
+        </label>
+
+        <select
+          [(ngModel)]="status"
+        >
+
+          <option value="Active">
+            Active
+          </option>
+
+          <option value="Inactive">
+            Inactive
+          </option>
+
+          <option value="Suspended">
+            Suspended
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- NOTES -->
+
+      <div class="form-group full-width">
+
+        <label>
+          Notes
+        </label>
+
+        <textarea
+          [(ngModel)]="notes"
+          rows="3"
+          placeholder="Enter additional notes"
+        ></textarea>
+
+      </div>
+
+    </div>
+
+
+    <!-- FORM ACTIONS -->
+
+    <div class="form-actions">
+
+      <button
+        class="cancel-button"
+        (click)="closeForm()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="save-button"
+        (click)="saveCertification()"
+      >
+        {{
+          editMode()
+            ? 'Update Certification'
+            : 'Save Certification'
+        }}
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       CERTIFICATION TABLE
+  =========================================== -->
+
+  <div class="table-card">
+
+    <div class="table-header">
+
+      <div>
+
+        <h2>Certification Records</h2>
+
+        <p>
+          Vendor certification and compliance records
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- LOADING -->
+
+    <div
+      *ngIf="loading()"
+      class="loading"
+    >
+      Loading certifications...
+    </div>
+
+
+    <!-- EMPTY -->
+
+    <div
+      *ngIf="
+        !loading() &&
+        certifications().length === 0
+      "
+      class="empty-state"
+    >
+      No certification records found.
+    </div>
+
+
+    <!-- TABLE -->
+
+    <div
+      *ngIf="
+        !loading() &&
+        certifications().length > 0
+      "
+      class="table-container"
+    >
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>ID</th>
+
+            <th>Vendor</th>
+
+            <th>Certification</th>
+
+            <th>Certificate No.</th>
+
+            <th>Authority</th>
+
+            <th>Issue Date</th>
+
+            <th>Expiry Date</th>
+
+            <th>Status</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr
+            *ngFor="
+              let certification
+              of certifications()
+            "
+          >
+
+            <td>
+              {{ certification.id }}
+            </td>
+
+
+            <td>
+
+              {{
+                vendors()
+                  .find(
+                    vendor =>
+                      vendor.id ===
+                      certification.vendor_id
+                  )?.name
+                  ||
+                vendors()
+                  .find(
+                    vendor =>
+                      vendor.id ===
+                      certification.vendor_id
+                  )?.vendor_name
+                  ||
+                'Vendor #' +
+                  certification.vendor_id
+              }}
+
+            </td>
+
+
+            <td>
+              {{ certification.certification_name }}
+            </td>
+
+
+            <td>
+              {{ certification.certificate_number }}
+            </td>
+
+
+            <td>
+              {{
+                certification.issuing_authority
+                || '-'
+              }}
+            </td>
+
+
+            <td>
+              {{ certification.issue_date }}
+            </td>
+
+
+            <td>
+              {{ certification.expiry_date }}
+            </td>
+
+
+            <td>
+
+              <span
+                class="status-badge"
+                [ngClass]="{
+                  'active':
+                    getExpiryStatus(
+                      certification.expiry_date
+                    ) === 'Active',
+
+                  'warning':
+                    getExpiryStatus(
+                      certification.expiry_date
+                    ) === 'Expiring Soon',
+
+                  'expired':
+                    getExpiryStatus(
+                      certification.expiry_date
+                    ) === 'Expired'
+                }"
+              >
+
+                {{
+                  getExpiryStatus(
+                    certification.expiry_date
+                  )
+                }}
+
+              </span>
+
+            </td>
+
+
+            <td>
+
+              <div class="action-buttons">
+
+                <button
+                  class="edit-button"
+                  (click)="
+                    openEditForm(
+                      certification
+                    )
+                  "
+                >
+                  Edit
+                </button>
+
+                <button
+                  class="delete-button"
+                  (click)="
+                    deleteCertification(
+                      certification.id
+                    )
+                  "
+                >
+                  Delete
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

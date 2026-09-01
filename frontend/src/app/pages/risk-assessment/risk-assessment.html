@@ -1,0 +1,413 @@
+<div class="risk-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+
+    <div>
+      <span class="eyebrow">AUDITOR WORKSPACE</span>
+
+      <h1>Risk Assessment</h1>
+
+      <p>
+        Assess vendor reliability, procurement risk and compliance exposure.
+      </p>
+    </div>
+
+    <button class="refresh-btn">
+      ↻ Refresh
+    </button>
+
+  </div>
+
+
+  <!-- Summary Cards -->
+  <div class="summary-grid">
+
+    <div class="summary-card">
+
+      <div class="card-icon purple">
+        ⚠️
+      </div>
+
+      <div>
+        <strong>{{ riskItems.length }}</strong>
+        <span>Vendors Assessed</span>
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="card-icon green">
+        ✓
+      </div>
+
+      <div>
+        <strong>{{ getRiskCount('low') }}</strong>
+        <span>Low Risk Vendors</span>
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="card-icon orange">
+        !
+      </div>
+
+      <div>
+        <strong>{{ getRiskCount('medium') }}</strong>
+        <span>Medium Risk Vendors</span>
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="card-icon red">
+        !
+      </div>
+
+      <div>
+        <strong>{{ getRiskCount('high') }}</strong>
+        <span>High Risk Vendors</span>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Overall Risk -->
+  <div class="overview-card">
+
+    <div class="section-heading">
+
+      <div>
+        <h2>Overall Risk Assessment</h2>
+
+        <p>
+          Current vendor risk profile across procurement operations.
+        </p>
+      </div>
+
+      <span class="status-badge medium">
+        Medium Risk
+      </span>
+
+    </div>
+
+
+    <div class="overview-content">
+
+      <div class="score-circle">
+
+        <div class="score">
+          {{ getAverageScore() | number:'1.2-2' }}
+        </div>
+
+        <span>Average Score</span>
+
+      </div>
+
+
+      <div class="risk-bars">
+
+        <div class="risk-bar">
+
+          <div class="bar-header">
+            <span>Low Risk</span>
+            <strong>{{ getRiskCount('low') }}</strong>
+          </div>
+
+          <div class="progress">
+            <div
+              class="progress-fill low-fill"
+              [style.width.%]="
+                riskItems.length
+                  ? (getRiskCount('low') / riskItems.length) * 100
+                  : 0
+              ">
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="risk-bar">
+
+          <div class="bar-header">
+            <span>Medium Risk</span>
+            <strong>{{ getRiskCount('medium') }}</strong>
+          </div>
+
+          <div class="progress">
+            <div
+              class="progress-fill medium-fill"
+              [style.width.%]="
+                riskItems.length
+                  ? (getRiskCount('medium') / riskItems.length) * 100
+                  : 0
+              ">
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="risk-bar">
+
+          <div class="bar-header">
+            <span>High Risk</span>
+            <strong>{{ getRiskCount('high') }}</strong>
+          </div>
+
+          <div class="progress">
+            <div
+              class="progress-fill high-fill"
+              [style.width.%]="
+                riskItems.length
+                  ? (getRiskCount('high') / riskItems.length) * 100
+                  : 0
+              ">
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Risk Table -->
+  <div class="table-card">
+
+    <div class="section-heading">
+
+      <div>
+        <h2>Vendor Risk Assessment</h2>
+
+        <p>
+          Detailed risk analysis for each supplier.
+        </p>
+      </div>
+
+      <span class="record-count">
+        {{ riskItems.length }} Vendors
+      </span>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Rank</th>
+
+            <th>Vendor</th>
+
+            <th>Risk Score</th>
+
+            <th>Risk Level</th>
+
+            <th>Financial</th>
+
+            <th>Delivery</th>
+
+            <th>Quality</th>
+
+            <th>Compliance</th>
+
+            <th>Recommendation</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          @for (item of riskItems; track item.vendor; let i = $index) {
+
+            <tr>
+
+              <td>
+                <span class="rank">
+                  #{{ i + 1 }}
+                </span>
+              </td>
+
+
+              <td>
+                <strong class="vendor-name">
+                  {{ item.vendor }}
+                </strong>
+              </td>
+
+
+              <td>
+
+                <div class="score-wrapper">
+
+                  <strong>
+                    {{ item.score | number:'1.2-2' }}
+                  </strong>
+
+                  <span>/ 100</span>
+
+                </div>
+
+                <div class="mini-progress">
+
+                  <div
+                    class="mini-progress-fill"
+                    [style.width.%]="item.score">
+                  </div>
+
+                </div>
+
+              </td>
+
+
+              <td>
+
+                <span
+                  class="risk-badge"
+                  [ngClass]="getRiskClass(
+                    item.riskLevel.replace(' Risk', '')
+                  )">
+
+                  {{ item.riskLevel }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <span
+                  class="risk-value"
+                  [ngClass]="getRiskClass(item.financialRisk)">
+
+                  {{ item.financialRisk }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <span
+                  class="risk-value"
+                  [ngClass]="getRiskClass(item.deliveryRisk)">
+
+                  {{ item.deliveryRisk }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <span
+                  class="risk-value"
+                  [ngClass]="getRiskClass(item.qualityRisk)">
+
+                  {{ item.qualityRisk }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <span
+                  class="risk-value"
+                  [ngClass]="getRiskClass(item.complianceRisk)">
+
+                  {{ item.complianceRisk }}
+
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <div class="recommendation">
+
+                  <strong>
+                    Monitor Supplier
+                  </strong>
+
+                  <p>
+                    {{ item.recommendation }}
+                  </p>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- Risk Guidelines -->
+  <div class="guidelines-card">
+
+    <h2>Risk Assessment Guidelines</h2>
+
+    <div class="guidelines-grid">
+
+      <div class="guideline low-guide">
+        <strong>Low Risk</strong>
+        <p>
+          Vendor performance is stable and requires normal monitoring.
+        </p>
+      </div>
+
+
+      <div class="guideline medium-guide">
+        <strong>Medium Risk</strong>
+        <p>
+          Vendor requires closer monitoring and periodic review.
+        </p>
+      </div>
+
+
+      <div class="guideline high-guide">
+        <strong>High Risk</strong>
+        <p>
+          Immediate review and contingency planning are recommended.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

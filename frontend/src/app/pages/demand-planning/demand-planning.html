@@ -1,0 +1,253 @@
+<div class="page-container">
+
+  <div class="page-header">
+
+    <div>
+      <span class="eyebrow">SUPPLY CHAIN PLANNING</span>
+
+      <h1>Demand Planning</h1>
+
+      <p>
+        Analyze demand trends and forecast future procurement requirements.
+      </p>
+    </div>
+
+    <button class="refresh-btn">
+      ↻ Refresh
+    </button>
+
+  </div>
+
+
+  <!-- SUMMARY -->
+
+  <div class="summary-grid">
+
+    <div class="summary-card">
+
+      <div class="icon blue">📊</div>
+
+      <div>
+        <span>Current Demand</span>
+        <strong>{{ totalCurrentDemand }}</strong>
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="icon purple">📈</div>
+
+      <div>
+        <span>Forecast Demand</span>
+        <strong>{{ totalForecast }}</strong>
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="icon orange">📦</div>
+
+      <div>
+        <span>Products Increasing</span>
+        <strong>{{ increasingProducts }}</strong>
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="icon green">↗</div>
+
+      <div>
+        <span>Average Change</span>
+        <strong>{{ averageChange.toFixed(1) }}%</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- FORECAST OVERVIEW -->
+
+  <div class="section-card">
+
+    <div class="section-header">
+
+      <div>
+        <h2>Demand Forecast</h2>
+
+        <p>
+          Current demand compared with forecasted requirements.
+        </p>
+      </div>
+
+      <span class="period">
+        Next 30 Days
+      </span>
+
+    </div>
+
+
+    <div class="forecast-chart">
+
+      @for (item of demandData; track item.product) {
+
+        <div class="forecast-row">
+
+          <div class="product-name">
+            <strong>{{ item.product }}</strong>
+          </div>
+
+          <div class="bar-area">
+
+            <div class="bar-label">
+              <span>Current {{ item.currentDemand }}</span>
+              <span>Forecast {{ item.forecast }}</span>
+            </div>
+
+            <div class="bar-background">
+
+              <div
+                class="current-bar"
+                [style.width.%]="(item.currentDemand / 600) * 100">
+              </div>
+
+            </div>
+
+            <div class="forecast-background">
+
+              <div
+                class="forecast-bar"
+                [style.width.%]="(item.forecast / 600) * 100">
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  </div>
+
+
+  <!-- DEMAND TABLE -->
+
+  <div class="section-card">
+
+    <div class="section-header">
+
+      <div>
+        <h2>Demand Analysis</h2>
+
+        <p>
+          Product-level demand trends and forecast changes.
+        </p>
+      </div>
+
+      <span class="period">
+        {{ demandData.length }} Products
+      </span>
+
+    </div>
+
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Product</th>
+            <th>Current Demand</th>
+            <th>Forecast</th>
+            <th>Change</th>
+            <th>Trend</th>
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          @for (item of demandData; track item.product) {
+
+            <tr>
+
+              <td>
+                <strong>{{ item.product }}</strong>
+              </td>
+
+              <td>{{ item.currentDemand }}</td>
+
+              <td>
+                <strong>{{ item.forecast }}</strong>
+              </td>
+
+              <td
+                [class.positive]="item.change > 0"
+                [class.negative]="item.change < 0">
+
+                {{ item.change > 0 ? '+' : '' }}{{ item.change }}%
+
+              </td>
+
+              <td>
+
+                <span
+                  class="trend"
+                  [class.increasing]="item.status === 'Increasing'"
+                  [class.stable]="item.status === 'Stable'">
+
+                  {{ item.status }}
+
+                </span>
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- PLANNING INSIGHTS -->
+
+  <div class="insights-card">
+
+    <div class="insight-icon">
+      💡
+    </div>
+
+    <div>
+
+      <h3>Planning Insight</h3>
+
+      <p>
+        Demand is increasing for {{ increasingProducts }} products.
+        Consider reviewing supplier capacity and procurement requirements
+        before the next planning cycle.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
