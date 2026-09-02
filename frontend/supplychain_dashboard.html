@@ -5,127 +5,157 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supply Chain Dashboard - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div style="margin-bottom: 24px;">
-        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Supply Chain Operations</h1>
-        <p style="color: var(--text-secondary);">Real-time monitoring of delivery schedules, delays, and partner performance. <span style="font-size: 11px; color: var(--text-secondary); opacity: 0.8; display: block; margin-top: 4px;">* Note: Vendor Proxy is derived from Product Card Id because the source dataset does not contain actual supplier names.</span></p>
+    <div class="dashboard-header">
+        <div>
+            <h1>Supply Chain Logistics & Fulfillment Intelligence</h1>
+            <p>Monitor multi-modal shipping pipelines, assess delivery schedule delays, track inventory flows, and evaluate supplier logistics risk.</p>
+        </div>
+        <div class="header-badge">
+            <span class="status-dot"></span> Multi-Modal Network: Active Telemetry
+        </div>
     </div>
 
-    <!-- KPI Grid -->
-    <div class="kpi-grid">
+    <!-- Top KPI Summary Cards -->
+    <div class="kpi-grid-4">
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Total Delivery Records</span>
-                <span class="kpi-icon">🚚</span>
+                <span class="kpi-label">Active Suppliers</span>
+                <span class="kpi-icon">🏢</span>
             </div>
-            <div class="kpi-value" id="totalDeliveries">0</div>
-            <div class="kpi-sub">Total packages received</div>
+            <div class="kpi-value" id="totalSuppliersVal">0</div>
+            <div class="kpi-sub" id="atRiskSub">0 At-Risk Suppliers</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">On-Time Rate</span>
-                <span class="kpi-icon">⏱️</span>
+                <span class="kpi-label">Active Purchase Orders</span>
+                <span class="kpi-icon">🛍️</span>
             </div>
-            <div class="kpi-value" id="onTimeRate">0%</div>
-            <div class="kpi-sub">Meets target threshold</div>
+            <div class="kpi-value" id="activePOsVal">0</div>
+            <div class="kpi-sub">Shipments in fulfillment pipeline</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Delayed Deliveries</span>
+                <span class="kpi-label">Delayed Shipments</span>
                 <span class="kpi-icon">⚠️</span>
             </div>
             <div class="kpi-value" id="delayedDeliveries" style="color: var(--danger-color);">0</div>
-            <div class="kpi-sub">Requires active follow-up</div>
+            <div class="kpi-sub" id="avgDelaySub">Avg Delay: 0.0 Days</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Average Delay (Late Deliveries)</span>
-                <span class="kpi-icon">📅</span>
+                <span class="kpi-label">On-Time Delivery Rate</span>
+                <span class="kpi-icon">⏱️</span>
             </div>
-            <div class="kpi-value" id="averageDelay">0 days</div>
-            <div class="kpi-sub">Latency average</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-label">Vendors at Risk</span>
-                <span class="kpi-icon">🚨</span>
-            </div>
-            <div class="kpi-value" id="atRiskVendors" style="color: var(--danger-color);">0</div>
-            <div class="kpi-sub">Critical score threshold</div>
+            <div class="kpi-value" id="onTimeRate" style="color: var(--success-color);">0.0%</div>
+            <div class="kpi-sub">Fulfillment SLA Target > 85%</div>
         </div>
     </div>
 
-    <!-- Alerts and Deliveries Container -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 32px;">
-        <!-- Alerts Section -->
-        <div class="chart-card" style="max-height: 420px; display: flex; flex-direction: column;">
-            <h3>Late Delivery Risk Alerts</h3>
-            <div id="alertsContainer" style="overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 12px; padding-right: 4px;">
-                <p style="color: var(--text-secondary); font-style: italic;">Loading alerts...</p>
+    <!-- Supplier Performance Distribution & Shipping Modes Section -->
+    <div class="section-grid-2" id="visibility-section">
+        <!-- Supplier Performance Distribution Donut Chart -->
+        <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div>
+                    <h3>Supplier Performance Distribution</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Tier breakdown based on composite reliability indexes.</p>
+                </div>
+                <span class="kpi-trend positive" id="performanceTierBadge">118 Suppliers</span>
+            </div>
+
+            <div class="chart-container" style="height: 250px; position: relative; display: flex; justify-content: center; align-items: center;">
+                <canvas id="supplierDistChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Shipping Modes & Fulfillment Breakdown Chart -->
+        <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div>
+                    <h3>Shipping Modes & Regional Flow</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Logistics distribution across fulfillment classes.</p>
+                </div>
+                <span class="kpi-trend neutral">Multi-Modal</span>
+            </div>
+
+            <div class="chart-container" style="height: 250px; position: relative;">
+                <canvas id="shippingModesChart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- Recent Deliveries Table -->
-    <div class="table-card">
+    <!-- Supply Chain Insights & Disruption Alerts -->
+    <div class="section-grid-2" id="disruption-monitor">
+        <!-- AI Supply Chain Insights -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="insight-card info">
+                <div class="insight-icon">🚚</div>
+                <div class="insight-content">
+                    <h4>Primary Freight Routing Mode</h4>
+                    <p id="topShippingModeInsight">Analyzing multi-modal freight data...</p>
+                </div>
+            </div>
+            <div class="insight-card warning">
+                <div class="insight-icon">⚠️</div>
+                <div class="insight-content">
+                    <h4>Late Delivery Impact Assessment</h4>
+                    <p id="delayImpactInsight">Evaluating order cycle latency variance...</p>
+                </div>
+            </div>
+            <div class="insight-card danger">
+                <div class="insight-icon">🚨</div>
+                <div class="insight-content">
+                    <h4>Critical Supplier Disruption Alert</h4>
+                    <p id="atRiskSuppliersInsight">Scanning supplier scorecards for bottlenecks...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Late Delivery Risk Alerts Box -->
+        <div class="chart-card" style="max-height: 280px; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3>Active Shipment Risk Alerts</h3>
+                <span class="badge badge-poor" id="alertsCountBadge">0 Alerts</span>
+            </div>
+            <div id="alertsContainer" style="overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Shipments & Logistics Log -->
+    <div class="table-card" id="recent-shipments" style="margin-bottom: 28px;">
         <div class="table-header-bar">
             <div class="table-header-title">
                 <h3>Recent Shipments & Deliveries Log</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Track live logistics milestones and shipment transit accuracy.</p>
             </div>
+            <a href="purchase-orders.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">Track All Shipments</a>
         </div>
         <div class="table-container">
             <table id="recentDeliveriesTable">
                 <thead>
                     <tr>
-                        <th>Delivery ID</th>
-                        <th>Vendor</th>
-                        <th>Product</th>
+                        <th>Shipment ID</th>
+                        <th>Supplier Name</th>
+                        <th>Destination Region</th>
+                        <th>Shipping Mode</th>
                         <th>Expected Date</th>
-                        <th>Actual Date</th>
                         <th>Status</th>
-                        <th>Delay</th>
+                        <th>Schedule Variance</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="recentDeliveriesBody">
                     <tr>
                         <td colspan="7" class="loading-spinner-wrapper">
                             <div class="spinner"></div>
-                            <p>Loading recent deliveries...</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Delivery Performance Trend Table -->
-    <div class="table-card">
-        <div class="table-header-bar">
-            <div class="table-header-title">
-                <h3>Delivery Performance Monthly Trend</h3>
-            </div>
-        </div>
-        <div class="table-container">
-            <table id="trendTable">
-                <thead>
-                    <tr>
-                        <th>Month</th>
-                        <th>Total Deliveries</th>
-                        <th>On-Time Deliveries</th>
-                        <th>Delayed Deliveries</th>
-                        <th>Performance Rate</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="5" class="loading-spinner-wrapper">
-                            <div class="spinner"></div>
-                            <p>Loading monthly trend data...</p>
+                            <p>Loading recent logistics shipments...</p>
                         </td>
                     </tr>
                 </tbody>

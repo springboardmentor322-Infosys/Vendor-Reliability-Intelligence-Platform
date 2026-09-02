@@ -5,93 +5,182 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vendor Dashboard - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div style="margin-bottom: 24px;">
-        <h1 id="welcomeHeader" style="font-size: 22px; font-weight: 700;">Welcome to Your Portal</h1>
+    <div class="dashboard-header">
+        <div>
+            <h1 id="welcomeHeader">Supplier Partner Portal</h1>
+            <p>Track your fulfillment performance metrics, order fulfillment pipelines, invoice settlements, and recommendations.</p>
+        </div>
+        <div class="header-badge">
+            <span class="status-dot"></span> Partner Status: <span id="vStatusBadge" style="font-weight: 700; margin-left: 4px; color: var(--success-color);">Active</span>
+        </div>
     </div>
 
-    <!-- Vendor Specific Metrics Grid -->
-    <div class="kpi-grid">
+    <!-- Top KPI Summary Cards -->
+    <div class="kpi-grid-4">
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Reliability Score</span>
-                <span class="kpi-icon">📈</span>
-            </div>
-            <div class="kpi-value" id="reliabilityScore" style="color: var(--success-color);">0.0</div>
-            <div class="kpi-sub">Calculated score (0-100)</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-label">Risk Classification</span>
+                <span class="kpi-label">Overall Reliability</span>
                 <span class="kpi-icon">🛡️</span>
             </div>
-            <div style="margin: 6px 0;">
-                <span id="riskLevel" class="badge badge-info">LOADING</span>
-            </div>
-            <div class="kpi-sub">Standard risk rating</div>
+            <div class="kpi-value" id="reliabilityScore" style="color: var(--primary-color);">0.0%</div>
+            <div class="kpi-sub" id="riskLevelSub">Performance Rating</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Pending Invoices</span>
+                <span class="kpi-label">On-Time Delivery</span>
+                <span class="kpi-icon">⏱️</span>
+            </div>
+            <div class="kpi-value" id="deliveryRateVal" style="color: var(--success-color);">0.0%</div>
+            <div class="kpi-sub">Fulfillment SLA Adherence</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Quality Score</span>
+                <span class="kpi-icon">⭐</span>
+            </div>
+            <div class="kpi-value" id="qualityScoreVal" style="color: #3b82f6;">0.0%</div>
+            <div class="kpi-sub">Inspection Acceptance Rate</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Active Orders & Revenue</span>
+                <span class="kpi-icon">💰</span>
+            </div>
+            <div class="kpi-value" id="totalRevenueVal">₹0.00</div>
+            <div class="kpi-sub" id="activeOrdersSub">0 Active Orders</div>
+        </div>
+    </div>
+
+    <!-- Multi-Metric Performance & Profile Section -->
+    <div class="section-grid-2" id="performance-overview">
+        <!-- Multi-Score Performance Breakdown Donut/Polar Chart -->
+        <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div>
+                    <h3>Performance Metric Breakdown</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Comprehensive evaluation across 5 operational competencies.</p>
+                </div>
+                <span class="kpi-trend positive" id="scorecardBadge">Active Partner</span>
+            </div>
+
+            <div class="chart-container" style="height: 260px; position: relative; display: flex; justify-content: center; align-items: center;">
+                <canvas id="vendorMetricsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Vendor Company Profile & Operations -->
+        <div class="stat-overview-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3>
+                    <span>🏢 Company Profile & Details</span>
+                </h3>
+                <span class="badge badge-active" id="vRiskBadge">Tier 1 Supplier</span>
+            </div>
+
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">Company Name</span>
+                <span class="overview-stat-value" id="vName">...</span>
+            </div>
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">Primary Product Category</span>
+                <span class="overview-stat-value" id="vCategory">...</span>
+            </div>
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">Registered Email</span>
+                <span class="overview-stat-value" id="vEmail">...</span>
+            </div>
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">Representative</span>
+                <span class="overview-stat-value" id="vContact">...</span>
+            </div>
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">Operations City & Region</span>
+                <span class="overview-stat-value" id="vCity">...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoices & Settlements Summary Grid -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px;">
+        <div class="kpi-card" style="border: 1px solid var(--border-color); box-shadow: none;">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Billed Invoices</span>
                 <span class="kpi-icon">📄</span>
             </div>
-            <div class="kpi-value" id="pendingBills">0</div>
-            <div class="kpi-sub">Awaiting confirmation</div>
+            <div class="kpi-value" id="vTotalBilled" style="font-size: 22px;">₹0.00</div>
+            <div class="kpi-sub" id="vTotalBilledCount">0 total invoices</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card" style="border: 1px solid var(--border-color); box-shadow: none;">
             <div class="kpi-header">
-                <span class="kpi-label">Unread Alerts</span>
-                <span class="kpi-icon">🔔</span>
+                <span class="kpi-label">Settled (Paid) Invoices</span>
+                <span class="kpi-icon">✅</span>
             </div>
-            <div class="kpi-value" id="unreadAlerts">0</div>
-            <div class="kpi-sub">System risk alerts</div>
+            <div class="kpi-value" id="vPaidAmount" style="font-size: 22px; color: var(--success-color);">₹0.00</div>
+            <div class="kpi-sub" id="vPaidCount">0 invoices cleared</div>
+        </div>
+
+        <div class="kpi-card" style="border: 1px solid var(--border-color); box-shadow: none;">
+            <div class="kpi-header">
+                <span class="kpi-label">Pending Settlements</span>
+                <span class="kpi-icon">⏳</span>
+            </div>
+            <div class="kpi-value" id="vPendingAmount" style="font-size: 22px; color: var(--warning-color);">₹0.00</div>
+            <div class="kpi-sub" id="vPendingCount">0 invoices pending</div>
         </div>
     </div>
 
-    <!-- Vendor Profiling Details -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 32px;">
-        <div class="chart-card">
-            <h3>Vendor Specifications</h3>
-            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px;">
-                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                    <span style="color: var(--text-secondary); font-weight: 500;">Company Name</span>
-                    <span style="font-weight: 600;" id="vName">...</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                    <span style="color: var(--text-secondary); font-weight: 500;">Product Category</span>
-                    <span style="font-weight: 600;" id="vCategory">...</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding-bottom: 4px;">
-                    <span style="color: var(--text-secondary); font-weight: 500;">Partnership Status</span>
-                    <span style="font-weight: 600;" id="vStatus">...</span>
-                </div>
-            </div>
+    <!-- Actionable Performance Recommendations -->
+    <div class="chart-card" style="margin-bottom: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h3>💡 Performance Optimization Insights</h3>
+            <span class="kpi-trend positive">AI Engine Insights</span>
         </div>
-
-        <div class="chart-card">
-            <h3>Contact Information</h3>
-            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 10px;">
-                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                    <span style="color: var(--text-secondary); font-weight: 500;">Primary Representative</span>
-                    <span style="font-weight: 600;" id="vContact">...</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                    <span style="color: var(--text-secondary); font-weight: 500;">Email Address</span>
-                    <span style="font-weight: 600;" id="vEmail">...</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding-bottom: 4px;">
-                    <span style="color: var(--text-secondary); font-weight: 500;">Operations City</span>
-                    <span style="font-weight: 600;" id="vCity">...</span>
-                </div>
-            </div>
+        <div id="recommendationsContainer" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Rendered dynamically -->
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Scoped Recent Purchase Orders Table -->
+    <div class="table-card" id="recent-orders">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>My Purchase Orders Pipeline</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Orders allocated directly to your company.</p>
+            </div>
+            <a href="purchase-orders.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">View All Orders</a>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Product Item</th>
+                        <th>Quantity</th>
+                        <th>Total Value</th>
+                        <th>Order Date</th>
+                        <th>Fulfillment Status</th>
+                    </tr>
+                </thead>
+                <tbody id="vendorOrdersBody">
+                    <tr>
+                        <td colspan="6" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading your purchase orders...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
     <script src="js/auth.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/vendor_dashboard.js"></script>

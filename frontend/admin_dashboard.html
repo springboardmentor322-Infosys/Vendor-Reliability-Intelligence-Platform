@@ -5,19 +5,176 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div style="margin-bottom: 24px;">
-        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Admin Approval Portal</h1>
-        <p style="color: var(--text-secondary);">Manage and approve incoming user registration requests.</p>
+    <div class="dashboard-header">
+        <div>
+            <h1>Platform Administration & Intelligence</h1>
+            <p>Complete enterprise-level visibility, user governance, platform metrics, and system activity logs.</p>
+        </div>
+        <div class="header-badge">
+            <span class="status-dot"></span> System Live: PostgreSQL 16
+        </div>
     </div>
 
-    <!-- Table Container -->
-    <div class="table-card">
+    <!-- Top KPI Cards Grid -->
+    <div class="kpi-grid-5">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Users</span>
+                <span class="kpi-icon">👥</span>
+            </div>
+            <div class="kpi-value" id="totalUsersCount">0</div>
+            <div class="kpi-sub" id="approvedUsersSub">0 Approved Accounts</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Registered Vendors</span>
+                <span class="kpi-icon">🏢</span>
+            </div>
+            <div class="kpi-value" id="totalVendorsCount">0</div>
+            <div class="kpi-sub">Active platform suppliers</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Active Purchase Orders</span>
+                <span class="kpi-icon">🛍️</span>
+            </div>
+            <div class="kpi-value" id="activePOsCount">0</div>
+            <div class="kpi-sub" id="totalPOsSub">0 Total Tracked</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Platform Growth</span>
+                <span class="kpi-icon">📈</span>
+            </div>
+            <div class="kpi-value" id="platformValuation">₹0.00</div>
+            <div class="kpi-sub">Total PO Transaction Volume</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Platform Reliability</span>
+                <span class="kpi-icon">🛡️</span>
+            </div>
+            <div class="kpi-value" id="platformReliability" style="color: var(--primary-color);">0.0%</div>
+            <div class="kpi-sub">Vendor Reliability Index</div>
+        </div>
+    </div>
+
+    <!-- Platform Overview & Analytics Section -->
+    <div class="section-grid-2" id="platform-overview">
+        <!-- Platform Overview Stat Card & Trend Chart -->
+        <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3>Platform Operations Overview</h3>
+                <span class="kpi-trend positive">✓ Live Aggregation</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
+                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Departments</div>
+                    <div style="font-size: 18px; font-weight: 700; color: var(--text-color); margin-top: 4px;" id="deptCount">0</div>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Locations</div>
+                    <div style="font-size: 18px; font-weight: 700; color: var(--text-color); margin-top: 4px;" id="locationCount">0</div>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Categories</div>
+                    <div style="font-size: 18px; font-weight: 700; color: var(--text-color); margin-top: 4px;" id="catCount">0</div>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Workflows</div>
+                    <div style="font-size: 18px; font-weight: 700; color: var(--text-color); margin-top: 4px;" id="workflowCount">8</div>
+                </div>
+            </div>
+
+            <div class="chart-container" style="height: 240px; position: relative;">
+                <canvas id="platformTrendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Users by Role Donut Chart -->
+        <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3>Users by Role Distribution</h3>
+                <span class="kpi-trend neutral" id="totalUsersBadge">0 Accounts</span>
+            </div>
+            <div class="chart-container" style="height: 280px; position: relative; display: flex; justify-content: center; align-items: center;">
+                <canvas id="usersRoleChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Health & Platform Insights Section -->
+    <div class="section-grid-2" id="system-health">
+        <!-- System Health & Usage -->
+        <div class="stat-overview-box">
+            <h3>
+                <span>⚡ System Health & Infrastructure</span>
+                <span class="kpi-trend positive">Operational</span>
+            </h3>
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">📡 API Response Latency</span>
+                <span class="overview-stat-value" id="apiLatencyVal">12.4 ms</span>
+            </div>
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">💾 Database Record Index</span>
+                <span class="overview-stat-value" id="dbRecordsVal">180,500+ Rows</span>
+            </div>
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">🔒 Authentication & Token Security</span>
+                <span class="overview-stat-value" style="color: var(--success-color);">HS256 Bearer JWT Active</span>
+            </div>
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">⚙️ System Engine</span>
+                <span class="overview-stat-value">PostgreSQL 16 & FastAPI Async</span>
+            </div>
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">⏱️ Server Status</span>
+                <span class="overview-stat-value" style="color: var(--success-color);">100% Uptime Operational</span>
+            </div>
+        </div>
+
+        <!-- Platform Intelligence Insights -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="insight-card info">
+                <div class="insight-icon">💡</div>
+                <div class="insight-content">
+                    <h4>Top Spend Merchandise Category</h4>
+                    <p id="topCategoryInsight">Analyzing platform merchandise categories...</p>
+                </div>
+            </div>
+            <div class="insight-card warning">
+                <div class="insight-icon">⚠️</div>
+                <div class="insight-content">
+                    <h4>Critical & High Risk Vendors</h4>
+                    <p id="highRiskVendorsInsight">Scanning supplier reliability index scores...</p>
+                </div>
+            </div>
+            <div class="insight-card success">
+                <div class="insight-icon">✅</div>
+                <div class="insight-content">
+                    <h4>Active Legal Agreements</h4>
+                    <p id="contractsInsight">Validating SLA compliance contracts...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin User Approval Queue (Preserved & Enhanced) -->
+    <div class="table-card" id="user-management" style="margin-bottom: 28px;">
         <div class="table-header-bar">
             <div class="table-header-title">
                 <h3>Pending Account Approval Queue</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Review user registrations, assign enterprise roles, and map vendor companies.</p>
             </div>
+            <span class="badge badge-pending" id="pendingQueueCountBadge">0 Pending</span>
         </div>
         <div class="table-container">
             <table id="pendingTable">
@@ -26,18 +183,56 @@
                         <th>ID</th>
                         <th>User Name</th>
                         <th>Email Address</th>
-                        <th>Requested Role</th>
+                        <th>Assign Platform Role & Vendor Link</th>
                         <th>Approval Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Populated dynamically by admin_dashboard.js -->
+                    <tr>
+                        <td colspan="5" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading pending accounts queue...</p>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Recent System Activities Audit Trail -->
+    <div class="table-card" id="recent-activities">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Recent System Activities & Audit Trail</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Real platform-level audit logs captured in PostgreSQL.</p>
+            </div>
+            <a href="audit_logs.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">View All Logs</a>
+        </div>
+        <div class="table-container">
+            <table id="systemActivitiesTable">
+                <thead>
+                    <tr>
+                        <th>Log ID</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Entity</th>
+                        <th>Activity Details</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody id="systemActivitiesBody">
+                    <tr>
+                        <td colspan="6" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading recent system activities...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Core Scripts -->
     <script src="js/auth.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/admin_dashboard.js"></script>

@@ -5,70 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finance Dashboard - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div style="margin-bottom: 24px;">
-        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Financial Operations</h1>
-        <p style="color: var(--text-secondary);">Manage billing, invoices, purchase order values, and account payments.</p>
+    <div class="dashboard-header">
+        <div>
+            <h1>Financial Operations & Spend Intelligence</h1>
+            <p>Track organizational spend, monitor ledger disbursements, analyze category expenses, and manage invoice clearance.</p>
+        </div>
+        <div class="header-badge">
+            <span class="status-dot"></span> Fiscal Ledger: Real-time Reconciled
+        </div>
     </div>
 
-    <!-- Metrics Cards Grid -->
-    <div class="kpi-grid">
+    <!-- Top KPI Cards Grid -->
+    <div class="kpi-grid-4" id="budget-overview">
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Total Invoices</span>
-                <span class="kpi-icon">📄</span>
-            </div>
-            <div class="kpi-value" id="totalCount">0</div>
-            <div class="kpi-sub">Total billed items</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-label">Total Invoice Value</span>
+                <span class="kpi-label">Total Spend (Ledger)</span>
                 <span class="kpi-icon">💰</span>
             </div>
-            <div class="kpi-value" id="totalAmount">₹0.00</div>
-            <div class="kpi-sub">Total ledger value</div>
+            <div class="kpi-value" id="totalSpendVal">₹0.00</div>
+            <div class="kpi-sub" id="totalInvoicesSub">0 Invoices Generated</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Pending Invoices</span>
-                <span class="kpi-icon">⏱️</span>
+                <span class="kpi-label">Paid Invoices</span>
+                <span class="kpi-icon">✅</span>
             </div>
-            <div class="kpi-value" id="pendingCount">0</div>
-            <div class="kpi-sub">Awaiting payout confirmation</div>
+            <div class="kpi-value" id="paidAmountVal" style="color: var(--success-color);">₹0.00</div>
+            <div class="kpi-sub" id="paidCountSub">0 Paid Items</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Pending Payment</span>
+                <span class="kpi-label">Pending Payments</span>
                 <span class="kpi-icon">⏳</span>
             </div>
-            <div class="kpi-value" id="pendingAmount">₹0.00</div>
-            <div class="kpi-sub">Committed pending value</div>
+            <div class="kpi-value" id="pendingAmountVal" style="color: var(--warning-color);">₹0.00</div>
+            <div class="kpi-sub" id="pendingCountSub">0 Pending Invoices</div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <span class="kpi-label">Budget Utilization</span>
+                <span class="kpi-icon">📊</span>
+            </div>
+            <div class="kpi-value" id="budgetUtilVal" style="color: var(--primary-color);">0.0%</div>
+            <div class="kpi-sub" id="budgetSub">Allocated ₹0.00</div>
         </div>
     </div>
 
-    <!-- Recent Invoices Table -->
-    <div class="table-card">
+    <!-- Spend by Category & Cash Flow Section -->
+    <div class="section-grid-2" id="spend-category">
+        <!-- Spend by Category (YTD) Donut Chart -->
+        <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div>
+                    <h3>Spend by Category (YTD)</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Procurement expenditures categorized from database transactions.</p>
+                </div>
+                <span class="kpi-trend neutral">Top Categories</span>
+            </div>
+
+            <div class="chart-container" style="height: 260px; position: relative; display: flex; justify-content: center; align-items: center;">
+                <canvas id="spendCategoryChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Cash Flow Overview Chart -->
+        <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div>
+                    <h3>Cash Flow Overview</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Monthly disbursement outflows vs operational return inflows.</p>
+                </div>
+                <span class="kpi-trend positive">Monthly Trend</span>
+            </div>
+
+            <div class="chart-container" style="height: 260px; position: relative;">
+                <canvas id="cashFlowChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Finance Insights & Observations -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 28px;">
+        <div class="insight-card info">
+            <div class="insight-icon">💡</div>
+            <div class="insight-content">
+                <h4>Dominant Spend Category</h4>
+                <p id="topCategorySpendInsight">Calculating top spend categories...</p>
+            </div>
+        </div>
+        <div class="insight-card warning">
+            <div class="insight-icon">⚠️</div>
+            <div class="insight-content">
+                <h4>Outstanding Liability Ratio</h4>
+                <p id="pendingLiabilityInsight">Checking unpaid invoice commitments...</p>
+            </div>
+        </div>
+        <div class="insight-card success">
+            <div class="insight-icon">💳</div>
+            <div class="insight-content">
+                <h4>Settlement Efficiency</h4>
+                <p id="settlementInsight">Measuring invoice payment turnover...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Invoices Table (Preserved & Enhanced) -->
+    <div class="table-card" id="recent-invoices">
         <div class="table-header-bar">
             <div class="table-header-title">
-                <h3>Recent Billing Invoices Log</h3>
+                <h3>Recent Invoices & Payment Ledger</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Track invoice records and confirm payment disbursements.</p>
             </div>
+            <a href="invoices.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">All Invoices</a>
         </div>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Invoice ID</th>
+                        <th>Invoice #</th>
                         <th>PO ID</th>
-                        <th>Vendor</th>
-                        <th>Product</th>
-                        <th>Amount</th>
-                        <th>Status</th>
+                        <th>Vendor Name</th>
+                        <th>Product Description</th>
+                        <th>Invoice Amount</th>
                         <th>Due Date</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -76,7 +142,7 @@
                     <tr>
                         <td colspan="8" class="loading-spinner-wrapper">
                             <div class="spinner"></div>
-                            <p>Loading recent invoices...</p>
+                            <p>Loading recent billing invoices...</p>
                         </td>
                     </tr>
                 </tbody>

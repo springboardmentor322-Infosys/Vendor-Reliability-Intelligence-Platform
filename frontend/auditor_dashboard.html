@@ -5,97 +5,155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auditor Dashboard - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div style="margin-bottom: 24px;">
-        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">System Audit & Compliance</h1>
-        <p style="color: var(--text-secondary);">Verify platform operations, check audit logs, inspect contracts, and analyze partner risk compliance.</p>
+    <div class="dashboard-header">
+        <div>
+            <h1>Audit & Compliance Governance</h1>
+            <p>Monitor vendor risk ratings, review quality control standards, verify legal compliance, and inspect audit trails.</p>
+        </div>
+        <div class="header-badge">
+            <span class="status-dot"></span> Audit Mode: Real-time Compliance Monitoring
+        </div>
     </div>
 
-    <!-- Metrics Cards Grid -->
-    <div class="kpi-grid">
+    <!-- Top KPI Summary Cards -->
+    <div class="kpi-grid-4">
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Total Audit Logs</span>
+                <span class="kpi-label">Total Audit Events</span>
                 <span class="kpi-icon">📝</span>
             </div>
             <div class="kpi-value" id="totalLogs">0</div>
-            <div class="kpi-sub">Total database events logged</div>
+            <div class="kpi-sub">Total database operations tracked</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Create Actions</span>
-                <span class="kpi-icon">🆕</span>
+                <span class="kpi-label">Compliance Pass Rate</span>
+                <span class="kpi-icon">🛡️</span>
             </div>
-            <div class="kpi-value" id="createCount">0</div>
-            <div class="kpi-sub">Insert statements executed</div>
+            <div class="kpi-value" id="complianceRateVal" style="color: var(--success-color);">0.0%</div>
+            <div class="kpi-sub">Suppliers meeting reliability SLA</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Update Actions</span>
-                <span class="kpi-icon">✏️</span>
+                <span class="kpi-label">High-Risk Findings</span>
+                <span class="kpi-icon">⚠️</span>
             </div>
-            <div class="kpi-value" id="updateCount">0</div>
-            <div class="kpi-sub">Modify actions executed</div>
+            <div class="kpi-value" id="highRiskFindingsVal" style="color: var(--danger-color);">0</div>
+            <div class="kpi-sub">Requiring remediation review</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Delete Actions</span>
-                <span class="kpi-icon">❌</span>
+                <span class="kpi-label">Controls Assessed</span>
+                <span class="kpi-icon">🎯</span>
             </div>
-            <div class="kpi-value" id="deleteCount" style="color: var(--danger-color);">0</div>
-            <div class="kpi-sub">Record deletions executed</div>
+            <div class="kpi-value" id="controlsAssessedVal">5/5</div>
+            <div class="kpi-sub" id="avgQualityScoreSub">Quality Avg: 0.0%</div>
         </div>
     </div>
 
-    <!-- Compliance Section -->
-    <div class="chart-card" style="margin-bottom: 32px;">
-        <h3>Contract Compliance & Risks</h3>
-        <div class="kpi-grid" style="margin-bottom: 0; padding: 10px 0 0;">
-            <div class="kpi-card" style="border: 1px solid var(--border-color); box-shadow: none;">
-                <div class="kpi-header">
-                    <span class="kpi-label">Average Compliance Rate</span>
-                    <span class="kpi-icon">⏱️</span>
+    <!-- Compliance Overview & Checklist Progress Grid -->
+    <div class="section-grid-2" id="compliance-overview">
+        <!-- Audit Compliance Overview (Large Donut Chart) -->
+        <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div>
+                    <h3>Audit Compliance Overview</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Breakdown of partner compliance across all active suppliers.</p>
                 </div>
-                <div class="kpi-value" id="contractCompliance">0%</div>
-                <div class="kpi-sub">Contract delivery SLAs met</div>
+                <span class="kpi-trend positive" id="complianceRateBadge">0% Compliant</span>
             </div>
-            <div class="kpi-card" style="border: 1px solid var(--border-color); box-shadow: none;">
-                <div class="kpi-header">
-                    <span class="kpi-label">Active Contracts</span>
-                    <span class="kpi-icon">📄</span>
-                </div>
-                <div class="kpi-value" id="activeContractsCount">0</div>
-                <div class="kpi-sub">SLAs currently active</div>
+
+            <div class="chart-container" style="height: 260px; position: relative; display: flex; justify-content: center; align-items: center;">
+                <canvas id="complianceDonutChart"></canvas>
             </div>
-            <div class="kpi-card" style="border: 1px solid var(--border-color); box-shadow: none;">
-                <div class="kpi-header">
-                    <span class="kpi-label">Expired/Expiring Contracts</span>
-                    <span class="kpi-icon">⚠️</span>
-                </div>
-                <div class="kpi-value" id="expiredContractsCount" style="color: var(--warning-color);">0</div>
-                <div class="kpi-sub">Requiring audit verification</div>
+        </div>
+
+        <!-- Audit Checklist Progress & Controls -->
+        <div class="stat-overview-box" id="checklist-progress">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3>
+                    <span>🎯 Audit Checklist & Control Status</span>
+                </h3>
+                <span class="kpi-trend positive" id="checklistProgressBadge">94% Verified</span>
             </div>
-            <div class="kpi-card" style="border: 1px solid var(--border-color); box-shadow: none;">
-                <div class="kpi-header">
-                    <span class="kpi-label">Pending Risk Alerts</span>
-                    <span class="kpi-icon">🚨</span>
-                </div>
-                <div class="kpi-value" id="pendingRiskAlerts" style="color: var(--danger-color);">0</div>
-                <div class="kpi-sub">Total active notifications</div>
+
+            <div id="controlsListContainer" style="display: flex; flex-direction: column; gap: 14px;">
+                <!-- Populated dynamically -->
             </div>
         </div>
     </div>
 
-    <!-- Recent Audit Activity Table -->
-    <div class="table-card">
+    <!-- Audit Insights & Alerts -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 28px;" id="audit-insights">
+        <div class="insight-card danger">
+            <div class="insight-icon">🚨</div>
+            <div class="insight-content">
+                <h4>High Risk Compliance Findings</h4>
+                <p id="findingsInsight">Scanning audit findings for critical anomalies...</p>
+            </div>
+        </div>
+        <div class="insight-card info">
+            <div class="insight-icon">📋</div>
+            <div class="insight-content">
+                <h4>Material Inspection Quality Index</h4>
+                <p id="qualityInsight">Checking ISO material quality pass rates...</p>
+            </div>
+        </div>
+        <div class="insight-card warning">
+            <div class="insight-icon">📑</div>
+            <div class="insight-content">
+                <h4>Contract Expirations & Renewals</h4>
+                <p id="contractAuditInsight">Inspecting legal agreements...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Audit Findings Table -->
+    <div class="table-card" id="audit-findings" style="margin-bottom: 28px;">
         <div class="table-header-bar">
             <div class="table-header-title">
-                <h3>Recent Activity Logs</h3>
+                <h3>Recent Audit Findings & Risk Flags</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Identified anomalies across vendor SLAs, inspection defects, and contract terms.</p>
             </div>
+        </div>
+        <div class="table-container">
+            <table id="findingsTable">
+                <thead>
+                    <tr>
+                        <th>Finding ID</th>
+                        <th>Audit Area</th>
+                        <th>Vendor Partner</th>
+                        <th>Risk Level</th>
+                        <th>Audit Status</th>
+                        <th>Identified Date</th>
+                    </tr>
+                </thead>
+                <tbody id="findingsTableBody">
+                    <tr>
+                        <td colspan="6" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading audit findings...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Real Audit Trail Activity Table -->
+    <div class="table-card" id="audit-trail">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>Recent Audit Trail & Log Activity</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Chronological ledger of user actions and database events.</p>
+            </div>
+            <a href="audit_logs.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">Full Audit Logs</a>
         </div>
         <div class="table-container">
             <table>
@@ -114,7 +172,7 @@
                     <tr>
                         <td colspan="7" class="loading-spinner-wrapper">
                             <div class="spinner"></div>
-                            <p>Loading recent activity...</p>
+                            <p>Loading audit trail activity...</p>
                         </td>
                     </tr>
                 </tbody>

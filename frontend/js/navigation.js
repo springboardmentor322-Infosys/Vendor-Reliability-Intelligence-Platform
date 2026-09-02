@@ -50,77 +50,128 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // Role-based navigation maps matching exact backend permissions
+    // Role-based navigation maps matching exact requirement specifications
     const roleNavConfig = {
         "Admin": [
+            { isSection: true, label: "MAIN MODULES" },
             { href: "admin_dashboard.html", label: "📊 Dashboard", id: "nav-dashboard" },
-            { href: "vendors.html", label: "👥 Vendors", id: "nav-vendors" },
+            { href: "admin_dashboard.html#user-management", label: "👥 User Management", id: "nav-users" },
+            { href: "vendors.html", label: "🏢 Vendors", id: "nav-vendors" },
+            { href: "purchase-request.html", label: "📝 Procurement", id: "nav-requisitions" },
             { href: "purchase-orders.html", label: "🛍️ Purchase Orders", id: "nav-purchase" },
-            { href: "purchase-request.html", label: "📝 Requisitions", id: "nav-requisitions" },
-            { href: "quality.html", label: "🛡️ Quality Inspections", id: "nav-quality" },
-            { href: "contracts.html", label: "📄 Contracts", id: "nav-contracts" },
-            { href: "contract-monitoring.html", label: "🔔 Contract Monitoring", id: "nav-monitoring" },
-            { href: "vendor-reliability.html", label: "📈 Vendor Reliability", id: "nav-reliability" },
-            { href: "analytics.html", label: "📉 Analytics", id: "nav-analytics" },
-            { href: "invoices.html", label: "💳 Invoices", id: "nav-invoices" },
-            { href: "reports.html", label: "📊 Reports", id: "nav-reports" },
-            { href: "audit_logs.html", label: "📝 Audit Logs", id: "nav-audit" },
+            { href: "contracts.html", label: "📄 Contracts & Compliance", id: "nav-contracts" },
+            { href: "invoices.html", label: "💳 Invoices & Payments", id: "nav-invoices" },
+            { href: "vendor-reliability.html", label: "📈 Performance & Reliability", id: "nav-reliability" },
+            { href: "reports.html", label: "📊 Reports & Analytics", id: "nav-reports" },
             { href: "notifications.html", label: "🔔 Notifications", id: "nav-notifications" },
-            { href: "profile.html", label: "👤 Profile", id: "nav-profile" }
-        ],
-        "Vendor": [
-            { href: "vendor_dashboard.html", label: "📊 Dashboard", id: "nav-dashboard" },
-            { href: "purchase-orders.html", label: "🛍️ Purchase Orders", id: "nav-purchase" },
-            { href: "contracts.html", label: "📄 Contracts", id: "nav-contracts" },
-            { href: "contract-monitoring.html", label: "🔔 Contract Monitoring", id: "nav-monitoring" },
-            { href: "vendor-reliability.html", label: "📈 Vendor Reliability", id: "nav-reliability" },
-            { href: "quality.html", label: "🛡️ Quality Inspections", id: "nav-quality" },
-            { href: "invoices.html", label: "💳 Invoices", id: "nav-invoices" },
-            { href: "notifications.html", label: "🔔 Notifications", id: "nav-notifications" },
-            { href: "profile.html", label: "👤 Profile", id: "nav-profile" }
-        ],
-        "Procurement Manager": [
-            { href: "procurement_dashboard.html", label: "📊 Dashboard", id: "nav-dashboard" },
-            { href: "vendors.html", label: "👥 Vendors", id: "nav-vendors" },
-            { href: "purchase-request.html", label: "📝 Requisitions", id: "nav-requisitions" },
-            { href: "purchase-orders.html", label: "🛍️ Purchase Orders", id: "nav-purchase" },
-            { href: "contracts.html", label: "📄 Contracts", id: "nav-contracts" },
-            { href: "vendor-reliability.html", label: "📈 Vendor Reliability", id: "nav-reliability" },
-            { href: "reports.html", label: "📊 Reports", id: "nav-reports" },
-            { href: "notifications.html", label: "🔔 Notifications", id: "nav-notifications" },
-            { href: "profile.html", label: "👤 Profile", id: "nav-profile" }
-        ],
-        "Supply Chain Manager": [
-            { href: "supplychain_dashboard.html", label: "📊 Dashboard", id: "nav-dashboard" },
-            { href: "vendors.html", label: "👥 Vendors", id: "nav-vendors" },
-            { href: "purchase-orders.html", label: "🛍️ Purchase Orders", id: "nav-purchase" },
-            { href: "quality.html", label: "🛡️ Quality Inspections", id: "nav-quality" },
-            { href: "vendor-reliability.html", label: "📈 Vendor Reliability", id: "nav-reliability" },
-            { href: "contract-monitoring.html", label: "🔔 Contract Monitoring", id: "nav-monitoring" },
-            { href: "analytics.html", label: "📉 Analytics", id: "nav-analytics" },
-            { href: "reports.html", label: "📊 Reports", id: "nav-reports" },
-            { href: "notifications.html", label: "🔔 Notifications", id: "nav-notifications" },
-            { href: "profile.html", label: "👤 Profile", id: "nav-profile" }
-        ],
-        "Finance Officer": [
-            { href: "finance_dashboard.html", label: "📊 Dashboard", id: "nav-dashboard" },
-            { href: "purchase-orders.html", label: "🛍️ Purchase Orders", id: "nav-purchase" },
-            { href: "invoices.html", label: "💳 Invoices", id: "nav-invoices" },
-            { href: "contracts.html", label: "📄 Contracts", id: "nav-contracts" },
-            { href: "analytics.html", label: "📉 Analytics", id: "nav-analytics" },
-            { href: "reports.html", label: "📊 Reports", id: "nav-reports" },
-            { href: "notifications.html", label: "🔔 Notifications", id: "nav-notifications" },
-            { href: "profile.html", label: "👤 Profile", id: "nav-profile" }
+            { href: "audit_logs.html", label: "📝 System Logs", id: "nav-audit" },
+            
+            { isSection: true, label: "ADMIN CONTROLS" },
+            { href: "admin_dashboard.html#user-management", label: "🔐 Role & Permission", id: "nav-roles" },
+            { href: "admin_dashboard.html#platform-overview", label: "🔄 Workflow Management", id: "nav-workflows" },
+            { href: "profile.html", label: "⚙️ System Settings", id: "nav-settings" },
+            { href: "audit_logs.html", label: "📋 Audit Logs", id: "nav-audit-control" },
+            { href: "analytics.html", label: "💾 Data Management", id: "nav-data" },
+            { href: "admin_dashboard.html#system-health", label: "🔌 Integrations", id: "nav-integrations" }
         ],
         "Auditor": [
+            { isSection: true, label: "AUDIT & COMPLIANCE" },
             { href: "auditor_dashboard.html", label: "📊 Dashboard", id: "nav-dashboard" },
-            { href: "audit_logs.html", label: "📝 Audit Logs", id: "nav-audit" },
-            { href: "reports.html", label: "📊 Reports", id: "nav-reports" },
-            { href: "vendor-reliability.html", label: "📈 Vendor Reliability", id: "nav-reliability" },
-            { href: "contract-monitoring.html", label: "🔔 Contract Monitoring", id: "nav-monitoring" },
-            { href: "analytics.html", label: "📉 Analytics", id: "nav-analytics" },
+            { href: "vendors.html", label: "🏢 Vendors", id: "nav-vendors" },
+            { href: "purchase-orders.html", label: "📝 Procurement & Orders", id: "nav-purchase" },
+            { href: "contracts.html", label: "📄 Contracts & Compliance", id: "nav-contracts" },
+            { href: "auditor_dashboard.html#audit-plan", label: "📑 Audit Plan", id: "nav-plan" },
+            { href: "auditor_dashboard.html#compliance-overview", label: "🛡️ Risk Assessment", id: "nav-risk" },
+            { href: "auditor_dashboard.html#audit-findings", label: "🔍 Audit Findings", id: "nav-findings" },
+            { href: "audit_logs.html", label: "📜 Audit Trails", id: "nav-audit" },
+            { href: "reports.html", label: "📊 Reports & Analytics", id: "nav-reports" },
+            { href: "contract-monitoring.html", label: "📑 Document Review", id: "nav-monitoring" },
+            { href: "communication.html", label: "💬 Communication Log", id: "nav-comm" },
+            { href: "notifications.html", label: "🔔 Alerts & Notifications", id: "nav-notifications" },
+            
+            { isSection: true, label: "AUDIT TOOLS" },
+            { href: "auditor_dashboard.html#control-assessment", label: "🎯 Control Assessment", id: "nav-controls" },
+            { href: "auditor_dashboard.html#checklist-progress", label: "✅ Checklist Management", id: "nav-checklist" },
+            { href: "auditor_dashboard.html#audit-findings", label: "📁 Evidence Management", id: "nav-evidence" },
+            
+            { isSection: true, label: "SETTINGS" },
+            { href: "profile.html", label: "👤 User Profile", id: "nav-profile" },
+            { href: "profile.html", label: "⚙️ System Settings", id: "nav-settings" }
+        ],
+        "Finance Officer": [
+            { isSection: true, label: "FINANCIAL MODULES" },
+            { href: "finance_dashboard.html", label: "💰 Financial Overview", id: "nav-dashboard" },
+            { href: "finance_dashboard.html#budget-overview", label: "📈 Budget & Forecasting", id: "nav-budget" },
+            { href: "purchase-orders.html", label: "🛍️ Purchase Orders", id: "nav-purchase" },
+            { href: "invoices.html", label: "💳 Invoices & Payments", id: "nav-invoices" },
+            { href: "vendors.html", label: "🏢 Vendors", id: "nav-vendors" },
+            { href: "finance_dashboard.html#spend-category", label: "📉 Cost Analysis", id: "nav-cost" },
+            { href: "analytics.html", label: "📊 Spend Analysis", id: "nav-analytics" },
+            { href: "contracts.html", label: "⚖️ Tax & Compliance", id: "nav-contracts" },
+            { href: "reports.html", label: "📑 Financial Reports", id: "nav-reports" },
+            { href: "finance_dashboard.html#recent-invoices", label: "✅ Approvals", id: "nav-approvals" },
+            { href: "invoices.html", label: "🔍 Payment Tracking", id: "nav-payment-tracking" },
+            { href: "vendor-reliability.html", label: "🛡️ Risk & Controls", id: "nav-reliability" },
+            
+            { isSection: true, label: "SETTINGS" },
+            { href: "profile.html", label: "👤 User Profile", id: "nav-profile" },
+            { href: "profile.html", label: "⚙️ System Settings", id: "nav-settings" }
+        ],
+        "Procurement Manager": [
+            { isSection: true, label: "PROCUREMENT OPERATIONS" },
+            { href: "procurement_dashboard.html", label: "📊 Dashboard", id: "nav-dashboard" },
+            { href: "purchase-request.html", label: "📝 Procurement Requests", id: "nav-requisitions" },
+            { href: "purchase-orders.html", label: "🛍️ Purchase Orders", id: "nav-purchase" },
+            { href: "vendors.html", label: "🏢 Vendors", id: "nav-vendors" },
+            { href: "vendor-performance.html", label: "📈 Vendor Performance", id: "nav-performance" },
+            { href: "contracts.html", label: "📄 Contracts & Compliance", id: "nav-contracts" },
+            { href: "invoices.html", label: "💳 Invoices & Payments", id: "nav-invoices" },
+            { href: "purchase-orders.html", label: "🚚 Order Tracking", id: "nav-tracking" },
+            { href: "reports.html", label: "📊 Reports & Analytics", id: "nav-reports" },
+            { href: "procurement_dashboard.html#budget-spend", label: "💰 Budget & Spend Analysis", id: "nav-budget" },
+            { href: "communication.html", label: "💬 Communications", id: "nav-comm" },
             { href: "notifications.html", label: "🔔 Notifications", id: "nav-notifications" },
-            { href: "profile.html", label: "👤 Profile", id: "nav-profile" }
+            
+            { isSection: true, label: "SETTINGS" },
+            { href: "profile.html", label: "👤 User Profile", id: "nav-profile" },
+            { href: "profile.html", label: "⚙️ System Settings", id: "nav-settings" }
+        ],
+        "Vendor": [
+            { isSection: true, label: "VENDOR PORTAL" },
+            { href: "vendor_dashboard.html", label: "📊 Overview", id: "nav-dashboard" },
+            { href: "profile.html", label: "🏢 Profile & Company", id: "nav-profile" },
+            { href: "vendor_dashboard.html#performance-overview", label: "📈 My Performance", id: "nav-performance" },
+            { href: "purchase-orders.html", label: "🛍️ Purchase Orders", id: "nav-purchase" },
+            { href: "vendor_dashboard.html#recent-orders", label: "🚚 Order & Delivery Tracking", id: "nav-tracking" },
+            { href: "invoices.html", label: "💳 Invoices", id: "nav-invoices" },
+            { href: "contracts.html", label: "📄 Contracts & Compliance", id: "nav-contracts" },
+            { href: "communication.html", label: "💬 Communications", id: "nav-comm" },
+            { href: "notifications.html", label: "🔔 Notifications", id: "nav-notifications" },
+            { href: "reports.html", label: "📑 Reports", id: "nav-reports" },
+            
+            { isSection: true, label: "ACCOUNT" },
+            { href: "profile.html", label: "⚙️ Settings", id: "nav-settings" }
+        ],
+        "Supply Chain Manager": [
+            { isSection: true, label: "SUPPLY CHAIN OPERATIONS" },
+            { href: "supplychain_dashboard.html", label: "📊 Dashboard", id: "nav-dashboard" },
+            { href: "vendors.html", label: "🏢 Vendors", id: "nav-vendors" },
+            { href: "purchase-request.html", label: "📝 Procurement", id: "nav-requisitions" },
+            { href: "purchase-orders.html", label: "🛍️ Purchase Orders", id: "nav-purchase" },
+            { href: "supplychain_dashboard.html#recent-shipments", label: "🚚 Order Tracking", id: "nav-tracking" },
+            { href: "supplychain_dashboard.html#visibility-section", label: "📦 Inventory Overview", id: "nav-inventory" },
+            { href: "analytics.html", label: "📈 Demand Planning", id: "nav-demand" },
+            { href: "vendor-performance.html", label: "📊 Supplier Performance", id: "nav-performance" },
+            { href: "vendor-reliability.html", label: "🛡️ Risk & Reliability", id: "nav-reliability" },
+            { href: "contract-monitoring.html", label: "📄 Contracts & Compliance", id: "nav-contracts" },
+            { href: "reports.html", label: "📑 Analytics & Reports", id: "nav-reports" },
+            { href: "communication.html", label: "💬 Communications", id: "nav-comm" },
+            { href: "notifications.html", label: "🔔 Alerts & Notifications", id: "nav-notifications" },
+            
+            { isSection: true, label: "SUPPLY CHAIN TOOLS" },
+            { href: "supplychain_dashboard.html#visibility-section", label: "🗺️ Supply Chain Map", id: "nav-map" },
+            { href: "supplychain_dashboard.html#disruption-monitor", label: "⚠️ Disruption Monitor", id: "nav-disruption" },
+            { href: "analytics.html", label: "🔬 Scenario Planning", id: "nav-scenario" }
         ]
     };
 
@@ -128,8 +179,12 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Construct Sidebar HTML
     let navLinksHtml = "";
-    links.forEach(link => {
-        navLinksHtml += `<a href="${link.href}" id="${link.id}">${link.label}</a>\n`;
+    links.forEach(item => {
+        if (item.isSection) {
+            navLinksHtml += `<div class="sidebar-section-header">${item.label}</div>\n`;
+        } else {
+            navLinksHtml += `<a href="${item.href}" id="${item.id}">${item.label}</a>\n`;
+        }
     });
 
     const sidebarHtml = `

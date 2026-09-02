@@ -5,114 +5,162 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Procurement Dashboard - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div style="margin-bottom: 24px;">
-        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Procurement Manager Console</h1>
-        <p style="color: var(--text-secondary);">Oversee supplier relations, track purchase orders, and monitor overall vendor performance.</p>
+    <div class="dashboard-header">
+        <div>
+            <h1>Procurement Management & Supplier Intelligence</h1>
+            <p>Monitor procurement order pipelines, evaluate vendor scorecards, manage budget allocations, and track fulfillments.</p>
+        </div>
+        <div class="header-badge">
+            <span class="status-dot"></span> Pipeline Active: Auto-Syncing Orders
+        </div>
     </div>
 
-    <!-- KPI Grid -->
-    <div class="kpi-grid" style="margin-bottom: 24px;">
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-label">Total Vendors</span>
-                <span class="kpi-icon">👥</span>
-            </div>
-            <div class="kpi-value" id="totalVendors">0</div>
-            <div class="kpi-sub">Registered suppliers</div>
-        </div>
-
+    <!-- Top KPI Summary Cards -->
+    <div class="kpi-grid-4">
         <div class="kpi-card">
             <div class="kpi-header">
                 <span class="kpi-label">Total Orders</span>
                 <span class="kpi-icon">🛍️</span>
             </div>
             <div class="kpi-value" id="totalOrders">0</div>
-            <div class="kpi-sub">Purchase transactions</div>
+            <div class="kpi-sub" id="totalVendorsSub">0 Active Suppliers</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Completed Orders</span>
-                <span class="kpi-icon">✅</span>
+                <span class="kpi-label">Active Orders</span>
+                <span class="kpi-icon">🚚</span>
             </div>
-            <div class="kpi-value" id="completedOrders">0</div>
-            <div class="kpi-sub">Fully fulfilled orders</div>
+            <div class="kpi-value" id="activeOrdersVal">0</div>
+            <div class="kpi-sub">In-Transit & Processing</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Pending Orders</span>
-                <span class="kpi-icon">⏳</span>
+                <span class="kpi-label">Pending Requisitions</span>
+                <span class="kpi-icon">📝</span>
             </div>
-            <div class="kpi-value" id="pendingOrders">0</div>
-            <div class="kpi-sub">Awaiting fulfillment</div>
+            <div class="kpi-value" id="pendingOrdersVal" style="color: var(--warning-color);">0</div>
+            <div class="kpi-sub">Awaiting Procurement Approval</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">On-Time Delivery</span>
+                <span class="kpi-label">On-Time Delivery Rate</span>
                 <span class="kpi-icon">⏱️</span>
             </div>
-            <div class="kpi-value" id="onTimeRate">0%</div>
-            <div class="kpi-sub">Average delivery rate</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-label">Late Delivery Risk</span>
-                <span class="kpi-icon">⚠️</span>
-            </div>
-            <div class="kpi-value" id="lateRate" style="color: var(--danger-color);">0%</div>
-            <div class="kpi-sub">Delayed shipment risk</div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-label">Avg Reliability</span>
-                <span class="kpi-icon">📈</span>
-            </div>
-            <div class="kpi-value" id="avgReliability">0.0</div>
-            <div class="kpi-sub">Platform-wide score</div>
+            <div class="kpi-value" id="onTimeRate" style="color: var(--success-color);">0.0%</div>
+            <div class="kpi-sub" id="avgReliabilitySub">Avg Reliability: 0.0</div>
         </div>
     </div>
 
-    <!-- Quick Actions Panel -->
-    <div style="display: flex; gap: 16px; margin: 24px 0; flex-wrap: wrap;">
-        <button class="btn btn-primary" onclick="window.location.href='vendors.html'">🔍 View Vendor Directory</button>
-        <button class="btn btn-primary" onclick="window.location.href='add-vendor.html'">➕ Add New Vendor</button>
-        <button class="btn btn-primary" onclick="window.location.href='purchase-request.html'">📝 Requisitions Portal</button>
-        <button class="btn btn-primary" onclick="window.location.href='add-contract.html'">📄 Create Contract</button>
+    <!-- Order Overview & Budget vs Spend Analysis Grid -->
+    <div class="section-grid-2" id="budget-spend">
+        <!-- Purchase Orders Overview Donut Chart -->
+        <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div>
+                    <h3>Procurement Orders Breakdown</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Fulfillment status of all recorded purchase requisitions.</p>
+                </div>
+                <span class="kpi-trend positive" id="completedRateBadge">0% Completed</span>
+            </div>
+
+            <div class="chart-container" style="height: 250px; position: relative; display: flex; justify-content: center; align-items: center;">
+                <canvas id="ordersDonutChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Budget vs Actual Spend Analysis -->
+        <div class="stat-overview-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3>
+                    <span>💰 Budget vs. Actual Spend</span>
+                </h3>
+                <span class="kpi-trend neutral" id="budgetUtilBadge">0% Utilized</span>
+            </div>
+
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">💵 Allocated Fiscal Budget</span>
+                <span class="overview-stat-value" id="allocatedBudgetVal">₹0.00</span>
+            </div>
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">💳 Actual Procurement Spend</span>
+                <span class="overview-stat-value" id="actualSpendVal">₹0.00</span>
+            </div>
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">📉 Remaining Available Budget</span>
+                <span class="overview-stat-value" id="remainingBudgetVal" style="color: var(--success-color);">₹0.00</span>
+            </div>
+
+            <div style="margin-top: 18px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">
+                    <span>Budget Consumption</span>
+                    <span id="budgetProgressPct" style="font-weight: 600; color: var(--text-color);">0%</span>
+                </div>
+                <div class="progress-meter">
+                    <div class="progress-meter-fill" id="budgetProgressBar" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Vendor Performance Scorecard -->
-    <div class="table-card" style="margin-bottom: 32px;">
+    <!-- Procurement Insights & Alerts -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 28px;">
+        <div class="insight-card info">
+            <div class="insight-icon">💡</div>
+            <div class="insight-content">
+                <h4>Supplier Fulfillment Velocity</h4>
+                <p id="velocityInsight">Evaluating supplier order cycle duration...</p>
+            </div>
+        </div>
+        <div class="insight-card warning">
+            <div class="insight-icon">⚠️</div>
+            <div class="insight-content">
+                <h4>Requisition Pipeline Alerts</h4>
+                <p id="pendingRequisitionsInsight">Checking open purchase requests...</p>
+            </div>
+        </div>
+        <div class="insight-card success">
+            <div class="insight-icon">🌟</div>
+            <div class="insight-content">
+                <h4>Top Performing Supplier Partner</h4>
+                <p id="topSupplierInsight">Identifying top-rated vendor scorecards...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supplier Performance Scorecard -->
+    <div class="table-card" style="margin-bottom: 28px;" id="vendor-scorecard">
         <div class="table-header-bar">
             <div class="table-header-title">
                 <h3>Supplier Performance Scorecard</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Multi-dimensional performance evaluation from real delivery transactions.</p>
             </div>
+            <a href="vendors.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">Full Vendor Directory</a>
         </div>
         <div class="table-container">
             <table id="vendorPerformanceTable">
                 <thead>
                     <tr>
-                        <th>Vendor ID</th>
-                        <th>Vendor Name</th>
+                        <th>Supplier ID</th>
+                        <th>Supplier Name</th>
                         <th>Total Orders</th>
                         <th>Completed</th>
-                        <th>Pending</th>
                         <th>On-Time Rate</th>
-                        <th>Quality Score</th>
-                        <th>Reliability Score</th>
-                        <th>Risk Level</th>
-                        <th>Performance Status</th>
+                        <th>Quality Index</th>
+                        <th>Reliability Rating</th>
+                        <th>Risk Tier</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="vendorPerformanceBody">
                     <tr>
-                        <td colspan="10" style="text-align: center; padding: 20px; color: var(--text-secondary);">
-                            Loading supplier scorecard...
+                        <td colspan="8" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading supplier performance scorecard...</p>
                         </td>
                     </tr>
                 </tbody>
@@ -121,29 +169,31 @@
     </div>
 
     <!-- Recent Purchase Orders Log -->
-    <div class="table-card" style="margin-bottom: 32px;">
+    <div class="table-card" id="recent-orders">
         <div class="table-header-bar">
             <div class="table-header-title">
-                <h3>Recent Purchase Orders Log</h3>
+                <h3>Recent Purchase Orders Pipeline</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Latest purchase order requisitions and fulfillment statuses.</p>
             </div>
+            <a href="purchase-orders.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">All Purchase Orders</a>
         </div>
         <div class="table-container">
             <table id="purchaseOrdersTable">
                 <thead>
                     <tr>
-                        <th>Order ID</th>
-                        <th>Vendor Name</th>
-                        <th>Product Description</th>
-                        <th>Quantity</th>
-                        <th>Total Price</th>
+                        <th>PO #</th>
+                        <th>Supplier Name</th>
+                        <th>Product Item</th>
+                        <th>Total Value</th>
                         <th>Order Date</th>
-                        <th>Fulfillment Status</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="purchaseOrdersBody">
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 20px; color: var(--text-secondary);">
-                            Loading purchase orders...
+                        <td colspan="6" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading purchase orders...</p>
                         </td>
                     </tr>
                 </tbody>
