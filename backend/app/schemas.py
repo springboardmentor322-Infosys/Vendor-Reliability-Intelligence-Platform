@@ -6,6 +6,8 @@ class VendorCreate(BaseModel):
     category: str
     status: str
     score: int
+    quality: int
+    response_time: int
     
 class VendorResponse(VendorCreate):
     id: int

@@ -10,6 +10,8 @@ class Vendor(Base):
     category = Column(String)
     status = Column(String)
     score = Column(Integer)
+    quality = Column(Integer)
+    response_time = Column(Integer)
 
 class PurchaseOrder(Base):
     __tablename__ = "purchase_orders"
@@ -22,3 +24,5 @@ class PurchaseOrder(Base):
     status = Column(String)
     invoice_number = Column(String)
     invoice_status = Column(String)
+    invoice_file = Column(String, nullable=True)
+    proof_of_delivery = Column(String, nullable=True)

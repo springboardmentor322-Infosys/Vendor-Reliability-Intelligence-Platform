@@ -14,7 +14,9 @@ def create_vendor(vendor: schemas.VendorCreate):
         delivery=vendor.delivery,
         category=vendor.category,
         status=vendor.status,
-        score=vendor.score
+        score=vendor.score,
+        quality=vendor.quality,
+response_time=vendor.response_time
     )
 
     db.add(new_vendor)
