@@ -1351,3 +1351,12 @@ def create_pr(req: PRCreateRequest, db: Session = Depends(database.get_db)):
     db.add(pr)
     db.commit()
     return {"success": True, "message": "Department PR Created Successfully", "pr_id": pr.id}
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run('main:app', host='127.0.0.1', port=8000, reload=True)
+
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run('main:app', host='127.0.0.1', port=8000, reload=True)
