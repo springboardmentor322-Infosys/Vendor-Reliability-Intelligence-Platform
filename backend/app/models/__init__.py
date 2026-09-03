@@ -1,3 +1,4 @@
+from app.models.app_setting import AppSetting
 from app.models.communication import AuditLog, ThreadMessage, ThreadType
 from app.models.user import Role, User
 from app.models.vendor import Vendor, VendorCategory, VendorContact, VendorDocument, VendorStatus, VendorStatusHistory
@@ -18,6 +19,7 @@ from app.models.vendoriq import (
 )
 
 __all__ = [
+    "AppSetting",
     "AuditLog",
     "ThreadMessage",
     "ThreadType",

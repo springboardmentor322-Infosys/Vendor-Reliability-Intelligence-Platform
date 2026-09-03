@@ -7,6 +7,7 @@ from sqlalchemy.exc import OperationalError
 
 from app.db.base import Base
 from app.models import communication  # noqa: F401 — register thread_messages & audit_logs tables
+import app.models.app_setting  # noqa: F401 — register app_settings table
 import app.models.supply_chain  # noqa: F401 — register products, deliveries, invoices, quality_inspections
 from app.db.seed_admin import ensure_admin_account
 from app.db.seed_vendor_categories import ensure_vendor_categories

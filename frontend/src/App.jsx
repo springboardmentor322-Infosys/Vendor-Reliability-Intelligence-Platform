@@ -31,6 +31,11 @@ import DeliveryTracking from './pages/DeliveryTracking'
 import QualityInspection from './pages/QualityInspection'
 import CommunicationHistory from './pages/CommunicationHistory'
 import MyDocuments from './pages/MyDocuments'
+import UserManagement from './pages/UserManagement'
+import RolesPermissions from './pages/RolesPermissions'
+import SystemSettings from './pages/SystemSettings'
+import SystemHealth from './pages/SystemHealth'
+import PurchaseOrderApprovalTrails from './pages/PurchaseOrderApprovalTrails'
 
 export default function App() {
   return (
@@ -47,6 +52,11 @@ export default function App() {
               <Route path="/vendor-dashboard" element={<VendorDashboard />} />
               <Route path="/finance-dashboard" element={<FinanceDashboard />} />
               <Route path="/vendor-management" element={<VendorManagement />} />
+              <Route path="/user-management" element={<UserManagement />} />
+              <Route path="/roles-permissions" element={<RolesPermissions />} />
+              <Route path="/system-settings" element={<SystemSettings />} />
+              <Route path="/system-health" element={<SystemHealth />} />
+              <Route path="/po-approval-trails" element={<PurchaseOrderApprovalTrails />} />
               <Route path="/my-vendor-profile" element={<VendorProfile />} />
               <Route path="/procurement" element={<ProcurementDashboard />} />
               <Route path="/purchase-orders" element={<PurchaseOrders />} />

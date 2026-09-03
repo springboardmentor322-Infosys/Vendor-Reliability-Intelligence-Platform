@@ -26,6 +26,17 @@ REGISTERABLE_ROLES = frozenset(
     }
 )
 
+# Staff roles that admins may reassign among each other. Administrator is seeded
+# only; Vendor is an external account category and is not interchangeable.
+INTERNAL_ASSIGNABLE_ROLES = frozenset(
+    {
+        Role.PROCUREMENT_MANAGER,
+        Role.SUPPLY_CHAIN_MANAGER,
+        Role.FINANCE_OFFICER,
+        Role.AUDITOR,
+    }
+)
+
 
 class User(Base):
     __tablename__ = "users"

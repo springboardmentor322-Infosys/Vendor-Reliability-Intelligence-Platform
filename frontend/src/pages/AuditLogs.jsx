@@ -8,6 +8,7 @@ import '../vendor-management.css'
 const ENTITY_TYPES = [
   { value: '', label: 'All entity types' },
   { value: 'purchase_order', label: 'Purchase Order' },
+  { value: 'user', label: 'User' },
   { value: 'vendor', label: 'Vendor' },
   { value: 'contract', label: 'Contract' },
 ]
