@@ -246,3 +246,8 @@ Automated procurement recommendations
 License
 
 This project is developed for educational and project demonstration purposes.
+## 🎥 Demo Video
+
+This video demonstrates the key features and workflow of the Vendor Reliability Intelligence & Procurement Risk Management Platform.
+
+[▶️ Watch Demo Video](docs/vendor-reliability.mp4)
