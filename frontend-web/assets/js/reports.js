@@ -29,6 +29,15 @@ document.getElementById("download-vendor-report").addEventListener("click", () =
 document.getElementById("download-po-report").addEventListener("click", () =>
   downloadCsv("/reports/purchase-orders.csv", "purchase_orders_report.csv")
 );
+document.getElementById("download-vendor-xlsx").addEventListener("click", () =>
+  downloadCsv("/reports/vendor-performance.xlsx", "vendor_performance_report.xlsx")
+);
+document.getElementById("download-vendor-pdf").addEventListener("click", () =>
+  downloadCsv("/reports/vendor-performance.pdf", "vendor_performance_report.pdf")
+);
+document.getElementById("download-contract-report").addEventListener("click", () =>
+  downloadCsv("/reports/contracts.csv", "contracts_report.csv")
+);
 
 async function loadRanking() {
   try {

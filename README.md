@@ -54,12 +54,24 @@ cd vendoriq
 docker compose up --build
 ```
 
-- Frontend: http://localhost:8080
-- Backend API: http://localhost:8000
-- Interactive API docs (Swagger UI): http://localhost:8000/docs
+- Frontend: http://localhost:18080
+- Backend API: http://localhost:18081
+- Interactive API docs (Swagger UI): http://localhost:18081/docs
 
-First time only: create your first user by opening http://localhost:8080/register.html
-and signing up (pick "Administrator" as the role so you can approve vendors).
+The local Docker setup creates a demonstration account for each of the six
+roles.  Sign in at http://localhost:18080 with any email below and password
+`Demo12`: `demo.admin@vendoriq-app.org`, `demo.procurement@vendoriq-app.org`,
+`demo.supplychain@vendoriq-app.org`, `demo.vendor@vendoriq-app.org`,
+`demo.finance@vendoriq-app.org`, or `demo.auditor@vendoriq-app.org`.
+Each account opens its own role dashboard.  You may also register a new
+account from http://localhost:18080/register.html and choose its role.
+
+The supplied local Docker mode also creates idempotent supporting business
+records (vendors, products, orders, deliveries, invoices, contracts, quality
+inspections and performance history), so all six dashboards have meaningful
+PostgreSQL data on a fresh demonstration run. It does **not** copy or download
+the external DataCo CSV; import that primary dataset separately from **Data
+Management** when you have downloaded it from Kaggle.
 
 ## One-command start (no Docker)
 
@@ -102,7 +114,7 @@ cp .env.example .env              # then edit DATABASE_URL / SECRET_KEY as neede
 # Apply the database schema
 alembic upgrade head
 
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --reload --port 18081
 ```
 
 ### 3. Frontend
@@ -111,9 +123,9 @@ server (opening the HTML files directly via `file://` will NOT work, because
 the browser blocks the API requests):
 ```bash
 cd frontend-web
-python3 -m http.server 8080
+python3 -m http.server 18080
 ```
-Then open http://localhost:8080
+Then open http://localhost:18080
 
 > If you serve the frontend on a different port, add that origin to
 > `CORS_ORIGINS` in `backend/app/core/config.py` (or via the `.env` file),
@@ -140,42 +152,77 @@ alembic upgrade head
   delivery history, quality, completion rate, responsiveness, and contract
   compliance (see `app/services/reliability.py`); recalculates automatically
   whenever new performance data or contracts come in
+- **Predictive delivery-risk watch** — forecasts each vendor's next-delivery
+  delay probability from their stored delivery history using a documented
+  smoothed statistical model. It is intentionally presented as a forecast, not
+  as a trained ML model; it can be replaced by supervised ML after enough
+  labelled organisation history has accumulated.
 - **Contracts & Compliance** — tracking with auto-derived status
   (active / expiring soon / expired) based on dates
 - **Notifications** — in-app notifications (e.g. on PO status changes)
-- **Reports & Export** — CSV export for vendor performance and purchase
-  orders (opens directly in Excel), plus a reliability ranking view
-- **Dashboards** — overview stats, recent vendors, reliability ranking
+- **Email notifications (SMTP)** — optional email delivery for vendor approval,
+  delayed delivery, contract-expiry, and paid-invoice events. PostgreSQL
+  notifications remain available even when SMTP is not configured.
+- **Reports & Export** — CSV, Excel, and PDF vendor-performance exports,
+  purchase-order and contract reports, plus a reliability ranking view
+- **Dashboards & Metrics** — six role dashboards, overview stats, recent
+  vendors, reliability ranking, risk recommendations, and calculated metrics
 
-## What's intentionally left as configuration, not code
+## SMTP email setup (optional)
+
+Email is off by default, so the project runs without any personal mail
+credentials. To enable it, edit the root `.env` file (never commit this file)
+and add your mail provider values. For a Gmail account, first enable two-step
+verification and create a **Google App Password**; do not use your normal Gmail
+password.
+
+```env
+SMTP_ENABLED=true
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your-email@gmail.com
+SMTP_PASSWORD=your-16-character-google-app-password
+SMTP_FROM_EMAIL=your-email@gmail.com
+SMTP_FROM_NAME=VendorIQ
+SMTP_USE_TLS=true
+SMTP_USE_SSL=false
+```
+
+Then restart VendorIQ with `START_VENDORIZ.bat`. The settings are passed only
+to the VendorIQ backend container. If no SMTP values are supplied, the alerts
+continue to appear inside the Notifications page and the business action still
+completes normally.
+
+## What's intentionally left as environment-specific configuration
 
 These need real third-party credentials that only you can provide, so
 they're wired as clear extension points rather than guessed at:
 
-- **Email/SMS delivery** — `app/services/notifications.py` creates in-app
-  notification records; plug an SMTP client or Twilio call in right after
-  `db.add(notification)` once you have real credentials.
 - **Cloud deployment (AWS/Azure/Kubernetes)** — the Dockerfile and
   docker-compose.yml work locally as-is; deploying to a specific cloud
   account needs your account details and is a separate, environment-specific
   step.
-- **PDF export** — CSV export is implemented (opens in Excel); PDF report
-  generation can be added on top the same way (e.g. with `reportlab`) if
-  you want it.
+- **SMS delivery** — SMTP email is supported. SMS needs organisation-owned
+  Twilio (or equivalent) credentials and is intentionally not enabled.
 
 ## Default local ports
 
 | Service   | Port |
 |-----------|------|
-| Frontend  | 8080 |
-| Backend   | 8000 |
+| Frontend  | 18080 |
+| Backend   | 18081 |
 | PostgreSQL| 5432 |
 | Redis     | 6379 |
 
-## Hardened runnable version
+## Current runnable version
 
-Read [RUNBOOK.md](RUNBOOK.md) before starting the current version. It replaces
-the older bootstrap guidance above: copy `.env.example` to `.env`, provide a
-unique `SECRET_KEY`, start Docker Compose, and create the first Administrator
-through the one-time `/api/v1/auth/setup` endpoint. Public registration no
-longer permits selection of an administrator or staff role.
+Run [START_VENDORIZ.bat](START_VENDORIZ.bat) with Docker Desktop open. VendorIQ
+is deliberately isolated on frontend port `18080`, API port `18081`, the
+`vendoriq-complete` Docker network, and its own PostgreSQL volume. This lets it
+run beside another local Docker project without sharing containers or ports.
+
+For the required primary data source, download the **DataCo Smart Supply Chain
+Dataset** CSV from Kaggle and, as an Administrator or Procurement Manager, open
+**Data Management** in the app to import it. Supporting vendor, contract,
+invoice and quality records are generated automatically in the local demo and
+can also be safely regenerated from that page.

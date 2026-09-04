@@ -53,9 +53,20 @@ function renderContracts() {
         <td class="mono">${endDate}</td>
         <td>${complianceBadge}</td>
         <td>${badgeHtml(c.status)}</td>
+        <td>${canRenewContract() ? `<button class="btn btn-ghost" style="padding:6px 12px" data-renew="${c.id}">Renew</button>` : ""}</td>
       </tr>`;
     })
     .join("");
+  body.querySelectorAll("[data-renew]").forEach((btn) => btn.addEventListener("click", () => renewContract(btn.dataset.renew)));
+}
+
+function canRenewContract() { return ["administrator", "procurement_manager", "auditor"].includes(Auth.getUser()?.role); }
+async function renewContract(id) {
+  const contract_number = prompt("New contract number"); if (!contract_number) return;
+  const start_date = prompt("Start date (YYYY-MM-DD)"); const end_date = prompt("End date (YYYY-MM-DD)");
+  if (!start_date || !end_date) return;
+  try { await Api.post(`/contracts/${id}/renew`, {contract_number, start_date: `${start_date}T00:00:00`, end_date: `${end_date}T00:00:00`}); loadContracts(); }
+  catch (err) { alert(err.message || "Could not renew contract."); }
 }
 
 function escapeHtml(str) {
@@ -106,6 +117,9 @@ createForm.addEventListener("submit", async (e) => {
     contract_number: document.getElementById("contract_number").value.trim(),
     start_date: startDate ? `${startDate}T00:00:00` : null,
     end_date: endDate ? `${endDate}T00:00:00` : null,
+    renewal_notice_days: Number(document.getElementById("renewal_notice_days").value || 30),
+    is_compliant: document.getElementById("is_compliant").value === "true",
+    terms: document.getElementById("contract_terms").value.trim() || null,
   };
 
   if (!payload.vendor_id || !payload.title || !payload.contract_number || !startDate || !endDate) {

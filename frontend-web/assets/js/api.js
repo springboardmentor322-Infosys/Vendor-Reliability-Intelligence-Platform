@@ -5,6 +5,7 @@
  * - parses JSON and throws a normal Error with the backend's message on failure
  */
 const TOKEN_KEY = "vendoriq_token";
+const REFRESH_TOKEN_KEY = "vendoriq_refresh_token";
 const USER_KEY = "vendoriq_user";
 
 const Auth = {
@@ -13,6 +14,9 @@ const Auth = {
   },
   setToken(token) {
     localStorage.setItem(TOKEN_KEY, token);
+  },
+  setRefreshToken(token) {
+    if (token) localStorage.setItem(REFRESH_TOKEN_KEY, token);
   },
   getUser() {
     const raw = localStorage.getItem(USER_KEY);
@@ -26,8 +30,27 @@ const Auth = {
   },
   logout() {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     window.location.href = "index.html";
+  },
+  async refreshSession() {
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    if (!refreshToken) return false;
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+      if (!response.ok) return false;
+      const tokens = await response.json();
+      this.setToken(tokens.access_token);
+      this.setRefreshToken(tokens.refresh_token);
+      return true;
+    } catch (_) {
+      return false;
+    }
   },
   /** Call at the top of any protected page (dashboard.html, vendors.html). */
   requireLogin() {
@@ -44,22 +67,36 @@ const Api = {
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     let payload = body;
-    if (body && !formEncoded) {
+    if (body instanceof FormData) {
+      payload = body;
+    } else if (body && !formEncoded) {
       headers["Content-Type"] = "application/json";
       payload = JSON.stringify(body);
     } else if (formEncoded) {
       headers["Content-Type"] = "application/x-www-form-urlencoded";
     }
 
-    const res = await fetch(`${API_BASE_URL}${path}`, {
-      method,
-      headers,
-      body: payload,
-    });
+    let res;
+    const send = () => fetch(`${API_BASE_URL}${path}`, { method, headers, body: payload });
+    try {
+      res = await send();
+    } catch (networkError) {
+      throw new Error("Cannot connect to the VendorIQ API. Start Docker Desktop, run START_VENDORIZ.bat, and wait for the API health-check success message.");
+    }
 
-    if (res.status === 401) {
-      Auth.logout();
-      throw new Error("Session expired. Please log in again.");
+    // A 401 while signing in means the entered credentials are wrong.  Do not
+    // redirect in that case: the sign-in page needs to show its error message.
+    // A 401 on an authenticated request does mean the saved session has expired.
+    if (res.status === 401 && token) {
+      const refreshed = await Auth.refreshSession();
+      if (refreshed) {
+        headers["Authorization"] = `Bearer ${Auth.getToken()}`;
+        res = await send();
+      }
+      if (res.status === 401) {
+        Auth.logout();
+        throw new Error("Session expired. Please log in again.");
+      }
     }
 
     const isJson = res.headers.get("content-type")?.includes("application/json");

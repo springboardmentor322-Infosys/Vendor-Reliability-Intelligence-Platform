@@ -45,6 +45,15 @@ const PO_STATUS_FLOW = ["pending", "approved", "ordered", "delivered", "complete
 const VENDOR_MANAGE_ROLES = ["administrator", "procurement_manager", "supply_chain_manager"];
 const VENDOR_APPROVE_ROLES = ["administrator", "procurement_manager"];
 
+const ROLE_DASHBOARD_COPY = {
+  administrator: "System administration and procurement governance",
+  procurement_manager: "Procurement approvals, suppliers, and purchase orders",
+  supply_chain_manager: "Supplier performance and delivery operations",
+  vendor: "Your supplier performance, orders, documents, and contracts",
+  finance_officer: "Approval, invoice, and procurement-value oversight",
+  auditor: "Compliance, contracts, documents, and reporting",
+};
+
 function paintUserChrome(user) {
   const nameEl = document.getElementById("user-name");
   const roleEl = document.getElementById("user-role");
@@ -77,11 +86,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const user = Auth.getUser();
   if (user) paintUserChrome(user);
 
+  const nav = document.querySelector(".sidebar nav");
+  if (nav) {
+    nav.insertAdjacentHTML("beforeend", `
+      <a class="nav-link" href="procurement-requests.html">Requests</a>
+      <a class="nav-link" href="performance.html">Performance</a>
+      <a class="nav-link" href="operations.html">Deliveries &amp; invoices</a>
+      <a class="nav-link" href="communications.html">Messages</a>
+      <a class="nav-link" href="documents.html">Documents</a>
+      <a class="nav-link" href="notifications.html">Notifications</a>
+      <a class="nav-link" href="profile.html">My profile</a>`);
+    if (["administrator", "procurement_manager"].includes(user?.role)) {
+      nav.insertAdjacentHTML("beforeend", '<a class="nav-link" href="data-management.html">Data management</a>');
+    }
+    if (user?.role === "administrator") {
+      nav.insertAdjacentHTML("beforeend", '<a class="nav-link" href="user-management.html">User management</a>');
+    }
+    if (["administrator", "auditor"].includes(user?.role)) {
+      nav.insertAdjacentHTML("beforeend", '<a class="nav-link" href="activity.html">Activity logs</a>');
+    }
+  }
+
   // Refresh from server in case the cached profile is stale
   Api.get("/auth/me")
     .then((freshUser) => {
       Auth.setUser(freshUser);
       paintUserChrome(freshUser);
+      const copy = document.getElementById("role-dashboard-copy");
+      if (copy) copy.textContent = ROLE_DASHBOARD_COPY[freshUser.role] || "Procurement workspace";
     })
     .catch(() => {});
 

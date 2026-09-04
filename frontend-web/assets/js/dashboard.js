@@ -1,16 +1,15 @@
 async function loadDashboard() {
   try {
-    const vendors = await Api.get("/vendors");
+    const [vendors, overview] = await Promise.all([Api.get("/vendors"), Api.get("/analytics/overview")]);
 
-    const total = vendors.length;
-    const approved = vendors.filter((v) => v.status === "approved").length;
-    const pending = vendors.filter((v) => v.status === "pending_approval").length;
-    const avgScore = total
-      ? Math.round(vendors.reduce((sum, v) => sum + (v.reliability_score || 0), 0) / total)
-      : 0;
+    const total = overview.total_vendors;
+    const approved = overview.approved_vendors;
+    const pending = overview.pending_requests;
+    const avgScore = overview.average_reliability;
 
     document.getElementById("stat-total").textContent = total;
     document.getElementById("stat-approved").textContent = approved;
+    document.querySelector("#stat-pending").previousElementSibling.textContent = "Pending requests";
     document.getElementById("stat-pending").textContent = pending;
     document.getElementById("stat-avg-score").textContent = total ? avgScore : "—";
 
