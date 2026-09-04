@@ -2,8 +2,8 @@ const API_BASE = "http://127.0.0.1:8000";
 
 let vendorRowCount = 0;
 
-// Department Budget Tracking Cache
-const budgetData = {
+// Department Budget Tracking Cache (with LocalStorage Persistence Support)
+const defaultBudgetData = {
     "Software Development": { total: 150000, allocated: 120000, spent: 0 },
     "HR": { total: 50000, allocated: 40000, spent: 0 },
     "Network": { total: 80000, allocated: 65000, spent: 0 },
@@ -11,6 +11,16 @@ const budgetData = {
     "Finance": { total: 90000, allocated: 75000, spent: 0 },
     "Management": { total: 120000, allocated: 100000, spent: 0 }
 };
+
+let budgetData = defaultBudgetData;
+const savedBudgets = localStorage.getItem('finance_budget_data');
+if (savedBudgets) {
+    try {
+        budgetData = JSON.parse(savedBudgets);
+    } catch (e) {
+        console.error("Error parsing saved budget data", e);
+    }
+}
 
 // --- 1. SESSION VERIFICATION & LOGOUT ---
 async function verifyFinanceSession() {
@@ -106,7 +116,6 @@ async function loadInvoicesFromDB() {
         const rawInvoices = await res.json();
         const invoices = Array.isArray(rawInvoices) ? rawInvoices : (rawInvoices.data || rawInvoices.invoices || []);
 
-        // Fetch POs to sync real-time order status from Manager Dashboard
         let purchaseOrders = [];
         try {
             const poRes = await fetch(`${API_BASE}/api/v1/purchase-orders`);
@@ -118,7 +127,6 @@ async function loadInvoicesFromDB() {
             console.error("Failed to fetch PO status sync:", poErr);
         }
 
-        // Map invoice numbers to manager order status
         const poStatusMap = {};
         purchaseOrders.forEach(po => {
             poStatusMap[po.invoice_no] = po.production_status || po.order_status;
@@ -161,7 +169,9 @@ async function loadInvoicesFromDB() {
             }
         });
 
-        // 1. Populate Pending Invoices Table (#invoice-tbody)
+        // PERSIST UPDATED SPENT AMOUNTS TO LOCALSTORAGE FOR AUDITOR DASHBOARD SYNC
+        localStorage.setItem('finance_budget_data', JSON.stringify(budgetData));
+
         const pendingTbody = document.getElementById('invoice-tbody');
         if (pendingTbody) {
             pendingTbody.innerHTML = '';
@@ -189,7 +199,6 @@ async function loadInvoicesFromDB() {
             }
         }
 
-        // 2. Populate Approved Invoices Table (#approved-invoices-tbody)
         const approvedTbody = document.getElementById('approved-invoices-tbody');
         if (approvedTbody) {
             const staticMsg = document.getElementById('empty-approved-msg');
@@ -215,7 +224,6 @@ async function loadInvoicesFromDB() {
             }
         }
 
-        // 3. Populate Rejected Invoices Table (#rejected-invoices-tbody)
         const rejectedTbody = document.getElementById('rejected-invoices-tbody');
         if (rejectedTbody) {
             const staticRejectedMsg = document.getElementById('empty-rejected-msg');
@@ -241,7 +249,6 @@ async function loadInvoicesFromDB() {
             }
         }
 
-        // 4. Populate Vendor Orders Table (#vendor-tbody)
         const vendorTbody = document.getElementById('vendor-tbody');
         if (vendorTbody) {
             const staticVendorMsg = document.getElementById('empty-vendor-msg');
@@ -486,7 +493,6 @@ async function extractVendorOrdersReport() {
             return;
         }
 
-        // Build CSV rows
         let csvRows = [];
         csvRows.push(["Inv No", "Vendor", "Product Name", "Order Status", "Inspection", "Payment", "Transaction ID"].join(","));
 
@@ -511,7 +517,6 @@ async function extractVendorOrdersReport() {
             csvRows.push(row.join(","));
         });
 
-        // Use Blob for reliable Excel/CSV downloading
         const csvString = csvRows.join("\r\n");
         const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
@@ -561,6 +566,10 @@ function updateDepartmentBudget(dept, field, value) {
     const numVal = parseFloat(value) || 0;
     if (budgetData[dept]) {
         budgetData[dept][field] = numVal;
+        
+        // Persist the updated state to localStorage so it stays after a refresh
+        localStorage.setItem('finance_budget_data', JSON.stringify(budgetData));
+
         renderBudgetTable();
         renderSettingsBudgetControls();
     }
@@ -699,7 +708,6 @@ window.addEventListener('DOMContentLoaded', () => {
     loadInvoicesFromDB();
 });
 
-// Continuous heartbeat ping every 3 seconds to keep active session count updated
 setInterval(() => {
   const currentUserId = sessionStorage.getItem("user_id") || localStorage.getItem("user_id");
   if (currentUserId) {
@@ -707,7 +715,6 @@ setInterval(() => {
   }
 }, 3000);
 
-// Instantly notify the backend when a tab or window is closed using keepalive fetch
 window.addEventListener('beforeunload', () => {
   const userId = sessionStorage.getItem("user_id") || localStorage.getItem("user_id");
   if (userId) {
@@ -720,7 +727,6 @@ window.addEventListener('beforeunload', () => {
   }
 });
 
-// Safe background polling loop every 3 seconds
 setInterval(() => {
   loadInvoicesFromDB().catch(err => console.error("Finance poll error:", err));
 }, 3000);
