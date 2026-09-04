@@ -1,0 +1,306 @@
+<!-- auditor_dash.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Vendor Reliability - Audit Portal</title>
+    <!-- FontAwesome CDN for UI Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="auditor_style.css">
+    <script src="auditor_script.js" defer></script>
+</head>
+<body>
+
+    <!-- TOP HEADER BAR -->
+    <header class="top-header">
+        <div class="brand-title">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Audit Portal</span>
+        </div>
+        <div class="user-info">
+            <i class="fa-regular fa-circle-user"></i>
+            <span>Auditor</span>
+        </div>
+    </header>
+
+    <div class="app-container">
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="sidebar">
+            <div class="sidebar-menu-wrapper">
+                <div class="sidebar-heading">Audit Navigation</div>
+                <ul class="nav-links">
+                    <li class="active" id="nav-overview">
+                        <a href="#" onclick="switchTab(event, 'view-overview')"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+                    </li>
+                    <li id="nav-audit-logs">
+                        <a href="#" onclick="switchTab(event, 'view-audit-logs')"><i class="fa-solid fa-clipboard-list"></i> System Audit Logs</a>
+                    </li>
+                    <li id="nav-budget">
+                        <a href="#" onclick="switchTab(event, 'view-budget')"><i class="fa-solid fa-wallet"></i> Budget & Allocation</a>
+                    </li>
+                    <li id="nav-vendor-orders">
+                        <a href="#" onclick="switchTab(event, 'view-vendor-orders')"><i class="fa-solid fa-truck-fast"></i> Vendor Orders</a>
+                    </li>
+                    <li id="nav-compliance">
+                        <a href="#" onclick="switchTab(event, 'view-compliance')"><i class="fa-solid fa-shield-halved"></i> Compliance</a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-footer">
+                <a href="#" class="logout-link" onclick="handleLogout(event)">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1 style="font-size: 1.6rem; font-weight: 700;">Auditor Control Center</h1>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 2px;">Monitor system logs, audit financial allocations, and verify regulatory compliance standards.</p>
+            </header>
+
+            <!-- OVERVIEW VIEW -->
+            <div id="view-overview" class="tab-content">
+                <section class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Total System Logs</span>
+                            <i class="fa-solid fa-database"></i>
+                        </div>
+                        <div class="kpi-value" id="dash-total-logs">0</div>
+                        <div class="kpi-subtext text-muted">Recorded system actions</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Flagged Events</span>
+                            <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                        </div>
+                        <div class="kpi-value" id="dash-flagged-events">0</div>
+                        <div class="kpi-subtext text-danger">Requires review</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Compliance Rating</span>
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                        </div>
+                        <div class="kpi-value" id="dash-compliance-rating">100%</div>
+                        <div class="kpi-subtext text-success">Meeting standards</div>
+                    </div>
+                </section>
+
+                <!-- NEW: Overview Grid for Recent Activity & Budget Summary -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+                    
+                    <!-- Recent Audit Activity -->
+                    <section class="data-section" style="margin-bottom: 0;">
+                        <div class="section-header">
+                            <h3>Recent Audit Activity</h3>
+                            <button class="btn btn-secondary" onclick="switchTab(event, 'view-audit-logs')" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">
+                                View All
+                            </button>
+                        </div>
+                        <table style="margin-top: 1rem;">
+                            <thead>
+                                <tr>
+                                    <th style="padding: 0.5rem; font-size: 0.8rem;">Timestamp</th>
+                                    <th style="padding: 0.5rem; font-size: 0.8rem;">Event Type</th>
+                                    <th style="padding: 0.5rem; font-size: 0.8rem;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="overview-recent-logs-tbody">
+                                <tr><td colspan="3" style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 1rem;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Budget Snapshot -->
+                    <section class="data-section" style="margin-bottom: 0;">
+                        <div class="section-header">
+                            <h3>Financial Allocation Snapshot</h3>
+                            <button class="btn btn-secondary" onclick="switchTab(event, 'view-budget')" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">
+                                Full Report
+                            </button>
+                        </div>
+                        <div id="overview-budget-summary" style="margin-top: 1.5rem; padding: 1rem; background: #f8fafc; border-radius: 8px; border: 1px solid var(--border);">
+                            <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading financial data...</p>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+
+            <!-- SYSTEM AUDIT LOGS VIEW -->
+            <div id="view-audit-logs" class="tab-content" style="display: none;">
+                <section class="data-section">
+                    <div class="section-header">
+                        <h3>System Audit Trail</h3>
+                        <button class="btn btn-primary" onclick="exportAuditLogsCSV()">
+                            <i class="fa-solid fa-download"></i> Export CSV
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Event Type</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-tbody">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading audit logs...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
+            <!-- BUDGET & ALLOCATION VIEW -->
+            <div id="view-budget" class="tab-content" style="display: none;">
+                <section class="data-section">
+                    <div class="section-header">
+                        <h3>Budget & Allocation Audit</h3>
+                        <button class="btn btn-primary" onclick="extractBudgetReport()">
+                            <i class="fa-solid fa-download"></i> Extract Report
+                        </button>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Review departmental budget limits, allocated funds, and real-time spending metrics for auditing purposes.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Total Budget</th>
+                                <th>Allocated Amount</th>
+                                <th>Spent Amount</th>
+                                <th>Remaining Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="budget-tbody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                        <tfoot id="budget-tfoot">
+                            <!-- Grand Total populated dynamically via JS -->
+                        </tfoot>
+                    </table>
+                </section>
+            </div>
+
+            <!-- VENDOR ORDERS VIEW -->
+            <div id="view-vendor-orders" class="tab-content" style="display: none;">
+                <section class="data-section">
+                    <div class="section-header">
+                        <h3>Vendor Orders Audit</h3>
+                        <button class="btn btn-primary" onclick="exportVendorOrdersCSV()">
+                            <i class="fa-solid fa-download"></i> Export CSV
+                        </button>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Review and audit all active and historical procurement orders placed with external vendors.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Vendor Name</th>
+                                <th>Items / Description</th>
+                                <th>Total Cost</th>
+                                <th>Transaction ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vendor-orders-tbody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading vendor orders...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
+            <!-- COMPLIANCE VIEW -->
+            <div id="view-compliance" class="tab-content" style="display: none;">
+                <!-- KPI metrics for Compliance -->
+                <section class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Active Frameworks</span>
+                            <i class="fa-solid fa-shield-halved text-primary"></i>
+                        </div>
+                        <div class="kpi-value" id="comp-kpi-active">0</div>
+                        <div class="kpi-subtext text-muted">Monitored standards</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Passed Frameworks</span>
+                            <i class="fa-solid fa-circle-check text-success"></i>
+                        </div>
+                        <div class="kpi-value" id="comp-kpi-passed">0</div>
+                        <div class="kpi-subtext text-success">Fully verified</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span>Control Violations</span>
+                            <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                        </div>
+                        <div class="kpi-value" id="comp-kpi-violations" style="color: var(--danger);">0</div>
+                        <div class="kpi-subtext text-danger">Anomalies detected</div>
+                    </div>
+                </section>
+
+                <!-- Framework checklist table -->
+                <section class="data-section">
+                    <div class="section-header">
+                        <h3>Regulatory Framework Checklist</h3>
+                        <button class="btn btn-primary" onclick="exportComplianceCSV()">
+                            <i class="fa-solid fa-download"></i> Export Compliance Report
+                        </button>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Tracking adherence across mandatory governance frameworks, automated security controls, and privilege workflows.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Standard / Framework</th>
+                                <th>Scope</th>
+                                <th>Last Audit Date</th>
+                                <th>Assigned Lead</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="compliance-tbody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading frameworks...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Automated System Controls Log -->
+                <section class="data-section" style="margin-top: 2rem;">
+                    <div class="section-header">
+                        <h3>Automated Security & Access Controls Log</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Control Category</th>
+                                <th>Description</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody id="compliance-logs-tbody">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading automated logs...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
