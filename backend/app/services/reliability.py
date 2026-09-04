@@ -18,12 +18,13 @@ WEIGHTS = {
     "order_completion": 15.0,
 }
 
-NEUTRAL_SCORE = 50.0
+NEUTRAL_SCORE = 0.0
 
 RECOMMENDATIONS = {
     "High": "Consider alternate supplier, review delivery history",
     "Medium": "Monitor delivery and quality",
     "Low": "Suitable for continued procurement",
+    "Unscored": "No operational history yet. Score stays at 0 until POs, deliveries, or inspections are recorded.",
 }
 
 
@@ -53,17 +54,17 @@ def _response_time_score(hours: float | None) -> float:
     return 25.0
 
 
-def _contract_compliance_score(db: Session, vendor_id: int) -> float:
+def _contract_compliance_score(db: Session, vendor_id: int) -> tuple[float, bool]:
     contracts = list(
         db.scalars(select(Contract).where(Contract.vendor_id == vendor_id))
     )
     if not contracts:
-        return NEUTRAL_SCORE
+        return NEUTRAL_SCORE, False
 
     compliant = sum(
         1 for contract in contracts if str(contract.compliance_flag) == ComplianceFlag.COMPLIANT.value
     )
-    return round(compliant / len(contracts) * 100, 2)
+    return round(compliant / len(contracts) * 100, 2), True
 
 
 def compute_vendor_reliability(db: Session, vendor: Vendor) -> VendorReliabilityScore:
@@ -75,7 +76,7 @@ def compute_vendor_reliability(db: Session, vendor: Vendor) -> VendorReliability
         raw.order_completion_rate if raw.order_completion_rate is not None else NEUTRAL_SCORE
     )
     communication_raw = _response_time_score(raw.average_response_time_hours)
-    compliance_raw = _contract_compliance_score(db, vendor.id)
+    compliance_raw, has_contracts = _contract_compliance_score(db, vendor.id)
 
     factor_scores = {
         "delivery_performance": delivery_raw,
@@ -110,7 +111,17 @@ def compute_vendor_reliability(db: Session, vendor: Vendor) -> VendorReliability
         )
 
     overall_score = round(overall, 2)
-    risk_level = _risk_level(overall_score)
+    sizes = raw.sample_sizes
+    has_history = any(
+        [
+            sizes.deliveries,
+            sizes.quality_inspections,
+            sizes.purchase_orders,
+            sizes.response_pairs,
+            has_contracts,
+        ]
+    )
+    risk_level = "Unscored" if not has_history else _risk_level(overall_score)
 
     return VendorReliabilityScore(
         vendor_id=vendor.id,

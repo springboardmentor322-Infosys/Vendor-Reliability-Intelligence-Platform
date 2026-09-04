@@ -345,7 +345,7 @@ def build_vendor_dashboard(db: Session, user: User) -> VendorDashboardResponse:
         MetricCard(
             label="Reliability Score",
             value=f"{reliability.overall_score:.1f}/100",
-            hint=f"{reliability.risk_level} risk",
+            hint="No history yet" if reliability.risk_level == "Unscored" else f"{reliability.risk_level} risk",
         ),
         MetricCard(label="Total Purchase Orders", value=_fmt_int(po_count), hint="Assigned to your profile"),
         MetricCard(label="On-Time Delivery %", value=_fmt_pct(performance.on_time_delivery_pct), hint="From delivery records"),

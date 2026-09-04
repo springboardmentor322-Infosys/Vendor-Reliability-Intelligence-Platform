@@ -13,9 +13,17 @@ function formatDate(value) {
 
 function scoreClass(score) {
   const value = Number(score)
-  if (value >= 80) return 'status-pill--good'
-  if (value >= 60) return 'status-pill--warn'
+  const pct = value <= 5 ? value * 20 : value
+  if (pct >= 80) return 'status-pill--good'
+  if (pct >= 60) return 'status-pill--warn'
   return 'status-pill--danger'
+}
+
+function formatScore(score) {
+  const value = Number(score)
+  if (Number.isNaN(value)) return '—'
+  if (value <= 5) return `${value.toFixed(1)} / 5`
+  return `${value.toFixed(1)}`
 }
 
 export default function QualityInspection() {
@@ -133,7 +141,7 @@ export default function QualityInspection() {
                     <td>{formatDate(item.inspection_date)}</td>
                     <td>
                       <span className={`status-pill ${scoreClass(item.quality_score)}`}>
-                        {Number(item.quality_score).toFixed(1)}
+                        {formatScore(item.quality_score)}
                       </span>
                     </td>
                     <td>{item.defects_found}</td>

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ProductResponse(BaseModel):
@@ -75,3 +75,10 @@ class QualityInspectionResponse(BaseModel):
     inspector_notes: Optional[str] = None
     vendor_name: Optional[str] = None
     po_number: Optional[str] = None
+
+
+class QualityInspectionCreate(BaseModel):
+    purchase_order_id: int = Field(..., ge=1)
+    quality_score: float = Field(..., ge=0, le=5)
+    defects_found: int = Field(..., ge=0)
+    inspector_notes: Optional[str] = Field(default=None, max_length=10000)

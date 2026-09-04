@@ -81,7 +81,8 @@ export default function VendorDashboard() {
             </div>
             <div className="legend-list">
               <div className="legend-item">
-                <span className="legend-dot" style={{ background: '#10b981' }} /> {data?.risk_level || 'Unscored'} risk
+                <span className="legend-dot" style={{ background: '#10b981' }} />{' '}
+                {data?.risk_level === 'Unscored' || !data?.risk_level ? 'Unscored' : `${data.risk_level} risk`}
               </div>
             </div>
           </div>

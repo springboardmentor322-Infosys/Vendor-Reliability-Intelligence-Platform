@@ -39,7 +39,7 @@ export default function ReliabilityGauge({ score, riskLevel, size = 180 }) {
       <div className="reliability-gauge__label">
         <strong>{normalized.toFixed(1)}</strong>
         <span>Reliability Score</span>
-        {riskLevel ? <em>{riskLevel} Risk</em> : null}
+        {riskLevel === 'Unscored' ? <em>Unscored</em> : riskLevel ? <em>{riskLevel} Risk</em> : null}
       </div>
     </div>
   )

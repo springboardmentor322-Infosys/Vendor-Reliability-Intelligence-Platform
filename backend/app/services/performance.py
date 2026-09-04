@@ -75,12 +75,19 @@ def _compute_order_completion_rate(purchase_orders: list[PurchaseOrder]) -> tupl
     return round(completed / len(active_orders) * 100, 2), len(purchase_orders)
 
 
+def _normalized_quality_score(score: float) -> float:
+    value = float(score)
+    if value <= 5:
+        return value * 20
+    return value
+
+
 def _compute_average_quality_score(
     inspections: list[QualityInspection],
 ) -> tuple[float | None, int]:
     if not inspections:
         return None, 0
-    total = sum(float(inspection.quality_score) for inspection in inspections)
+    total = sum(_normalized_quality_score(inspection.quality_score) for inspection in inspections)
     return round(total / len(inspections), 2), len(inspections)
 
 

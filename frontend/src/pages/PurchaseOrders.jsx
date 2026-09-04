@@ -10,6 +10,7 @@ import {
 } from '../api/purchaseOrders'
 import { fetchProcurementRequests } from '../api/procurement'
 import { fetchVendors } from '../api/vendors'
+import { createQualityInspection } from '../api/supplyChain'
 import { getErrorMessage } from '../utils/auth'
 import { formatDateTime } from '../utils/vendorStatus'
 import DetailTabBar from '../components/DetailTabBar'
@@ -84,12 +85,22 @@ function PODetailModal({ poId, user, onClose, onUpdated }) {
   const [uploading, setUploading] = useState(false)
   const [docType, setDocType] = useState(DOC_TYPES[0])
   const [activeTab, setActiveTab] = useState('overview')
+  const [showInspectionForm, setShowInspectionForm] = useState(false)
+  const [inspectionForm, setInspectionForm] = useState({
+    quality_score: '5',
+    defects_found: '0',
+    inspector_notes: '',
+  })
+  const [savingInspection, setSavingInspection] = useState(false)
+  const [inspectionNotice, setInspectionNotice] = useState('')
   const fileRef = useRef(null)
 
   const role = user?.role
   const isVendor = role === 'Vendor'
   const isPM = role === 'Procurement Manager'
   const canModify = isVendor || isPM
+  const canAddInspection =
+    (role === 'Administrator' || isPM) && ['Delivered', 'Completed'].includes(po?.status)
 
   const allowedStatuses = isVendor ? DELIVERY_STATUSES : isPM ? PM_STATUSES : []
 
@@ -141,6 +152,29 @@ function PODetailModal({ poId, user, onClose, onUpdated }) {
       setError(getErrorMessage(err, 'Failed to upload document'))
     } finally {
       setUploading(false)
+    }
+  }
+
+  const handleCreateInspection = async (event) => {
+    event.preventDefault()
+    if (!poId) return
+    setSavingInspection(true)
+    setInspectionNotice('')
+    setError('')
+    try {
+      await createQualityInspection({
+        purchase_order_id: poId,
+        quality_score: Number(inspectionForm.quality_score),
+        defects_found: Number(inspectionForm.defects_found) || 0,
+        inspector_notes: inspectionForm.inspector_notes.trim() || null,
+      })
+      setInspectionNotice('Quality inspection saved. Open Quality Inspection in the sidebar to see it.')
+      setShowInspectionForm(false)
+      setInspectionForm({ quality_score: '5', defects_found: '0', inspector_notes: '' })
+    } catch (err) {
+      setInspectionNotice(getErrorMessage(err, 'Could not save quality inspection'))
+    } finally {
+      setSavingInspection(false)
     }
   }
 
@@ -207,6 +241,82 @@ function PODetailModal({ poId, user, onClose, onUpdated }) {
                 <p style={{ margin: '0.25rem 0 0', color: '#475569', fontSize: '0.9rem' }}>{po.notes}</p>
               </div>
             )}
+
+            {canAddInspection ? (
+              <div className="vendor-section">
+                <h3>Quality Inspection</h3>
+                {inspectionNotice ? <p className="vendor-notice">{inspectionNotice}</p> : null}
+                {!showInspectionForm ? (
+                  <button
+                    type="button"
+                    className="dashboard-admin-btn dashboard-admin-btn--primary"
+                    onClick={() => {
+                      setShowInspectionForm(true)
+                      setInspectionNotice('')
+                    }}
+                  >
+                    Add Quality Inspection
+                  </button>
+                ) : (
+                  <form className="vendor-form" onSubmit={handleCreateInspection}>
+                    <p style={{ color: '#64748b', fontSize: '0.88rem', margin: '0 0 0.75rem' }}>
+                      Score is 0–5. Existing seeded inspections may still show 0–100 on the Quality Inspection page.
+                    </p>
+                    <label style={{ fontSize: '0.88rem', color: '#334155', display: 'block', marginBottom: '0.6rem' }}>
+                      Quality score (0–5)
+                      <input
+                        type="number"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        value={inspectionForm.quality_score}
+                        onChange={(e) => setInspectionForm((prev) => ({ ...prev, quality_score: e.target.value }))}
+                        required
+                        style={{ display: 'block', marginTop: '0.3rem', padding: '0.45rem 0.65rem', border: '1px solid #e2e8f0', borderRadius: '0.55rem' }}
+                      />
+                    </label>
+                    <label style={{ fontSize: '0.88rem', color: '#334155', display: 'block', marginBottom: '0.6rem' }}>
+                      Defects found
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={inspectionForm.defects_found}
+                        onChange={(e) => setInspectionForm((prev) => ({ ...prev, defects_found: e.target.value }))}
+                        required
+                        style={{ display: 'block', marginTop: '0.3rem', padding: '0.45rem 0.65rem', border: '1px solid #e2e8f0', borderRadius: '0.55rem' }}
+                      />
+                    </label>
+                    <label style={{ fontSize: '0.88rem', color: '#334155', display: 'block', marginBottom: '0.6rem' }}>
+                      Inspector notes
+                      <textarea
+                        rows={3}
+                        value={inspectionForm.inspector_notes}
+                        onChange={(e) => setInspectionForm((prev) => ({ ...prev, inspector_notes: e.target.value }))}
+                        placeholder="Optional"
+                        style={{ display: 'block', marginTop: '0.3rem', padding: '0.45rem 0.65rem', border: '1px solid #e2e8f0', borderRadius: '0.55rem', width: '100%' }}
+                      />
+                    </label>
+                    <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                      <button
+                        type="submit"
+                        className="dashboard-admin-btn dashboard-admin-btn--primary"
+                        disabled={savingInspection}
+                      >
+                        {savingInspection ? 'Saving…' : 'Save inspection'}
+                      </button>
+                      <button
+                        type="button"
+                        className="dashboard-admin-btn dashboard-admin-btn--ghost"
+                        onClick={() => setShowInspectionForm(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            ) : null}
 
             {/* Line items */}
             <div className="vendor-section">
@@ -610,8 +720,8 @@ export default function PurchaseOrders() {
             {isVendor
               ? 'Track your assigned purchase orders and upload delivery documents.'
               : isPM
-                ? 'Create purchase orders, manage statuses, and track fulfilment.'
-                : 'View and track purchase orders across the organisation.'}
+                ? 'Create purchase orders, manage statuses, and open a row to view PO details.'
+                : 'View and track purchase orders across the organisation. Open a row to see PO details.'}
           </p>
         </div>
         {isPM && (
@@ -670,7 +780,7 @@ export default function PurchaseOrders() {
               <th>Expected Delivery</th>
               <th>Total</th>
               <th>Status</th>
-              <th style={{ width: 80 }} />
+              <th>Details</th>
             </tr>
           </thead>
           <tbody>
@@ -688,11 +798,11 @@ export default function PurchaseOrders() {
                 <td>
                   <button
                     type="button"
-                    className="dashboard-admin-btn dashboard-admin-btn--ghost"
-                    style={{ padding: '0.3rem 0.55rem', fontSize: '0.8rem' }}
+                    className="dashboard-admin-btn dashboard-admin-btn--primary"
+                    style={{ padding: '0.3rem 0.7rem', fontSize: '0.82rem' }}
                     onClick={(e) => { e.stopPropagation(); setSelectedPoId(po.id) }}
                   >
-                    View
+                    View details
                   </button>
                 </td>
               </tr>

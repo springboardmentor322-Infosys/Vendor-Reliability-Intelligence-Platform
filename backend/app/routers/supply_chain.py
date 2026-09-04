@@ -1,5 +1,7 @@
 """Supply chain APIs: products, deliveries, invoices, and quality inspections."""
 
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
@@ -17,6 +19,7 @@ from app.schemas.supply_chain import (
     InvoiceStatusUpdate,
     InvoiceSummaryResponse,
     ProductResponse,
+    QualityInspectionCreate,
     QualityInspectionResponse,
 )
 from app.services.audit import format_status_change_description, record_audit_log
@@ -35,6 +38,9 @@ products_router = APIRouter(prefix="/products", tags=["products"])
 deliveries_router = APIRouter(prefix="/deliveries", tags=["deliveries"])
 invoices_router = APIRouter(prefix="/invoices", tags=["invoices"])
 quality_inspections_router = APIRouter(prefix="/quality-inspections", tags=["quality-inspections"])
+
+INSPECTABLE_PO_STATUSES = {"Delivered", "Completed"}
+INSPECTION_WRITERS = {Role.ADMINISTRATOR, Role.PROCUREMENT_MANAGER}
 
 
 def _get_vendor_for_user(user: User, db: Session) -> Vendor | None:
@@ -378,6 +384,58 @@ def list_quality_inspections(
         db.scalars(query.order_by(QualityInspection.inspection_date.desc()).offset(skip).limit(limit))
     )
     return [_inspection_to_response(inspection) for inspection in inspections]
+
+
+@quality_inspections_router.post("", response_model=QualityInspectionResponse, status_code=status.HTTP_201_CREATED)
+def create_quality_inspection(
+    payload: QualityInspectionCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> QualityInspectionResponse:
+    if current_user.role not in INSPECTION_WRITERS:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only Administrators and Procurement Managers can create quality inspections",
+        )
+
+    po = db.scalar(
+        select(PurchaseOrder)
+        .options(selectinload(PurchaseOrder.vendor))
+        .where(PurchaseOrder.id == payload.purchase_order_id)
+    )
+    if po is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Purchase order not found")
+
+    po_status = po.status.value if hasattr(po.status, "value") else str(po.status)
+    if po_status not in INSPECTABLE_PO_STATUSES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Quality inspections can only be added when the purchase order is Delivered or Completed",
+        )
+
+    notes = payload.inspector_notes.strip() if payload.inspector_notes else None
+    inspection = QualityInspection(
+        vendor_id=po.vendor_id,
+        purchase_order_id=po.id,
+        inspection_date=datetime.now(timezone.utc),
+        quality_score=round(payload.quality_score, 2),
+        defects_found=payload.defects_found,
+        inspector_notes=notes or None,
+    )
+    db.add(inspection)
+    db.flush()
+    record_audit_log(
+        db,
+        action_description=(
+            f"Quality inspection scored {inspection.quality_score}/5 for PO {po.po_number} "
+            f"by {current_user.name}"
+        ),
+        performed_by=current_user.id,
+        entity_type="quality_inspection",
+        entity_id=inspection.id,
+    )
+    db.commit()
+    return _inspection_to_response(_get_inspection_or_404(inspection.id, db))
 
 
 @quality_inspections_router.get("/{inspection_id}", response_model=QualityInspectionResponse)
