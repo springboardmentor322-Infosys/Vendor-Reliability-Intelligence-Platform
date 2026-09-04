@@ -1,0 +1,174 @@
+<div class="container">
+
+  <div class="header">
+    <h2>Procurement Requests</h2>
+
+    <button class="add-btn" routerLink="/add-procurement">
+      + Add Request
+    </button>
+  </div>
+
+
+
+  <table class="procurement-table">
+
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Department</th>
+        <th>Requested By</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Workflow</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+
+
+    <tbody>
+
+
+      @for (item of procurements; track item.id) {
+
+
+      <tr>
+
+        <td>{{ item.product_name }}</td>
+
+        <td>{{ item.quantity }}</td>
+
+        <td>{{ item.department }}</td>
+
+        <td>{{ item.requested_by }}</td>
+
+        <td>{{ item.priority }}</td>
+
+
+
+        <td>
+          <span
+          [class]="'status-' + item.status.toLowerCase()">
+            {{ item.status }}
+          </span>
+        </td>
+
+
+
+        <td>
+
+
+          @if (item.status === 'Pending') {
+
+          <button
+            class="approve-btn"
+            (click)="approveProcurement(item.id)">
+            Approve
+          </button>
+
+          }
+
+
+
+          @if (item.status === 'Approved') {
+
+          <button
+            class="order-btn"
+            (click)="orderProcurement(item.id)">
+            Order
+          </button>
+
+          }
+
+
+
+          @if (item.status === 'Ordered') {
+
+          <button
+            class="deliver-btn"
+            (click)="deliverProcurement(item.id)">
+            Deliver
+          </button>
+
+          }
+
+
+
+          @if (item.status === 'Delivered') {
+
+          <button
+            class="complete-btn"
+            (click)="completeProcurement(item.id)">
+            Complete
+          </button>
+
+          }
+
+
+
+          @if (
+            item.status !== 'Completed' &&
+            item.status !== 'Cancelled'
+          ) {
+
+          <button
+            class="cancel-btn"
+            (click)="cancelProcurement(item.id)">
+            Cancel
+          </button>
+
+          }
+
+
+        </td>
+
+
+
+
+        <td>
+
+
+          <button
+            class="edit-btn"
+            (click)="editProcurement(item.id)">
+            Edit
+          </button>
+
+
+
+          <button
+            class="delete-btn"
+            (click)="deleteProcurement(item.id)">
+            Delete
+          </button>
+
+
+        </td>
+
+
+      </tr>
+
+
+      }
+
+
+
+      @empty {
+
+      <tr>
+        <td colspan="8">
+          No procurement requests available.
+        </td>
+      </tr>
+
+      }
+
+
+    </tbody>
+
+
+  </table>
+
+
+</div>

@@ -1,0 +1,498 @@
+<div class="container">
+
+
+  <div class="page-header">
+
+
+    <div>
+
+      <h1>
+        Vendor Management
+      </h1>
+
+      <p>
+        Manage suppliers, approvals and vendor details
+      </p>
+
+    </div>
+
+
+
+    <button
+      *ngIf="canManage"
+      class="add-btn"
+      routerLink="/add-vendor">
+
+      + Add Vendor
+
+    </button>
+
+
+  </div>
+
+
+
+
+
+
+  <!-- Filters -->
+
+  <div class="filter-card">
+
+
+    <input
+
+      type="text"
+
+      placeholder="Search vendor..."
+
+      [(ngModel)]="searchText"
+
+      (input)="applyFilter()">
+
+
+    
+
+
+    <select
+
+      [(ngModel)]="selectedStatus"
+
+      (change)="applyFilter()">
+
+
+
+      <option value="All">
+        All Status
+      </option>
+
+
+      <option value="Pending">
+        Pending
+      </option>
+
+
+      <option value="Under Review">
+        Under Review
+      </option>
+
+
+      <option value="Approved">
+        Approved
+      </option>
+
+
+      <option value="Rejected">
+        Rejected
+      </option>
+
+
+    </select>
+
+
+
+
+
+
+
+    <select
+
+      [(ngModel)]="selectedCategory"
+
+      (change)="applyFilter()">
+
+
+
+      <option value="All">
+
+        All Categories
+
+      </option>
+
+
+
+      @for(category of categories; track category){
+
+
+        <option [value]="category">
+
+          {{category}}
+
+        </option>
+
+
+      }
+
+
+
+    </select>
+
+
+
+  </div>
+
+
+
+
+
+
+
+
+
+  <!-- Vendor Table -->
+
+
+  <div class="table-card">
+
+
+    <table class="vendor-table">
+
+
+
+      <thead>
+
+
+        <tr>
+
+
+          <th>
+            Vendor
+          </th>
+
+
+          <th>
+            Category
+          </th>
+
+
+          <th>
+            Contact
+          </th>
+
+
+          <th>
+            Email
+          </th>
+
+
+          <th>
+            Phone
+          </th>
+
+
+          <th>
+            Status
+          </th>
+
+
+          <th>
+            Approval
+          </th>
+
+
+          <th>
+            Actions
+          </th>
+
+
+        </tr>
+
+
+      </thead>
+
+
+
+
+
+
+
+      <tbody>
+
+
+        @for(vendor of filteredVendors; track vendor.id){
+
+
+
+        <tr>
+
+
+
+          <td>
+
+            <strong>
+
+              {{vendor.vendor_name}}
+
+            </strong>
+
+          </td>
+
+
+
+
+
+          <td>
+
+            {{vendor.category}}
+
+          </td>
+
+
+
+
+
+          <td>
+
+            {{vendor.contact_person}}
+
+          </td>
+
+
+
+
+
+          <td>
+
+            {{vendor.email}}
+
+          </td>
+
+
+
+
+
+          <td>
+
+            {{vendor.phone}}
+
+          </td>
+
+
+
+
+
+
+
+          <td>
+
+
+            <span
+
+            [class]="
+
+            'status-' +
+
+            vendor.status
+
+            .toLowerCase()
+
+            .replace(' ','-')
+
+            ">
+
+
+              {{vendor.status}}
+
+
+            </span>
+
+
+          </td>
+
+
+
+
+
+
+
+          <td>
+
+
+            @if(vendor.status === 'Pending'){
+
+
+              <button
+
+              *ngIf="canManage"
+              class="review-btn"
+
+              (click)="reviewVendor(vendor.id)">
+
+
+                Review
+
+
+              </button>
+
+
+            }
+
+
+
+
+
+
+
+            @if(vendor.status === 'Under Review'){
+
+
+
+              <button
+
+              *ngIf="canManage"
+              class="approve-btn"
+
+              (click)="approveVendor(vendor.id)">
+
+
+
+                Approve
+
+
+              </button>
+
+
+
+
+
+              <button
+
+              *ngIf="canManage"
+              class="reject-btn"
+
+              (click)="rejectVendor(vendor.id)">
+
+
+
+                Reject
+
+
+              </button>
+
+
+
+            }
+
+
+          </td>
+
+
+
+
+
+
+
+
+
+
+          <td>
+
+
+
+            <button
+
+            class="view-btn"
+
+            (click)="viewVendor(vendor.id)">
+
+
+
+              View
+
+
+            </button>
+
+
+
+
+
+
+
+            <button
+
+            *ngIf="canManage"
+              class="edit-btn"
+
+            (click)="editVendor(vendor.id)">
+
+
+
+              Edit
+
+
+            </button>
+
+
+
+
+
+
+
+            <button
+
+            *ngIf="canManage"
+              class="delete-btn"
+
+            (click)="deleteVendor(vendor.id)">
+
+
+
+              Delete
+
+
+            </button>
+
+
+
+          </td>
+
+
+
+
+
+        </tr>
+
+
+
+        }
+
+
+
+
+
+
+        @empty{
+
+
+          <tr>
+
+
+            <td colspan="8" class="empty">
+
+
+              No vendors available.
+
+
+            </td>
+
+
+          </tr>
+
+
+        }
+
+
+
+      </tbody>
+
+
+
+    </table>
+
+
+
+  </div>
+
+
+
+</div>

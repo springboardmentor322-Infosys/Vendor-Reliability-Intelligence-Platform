@@ -1,0 +1,71 @@
+<div class="role-dashboard">
+  <header class="dashboard-header">
+    <div>
+      <div class="crumb">HOME / {{ title | uppercase }}</div>
+      <h1>Welcome back, {{ currentUserName }}! <span>👋</span></h1>
+      <p>{{ subtitle }}</p>
+    </div>
+    <div class="header-actions">
+      <button class="icon-button"><mat-icon>notifications_none</mat-icon><b></b></button>
+      <button class="icon-button"><mat-icon>mail_outline</mat-icon></button>
+      <div class="date-control"><mat-icon>calendar_today</mat-icon><span>This Month</span><mat-icon>expand_more</mat-icon></div>
+      <div class="user-chip"><span>{{ currentUserName.charAt(0) }}</span><div><strong>{{ currentUserName }}</strong><small>{{ title.replace(' Dashboard','') }}</small></div></div>
+    </div>
+  </header>
+
+  <section class="metric-grid">
+    <article class="metric-card" *ngFor="let m of metrics; trackBy: track">
+      <div class="metric-icon" [ngClass]="['metric-icon',m.tone]"><mat-icon>{{m.icon}}</mat-icon></div>
+      <div class="metric-copy"><small>{{m.label}}</small><strong>{{m.value}}</strong><em [class.down]="m.change.startsWith('-')">{{m.change}}</em></div>
+    </article>
+  </section>
+
+  <section class="content-grid first-row">
+    <article class="panel wide-panel">
+      <div class="panel-heading"><div><h2>{{chartTitle}}</h2><p>{{role === 'auditor' ? 'Open, resolved and high-risk findings' : 'Performance trend over recent months'}}</p></div><a routerLink="/analytics">View Details <mat-icon>arrow_forward</mat-icon></a></div>
+      <div class="line-chart">
+        <div class="y-labels"><span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0%</span></div>
+        <svg viewBox="0 0 700 240" preserveAspectRatio="none" aria-label="trend chart">
+          <line x1="0" y1="20" x2="700" y2="20"/><line x1="0" y1="70" x2="700" y2="70"/><line x1="0" y1="120" x2="700" y2="120"/><line x1="0" y1="170" x2="700" y2="170"/><line x1="0" y1="220" x2="700" y2="220"/>
+          <polyline [attr.points]="chartPoints" fill="none" stroke="#5b4bc4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline [attr.points]="secondaryPoints" fill="none" stroke="#2eb7b4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="x-labels"><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span></div>
+      </div>
+    </article>
+
+    <article class="panel donut-panel">
+      <div class="panel-heading"><div><h2>{{donutLabel}}</h2><p>This month</p></div><a routerLink="/reports">View Report <mat-icon>arrow_forward</mat-icon></a></div>
+      <div class="donut-area"><div class="donut" [style.--pct]="donut + '%'" [style.background]="'conic-gradient(#5b4bc4 0 '+donut+'%, #e8e8f2 '+donut+'% 100%)'"><div><strong>{{donut}}%</strong><small>{{donutLabel}}</small></div></div></div>
+      <div class="legend-list"><span><i class="purple"></i>Completed <b>{{donut}}%</b></span><span><i class="gray"></i>Remaining <b>{{100-donut | number:'1.0-1'}}%</b></span></div>
+    </article>
+  </section>
+
+  <section class="content-grid second-row">
+    <article class="panel">
+      <div class="panel-heading"><div><h2>{{ role === 'auditor' ? 'Risk Assessment Overview' : role === 'supply' ? 'Supplier Performance Summary' : role === 'finance' ? 'Payment Summary' : 'Procurement Overview' }}</h2><p>{{ role === 'auditor' ? 'Current vendor risk distribution' : 'Current period summary' }}</p></div><a routerLink="/reliability">View Details <mat-icon>arrow_forward</mat-icon></a></div>
+      <div class="bars">
+        <div class="bar-row" *ngFor="let value of [88,72,62,48,35]; let i=index"><span>{{['Excellent','Good','Average','At Risk','Critical'][i]}}</span><div><i [style.width.%]="value"></i></div><b>{{value}}%</b></div>
+      </div>
+    </article>
+    <article class="panel">
+      <div class="panel-heading"><div><h2>{{ role === 'finance' ? 'Top Vendors by Spend' : role === 'supply' ? 'Top Supply Chain Risks' : role === 'auditor' ? 'Audit Findings Summary' : 'Top Vendor Performance' }}</h2><p>Highest priority items</p></div><a routerLink="/vendors">View All <mat-icon>arrow_forward</mat-icon></a></div>
+      <div class="rank-list"><div *ngFor="let row of tableRows.slice(0,5); let i=index"><span class="rank">{{i+1}}</span><div><strong>{{row.subtitle}}</strong><small>{{row.title}}</small></div><b>{{row.value}}</b></div></div>
+    </article>
+    <article class="panel alerts-panel"><div class="panel-heading"><div><h2>Recent Alerts</h2><p>Needs attention</p></div><a routerLink="/notifications">View All <mat-icon>arrow_forward</mat-icon></a></div><div class="alert-item" *ngFor="let a of alerts"><mat-icon [class]="a.severity">{{a.severity==='error'?'warning':a.severity==='success'?'check_circle':'notifications'}}</mat-icon><div><strong>{{a.title}}</strong><small>{{a.detail}}</small></div></div></article>
+  </section>
+
+  <section class="content-grid third-row">
+    <article class="panel table-panel">
+      <div class="panel-heading"><div><h2>{{tableTitle}}</h2><p>Latest activity from the platform</p></div><a routerLink="/purchase-orders">View All <mat-icon>arrow_forward</mat-icon></a></div>
+      <div class="data-table"><div class="table-head"><span>Reference</span><span>Vendor</span><span>Amount / Detail</span><span>Status</span></div><div class="table-row" *ngFor="let row of tableRows"><span><strong>{{row.title}}</strong></span><span>{{row.subtitle}}</span><span>{{row.value}}</span><span class="status" [ngClass]="['status',(row.status||'Pending').toLowerCase().replaceAll(' ','-')]">{{row.status}}</span></div></div>
+    </article>
+    <article class="panel quick-panel"><div class="panel-heading"><div><h2>Quick Actions</h2><p>Common tasks</p></div></div><div class="quick-grid"><a *ngFor="let q of quickActions" [routerLink]="q.route"><mat-icon>{{q.icon}}</mat-icon><span>{{q.label}}</span><mat-icon>arrow_forward</mat-icon></a></div></article>
+  </section>
+
+  <section class="side-stat-grid">
+    <article *ngFor="let c of sideCards"><div class="side-icon" [ngClass]="['side-icon',c.tone]"><mat-icon>{{c.icon}}</mat-icon></div><div><small>{{c.title}}</small><strong>{{c.value}}</strong><em>{{c.note}}</em></div></article>
+  </section>
+
+  <footer class="insight"><mat-icon>auto_awesome</mat-icon><strong>{{title.replace(' Dashboard','')}} Insight:</strong><span>{{ role === 'auditor' ? 'Review high-risk findings and overdue actions to keep compliance on target.' : role === 'finance' ? 'Spend and payment trends are updated from the latest financial records.' : role === 'supply' ? 'Supplier and delivery trends indicate where operational attention is needed.' : 'Procurement spend and vendor performance are updated from the latest records.' }}</span><a routerLink="/reports">View Full Report <mat-icon>arrow_forward</mat-icon></a></footer>
+</div>
