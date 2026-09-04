@@ -239,7 +239,6 @@ def get_users(role: str = "All", db: Session = Depends(get_db)):
     
     if role and role != "All":
         normalized_role = role.strip().lower().replace(" ", "_")
-        # Match both exact DB value and normalized variations
         if normalized_role == "finance_officer":
             query = query.filter(func.lower(models.User.role).in_(["finance_officer", "auditor", "finance officer"]))
         else:
@@ -265,21 +264,6 @@ def get_active_sessions_count(db: Session = Depends(get_db)):
     valid_users = {u.id for u in db.query(models.User).filter(models.User.status == "approved").all()}
     active_online = set(ACTIVE_SESSIONS.keys()).intersection(valid_users)
     return {"active_sessions": len(active_online)}
-
-
-@app.get("/admin/users")
-def get_users(role: str = "All", db: Session = Depends(get_db)):
-    query = db.query(models.User).filter(models.User.status == "approved")
-    role_map = {
-        "Procurement Manager": "procurement_manager",
-        "Finance Officer": "finance_officer",
-        "Supply Chain Manager": "supply_chain_manager",
-        "Vendor": "vendor"
-    }
-    if role in role_map:
-        query = query.filter(models.User.role == role_map[role])
-    users = query.all()
-    return [{"id": u.id, "fullname": u.fullname, "email": u.email, "role": u.role} for u in users]
 
 
 @app.get("/admin/pending-users")
@@ -405,6 +389,37 @@ def get_purchase_orders(vendor: Optional[str] = None, db: Session = Depends(get_
     if vendor:
         query = query.filter(models.PurchaseOrder.vendor_name == vendor)
     return query.all()
+
+
+# --- Auditor Endpoints (Vendor Orders with Transaction ID & Audit Logs) ---
+
+@app.get("/api/v1/vendor-orders")
+def get_vendor_orders(db: Session = Depends(get_db)):
+    orders = db.query(models.PurchaseOrder).all()
+    result = []
+    for po in orders:
+        invoice = db.query(models.Invoice).filter(models.Invoice.invoice_no == po.invoice_no).first()
+        tx_id = invoice.transaction_id if invoice and invoice.transaction_id else "N/A"
+        result.append({
+            "id": po.invoice_no,
+            "order_id": po.invoice_no,
+            "vendor_name": po.vendor_name,
+            "items": po.product_name,
+            "total_cost": po.total_value,
+            "transaction_id": tx_id
+        })
+    return result
+
+
+@app.get("/api/v1/audit-logs")
+def get_audit_logs(db: Session = Depends(get_db)):
+    logs = db.query(models.SystemLog).order_by(models.SystemLog.id.desc()).all()
+    return [{
+        "timestamp": l.timestamp.strftime("%Y-%m-%d %H:%M:%S") if l.timestamp else "N/A",
+        "event_type": l.event_type,
+        "description": l.description,
+        "status": "Recorded"
+    } for l in logs]
 
 
 @app.put("/api/v1/purchase-orders/{po_id}/status")
