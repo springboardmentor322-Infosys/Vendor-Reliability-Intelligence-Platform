@@ -30,14 +30,12 @@ orders, performance history, contracts and messages so the dashboards aren't emp
 python seed.py
 ```
 
-Demo logins printed after seeding, e.g.:
-| Role | Email | Password |
-|---|---|---|
-| Administrator | admin@vendoriq.com | Admin@123 |
-| Procurement Manager | procurement@vendoriq.com | Proc@123 |
-| Supply Chain Manager | supplychain@vendoriq.com | Supply@123 |
-| Finance Officer | finance@vendoriq.com | Finance@123 |
-| Auditor | auditor@vendoriq.com | Audit@123 |
+### User Accounts
+
+User accounts are created through the VendorIQ registration and administration workflows.
+
+For security reasons, passwords and demo credentials are not stored in this repository.
+
 
 ## 3. Run
 
