@@ -5,7 +5,7 @@
 
     async function loadDashboardData() {
         try {
-            const resVendors = await fetch('http://127.0.0.1:8000/api/vendors');
+            const resVendors = await fetch('/api/vendors');
             const vendors = await resVendors.json();
             globalVendorsData = vendors;
 
@@ -21,7 +21,7 @@
             document.getElementById('kpi-avg-rating').innerText = avgRating + ' / 5';
             document.getElementById('kpi-ontime-delivery').innerText = avgDelivery + '%';
 
-            const resContracts = await fetch('http://127.0.0.1:8000/api/contracts');
+            const resContracts = await fetch('/api/contracts');
             const contracts = await resContracts.json();
             document.getElementById('kpi-active-contracts').innerText = contracts.length;
 
@@ -41,7 +41,7 @@
             });
             
             // Fetch and render charts data
-            const resCharts = await fetch('http://127.0.0.1:8000/api/dashboard/charts');
+            const resCharts = await fetch('/api/dashboard/charts');
             const charts = await resCharts.json();
             renderCharts(charts);
 
@@ -75,7 +75,7 @@
     async function loadAuditLogs() {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await fetch('http://127.0.0.1:8000/api/audit_logs', {
+            const res = await fetch('/api/audit_logs', {
                 headers: { 'Authorization': `Bearer ${ token }` }
             });
             const logs = await res.json();

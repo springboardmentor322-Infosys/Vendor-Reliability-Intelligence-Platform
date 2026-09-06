@@ -261,22 +261,22 @@
                 <span class="material-symbols-outlined text-[18px]">account_balance</span> Manage Budgets
             </button>
 
-            <button onclick="window.open('http://127.0.0.1:8000/api/v1/reports/pdf', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+            <button onclick="window.open('/api/v1/reports/pdf', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
                 <span class="material-symbols-outlined text-[18px] text-rose-400">picture_as_pdf</span> Export PDF
             </button>
-            <button onclick="window.open('http://127.0.0.1:8000/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+            <button onclick="window.open('/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
                 <span class="material-symbols-outlined text-[18px] text-emerald-400">table_view</span> Export Excel/CSV
             </button>
-            <button onclick="window.open('http://127.0.0.1:8000/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+            <button onclick="window.open('/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
                 <span class="material-symbols-outlined text-[18px] text-blue-400">calendar_month</span> Monthly Spending Report
             </button>
-            <button onclick="window.open('http://127.0.0.1:8000/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+            <button onclick="window.open('/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
                 <span class="material-symbols-outlined text-[18px] text-indigo-400">storefront</span> Vendor Spending Report
             </button>
-            <button onclick="window.open('http://127.0.0.1:8000/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+            <button onclick="window.open('/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
                 <span class="material-symbols-outlined text-[18px] text-purple-400">receipt_long</span> Invoice Report
             </button>
-            <button onclick="window.open('http://127.0.0.1:8000/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
+            <button onclick="window.open('/api/v1/reports/finance_csv', '_blank')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2 text-xs">
                 <span class="material-symbols-outlined text-[18px] text-amber-400">account_balance_wallet</span> Procurement Expenditure Report
             </button>
         </div>
@@ -559,7 +559,7 @@
 
         window.approvePR = async function(prId) {
             try {
-                await fetch(`http://127.0.0.1:8000/api/procurement_requests/${prId}/approve`, {method: 'POST'});
+                await fetch(`/api/procurement_requests/${prId}/approve`, {method: 'POST'});
                 alert("PR Approved. PO Generated.");
                 window.location.reload();
             } catch (e) { console.error(e); }
@@ -569,7 +569,7 @@
             let reason = prompt("Enter reason for rejection:");
             if (reason === null) return;
             try {
-                await fetch(`http://127.0.0.1:8000/api/procurement_requests/${prId}/reject`, {
+                await fetch(`/api/procurement_requests/${prId}/reject`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({reason: reason})
@@ -582,11 +582,11 @@
         try {
             // Fetch all data
             const [analytics, prs, pos, invoices, vendorsData] = await Promise.all([
-                fetch('http://127.0.0.1:8000/api/analytics/finance').then(r => r.json()),
-                fetch('http://127.0.0.1:8000/api/procurement_requests').then(r => r.json()),
-                fetch('http://127.0.0.1:8000/api/purchase_orders').then(r => r.json()),
-                fetch('http://127.0.0.1:8000/api/invoices').then(r => r.json()),
-                fetch('http://127.0.0.1:8000/api/vendors').then(r => r.json())
+                fetch('/api/analytics/finance').then(r => r.json()),
+                fetch('/api/procurement_requests').then(r => r.json()),
+                fetch('/api/purchase_orders').then(r => r.json()),
+                fetch('/api/invoices').then(r => r.json()),
+                fetch('/api/vendors').then(r => r.json())
             ]);
 
             const vendorMap = {};
@@ -710,7 +710,7 @@
             if (invoices.length === 0) invBody.innerHTML = '<tr><td colspan="8" class="p-4 text-center italic text-white/30">No Invoices found.</td></tr>';
 
             // 6. Fetch and render charts dynamically
-            const chartData = await fetch('http://127.0.0.1:8000/api/dashboard/charts').then(res => res.json());
+            const chartData = await fetch('/api/dashboard/charts').then(res => res.json());
 
             const trendCtx = document.getElementById('monthlySpendingChart');
             if (trendCtx) {
@@ -805,7 +805,7 @@ async function fetchUnreadCount() {
     try {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         if(!token) return;
-        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        const res = await fetch('/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
         if(res.ok) {
             const notifs = await res.json();
             const unread = notifs.filter(n => !n.is_read).length;
@@ -868,7 +868,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentEntityType || !currentEntityId) return;
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentEntityType}/${currentEntityId}`, {
+            const res = await fetch(`/api/threads/${currentEntityType}/${currentEntityId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const thread = await res.json();
@@ -935,7 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentThreadId}/messages`, {
+            const res = await fetch(`/api/threads/${currentThreadId}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ content })
@@ -952,7 +952,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function approvePR(id) {
         const token = localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/procurement_requests/${id}/approve`, {
+            const res = await fetch(`/api/procurement_requests/${id}/approve`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -973,7 +973,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (reason === null) return;
         const token = localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/procurement_requests/${id}/reject`, {
+            const res = await fetch(`/api/procurement_requests/${id}/reject`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ reason: reason || "Rejected by Finance" })
@@ -995,7 +995,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("No document attached to this invoice.");
             return;
         }
-        window.open(path.startsWith('http') ? path : 'http://127.0.0.1:8000/' + path, '_blank');
+        window.open(path.startsWith('http') ? path : '/' + path, '_blank');
     }
 </script>
 
@@ -1028,7 +1028,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
             const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
-            const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+            const res = await fetch('/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
             if(res.ok) {
                 const notifs = await res.json();
                 const container = document.getElementById('notif-messages');
@@ -1109,7 +1109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.innerHTML = '<tr><td colspan="3" class="text-center p-4 text-white/50">Loading...</td></tr>';
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await fetch('http://127.0.0.1:8000/api/budgets', { headers: { 'Authorization': `Bearer ${token}` } });
+            const res = await fetch('/api/budgets', { headers: { 'Authorization': `Bearer ${token}` } });
             const budgets = await res.json();
             tbody.innerHTML = '';
             budgets.forEach(b => {
@@ -1141,7 +1141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await fetch('http://127.0.0.1:8000/api/budgets', {
+            const res = await fetch('/api/budgets', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ department: dept, limit: limit })

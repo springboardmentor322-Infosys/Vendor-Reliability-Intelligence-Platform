@@ -328,7 +328,7 @@
     async function loadPRs() {
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await fetch('http://127.0.0.1:8000/api/procurement_requests', {
+            const response = await fetch('/api/procurement_requests', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const prs = await response.json();
@@ -385,7 +385,7 @@
         
         const token = localStorage.getItem('accessToken');
         try {
-            await fetch(`http://127.0.0.1:8000/api/procurement_requests/${prId}/status`, {
+            await fetch(`/api/procurement_requests/${prId}/status`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ approval_status: status })
@@ -399,7 +399,7 @@
     async function openCreatePRModal() { 
         document.getElementById('create-pr-modal').classList.remove('hidden'); 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/vendors');
+            const response = await fetch('/api/vendors');
             const vendors = await response.json();
             const select = document.getElementById('pr-vendor');
             select.innerHTML = '<option value="">Select an Approved Vendor...</option>';
@@ -446,7 +446,7 @@
         const token = localStorage.getItem('accessToken');
 
         try {
-            const prRes = await fetch('http://127.0.0.1:8000/api/procurement_requests', {
+            const prRes = await fetch('/api/procurement_requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({
@@ -472,7 +472,7 @@
                 const qty = parseInt(row.querySelector('.item-qty').value, 10);
                 const cost = parseFloat(row.querySelector('.item-cost').value);
                 
-                await fetch(`http://127.0.0.1:8000/api/procurement_requests/${pr.id}/items`, {
+                await fetch(`/api/procurement_requests/${pr.id}/items`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ item_details: desc, quantity: qty, estimated_cost: cost })
@@ -501,7 +501,7 @@
         
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await fetch('http://127.0.0.1:8000/api/vendors', {
+            const response = await fetch('/api/vendors', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const vendors = await response.json();
@@ -538,7 +538,7 @@
         const token = localStorage.getItem('accessToken');
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/purchase_orders', {
+            const response = await fetch('/api/purchase_orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({
@@ -641,7 +641,7 @@ async function fetchUnreadCount() {
     try {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         if(!token) return;
-        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        const res = await fetch('/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
         if(res.ok) {
             const notifs = await res.json();
             const unread = notifs.filter(n => !n.is_read).length;
@@ -704,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentEntityType || !currentEntityId) return;
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentEntityType}/${currentEntityId}`, {
+            const res = await fetch(`/api/threads/${currentEntityType}/${currentEntityId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const thread = await res.json();
@@ -771,7 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentThreadId}/messages`, {
+            const res = await fetch(`/api/threads/${currentThreadId}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ content })

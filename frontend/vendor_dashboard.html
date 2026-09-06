@@ -465,7 +465,7 @@
 
         window.uploadInvoice = async function(poId) {
             try {
-                await fetch(`http://127.0.0.1:8000/api/purchase_orders/${poId}/invoice`, {method: 'POST'});
+                await fetch(`/api/purchase_orders/${poId}/invoice`, {method: 'POST'});
                 alert("Invoice Uploaded and Paid. Reliability score updated.");
                 window.location.reload();
             } catch(e) { console.error(e); }
@@ -473,7 +473,7 @@
 
         window.updateDelivery = async function(poId) {
             try {
-                await fetch(`http://127.0.0.1:8000/api/delivery/${poId}/status?status=Delivered`, {method: 'POST'});
+                await fetch(`/api/delivery/${poId}/status?status=Delivered`, {method: 'POST'});
                 alert("Status updated to Delivered. Score recalculated.");
                 window.location.reload();
             } catch(e) { console.error(e); }
@@ -484,7 +484,7 @@
             const category = document.getElementById('profile-category').value;
             const token = localStorage.getItem('accessToken');
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/vendors/${currentVendorId}`, {
+                const response = await fetch(`/api/vendors/${currentVendorId}`, {
                     method: 'PUT',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -504,7 +504,7 @@
         };
 
         try {
-            const vendors = await fetch('http://127.0.0.1:8000/api/vendors').then(res => res.json());
+            const vendors = await fetch('/api/vendors').then(res => res.json());
             const currentVendor = vendors.find(v => v.user_id == userId);
             
             if (currentVendor) {
@@ -514,7 +514,7 @@
                 currentVendorId = 1; // Fallback if user doesn't have an associated vendor record somehow
             }
 
-            const intel = await fetch(`http://127.0.0.1:8000/api/intelligence/calculate_score/${currentVendorId}`, { method: 'POST' }).then(res => res.json());
+            const intel = await fetch(`/api/intelligence/calculate_score/${currentVendorId}`, { method: 'POST' }).then(res => res.json());
             
             document.getElementById('kpi-score').innerText = intel.score;
             document.getElementById('kpi-risk-badge').innerText = intel.risk_level + ' Risk';
@@ -529,7 +529,7 @@
                 badgeElem.className = 'px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 animate-pulse';
             }
 
-            const pos = await fetch('http://127.0.0.1:8000/api/purchase_orders').then(res => res.json());
+            const pos = await fetch('/api/purchase_orders').then(res => res.json());
             const vendorPos = pos.filter(p => p.vendor_id == currentVendorId);
             
             document.getElementById('kpi-total').innerText = vendorPos.length;
@@ -562,7 +562,7 @@
             }
 
             // Fetch Contracts
-            const contracts = await fetch('http://127.0.0.1:8000/api/contracts').then(res => res.json());
+            const contracts = await fetch('/api/contracts').then(res => res.json());
             const vendorContracts = contracts.filter(c => c.vendor_id == currentVendorId);
             const contractsBody = document.getElementById('contracts-table-body');
             if (contractsBody) {
@@ -585,7 +585,7 @@
 
             // Fetch Notifications
             const token = localStorage.getItem('accessToken');
-            const notifs = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', {
+            const notifs = await fetch('/api/intelligence/notifications', {
                 headers: { 'Authorization': `Bearer ${token}` }
             }).then(res => res.json());
             
@@ -670,7 +670,7 @@ async function fetchUnreadCount() {
     try {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         if(!token) return;
-        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        const res = await fetch('/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
         if(res.ok) {
             const notifs = await res.json();
             const unread = notifs.filter(n => !n.is_read).length;
@@ -733,7 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentEntityType || !currentEntityId) return;
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentEntityType}/${currentEntityId}`, {
+            const res = await fetch(`/api/threads/${currentEntityType}/${currentEntityId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const thread = await res.json();
@@ -800,7 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentThreadId}/messages`, {
+            const res = await fetch(`/api/threads/${currentThreadId}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ content })

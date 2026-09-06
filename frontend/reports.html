@@ -111,7 +111,7 @@
     <script>
         async function fetchPreview() {
             const riskFilter = document.getElementById('riskFilter').value;
-            let url = 'http://127.0.0.1:8000/api/vendors';
+            let url = '/api/vendors';
             
             try {
                 const res = await fetch(url);
@@ -146,13 +146,13 @@
 
         function downloadCSV() {
             const riskFilter = document.getElementById('riskFilter').value;
-            let url = 'http://127.0.0.1:8000/api/v1/reports/csv';
+            let url = '/api/v1/reports/csv';
             if (riskFilter) url += '?risk_level=' + riskFilter;
             window.open(url, '_blank');
         }
 
         function downloadPDF() {
-            window.open('http://127.0.0.1:8000/api/v1/reports/pdf', '_blank');
+            window.open('/api/v1/reports/pdf', '_blank');
         }
 
         document.addEventListener('DOMContentLoaded', fetchPreview);
@@ -206,7 +206,7 @@ async function fetchUnreadCount() {
     try {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         if(!token) return;
-        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        const res = await fetch('/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
         if(res.ok) {
             const notifs = await res.json();
             const unread = notifs.filter(n => !n.is_read).length;

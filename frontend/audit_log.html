@@ -480,7 +480,7 @@
 
     document.addEventListener("DOMContentLoaded", async () => {
         try {
-            const logs = await fetch('http://127.0.0.1:8000/api/audit_logs').then(res => res.json());
+            const logs = await fetch('/api/audit_logs').then(res => res.json());
             
             // Populate table with Logs
             const tbody = document.getElementById('vendors-table-body');
@@ -554,7 +554,7 @@ async function fetchUnreadCount() {
     try {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         if(!token) return;
-        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        const res = await fetch('/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
         if(res.ok) {
             const notifs = await res.json();
             const unread = notifs.filter(n => !n.is_read).length;

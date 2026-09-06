@@ -7,6 +7,8 @@ from pydantic import BaseModel
 from typing import List, Optional, Callable
 import io
 import csv
+import os
+from fastapi.staticfiles import StaticFiles
 
 import models, database, services
 
@@ -344,10 +346,6 @@ allow_read_only_and_above = RoleChecker(["admin", "procumentor", "auditor", "ven
 allow_admin_only = RoleChecker(["admin"])
 
 # --- Endpoints ---
-
-@app.get("/")
-def root():
-    return {"message": "VendorIntel API is running"}
 
 @app.get("/api/vendors", response_model=List[VendorResponse])
 def get_vendors(db: Session = Depends(database.get_db)):
@@ -1352,11 +1350,13 @@ def create_pr(req: PRCreateRequest, db: Session = Depends(database.get_db)):
     db.commit()
     return {"success": True, "message": "Department PR Created Successfully", "pr_id": pr.id}
 
+# Mount static files at the root
+frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
+if os.path.exists(frontend_dir):
+    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run('main:app', host='127.0.0.1', port=8000, reload=True)
-
-
-if __name__ == '__main__':
-    import uvicorn
-    uvicorn.run('main:app', host='127.0.0.1', port=8000, reload=True)
+    # Use port 8000 locally, but allow Render to specify $PORT
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run('main:app', host='0.0.0.0', port=port)

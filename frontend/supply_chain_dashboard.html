@@ -489,7 +489,7 @@
 
         window.markDelayed = async function(poId) {
             try {
-                await fetch(`http://127.0.0.1:8000/api/delivery/${poId}/status?status=Delayed`, {method: 'POST'});
+                await fetch(`/api/delivery/${poId}/status?status=Delayed`, {method: 'POST'});
                 alert("PO marked as Delayed. Vendor score impacted and Admin notified.");
                 window.location.reload();
             } catch (e) { console.error(e); }
@@ -498,21 +498,21 @@
         window.cancelOrder = async function(poId) {
             if(!confirm("Are you sure you want to cancel this order?")) return;
             try {
-                await fetch(`http://127.0.0.1:8000/api/delivery/${poId}/status?status=Cancelled`, {method: 'POST'});
+                await fetch(`/api/delivery/${poId}/status?status=Cancelled`, {method: 'POST'});
                 alert("Order has been Cancelled successfully.");
                 window.location.reload();
             } catch (e) { console.error(e); }
         };
 
         try {
-            const analytics = await fetch('http://127.0.0.1:8000/api/analytics/supply_chain').then(res => res.json());
+            const analytics = await fetch('/api/analytics/supply_chain').then(res => res.json());
             
             document.getElementById('kpi-pending-deliveries').innerText = analytics.total_pos;
             document.getElementById('kpi-delayed-orders').innerText = analytics.delayed;
             document.getElementById('kpi-in-transit').innerText = analytics.in_transit;
             document.getElementById('kpi-completed-deliveries').innerText = analytics.delivered;
             
-            const pos = await fetch('http://127.0.0.1:8000/api/purchase_orders').then(res => res.json());
+            const pos = await fetch('/api/purchase_orders').then(res => res.json());
             const tbody = document.getElementById('vendors-table-body');
             if(tbody) {
                 tbody.innerHTML = '';
@@ -541,7 +541,7 @@
             }
 
             // Fetch and render charts dynamically
-            const chartData = await fetch('http://127.0.0.1:8000/api/dashboard/charts').then(res => res.json());
+            const chartData = await fetch('/api/dashboard/charts').then(res => res.json());
 
             const trendCtx = document.getElementById('trendChart');
             if (trendCtx) {
@@ -664,7 +664,7 @@ async function fetchUnreadCount() {
     try {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         if(!token) return;
-        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        const res = await fetch('/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
         if(res.ok) {
             const notifs = await res.json();
             const unread = notifs.filter(n => !n.is_read).length;
@@ -727,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentEntityType || !currentEntityId) return;
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentEntityType}/${currentEntityId}`, {
+            const res = await fetch(`/api/threads/${currentEntityType}/${currentEntityId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const thread = await res.json();
@@ -794,7 +794,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentThreadId}/messages`, {
+            const res = await fetch(`/api/threads/${currentThreadId}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ content })

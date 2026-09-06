@@ -210,7 +210,7 @@
         // Fetch Backend Data and Populate Dashboard
         async function loadDashboardData() {
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/vendors');
+                const response = await fetch('/api/vendors');
                 if (!response.ok) throw new Error('Network response was not ok');
                 const vendors = await response.json();
 
@@ -296,7 +296,7 @@
             const token = localStorage.getItem('accessToken');
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/vendors', {
+                const response = await fetch('/api/vendors', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -332,7 +332,7 @@
             modal.classList.remove('hidden');
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/vendors');
+                const response = await fetch('/api/vendors');
                 const vendors = await response.json();
                 const tbody = document.getElementById('all-vendors-tbody');
                 tbody.innerHTML = '';
@@ -376,7 +376,7 @@
         async function updateVendorStatus(vendorId, newStatus) {
             const token = localStorage.getItem('accessToken');
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/vendors/${vendorId}/status`, {
+                const response = await fetch(`/api/vendors/${vendorId}/status`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -399,7 +399,7 @@
         if (!confirm("Are you sure you want to delete this vendor and all associated records?")) return;
         const token = localStorage.getItem('accessToken');
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/vendors/${vendorId}`, {
+            const response = await fetch(`/api/vendors/${vendorId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -416,4 +416,4 @@
 
     function closeManageVendorsModal() {
         document.getElementById('manage-vendors-modal').classList.add('hidden');
-    }
+    }

@@ -501,7 +501,7 @@
         const token = localStorage.getItem('accessToken');
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/vendors', {
+            const response = await fetch('/api/vendors', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -542,7 +542,7 @@
 
     async function populateVendorSelect() {
         const token = localStorage.getItem('accessToken');
-        const response = await fetch('http://127.0.0.1:8000/api/vendors', { headers: { 'Authorization': `Bearer ${token}` } });
+        const response = await fetch('/api/vendors', { headers: { 'Authorization': `Bearer ${token}` } });
         const vendors = await response.json();
         const select = document.getElementById('perf-vendor-id');
         select.innerHTML = '<option value="">Select Vendor...</option>';
@@ -565,7 +565,7 @@
         };
 
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/performance_logs', {
+            const res = await fetch('/api/performance_logs', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(payload)
@@ -587,7 +587,7 @@
             const headers = { 'Authorization': `Bearer ${token}` };
 
             // Load Telemetry KPIs
-            const resTelemetry = await fetch('http://127.0.0.1:8000/api/dashboard/telemetry', { headers });
+            const resTelemetry = await fetch('/api/dashboard/telemetry', { headers });
             const telemetry = await resTelemetry.json();
             
             document.getElementById('kpi-active-vendors').innerText = telemetry.active_vendors;
@@ -596,12 +596,12 @@
             document.getElementById('kpi-open-disputes').innerText = telemetry.open_disputes;
             
             // Load Charts
-            const resCharts = await fetch('http://127.0.0.1:8000/api/dashboard/charts', { headers });
+            const resCharts = await fetch('/api/dashboard/charts', { headers });
             const charts = await resCharts.json();
             renderCharts(charts);
             
             // Load Recent Transactions (Mocking by getting recent Audit Logs if possible, else PRs)
-            const resLogs = await fetch('http://127.0.0.1:8000/api/audit_logs', { headers });
+            const resLogs = await fetch('/api/audit_logs', { headers });
             const logs = await resLogs.json();
             
             const tbody = document.getElementById('transactions-table-body');
@@ -688,7 +688,7 @@
     }
 
     function exportReport() {
-        window.open('http://127.0.0.1:8000/api/v1/reports/pdf', '_blank');
+        window.open('/api/v1/reports/pdf', '_blank');
     }
 
     document.addEventListener('DOMContentLoaded', loadProcurementData);
@@ -742,7 +742,7 @@ async function fetchUnreadCount() {
     try {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         if(!token) return;
-        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        const res = await fetch('/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
         if(res.ok) {
             const notifs = await res.json();
             const unread = notifs.filter(n => !n.is_read).length;
@@ -808,7 +808,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/threads/${entityType}/${entityId}`, {
+            const res = await fetch(`/api/threads/${entityType}/${entityId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const thread = await res.json();
@@ -854,7 +854,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentThreadId}/messages`, {
+            const res = await fetch(`/api/threads/${currentThreadId}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ content })
@@ -895,7 +895,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
             const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
-            const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+            const res = await fetch('/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
             if(res.ok) {
                 const notifs = await res.json();
                 const container = document.getElementById('notif-messages');

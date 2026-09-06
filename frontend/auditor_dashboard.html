@@ -978,7 +978,7 @@
     // Fetch Backend Data and Populate Dashboard
     async function loadDashboardData() {
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/vendors');
+            const response = await fetch('/api/vendors');
             if (!response.ok) throw new Error('Network response was not ok');
             const vendors = await response.json();
             
@@ -1058,7 +1058,7 @@
         const status = document.getElementById('add-status').value;
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/vendors', {
+            const response = await fetch('/api/vendors', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1088,7 +1088,7 @@
         modal.classList.remove('hidden');
         
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/vendors');
+            const response = await fetch('/api/vendors');
             const vendors = await response.json();
             const tbody = document.getElementById('all-vendors-tbody');
             tbody.innerHTML = '';
@@ -1283,7 +1283,7 @@
     loadDashboardData = async function() {
         await originalLoad();
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/vendors');
+            const res = await fetch('/api/vendors');
             globalVendorsData = await res.json();
         } catch(e) {}
     }
@@ -1323,7 +1323,7 @@
 <script>
     async function loadDashboardData() {
         try {
-            const resVendors = await fetch('http://127.0.0.1:8000/api/vendors');
+            const resVendors = await fetch('/api/vendors');
             const vendors = await resVendors.json();
             
             const total = vendors.length;
@@ -1338,7 +1338,7 @@
             document.getElementById('kpi-avg-rating').innerText = avgRating + ' / 5';
             document.getElementById('kpi-ontime-delivery').innerText = avgDelivery + '%';
             
-            const resContracts = await fetch('http://127.0.0.1:8000/api/contracts');
+            const resContracts = await fetch('/api/contracts');
             const contracts = await resContracts.json();
             document.getElementById('kpi-active-contracts').innerText = contracts.length;
             
@@ -1411,7 +1411,7 @@ async function fetchUnreadCount() {
     try {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         if(!token) return;
-        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        const res = await fetch('/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
         if(res.ok) {
             const notifs = await res.json();
             const unread = notifs.filter(n => !n.is_read).length;
@@ -1443,7 +1443,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
 async function loadAIInsights() {
     try {
-        const res = await fetch('http://127.0.0.1:8000/api/intelligence/insights');
+        const res = await fetch('/api/intelligence/insights');
         if (res.ok) {
             const insights = await res.json();
             const container = document.getElementById('ai-insights-container');
@@ -1474,7 +1474,7 @@ document.addEventListener('DOMContentLoaded', loadAIInsights);
     async function populateQAVendors() {
         const select = document.getElementById('qa-vendor-id');
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/vendors');
+            const res = await fetch('/api/vendors');
             if (res.ok) {
                 const vendors = await res.json();
                 select.innerHTML = vendors.map(v => `<option value="${v.id}">${v.company_name}</option>`).join('');
@@ -1488,7 +1488,7 @@ document.addEventListener('DOMContentLoaded', loadAIInsights);
         const token = localStorage.getItem('token');
         
         try {
-            const res = await fetch('http://127.0.0.1:8000/api/intelligence/notify_quality', {
+            const res = await fetch('/api/intelligence/notify_quality', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -283,12 +283,12 @@
     async function loadContracts() {
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await fetch('http://127.0.0.1:8000/api/contracts', {
+            const response = await fetch('/api/contracts', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const contracts = await response.json();
 
-            const vendorRes = await fetch('http://127.0.0.1:8000/api/vendors');
+            const vendorRes = await fetch('/api/vendors');
             const vendors = await vendorRes.json();
             const vendorMap = {};
             vendors.forEach(v => vendorMap[v.id] = v.company_name);
@@ -386,7 +386,7 @@
         const token = localStorage.getItem('accessToken');
         
         try {
-            await fetch(`http://127.0.0.1:8000/api/contracts/${id}/upload`, {
+            await fetch(`/api/contracts/${id}/upload`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ document_url: file })
@@ -412,7 +412,7 @@
         const token = localStorage.getItem('accessToken');
         
         try {
-            await fetch(`http://127.0.0.1:8000/api/contracts`, {
+            await fetch(`/api/contracts`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ vendor_id, start_date, expiry_date, status, renewal_notice_days: 30 })
@@ -436,7 +436,7 @@
         if (!currentEntityType || !currentEntityId) return;
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentEntityType}/${currentEntityId}`, {
+            const res = await fetch(`/api/threads/${currentEntityType}/${currentEntityId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const thread = await res.json();
@@ -503,7 +503,7 @@
 
         const token = localStorage.getItem('accessToken');
         try {
-            const res = await fetch(`http://127.0.0.1:8000/api/threads/${currentThreadId}/messages`, {
+            const res = await fetch(`/api/threads/${currentThreadId}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ content })
@@ -589,7 +589,7 @@ async function fetchUnreadCount() {
     try {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         if(!token) return;
-        const res = await fetch('http://127.0.0.1:8000/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
+        const res = await fetch('/api/intelligence/notifications', { headers: { 'Authorization': 'Bearer ' + token }});
         if(res.ok) {
             const notifs = await res.json();
             const unread = notifs.filter(n => !n.is_read).length;
