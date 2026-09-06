@@ -148,7 +148,7 @@ Provides access to audit and review activities including:
 
 A typical procurement workflow can be handled through the following sequence:
 
-```text
+
 Procurement Request
         |
         v
@@ -787,6 +787,6 @@ The platform includes:
 * User Management
 * Settings
 
-The project is maintained on the assigned GitHub development branch.
+
 
 
