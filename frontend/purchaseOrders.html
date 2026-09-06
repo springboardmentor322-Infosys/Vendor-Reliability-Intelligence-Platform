@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Purchase Orders</title>
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/purchaseOrders.css" />
+  </head>
+
+  <body>
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+      <div id="navbar"></div>
+
+      <div class="page-content">
+        <div class="page-header">
+          <h2>Purchase Orders</h2>
+
+          <button id="addPurchaseOrderBtn" class="btn-primary">
+            + Add Purchase Order
+          </button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>PO Number</th>
+
+              <th>Vendor</th>
+
+              <th>Product</th>
+
+              <th>Amount</th>
+
+              <th>Status</th>
+
+              <th>Delivery</th>
+
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody id="purchaseOrderTableBody"></tbody>
+        </table>
+
+        <div class="purchase-order-pagination-wrapper">
+          <div
+            id="purchaseOrderPaginationInfo"
+            class="purchase-order-pagination-info"
+          >
+            Showing 0 to 0 of 0 purchase orders
+          </div>
+
+          <div
+            id="purchaseOrderPagination"
+            class="purchase-order-pagination"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+
+    <div class="modal" id="purchaseOrderModal">
+      <div class="modal-content">
+        <h2 id="purchaseOrderModalTitle">Add Purchase Order</h2>
+
+        <form id="purchaseOrderForm">
+          <input type="text" id="poNumber" placeholder="PO Number" required />
+
+          <select id="vendorSelect" required>
+            <option value="">Select Vendor</option>
+          </select>
+
+          <select id="productSelect" required>
+            <option value="">Select Product</option>
+          </select>
+
+          <input type="number" id="amount" placeholder="Amount" required />
+
+          <input type="date" id="orderDate" required />
+
+          <input type="date" id="deliveryDate" required />
+
+          <select id="status" required>
+            <option value="Pending">Pending</option>
+
+            <option value="Processing">Processing</option>
+
+            <option value="Completed">Completed</option>
+
+            <option value="Cancelled">Cancelled</option>
+
+            <option value="On Hold">On Hold</option>
+
+            <option value="Payment Review">Payment Review</option>
+
+            <option value="Pending Payment">Pending Payment</option>
+
+            <option value="Suspected Fraud">Suspected Fraud</option>
+          </select>
+
+          <textarea id="description" placeholder="Description"></textarea>
+
+          <div class="modal-buttons">
+            <button type="submit" class="btn-primary">Save</button>
+
+            <button
+              type="button"
+              id="cancelPurchaseOrder"
+              class="btn-secondary"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ======================================
+CONFIRM DELETE MODAL
+====================================== -->
+
+    <div id="confirmModal" class="confirm-modal">
+      <div class="confirm-box">
+        <h3>Confirm Delete</h3>
+
+        <p id="confirmMessage">Are you sure?</p>
+
+        <div class="confirm-actions">
+          <button id="confirmNo" class="btn btn-secondary">Cancel</button>
+
+          <button id="confirmYes" class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/roleAccess.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/confirm.js"></script>
+    <script src="js/purchaseOrders.js"></script>
+
+    <script>
+      requirePermission("purchaseOrders");
+    </script>
+  </body>
+</html>

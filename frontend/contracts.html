@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Contracts</title>
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/contracts.css" />
+  </head>
+
+  <body>
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+      <div id="navbar"></div>
+
+      <div class="page-content">
+        <div class="page-header">
+          <div>
+            <h2>Contracts</h2>
+            <p>Manage Vendor Contracts</p>
+          </div>
+
+          <button id="addContractBtn" class="primary-btn">
+            + Add Contract
+          </button>
+        </div>
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Contract No.</th>
+
+                <th>Vendor</th>
+
+                <th>Start Date</th>
+
+                <th>End Date</th>
+
+                <th>Contract Value</th>
+
+                <th>Status</th>
+
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="contractTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination-wrapper">
+          <div id="contractPaginationInfo" class="pagination-info">
+            Showing 0 to 0 of 0 contracts
+          </div>
+
+          <div id="contractPagination" class="pagination"></div>
+        </div>
+
+        <div id="footer"></div>
+      </div>
+    </div>
+
+    <!-- Contract Modal -->
+
+    <div class="modal" id="contractModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="contractModalTitle">Add Contract</h3>
+
+          <button type="button" id="closeContractModal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <form id="contractForm">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="contractNumber"> Contract Number </label>
+
+                <input type="text" id="contractNumber" required />
+              </div>
+
+              <div class="form-group">
+                <label for="contractVendor"> Vendor </label>
+
+                <select id="contractVendor" required>
+                  <option value="">Select Vendor</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="contractStartDate"> Start Date </label>
+
+                <input type="date" id="contractStartDate" required />
+              </div>
+
+              <div class="form-group">
+                <label for="contractEndDate"> End Date </label>
+
+                <input type="date" id="contractEndDate" required />
+              </div>
+
+              <div class="form-group">
+                <label for="contractValue"> Contract Value </label>
+
+                <input
+                  type="number"
+                  id="contractValue"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="contractStatus"> Status </label>
+
+                <select id="contractStatus" required>
+                  <option value="Active">Active</option>
+
+                  <option value="Pending">Pending</option>
+
+                  <option value="Expired">Expired</option>
+
+                  <option value="Terminated">Terminated</option>
+                </select>
+              </div>
+
+              <div class="form-group full">
+                <label for="contractTerms"> Terms </label>
+
+                <textarea
+                  id="contractTerms"
+                  rows="5"
+                  maxlength="1000"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="secondary-btn" id="cancelContract">
+                Cancel
+              </button>
+
+              <button type="submit" class="primary-btn">Save Contract</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+
+    <div id="toast" class="toast"></div>
+
+    <!-- Confirmation -->
+
+    <div id="confirmModal" class="confirm-modal">
+      <div class="confirm-box">
+        <h3>Confirmation</h3>
+
+        <p id="confirmMessage"></p>
+
+        <div class="confirm-buttons">
+          <button id="confirmYes">Yes</button>
+
+          <button id="confirmNo">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/roleAccess.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/components.js"></script>
+
+    <script src="js/toast.js"></script>
+
+    <script src="js/confirm.js"></script>
+
+    <script src="js/contracts.js"></script>
+    <script>
+      requirePermission("contracts");
+    </script>
+  </body>
+</html>

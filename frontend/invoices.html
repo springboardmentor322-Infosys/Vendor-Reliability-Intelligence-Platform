@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <title>Invoices</title>
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/invoices.css" />
+  </head>
+
+  <body>
+
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+
+      <div id="navbar"></div>
+
+      <div class="page-content">
+
+        <div class="page-header">
+
+          <div>
+            <h2>Invoices</h2>
+            <p>Manage Vendor Invoices</p>
+          </div>
+
+          <button
+            id="addInvoiceBtn"
+            class="primary-btn"
+          >
+            + Add Invoice
+          </button>
+
+        </div>
+
+
+        <div class="table-card">
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>Invoice Number</th>
+
+                <th>PO Number</th>
+
+                <th>Vendor</th>
+
+                <th>Invoice Date</th>
+
+                <th>Due Date</th>
+
+                <th>Amount</th>
+
+                <th>Payment Status</th>
+
+                <th>Actions</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="invoiceTableBody">
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        <div class="pagination-container">
+
+          <div
+            id="invoicePaginationInfo"
+            class="pagination-info"
+          >
+            Showing 0 to 0 of 0 invoices
+          </div>
+
+          <div
+            id="invoicePagination"
+            class="pagination"
+          ></div>
+
+        </div>
+
+
+        <div id="footer"></div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Invoice Modal -->
+
+    <div
+      class="modal"
+      id="invoiceModal"
+    >
+
+      <div class="modal-content">
+
+        <div class="modal-header">
+
+          <h3 id="invoiceModalTitle">
+            Add Invoice
+          </h3>
+
+          <button
+            id="closeInvoiceModal"
+            type="button"
+          >
+            &times;
+          </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+          <form id="invoiceForm">
+
+            <div class="form-grid">
+
+
+              <div class="form-group">
+
+                <label>
+                  Purchase Order
+                </label>
+
+                <select
+                  id="invoicePurchaseOrder"
+                  required
+                >
+
+                  <option value="">
+                    Select Purchase Order
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>
+                  Vendor
+                </label>
+
+                <select
+                  id="invoiceVendor"
+                  required
+                >
+
+                  <option value="">
+                    Select Vendor
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>
+                  Invoice Date
+                </label>
+
+                <input
+                  type="date"
+                  id="invoiceDate"
+                  required
+                />
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>
+                  Due Date
+                </label>
+
+                <input
+                  type="date"
+                  id="invoiceDueDate"
+                  required
+                />
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>
+                  Amount
+                </label>
+
+                <input
+                  type="number"
+                  id="invoiceAmount"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>
+                  Payment Status
+                </label>
+
+                <select
+                  id="invoicePaymentStatus"
+                >
+
+                  <option value="Pending">
+                    Pending
+                  </option>
+
+                  <option value="Paid">
+                    Paid
+                  </option>
+
+                  <option value="Overdue">
+                    Overdue
+                  </option>
+
+                  <option value="Cancelled">
+                    Cancelled
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <div class="form-group full">
+
+                <label>
+                  Notes
+                </label>
+
+                <textarea
+                  id="invoiceNotes"
+                  rows="4"
+                ></textarea>
+
+              </div>
+
+
+            </div>
+
+
+            <div class="modal-footer">
+
+              <button
+                type="button"
+                class="secondary-btn"
+                id="cancelInvoice"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                class="primary-btn"
+              >
+                Save Invoice
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Toast -->
+
+    <div
+      id="toast"
+      class="toast"
+    ></div>
+
+
+    <!-- Confirmation Modal -->
+
+    <div
+      id="confirmModal"
+      class="confirm-modal"
+    >
+
+      <div class="confirm-box">
+
+        <h3>Confirmation</h3>
+
+        <p id="confirmMessage"></p>
+
+        <div class="confirm-buttons">
+
+          <button id="confirmYes">
+            Yes
+          </button>
+
+          <button id="confirmNo">
+            Cancel
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <script src="js/api.js"></script>
+    <script src="js/roleAccess.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/components.js"></script>
+
+    <script src="js/toast.js"></script>
+
+    <script src="js/confirm.js"></script>
+
+    <script src="js/invoices.js"></script>
+
+    <script>
+      requirePermission("invoices");    
+    </script>
+
+  </body>
+</html>

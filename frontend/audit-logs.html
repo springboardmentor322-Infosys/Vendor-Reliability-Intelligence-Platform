@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Audit Logs | VendorIQ</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/navbar.css">
+
+    <link
+        rel="stylesheet"
+        href="css/audit-logs.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div
+        id="sidebarOverlay"
+        class="sidebar-overlay"
+    ></div>
+
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+        <!-- Navbar -->
+        <div id="navbar"></div>
+
+
+        <!-- Audit Logs Page -->
+        <main class="audit-page">
+
+            <div class="page-header">
+
+                <div>
+                    <h1>Audit Logs</h1>
+
+                    <p>
+                        Monitor and review system activity
+                        across VendorIQ.
+                    </p>
+                </div>
+
+                <div class="audit-header-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+
+            </div>
+
+
+            <!-- Summary -->
+            <section class="audit-summary">
+
+                <div class="audit-stat-card">
+
+                    <div class="audit-stat-icon">
+                        <i class="fa-solid fa-list"></i>
+                    </div>
+
+                    <div>
+                        <span>Total Activity</span>
+
+                        <strong id="totalActivity">
+                            -
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="audit-stat-card">
+
+                    <div class="audit-stat-icon">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+
+                    <div>
+                        <span>Users Tracked</span>
+
+                        <strong id="usersTracked">
+                            -
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="audit-stat-card">
+
+                    <div class="audit-stat-icon">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+
+                    <div>
+                        <span>Latest Activity</span>
+
+                        <strong id="latestActivity">
+                            -
+                        </strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Audit Logs -->
+            <section class="audit-card">
+
+                <div class="filter-header">
+
+                    <div>
+                        <h2>System Activity</h2>
+
+                        <p>
+                            Review actions performed
+                            across the platform.
+                        </p>
+                    </div>
+
+                    <button
+                        id="refreshAuditLogs"
+                        class="refresh-btn"
+                        type="button"
+                    >
+                        <i class="fa-solid fa-rotate"></i>
+                        Refresh
+                    </button>
+
+                </div>
+
+
+                <!-- Filters -->
+                <div class="audit-filters">
+
+                    <div class="filter-group">
+
+                        <label for="searchAudit">
+                            Search
+                        </label>
+
+                        <div class="search-box">
+
+                            <i class="fa-solid fa-search"></i>
+
+                            <input
+                                type="text"
+                                id="searchAudit"
+                                placeholder="Search activity..."
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="filter-group">
+
+                        <label for="actionFilter">
+                            Action
+                        </label>
+
+                        <select id="actionFilter">
+
+                            <option value="">
+                                All Actions
+                            </option>
+
+                            <option value="CREATE">
+                                Create
+                            </option>
+
+                            <option value="UPDATE">
+                                Update
+                            </option>
+
+                            <option value="DELETE">
+                                Delete
+                            </option>
+
+                            <option value="STATUS_CHANGE">
+                                Status Change
+                            </option>
+
+                            <option value="LOGIN">
+                                Login
+                            </option>
+
+                            <option value="LOGOUT">
+                                Logout
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="filter-group">
+
+                        <label for="moduleFilter">
+                            Module
+                        </label>
+
+                        <select id="moduleFilter">
+
+                            <option value="">
+                                All Modules
+                            </option>
+
+                            <option value="Users">
+                                Users
+                            </option>
+
+                            <option value="Vendors">
+                                Vendors
+                            </option>
+
+                            <option value="Procurement Requests">
+                                Procurement Requests
+                            </option>
+
+                            <option value="Purchase Orders">
+                                Purchase Orders
+                            </option>
+
+                            <option value="Deliveries">
+                                Deliveries
+                            </option>
+
+                            <option value="Contracts">
+                                Contracts
+                            </option>
+
+                            <option value="Invoices">
+                                Invoices
+                            </option>
+
+                            <option value="Quality Inspections">
+                                Quality Inspections
+                            </option>
+
+                            <option value="Notifications">
+                                Notifications
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="filter-group">
+
+                        <label for="roleFilter">
+                            Role
+                        </label>
+
+                        <select id="roleFilter">
+
+                            <option value="">
+                                All Roles
+                            </option>
+
+                            <option value="Administrator">
+                                Administrator
+                            </option>
+
+                            <option value="Procurement Manager">
+                                Procurement Manager
+                            </option>
+
+                            <option value="Supply Chain Manager">
+                                Supply Chain Manager
+                            </option>
+
+                            <option value="Vendor">
+                                Vendor
+                            </option>
+
+                            <option value="Finance Officer">
+                                Finance Officer
+                            </option>
+
+                            <option value="Auditor">
+                                Auditor
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Table -->
+                <div class="table-wrapper">
+
+                    <table class="audit-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Date & Time</th>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Action</th>
+                                <th>Module</th>
+                                <th>Description</th>
+                                <th>Details</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="auditLogsBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="7"
+                                    class="loading-cell"
+                                >
+                                    Loading audit logs...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- Pagination -->
+                <div class="pagination">
+
+                    <button
+                        id="previousPage"
+                        type="button"
+                    >
+                        <i class="fa-solid fa-chevron-left"></i>
+                        Previous
+                    </button>
+
+                    <span id="pageNumber">
+                        Page 1
+                    </span>
+
+                    <button
+                        id="nextPage"
+                        type="button"
+                    >
+                        Next
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <!-- Footer -->
+        <div id="footer"></div>
+
+    </div>
+
+
+    <!-- Core JS -->
+    <script src="js/api.js"></script>
+    <script src="js/roleAccess.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/audit-logs.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Deliveries</title>
+
+    <!-- Global CSS -->
+
+    <link rel="stylesheet" href="css/style.css" />
+
+    <link rel="stylesheet" href="css/layout.css" />
+
+    <link rel="stylesheet" href="css/sidebar.css" />
+
+    <link rel="stylesheet" href="css/navbar.css" />
+
+    <!-- Deliveries CSS -->
+
+    <link rel="stylesheet" href="css/deliveries.css" />
+  </head>
+
+  <body>
+    <!-- ================================
+         SIDEBAR
+    ================================= -->
+
+    <div id="sidebar-container"></div>
+
+    <!-- ================================
+         MAIN CONTENT
+    ================================= -->
+
+    <div class="main-content">
+      <!-- ================================
+             NAVBAR
+        ================================= -->
+
+      <div id="navbar"></div>
+
+      <!-- ================================
+             PAGE CONTENT
+        ================================= -->
+
+      <div class="page-content">
+        <!-- ================================
+                 PAGE HEADER
+            ================================= -->
+
+        <div class="page-header">
+          <div>
+            <h2>Deliveries</h2>
+
+            <p>Manage Vendor Deliveries</p>
+          </div>
+
+          <button id="addDeliveryBtn" class="primary-btn" type="button">
+            <i class="fa-solid fa-plus"></i>
+
+            Add Delivery
+          </button>
+        </div>
+
+        <!-- ================================
+                 DELIVERY TABLE
+            ================================= -->
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+
+                <th>PO Number</th>
+
+                <th>Vendor</th>
+
+                <th>Delivery Date</th>
+
+                <th>Expected Date</th>
+
+                <th>Delay</th>
+
+                <th>Status</th>
+
+                <th>Damaged Goods</th>
+
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="deliveryTableBody">
+              <!-- JavaScript loads deliveries here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ================================
+                 PAGINATION
+            ================================= -->
+
+        <div class="pagination-container">
+          <div id="deliveryPaginationInfo" class="pagination-info">
+            Showing 0 to 0 of 0 deliveries
+          </div>
+
+          <div id="deliveryPagination" class="pagination"></div>
+        </div>
+
+        <!-- ================================
+                 FOOTER
+            ================================= -->
+
+        <div id="footer"></div>
+      </div>
+    </div>
+
+    <!-- ================================
+         DELIVERY MODAL
+    ================================= -->
+
+    <div class="modal" id="deliveryModal">
+      <div class="modal-content">
+        <!-- ================================
+                 MODAL HEADER
+            ================================= -->
+
+        <div class="modal-header">
+          <h3 id="deliveryModalTitle">Add Delivery</h3>
+
+          <button id="closeDeliveryModal" type="button" aria-label="Close">
+            &times;
+          </button>
+        </div>
+
+        <!-- ================================
+                 MODAL BODY
+            ================================= -->
+
+        <div class="modal-body">
+          <form id="deliveryForm">
+            <div class="form-grid">
+              <!-- ================================
+                             PURCHASE ORDER
+                        ================================= -->
+
+              <div class="form-group">
+                <label for="deliveryPurchaseOrderSelect">
+                  Purchase Order
+                </label>
+
+                <select id="deliveryPurchaseOrderSelect" required>
+                  <option value="">Select Purchase Order</option>
+                </select>
+              </div>
+
+              <!-- ================================
+                             VENDOR
+                        ================================= -->
+
+              <div class="form-group">
+                <label for="deliveryVendorSelect"> Vendor </label>
+
+                <select id="deliveryVendorSelect" required disabled>
+                  <option value="">Select Purchase Order First</option>
+                </select>
+              </div>
+
+              <!-- ================================
+                             DELIVERY DATE
+                        ================================= -->
+
+              <div class="form-group">
+                <label for="deliveryDate"> Delivery Date </label>
+
+                <input type="date" id="deliveryDate" required />
+              </div>
+
+              <!-- ================================
+                             EXPECTED DELIVERY DATE
+                        ================================= -->
+
+              <div class="form-group">
+                <label for="expectedDeliveryDate">
+                  Expected Delivery Date
+                </label>
+
+                <input type="date" id="expectedDeliveryDate" required />
+              </div>
+
+              <!-- ================================
+                             DELAY DAYS
+                        ================================= -->
+
+              <div class="form-group">
+                <label for="delayDays"> Delay Days </label>
+
+                <input type="number" id="delayDays" min="0" value="0" />
+              </div>
+
+              <!-- ================================
+                             STATUS
+                        ================================= -->
+
+              <div class="form-group">
+                <label for="deliveryStatus"> Status </label>
+
+                <select id="deliveryStatus">
+                  <option value="Delivered">Delivered</option>
+
+                  <option value="Pending">Pending</option>
+
+                  <option value="Delayed">Delayed</option>
+
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+
+              <!-- ================================
+                             DAMAGED GOODS
+                        ================================= -->
+
+              <div class="form-group">
+                <label for="damagedGoods"> Damaged Goods </label>
+
+                <input type="number" id="damagedGoods" min="0" value="0" />
+              </div>
+
+              <!-- ================================
+                             NOTES
+                        ================================= -->
+
+              <div class="form-group full">
+                <label for="deliveryNotes"> Notes </label>
+
+                <textarea id="deliveryNotes" rows="4"></textarea>
+              </div>
+            </div>
+
+            <!-- ================================
+                         MODAL FOOTER
+                    ================================= -->
+
+            <div class="modal-footer">
+              <button type="button" class="secondary-btn" id="cancelDelivery">
+                Cancel
+              </button>
+
+              <button type="submit" class="primary-btn">Save Delivery</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================
+         TOAST
+    ================================= -->
+
+    <div id="toast" class="toast"></div>
+
+    <!-- ================================
+         CONFIRMATION MODAL
+    ================================= -->
+
+    <div id="confirmModal" class="confirm-modal">
+      <div class="confirm-box">
+        <h3>Confirmation</h3>
+
+        <p id="confirmMessage"></p>
+
+        <div class="confirm-buttons">
+          <button id="confirmYes" type="button">Yes</button>
+
+          <button id="confirmNo" type="button">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================
+         JAVASCRIPT
+    ================================= -->
+
+    <script src="js/api.js"></script>
+    <script src="js/roleAccess.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/components.js"></script>
+
+    <script src="js/toast.js"></script>
+
+    <script src="js/confirm.js"></script>
+
+    <script src="js/deliveries.js"></script>
+
+    <script>
+      requirePermission("deliveries");
+    </script>
+  </body>
+</html>

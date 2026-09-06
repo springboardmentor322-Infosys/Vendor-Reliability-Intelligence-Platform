@@ -1,286 +1,379 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
 
-<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta charset="UTF-8">
+    <title>VendorIQ | Dashboard</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
 
-    <title>Dashboard | Vendor Reliability Platform</title>
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/navbar.css" />
+  </head>
 
-    <link rel="stylesheet" href="css/dashboard.css">
+  <body>
+    <!-- ================= SIDEBAR ================= -->
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <div id="sidebar-container"></div>
 
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-</head>
+    <!-- ================= MAIN CONTENT ================= -->
 
-<body>
+    <div class="main-content">
+      <!-- Navbar -->
 
-<div class="dashboard">
+      <div id="navbar"></div>
 
-    <!-- ================= Sidebar ================= -->
+      <!-- ================= DASHBOARD ================= -->
 
-    <aside class="sidebar">
+      <section class="dashboard">
+        <!-- Dashboard Header -->
 
-        <div>
+        <div class="page-header">
+          <div>
+            <h2 id="dashboardTitle">Dashboard</h2>
 
-            <h2>
-
-                <i class="fa-solid fa-chart-line"></i>
-
-                Vendor Platform
-
-            </h2>
-
-            <ul>
-
-                <li class="active">
-
-                    <i class="fa-solid fa-house"></i>
-
-                    Dashboard
-
-                </li>
-
-                <li>
-
-                    <i class="fa-solid fa-users"></i>
-
-                    Vendors
-
-                </li>
-
-                <li>
-
-                    <i class="fa-solid fa-cart-shopping"></i>
-
-                    Procurement
-
-                </li>
-
-                <li>
-
-                    <i class="fa-solid fa-file-contract"></i>
-
-                    Contracts
-
-                </li>
-
-                <li>
-
-                    <i class="fa-solid fa-chart-line"></i>
-
-                    Reports
-
-                </li>
-
-            </ul>
-
+            <p id="dashboardSubtitle">Vendor Reliability Platform</p>
+          </div>
         </div>
 
-    </aside>
+        <!-- ================= ROLE INFORMATION ================= -->
 
-    <!-- ================= Main Content ================= -->
+        <div class="dashboard-role-card" id="dashboardRoleCard">
+          <div>
+            <span class="role-label"> Logged in as </span>
 
-    <main class="content">
+            <h3 id="dashboardUserName">User</h3>
+          </div>
 
-        <!-- Top Navigation -->
+          <div>
+            <span class="role-label"> Role </span>
 
-        <header class="topbar">
+            <strong id="dashboardUserRole"> Loading... </strong>
+          </div>
+        </div>
 
+        <!-- ================= ROLE DASHBOARD CONTENT ================= -->
+
+        <div id="roleDashboardContent"></div>
+
+        <!-- ================= KPI SECTION ================= -->
+
+        <section class="kpi-section">
+          <!-- Total Users -->
+
+          <div class="kpi-card users" data-permission="userManagement">
+            <div class="kpi-icon">
+              <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div class="kpi-info">
+              <h4>Total Users</h4>
+
+              <h2 id="totalUsers">0</h2>
+
+              <p>Registered platform users</p>
+            </div>
+          </div>
+
+          <!-- Total Vendors -->
+
+          <div class="kpi-card vendors" data-permission="vendors">
+            <div class="kpi-icon">
+              <i class="fa-solid fa-building"></i>
+            </div>
+
+            <div class="kpi-info">
+              <h4>Total Vendors</h4>
+
+              <h2 id="totalVendors">0</h2>
+
+              <p>Registered vendors</p>
+            </div>
+          </div>
+
+          <!-- Active Vendors -->
+
+          <div class="kpi-card active" data-permission="vendors">
+            <div class="kpi-icon">
+              <i class="fa-solid fa-user-check"></i>
+            </div>
+
+            <div class="kpi-info">
+              <h4>Active Vendors</h4>
+
+              <h2 id="activeVendors">0</h2>
+
+              <p>Currently active</p>
+            </div>
+          </div>
+
+          <!-- Purchase Orders -->
+
+          <div class="kpi-card orders" data-permission="purchaseOrders">
+            <div class="kpi-icon">
+              <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+
+            <div class="kpi-info">
+              <h4>Purchase Orders</h4>
+
+              <h2 id="purchaseOrders">0</h2>
+
+              <p>Total purchase orders</p>
+            </div>
+          </div>
+
+          <!-- Invoices -->
+
+          <div class="kpi-card invoice" data-permission="invoices">
+            <div class="kpi-icon">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+
+            <div class="kpi-info">
+              <h4>Invoices</h4>
+
+              <h2 id="invoiceCount">0</h2>
+
+              <p>Total invoices</p>
+            </div>
+          </div>
+
+          <!-- Active Contracts -->
+
+          <div class="kpi-card contracts" data-permission="contracts">
+            <div class="kpi-icon">
+              <i class="fa-solid fa-file-contract"></i>
+            </div>
+
+            <div class="kpi-info">
+              <h4>Active Contracts</h4>
+
+              <h2 id="activeContracts">0</h2>
+
+              <p>Currently active</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= DASHBOARD OVERVIEW ================= -->
+
+        <div class="content-box">
+          <h3 id="overviewTitle">Dashboard Overview</h3>
+
+          <p id="overviewText">Loading dashboard information...</p>
+        </div>
+
+        <section class="dashboard-card administrator-alerts-card">
+          <div class="card-header">
             <div>
-
-                <h1>
-
-                    Welcome,
-
-                    <span id="username">
-
-                        User
-
-                    </span>
-
-                </h1>
-
-                <p>
-
-                    Vendor Reliability Intelligence Platform
-
-                </p>
-
+              <h3>System Alerts</h3>
+              <p>Items requiring administrator attention</p>
             </div>
 
-            <div class="profile">
+            <span class="card-badge"> Live </span>
+          </div>
 
-                <button id="profileBtn">
+          <div id="administratorAlerts" class="administrator-alerts"></div>
+        </section>
+        <!-- ================= CHARTS ================= -->
 
-                    <i class="fa-solid fa-circle-user"></i>
+        <section class="chart-grid">
+          <!-- Vendor Reliability -->
 
-                    <span id="profileName">
+          <div class="chart-card" data-permission="analytics">
+            <div class="card-header">
+              <h3>Vendor Reliability</h3>
 
-                        User
-
-                    </span>
-
-                    <i class="fa-solid fa-chevron-down"></i>
-
-                </button>
-
-                <div class="dropdown" id="profileMenu">
-
-                    <div class="profile-info">
-
-                        <h3 id="menuName">
-
-                            User
-
-                        </h3>
-
-                        <p id="menuEmail">
-
-                            user@email.com
-
-                        </p>
-
-                        <span id="menuRole">
-
-                            Vendor
-
-                        </span>
-
-                    </div>
-
-                    <hr>
-
-                    <button id="logoutBtn">
-
-                        <i class="fa-solid fa-right-from-bracket"></i>
-
-                        Logout
-
-                    </button>
-
-                </div>
-
+              <span> Current Performance </span>
             </div>
 
-        </header>
+            <div class="chart-container">
+              <canvas id="vendorReliabilityChart"></canvas>
+            </div>
+          </div>
 
-        <!-- Dashboard Cards -->
+          <!-- Procurement Trend -->
 
-        <section class="cards">
+          <div class="chart-card" data-permission="purchaseOrders">
+            <div class="card-header">
+              <h3>Procurement Trend</h3>
 
-            <div class="card">
-
-                <i class="fa-solid fa-users"></i>
-
-                <h3>Total Vendors</h3>
-
-                <h2 id="vendorCount">
-
-                    120
-
-                </h2>
-
+              <span> Purchase Orders </span>
             </div>
 
-            <div class="card">
+            <div class="chart-container">
+              <canvas id="procurementTrendChart"></canvas>
+            </div>
+          </div>
 
-                <i class="fa-solid fa-cart-shopping"></i>
+          <!-- Vendor Categories -->
 
-                <h3>Purchase Orders</h3>
+          <div class="chart-card" data-permission="vendors">
+            <div class="card-header">
+              <h3>Vendor Categories</h3>
 
-                <h2>
-
-                    45
-
-                </h2>
-
+              <span> Current Vendors </span>
             </div>
 
-            <div class="card">
+            <div class="chart-container">
+              <canvas id="vendorCategoryChart"></canvas>
+            </div>
+          </div>
 
-                <i class="fa-solid fa-file-contract"></i>
+          <!-- Compliance -->
 
-                <h3>Contracts</h3>
+          <div class="dashboard-card chart-card" data-permission="analytics">
+            <div class="card-header">
+              <div>
+                <h3>Compliance Status</h3>
+                <p>Vendor compliance monitoring</p>
+              </div>
 
-                <h2>
-
-                    32
-
-                </h2>
-
+              <span class="card-badge"> Live </span>
             </div>
 
-            <div class="card">
-
-                <i class="fa-solid fa-star"></i>
-
-                <h3>Performance</h3>
-
-                <h2>
-
-                    92%
-
-                </h2>
-
+            <div class="chart-container">
+              <canvas id="complianceChart"></canvas>
             </div>
-
+          </div>
         </section>
 
-        <!-- Recent Activity -->
+        <!-- ================= TABLES ================= -->
 
-        <section class="activity">
+        <section class="dashboard-grid">
+          <!-- Top Vendors -->
 
-            <h2>
+          <div class="dashboard-card" data-permission="vendors">
+            <div class="card-header">
+              <h3>Top Vendors</h3>
 
-                Recent Activity
+              <button type="button" id="viewAllVendors">View All</button>
+            </div>
 
-            </h2>
+            <table class="vendor-table">
+              <thead>
+                <tr>
+                  <th>Vendor</th>
 
-            <ul>
+                  <th>Category</th>
 
-                <li>
+                  <th>Score</th>
+                </tr>
+              </thead>
 
-                    Vendor ABC registered.
+              <tbody id="recentVendorTable">
+                <tr>
+                  <td colspan="3">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-                </li>
+          <!-- Recent Activity -->
 
-                <li>
+          <div class="dashboard-card" data-permission="notifications">
+            <div class="card-header">
+              <h3>Recent Activity</h3>
+            </div>
 
-                    Purchase Order #102 approved.
-
-                </li>
-
-                <li>
-
-                    Contract renewed successfully.
-
-                </li>
-
-                <li>
-
-                    Vendor performance updated.
-
-                </li>
-
+            <ul class="activity-list" id="recentActivityList">
+              <li>Loading recent activity...</li>
             </ul>
-
+          </div>
         </section>
 
-    </main>
+        <!-- ================= RECENT PURCHASE ORDERS ================= -->
 
-</div>
+        <section
+          class="dashboard-card full-width"
+          data-permission="purchaseOrders"
+        >
+          <div class="card-header">
+            <h3>Recent Purchase Orders</h3>
 
-<script src="js/api.js"></script>
+            <button
+              id="viewAllPurchaseOrders"
+              class="view-all-btn"
+              type="button"
+            >
+              View All
+            </button>
+          </div>
 
-<script src="js/dashboard.js"></script>
+          <table class="vendor-table">
+            <thead>
+              <tr>
+                <th>PO Number</th>
 
-</body>
+                <th>Vendor</th>
 
+                <th>Amount</th>
+
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody id="recentPurchaseTable">
+              <tr>
+                <td colspan="4">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- ================= QUICK ACCESS ================= -->
+
+        <section class="dashboard-card full-width" id="quickAccessSection">
+          <div class="card-header">
+            <h3>Quick Access</h3>
+          </div>
+
+          <div class="quick-access-grid" id="quickAccessGrid">
+            <!-- Javascript will populate this -->
+          </div>
+        </section>
+      </section>
+
+      <!-- ================= FOOTER ================= -->
+
+      <div id="footer"></div>
+    </div>
+
+    <!-- ================= SCRIPTS ================= -->
+
+    <script src="js/api.js"></script>
+
+    <script src="js/roleAccess.js"></script>
+
+    <script src="js/auth.js"></script>
+
+    <script src="js/components.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="js/dashboard.js"></script>
+
+    <!-- Dashboard permission -->
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        if (typeof requirePermission === "function") {
+          requirePermission("dashboard");
+        }
+      });
+    </script>
+  </body>
 </html>

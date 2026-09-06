@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Quality Inspections</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/layout.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/sidebar.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/navbar.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/quality_inspections.css"
+    >
+
+</head>
+
+
+<body>
+
+    <div id="sidebar-container"></div>
+
+
+    <div class="main-content">
+
+        <div id="navbar"></div>
+
+
+        <div class="page-content">
+
+            <div class="page-header">
+
+                <div>
+
+                    <h2>Quality Inspections</h2>
+
+                    <p>
+                        Manage vendor quality inspections
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="addQualityInspectionBtn"
+                    class="primary-btn"
+                >
+
+                    + Add Inspection
+
+                </button>
+
+            </div>
+
+
+            <div class="table-card">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+
+                            <th>PO Number</th>
+
+                            <th>Vendor</th>
+
+                            <th>Inspection Date</th>
+
+                            <th>Inspector</th>
+
+                            <th>Quality Score</th>
+
+                            <th>Defects</th>
+
+                            <th>Status</th>
+
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="qualityInspectionTableBody"
+                    ></tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="pagination-container">
+
+                <div
+                    id="qualityInspectionPaginationInfo"
+                >
+                    Showing 0 to 0 of 0 inspections
+                </div>
+
+
+                <div
+                    id="qualityInspectionPagination"
+                    class="pagination"
+                ></div>
+
+            </div>
+
+
+            <div id="footer"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- QUALITY INSPECTION MODAL -->
+
+    <div
+        class="modal"
+        id="qualityInspectionModal"
+    >
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h3 id="qualityInspectionModalTitle">
+                    Add Quality Inspection
+                </h3>
+
+
+                <button
+                    id="closeQualityInspectionModal"
+                >
+                    &times;
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <form
+                    id="qualityInspectionForm"
+                >
+
+                    <div class="form-grid">
+
+
+                        <!-- PURCHASE ORDER -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Purchase Order
+                            </label>
+
+                            <select
+                                id="qualityPurchaseOrderSelect"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Purchase Order
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- VENDOR -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Vendor
+                            </label>
+
+                            <select
+                                id="qualityVendorSelect"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Vendor
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- INSPECTION DATE -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Inspection Date
+                            </label>
+
+                            <input
+                                type="date"
+                                id="inspectionDate"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- INSPECTOR -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Inspector
+                            </label>
+
+                            <input
+                                type="text"
+                                id="inspector"
+                                maxlength="100"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- QUALITY SCORE -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Quality Score
+                            </label>
+
+                            <input
+                                type="number"
+                                id="qualityScore"
+                                min="0"
+                                max="100"
+                                step="0.01"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- DEFECTS -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Defects Found
+                            </label>
+
+                            <input
+                                type="number"
+                                id="defectsFound"
+                                min="0"
+                                value="0"
+                            >
+
+                        </div>
+
+
+                        <!-- STATUS -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Status
+                            </label>
+
+                            <select id="qualityStatus">
+
+                                <option value="Passed">
+                                    Passed
+                                </option>
+
+                                <option value="Failed">
+                                    Failed
+                                </option>
+
+                                <option value="Pending">
+                                    Pending
+                                </option>
+
+                                <option value="Reinspection">
+                                    Reinspection
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- REMARKS -->
+
+                        <div class="form-group full">
+
+                            <label>
+                                Remarks
+                            </label>
+
+                            <textarea
+                                id="qualityRemarks"
+                                maxlength="500"
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="modal-footer">
+
+                        <button
+                            type="button"
+                            class="secondary-btn"
+                            id="cancelQualityInspection"
+                        >
+
+                            Cancel
+
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            class="primary-btn"
+                        >
+
+                            Save Inspection
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- TOAST -->
+
+    <div
+        id="toast"
+        class="toast"
+    ></div>
+
+
+
+    <!-- CONFIRM MODAL -->
+
+    <div
+        id="confirmModal"
+        class="confirm-modal"
+    >
+
+        <div class="confirm-box">
+
+            <h3>
+                Confirmation
+            </h3>
+
+
+            <p id="confirmMessage"></p>
+
+
+            <div class="confirm-buttons">
+
+                <button id="confirmYes">
+                    Yes
+                </button>
+
+                <button id="confirmNo">
+                    Cancel
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script src="js/api.js"></script>
+    <script src="js/roleAccess.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/components.js"></script>
+
+    <script src="js/toast.js"></script>
+
+    <script src="js/confirm.js"></script>
+
+    <script src="js/quality_inspections.js"></script>
+
+    <script>
+      requirePermission("qualityInspections");
+    </script>
+
+</body>
+
+</html>

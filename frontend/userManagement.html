@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>User Management</title>
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/sidebar.css" />
+    <link rel="stylesheet" href="css/navbar.css" />
+    <link rel="stylesheet" href="css/userManagement.css" />
+  </head>
+
+  <body>
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+      <div id="navbar"></div>
+
+      <div class="page-content">
+        <div class="page-header">
+          <div>
+            <h2>User Management</h2>
+
+            <p>Manage platform users and their roles</p>
+          </div>
+
+          <button id="addUserBtn" class="primary-btn">
+            <i class="fa-solid fa-plus"></i>
+            Add User
+          </button>
+        </div>
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+
+                <th>Full Name</th>
+
+                <th>Email</th>
+
+                <th>Role</th>
+
+                <th>Created At</th>
+
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody id="userTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination-container" id="userPagination"></div>
+
+        <div id="footer"></div>
+      </div>
+    </div>
+
+    <!-- User Modal -->
+
+    <div class="modal" id="userModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="userModalTitle">Add User</h3>
+
+          <button id="closeUserModal" type="button">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <form id="userForm">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="fullName"> Full Name </label>
+
+                <input type="text" id="fullName" required />
+              </div>
+
+              <div class="form-group">
+                <label for="email"> Email </label>
+
+                <input type="email" id="email" required />
+              </div>
+
+              <div class="form-group">
+                <label for="password"> Password </label>
+
+                <input type="password" id="password" />
+
+                <small id="passwordHelp"> Required when creating a user </small>
+              </div>
+
+              <div class="form-group">
+                <label for="role"> Role </label>
+
+                <select id="role">
+                  <option value="Vendor">Vendor</option>
+
+                  <option value="Administrator">Administrator</option>
+
+                  <option value="Procurement Manager">
+                    Procurement Manager
+                  </option>
+
+                  <option value="Supply Chain Manager">
+                    Supply Chain Manager
+                  </option>
+
+                  <option value="Finance Officer">Finance Officer</option>
+
+                  <option value="Auditor">Auditor</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="secondary-btn" id="cancelUser">
+                Cancel
+              </button>
+
+              <button type="submit" class="primary-btn">Save User</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+
+    <div id="toast" class="toast"></div>
+
+    <!-- Confirmation -->
+
+    <div id="confirmModal" class="confirm-modal">
+      <div class="confirm-box">
+        <h3>Confirmation</h3>
+
+        <p id="confirmMessage"></p>
+
+        <div class="confirm-buttons">
+          <button id="confirmYes">Yes</button>
+
+          <button id="confirmNo">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/roleAccess.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/components.js"></script>
+
+    <script src="js/toast.js"></script>
+
+    <script src="js/confirm.js"></script>
+
+    <script src="js/userManagement.js"></script>
+
+    <script>
+      requirePermission("userManagement");
+    </script>
+  </body>
+</html>

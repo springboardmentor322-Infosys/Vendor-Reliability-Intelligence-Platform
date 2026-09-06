@@ -70,10 +70,16 @@ form.addEventListener("submit", async function (e) {
 
     } catch (error) {
 
+        console.error(
+            "Login failed:",
+            error
+        );
+
         message.className = "error";
 
-        message.innerHTML = error.detail || "Invalid email or password.";
-
+        message.innerHTML =
+            error.message ||
+            "Invalid email or password.";
     }
 
     loginBtn.disabled = false;
