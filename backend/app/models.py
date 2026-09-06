@@ -26,3 +26,27 @@ class PurchaseOrder(Base):
     invoice_status = Column(String)
     invoice_file = Column(String, nullable=True)
     proof_of_delivery = Column(String, nullable=True)
+
+class Contract(Base):
+    __tablename__ = "contracts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    contract_id = Column(String, unique=True, index=True)
+    vendor = Column(String)
+    contract_name = Column(String)
+    start_date = Column(String)
+    expiry_date = Column(String)
+    renewal_notice_period = Column(Integer, default=30)
+    terms = Column(String, nullable=True)
+    status = Column(String, default="Active")
+
+class Procurement(Base):
+    __tablename__ = "procurements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    item_name = Column(String)
+    quantity = Column(Integer)
+    estimated_cost = Column(Integer)
+    department = Column(String)
+    status = Column(String, default="Pending")
+

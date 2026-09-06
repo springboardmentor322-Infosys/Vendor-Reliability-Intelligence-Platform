@@ -1,194 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Analytics</title>
-
+    <title>Platform Analytics | Vendor Intelligence</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style.css">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
 
 <div class="dashboard">
 
     <!-- Sidebar -->
     <div class="sidebar">
-
-        <h2>Vendor IQ</h2>
+        <div class="sidebar-brand">
+            <span class="brand-icon">V</span>
+            <h2>Vendor IQ</h2>
+        </div>
 
         <ul>
-
-            <li>
-                <a href="dashboard.html">
-                    Dashboard
-                </a>
-            </li>
-
-            <li>
-                <a href="vendors.html">
-                    Vendors
-                </a>
-            </li>
-
-            <li>
-                <a href="procurement.html">
-                    Procurement
-                </a>
-            </li>
-
-            <li>
-                <a href="purchase-orders.html">
-                    Purchase Orders
-                </a>
-            </li>
-
-            <li>
-                <a href="contracts.html">
-                    Contracts
-                </a>
-            </li>
-
-            <li>
-                <a href="communication.html">
-                    Communication
-                </a>
-            </li>
-
-            <li>
-                <a href="performance.html">
-                    Performance
-                </a>
-            </li>
-
-            <li>
-                <a href="analytics.html" class="active">
-                    Analytics
-                </a>
-            </li>
-
-            <li>
-                <a href="reports.html">
-                    Reports
-                </a>
-            </li>
-
-            <li>
-                <a href="notifications.html">
-                    Notifications
-                </a>
-            </li>
-
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="vendors.html">🏢 Vendors</a></li>
+            <li><a href="procurement.html">📋 Procurement</a></li>
+            <li><a href="purchase-orders.html">📦 Purchase Orders</a></li>
+            <li><a href="contracts.html">📄 Contracts</a></li>
+            <li><a href="communication.html">💬 Communication</a></li>
+            <li><a href="performance.html">⭐ Performance</a></li>
+            <li><a href="analytics.html" class="active">📈 Analytics</a></li>
+            <li><a href="reports.html">📑 Reports</a></li>
+            <li><a href="notifications.html">🔔 Notifications</a></li>
         </ul>
-
     </div>
-
 
     <!-- Main Content -->
     <div class="content">
 
-        <h1>Analytics</h1>
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchAnalytics" class="search-box" placeholder="Search analytics metric or summary data...">
+            </div>
 
+            <div class="top-icons">
+                <div class="icon-btn">🔔<span class="badge-count">3</span></div>
+                <div class="icon-btn">📧<span class="badge-count">5</span></div>
+                <a href="profile.html" class="profile-chip">
+                    <span class="avatar">👤</span>
+                    <span class="user-name">Admin</span>
+                </a>
+            </div>
+        </div>
 
-        <!-- Analytics Cards -->
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>Platform Analytics & Intelligence</h1>
+                <p class="subtitle">Deep dive performance insights, vendor rating breakdown, order fulfillment rates, and KPI summaries</p>
+            </div>
+            <div class="system-status">
+                <span class="pulse-green"></span> Live Intelligence
+            </div>
+        </div>
+
+        <!-- KPI Metric Cards -->
         <div class="cards">
-
-            <div class="card">
-                <h3>Total Vendors</h3>
-                <p id="totalVendors">0</p>
+            <div class="card card1">
+                <div class="card-icon-wrapper blue">🏢</div>
+                <div class="card-info">
+                    <h3>Total Vendors</h3>
+                    <p id="totalVendors">0</p>
+                </div>
             </div>
 
-            <div class="card">
-                <h3>Total Orders</h3>
-                <p id="totalOrders">0</p>
+            <div class="card card2">
+                <div class="card-icon-wrapper green">📦</div>
+                <div class="card-info">
+                    <h3>Total Orders</h3>
+                    <p id="totalOrders">0</p>
+                </div>
             </div>
 
-            <div class="card">
-                <h3>Average Score</h3>
-                <p id="averageScore">0%</p>
+            <div class="card card3">
+                <div class="card-icon-wrapper purple">⭐</div>
+                <div class="card-info">
+                    <h3>Average Score</h3>
+                    <p id="averageScore">0%</p>
+                </div>
             </div>
 
-            <div class="card">
-                <h3>Risk Vendors</h3>
-                <p id="riskVendors">0</p>
+            <div class="card card4">
+                <div class="card-icon-wrapper orange">⚠️</div>
+                <div class="card-info">
+                    <h3>At Risk Vendors (<70%)</h3>
+                    <p id="riskVendors">0</p>
+                </div>
             </div>
-
         </div>
 
+        <!-- Charts Container -->
+        <div class="chart-container">
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📊 Vendor Rating Distribution</h3>
+                    <small>Categorized Breakdown (Excellent, Good, Average, Poor)</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="vendorRatingChart"></canvas>
+                </div>
+            </div>
 
-        <br>
-
-
-        <!-- Vendor Performance Chart -->
-        <h2>Vendor Performance Analytics</h2>
-
-        <div style="width: 80%; height: 350px; margin: 20px auto;">
-
-            <canvas id="vendorPerformanceChart"></canvas>
-
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📈 Vendor Performance Analytics</h3>
+                    <small>Individual Supplier Reliability Scores (%)</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="vendorPerformanceChart"></canvas>
+                </div>
+            </div>
         </div>
 
+        <!-- Summary Directory Header -->
+        <div class="section-title-wrapper">
+            <h2>Analytics Summary Directory</h2>
+            <span class="live-indicator">Aggregated Metrics</span>
+        </div>
 
-        <br>
-
-
-        <!-- Analytics Summary -->
-         <h2>Vendor Rating Distribution</h2>
-         <div style="width: 400px; height: 350px; margin: 20px auto;">
-    <canvas id="vendorRatingChart"></canvas>
-</div>
-        <h2>Analytics Summary</h2>
-
-        <table border="1" width="100%" cellpadding="10">
-
-            <thead>
-
-                <tr>
-                    <th>Metric</th>
-                    <th>Value</th>
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                <tr>
-                    <td>Total Vendors</td>
-                    <td id="summaryTotalVendors">7</td>
-                </tr>
-
-                <tr>
-                    <td>Completed Orders</td>
-                    <td id="completedOrders">0</td>
-                </tr>
-
-                <tr>
-                    <td>Pending Orders</td>
-                    <td id="pendingOrders">0</td>
-                </tr>
-
-                <tr>
-                    <td>Average Vendor Score</td>
-                    <td id="summaryAverageScore">0%</td>
-                </tr>
-
-            </tbody>
-
-        </table>
+        <!-- Summary Table Container -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric Indicator</th>
+                        <th>Current Value</th>
+                    </tr>
+                </thead>
+                <tbody id="analyticsSummaryTableBody">
+                    <tr>
+                        <td><strong>Total Active Vendors</strong></td>
+                        <td><span class="badge-status approved" id="summaryTotalVendors">0</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Completed Purchase Orders</strong></td>
+                        <td><span class="badge-status approved" id="completedOrders">0</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pending Purchase Orders</strong></td>
+                        <td><span class="badge-status pending" id="pendingOrders">0</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Average Platform Reliability Score</strong></td>
+                        <td><span class="badge-status under-review" id="summaryAverageScore">0%</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
     </div>
 
 </div>
 
-
-<!-- JavaScript -->
 <script src="js/script.js"></script>
 
 </body>
-
 </html>

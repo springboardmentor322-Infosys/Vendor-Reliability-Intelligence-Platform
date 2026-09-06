@@ -3,135 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contract Repository</title>
+    <title>Contracts Management | Vendor Intelligence</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
 
 <div class="dashboard">
 
+    <!-- Sidebar -->
     <div class="sidebar">
-        <h2>Vendor IQ</h2>
+        <div class="sidebar-brand">
+            <span class="brand-icon">V</span>
+            <h2>Vendor IQ</h2>
+        </div>
 
         <ul>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="vendors.html">Vendors</a></li>
-            <li><a href="procurement.html">Procurement</a></li>
-            <li><a href="purchase-orders.html">Purchase Orders</a></li>
-            <li><a href="contracts.html">Contracts</a></li>
-            <li><a href="communication.html">Communication</a></li>
-            <li><a href="performance.html">Performance</a></li>
-            <li><a href="analytics.html">Analytics</a></li>
-            <li><a href="reports.html">Reports</a></li>
-            <li><a href="notifications.html">Notifications</a></li>
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="vendors.html">🏢 Vendors</a></li>
+            <li><a href="procurement.html">📋 Procurement</a></li>
+            <li><a href="purchase-orders.html">📦 Purchase Orders</a></li>
+            <li><a href="contracts.html" class="active">📄 Contracts</a></li>
+            <li><a href="communication.html">💬 Communication</a></li>
+            <li><a href="performance.html">⭐ Performance</a></li>
+            <li><a href="analytics.html">📈 Analytics</a></li>
+            <li><a href="reports.html">📑 Reports</a></li>
+            <li><a href="notifications.html">🔔 Notifications</a></li>
         </ul>
     </div>
 
+    <!-- Main Content -->
     <div class="content">
 
-        <h1>Contract Repository</h1>
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchContracts" class="search-box" placeholder="Search contract ID, vendor, title, or terms...">
+            </div>
 
-        <button id="addContractBtn">Add Contract</button>
-
-        <div id="contractForm" style="display:none; margin-top:20px;">
-
-            <h3>Add Contract</h3>
-
-            <label>Vendor:</label>
-            <input type="text" id="contractVendor">
-
-            <br><br>
-
-            <label>Contract Name:</label>
-            <input type="text" id="contractName">
-
-            <br><br>
-
-            <label>Start Date:</label>
-            <input type="date" id="contractStartDate">
-
-            <br><br>
-
-            <label>Expiry Date:</label>
-            <input type="date" id="contractExpiryDate">
-
-            <br><br>
-
-            <label>Renewal Notice Period:</label>
-<select id="renewalNoticePeriod">
-    <option value="30">30 Days</option>
-    <option value="60">60 Days</option>
-    <option value="90">90 Days</option>
-</select>
-
-<br><br>
-
-<label>Contract Terms:</label>
-<textarea id="contractTerms" rows="4" placeholder="Enter contract terms"></textarea>
-
-<br><br>
-
-<label>Compliance Flags:</label>
-
-<br>
-
-<label>
-    <input type="checkbox" id="complianceQuality">
-    Quality Compliance
-</label>
-
-<br>
-
-<label>
-    <input type="checkbox" id="complianceDelivery">
-    Delivery Compliance
-</label>
-
-<br>
-
-<label>
-    <input type="checkbox" id="complianceContract">
-    Contract Compliance
-</label>
-
-<br><br>
-
-            <label>Contract Status:</label>
-            <select id="contractStatus">
-                <option value="Active">Active</option>
-                <option value="Expired">Expired</option>
-            </select>
-
-            <br><br>
-
-            <button id="saveContractBtn">Save Contract</button>
-
+            <div class="top-icons">
+                <div class="icon-btn">🔔<span class="badge-count">3</span></div>
+                <div class="icon-btn">📧<span class="badge-count">5</span></div>
+                <a href="profile.html" class="profile-chip">
+                    <span class="avatar">👤</span>
+                    <span class="user-name">Admin</span>
+                </a>
+            </div>
         </div>
 
-        <br><br>
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>Contracts Management</h1>
+                <p class="subtitle">Maintain vendor legal agreements, renewal notice periods, compliance flags, and expiration alerts</p>
+            </div>
+            <button id="addContractBtn" class="action-header-btn">
+                <span>📄 Add New Contract</span>
+            </button>
+        </div>
 
-        <table border="1" width="100%" cellpadding="10">
+        <!-- KPI Metric Cards -->
+        <div class="cards">
+            <div class="card card1">
+                <div class="card-icon-wrapper blue">📄</div>
+                <div class="card-info">
+                    <h3>Total Contracts</h3>
+                    <p id="totalContractsCount">0</p>
+                </div>
+            </div>
 
-            <thead>
-                <tr>
-                    <th>Contract ID</th>
-                    <th>Vendor</th>
-                    <th>Contract Name</th>
-                    <th>Start Date</th>
-                    <th>Expiry Date</th>
-                    <th>Renewal Notice</th>
-                    <th>Terms</th>
-                    <th>Compliance Flags</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
+            <div class="card card2">
+                <div class="card-icon-wrapper green">✅</div>
+                <div class="card-info">
+                    <h3>Active Agreements</h3>
+                    <p id="activeContractsCount">0</p>
+                </div>
+            </div>
 
-            <tbody id="contractTableBody">
-            </tbody>
+            <div class="card card3">
+                <div class="card-icon-wrapper orange">⚠️</div>
+                <div class="card-info">
+                    <h3>Expiring Soon (< 60D)</h3>
+                    <p id="expiringContractsCount">0</p>
+                </div>
+            </div>
 
-        </table>
+            <div class="card card4">
+                <div class="card-icon-wrapper pink">❌</div>
+                <div class="card-info">
+                    <h3>Expired Contracts</h3>
+                    <p id="expiredContractsCount">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contract Form Card / Modal -->
+        <div id="contractForm" class="form-card" style="display:none;">
+            <div class="form-header">
+                <h3>Add / Edit Legal Contract</h3>
+                <span class="close-form-btn" onclick="document.getElementById('contractForm').style.display='none'">✕</span>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="contractVendor">Vendor Name</label>
+                    <input type="text" id="contractVendor" placeholder="e.g. Acme Corporation">
+                </div>
+
+                <div class="form-group">
+                    <label for="contractName">Contract Title / Name</label>
+                    <input type="text" id="contractName" placeholder="e.g. Master Services Agreement">
+                </div>
+
+                <div class="form-group">
+                    <label for="contractStartDate">Start Date</label>
+                    <input type="date" id="contractStartDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="contractExpiryDate">Expiry Date</label>
+                    <input type="date" id="contractExpiryDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="renewalNoticePeriod">Renewal Notice Period</label>
+                    <select id="renewalNoticePeriod">
+                        <option value="30">30 Days</option>
+                        <option value="60">60 Days</option>
+                        <option value="90">90 Days</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="contractStatus">Contract Status</label>
+                    <select id="contractStatus">
+                        <option value="Active">Active</option>
+                        <option value="Expired">Expired</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="contractTerms">Contract Terms & Description</label>
+                    <textarea id="contractTerms" rows="3" placeholder="Enter key terms, SLAs, payment terms, etc."></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Compliance Flags</label>
+                    <div style="display:flex; gap: 20px; margin-top: 8px;">
+                        <label style="display:inline-flex; align-items:center; gap: 6px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="complianceQuality" style="width:auto; margin:0;">
+                            Quality Compliance
+                        </label>
+                        <label style="display:inline-flex; align-items:center; gap: 6px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="complianceDelivery" style="width:auto; margin:0;">
+                            Delivery Compliance
+                        </label>
+                        <label style="display:inline-flex; align-items:center; gap: 6px; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="complianceContract" style="width:auto; margin:0;">
+                            Contract Compliance
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button id="saveContractBtn" class="save-btn">Save Contract</button>
+                <button type="button" class="cancel-btn" onclick="document.getElementById('contractForm').style.display='none'">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Charts Container -->
+        <div class="chart-container">
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📊 Contract Status Distribution</h3>
+                    <small>Breakdown of Active, Expiring, and Expired Agreements</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="contractStatusChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📈 Contracts by Renewal Notice Period</h3>
+                    <small>Notice Period Requirements (30 / 60 / 90 Days)</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="contractNoticeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contract Directory Header -->
+        <div class="section-title-wrapper">
+            <h2>Legal Contracts Directory</h2>
+            <span class="live-indicator">Active Agreements</span>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Contract ID</th>
+                        <th>Vendor</th>
+                        <th>Contract Name</th>
+                        <th>Start Date</th>
+                        <th>Expiry Date</th>
+                        <th>Renewal Notice</th>
+                        <th>Terms</th>
+                        <th>Compliance Flags</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="contractTableBody">
+                </tbody>
+            </table>
+        </div>
 
     </div>
 

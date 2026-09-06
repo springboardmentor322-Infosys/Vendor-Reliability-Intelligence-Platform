@@ -3,108 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendor Management</title>
+    <title>Vendor Management | Vendor Intelligence</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <div class="dashboard">
 
-     <div class="sidebar">
-        <h2>Vendor IQ</h2>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-icon">V</span>
+            <h2>Vendor IQ</h2>
+        </div>
 
         <ul>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="vendors.html">Vendors</a></li>
-            <li><a href="procurement.html">Procurement</a></li>
-            <li><a href="purchase-orders.html">Purchase Orders</a></li>
-            <li><a href="contracts.html">Contracts</a></li>
-            <li><a href="communication.html">Communication</a></li>
-            <li><a href="performance.html">Performance</a></li>
-            <li><a href="analytics.html">Analytics</a></li>
-            <li><a href="reports.html">Reports</a></li>
-            <li><a href="notifications.html">Notifications</a></li>
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="vendors.html" class="active">🏢 Vendors</a></li>
+            <li><a href="procurement.html">📋 Procurement</a></li>
+            <li><a href="purchase-orders.html">📦 Purchase Orders</a></li>
+            <li><a href="contracts.html">📄 Contracts</a></li>
+            <li><a href="communication.html">💬 Communication</a></li>
+            <li><a href="performance.html">⭐ Performance</a></li>
+            <li><a href="analytics.html">📈 Analytics</a></li>
+            <li><a href="reports.html">📑 Reports</a></li>
+            <li><a href="notifications.html">🔔 Notifications</a></li>
         </ul>
-</div>
+    </div>
 
+    <!-- Main Content -->
     <div class="content">
 
-        <h1>Vendor Management</h1>
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchVendor" class="search-box" placeholder="Search vendor name, category, or status...">
+            </div>
 
-        <button id="addVendorBtn">Add Vendor</button>
+            <div class="top-icons">
+                <div class="icon-btn">🔔<span class="badge-count">3</span></div>
+                <div class="icon-btn">📧<span class="badge-count">5</span></div>
+                <a href="profile.html" class="profile-chip">
+                    <span class="avatar">👤</span>
+                    <span class="user-name">Admin</span>
+                </a>
+            </div>
+        </div>
 
-        <br><br>
+        <!-- Page Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>Vendor Management</h1>
+                <p class="subtitle">Monitor supplier status, performance scores, and maintain vendor directory</p>
+            </div>
+            <button id="addVendorBtn" class="action-header-btn">
+                <span>➕ Add New Vendor</span>
+            </button>
+        </div>
 
-        <input type="text" id="searchVendor" placeholder="Search Vendor">
+        <!-- Vendor Form Modal / Section -->
+        <div id="vendorForm" class="form-card" style="display:none;">
+            <div class="form-header">
+                <h3>Add / Edit Vendor Profile</h3>
+                <span class="close-form-btn" onclick="document.getElementById('vendorForm').style.display='none'">✕</span>
+            </div>
 
-        <br><br>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="vendorName">Vendor Name</label>
+                    <input type="text" id="vendorName" placeholder="e.g. Acme Corporation">
+                </div>
 
-<div id="vendorForm" style="display:none; margin-top:20px;">
+                <div class="form-group">
+                    <label for="delivery">Delivery Performance</label>
+                    <select id="delivery">
+                        <option value="On Time">On Time</option>
+                        <option value="Late">Late</option>
+                    </select>
+                </div>
 
-    <h3>Add New Vendor</h3>
+                <div class="form-group">
+                    <label for="quality">Quality Score (%)</label>
+                    <input type="number" id="quality" placeholder="e.g. 95" min="0" max="100">
+                </div>
 
-    <input type="text" id="vendorName" placeholder="Vendor Name">
-    <br><br>
+                <div class="form-group">
+                    <label for="responseTime">Response Time (%)</label>
+                    <input type="number" id="responseTime" placeholder="e.g. 90" min="0" max="100">
+                </div>
 
-    <input type="text" id="delivery" placeholder="Delivery (On Time/Late)">
-    <br><br>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category">
+                        <option value="">Select Category</option>
+                        <option value="Raw Material">Raw Material</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="IT Equipment">IT Equipment</option>
+                        <option value="Logistics">Logistics</option>
+                        <option value="Services">Services</option>
+                    </select>
+                </div>
 
-    <input type="number" id="quality" placeholder="Quality (%)">
-    <br><br>
+                <div class="form-group">
+                    <label for="status">Approval Status</label>
+                    <select id="status">
+                        <option value="Pending">Pending</option>
+                        <option value="Under Review">Under Review</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
 
-    <input type="number" id="responseTime" placeholder="Response Time (%)">
-    <br><br>
+                <div class="form-group full-width">
+                    <label for="score">Vendor Overall Score (0 - 100)</label>
+                    <input type="number" id="score" placeholder="e.g. 88" min="0" max="100">
+                </div>
+            </div>
 
-<select id="category">
-    <option value="">Select Category</option>
-    <option value="Raw Material">Raw Material</option>
-    <option value="Electronics">Electronics</option>
-    <option value="IT Equipment">IT Equipment</option>
-    <option value="Logistics">Logistics</option>
-    <option value="Services">Services</option>
-</select>
-<br><br>
+            <div class="form-actions">
+                <button id="saveVendorBtn" class="save-btn">Save Vendor Data</button>
+                <button type="button" class="cancel-btn" onclick="document.getElementById('vendorForm').style.display='none'">Cancel</button>
+            </div>
+        </div>
 
-<select id="status">
-    <option value="Pending">Pending</option>
-    <option value="Under Review">Under Review</option>
-    <option value="Approved">Approved</option>
-    <option value="Rejected">Rejected</option>
-</select>
+        <!-- Charts Container -->
+        <div class="chart-container">
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📊 Vendor Approval Status</h3>
+                    <small>Distribution of Vendor Statuses</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="vendorStatusChart"></canvas>
+                </div>
+            </div>
 
-<br><br>
-    <input type="number" id="score" placeholder="Vendor Score">
-    <br><br>
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📈 Vendor Score Overview</h3>
+                    <small>Individual Reliability Scores</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="vendorScoreChart"></canvas>
+                </div>
+            </div>
+        </div>
 
-    <button id="saveVendorBtn">Save Vendor</button>
+        <!-- Vendor Directory Table -->
+        <div class="section-title-wrapper">
+            <h2>Vendor Directory</h2>
+            <span class="live-indicator">Active Records</span>
+        </div>
 
-</div>
-<br><br>
-
-<table border="1" id="vendorTable">
-    <thead>
-        <tr>
-            <th>Vendor Name</th>
-            <th>Delivery</th>
-            <th>category</th>
-            <th>Quality</th>
-            <th>Response Time</th>
-            <th>status</th>
-            <th>Vendor Score</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody id="vendorTableBody">
-    </tbody>
-</table>
-
-<br><br>
+        <div class="table-container">
+            <table id="vendorTable">
+                <thead>
+                    <tr>
+                        <th>Vendor Name</th>
+                        <th>Delivery</th>
+                        <th>Category</th>
+                        <th>Quality</th>
+                        <th>Response Time</th>
+                        <th>Status</th>
+                        <th>Vendor Score</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="vendorTableBody">
+                </tbody>
+            </table>
+        </div>
 
     </div>
 
 </div>
 
 <script src="js/script.js"></script>
-
+<script>
+    loadVendors();
+</script>
 </body>
 </html>

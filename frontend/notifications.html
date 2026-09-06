@@ -3,53 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifications</title>
+    <title>Notifications & Alerts | Vendor Intelligence Platform</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <div class="dashboard">
 
+    <!-- Sidebar -->
     <div class="sidebar">
-        <h2>Vendor IQ</h2>
+        <div class="sidebar-brand">
+            <span class="brand-icon">V</span>
+            <h2>Vendor IQ</h2>
+        </div>
 
         <ul>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="vendors.html">Vendors</a></li>
-            <li><a href="procurement.html">Procurement</a></li>
-            <li><a href="purchase-orders.html">Purchase Orders</a></li>
-            <li><a href="contracts.html">Contracts</a></li>
-            <li><a href="communication.html">Communication</a></li>
-            <li><a href="performance.html">Performance</a></li>
-            <li><a href="analytics.html">Analytics</a></li>
-            <li><a href="reports.html">Reports</a></li>
-            <li><a href="notifications.html">Notifications</a></li>
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="vendors.html">🏢 Vendors</a></li>
+            <li><a href="procurement.html">📋 Procurement</a></li>
+            <li><a href="purchase-orders.html">📦 Purchase Orders</a></li>
+            <li><a href="contracts.html">📄 Contracts</a></li>
+            <li><a href="communication.html">💬 Communication</a></li>
+            <li><a href="performance.html">⭐ Performance</a></li>
+            <li><a href="analytics.html">📈 Analytics</a></li>
+            <li><a href="reports.html">📑 Reports</a></li>
+            <li><a href="notifications.html" class="active">🔔 Notifications</a></li>
         </ul>
     </div>
 
+    <!-- Main Content -->
     <div class="content">
 
-        <h1>Notifications</h1>
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchNotifications" class="search-box" placeholder="Search alerts by title, message, category, or status...">
+            </div>
 
-       <table id="notificationTable" border="1" width="100%" cellpadding="10">
+            <div class="top-icons">
+                <div class="icon-btn" title="Unread Notifications">🔔<span class="badge-count" id="topbarUnreadBadge">0</span></div>
+                <div class="icon-btn" title="Messages">📧<span class="badge-count">5</span></div>
+                <a href="profile.html" class="profile-chip">
+                    <span class="avatar">👤</span>
+                    <span class="user-name">Admin</span>
+                </a>
+            </div>
+        </div>
 
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Notification</th>
-            <th>Status</th>
-        </tr>
-    </thead>
+        <!-- Dashboard Header -->
+        <div class="dashboard-header" style="align-items: center; margin-bottom: 25px;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
+                    <h1 style="margin: 0;">Notifications & System Alerts</h1>
+                    <span class="live-stream-status"><span class="pulse-dot"></span> Live Activity Stream</span>
+                </div>
+                <p class="subtitle">Real-time platform events, supplier compliance risks, purchase order status updates, and contract expiration warnings</p>
+            </div>
+            
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <div class="view-switcher">
+                    <button type="button" class="view-btn active" id="feedViewToggleBtn">📱 Stream Feed</button>
+                    <button type="button" class="view-btn" id="tableViewToggleBtn">📊 Data Table</button>
+                </div>
 
-    <tbody id="notificationTableBody">
-    </tbody>
+                <button class="action-header-btn" id="markAllReadBtn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; color: white !important;">
+                    <span>✓</span> Mark All Read
+                </button>
+                
+                <button class="action-header-btn" id="clearReadBtn" style="background: #f1f5f9 !important; color: #475569 !important; border: 1px solid #cbd5e1 !important;">
+                    <span>🧹</span> Clear Read
+                </button>
 
-</table>
+                <button class="action-header-btn" id="addAlertBtn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important; color: white !important;">
+                    <span>➕</span> Post Alert
+                </button>
+            </div>
+        </div>
+
+        <!-- KPI Metric Cards -->
+        <div class="cards">
+            <div class="card card1">
+                <div class="card-icon-wrapper blue">🔔</div>
+                <div class="card-info">
+                    <h3>Total Alerts</h3>
+                    <p id="totalNotificationsCount">0</p>
+                </div>
+            </div>
+
+            <div class="card card2">
+                <div class="card-icon-wrapper orange">📩</div>
+                <div class="card-info">
+                    <h3>Unread Alerts</h3>
+                    <p id="unreadNotificationsCount">0</p>
+                </div>
+            </div>
+
+            <div class="card card3">
+                <div class="card-icon-wrapper pink">🚨</div>
+                <div class="card-info">
+                    <h3>High Priority</h3>
+                    <p id="highPriorityCount">0</p>
+                </div>
+            </div>
+
+            <div class="card card4">
+                <div class="card-icon-wrapper green">🛡️</div>
+                <div class="card-info">
+                    <h3>System & PO Alerts</h3>
+                    <p id="systemAlertsCount">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Charts Container -->
+        <div class="chart-container" style="margin-bottom: 30px;">
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📊 Alert Priority Breakdown</h3>
+                    <small>Urgency level distribution across active alerts</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="notificationPriorityChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📈 Notifications by Domain</h3>
+                    <small>Event volume grouped by operational category</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="notificationCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Pills Bar & Section Header -->
+        <div class="section-title-wrapper" style="justify-content: space-between; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h2 id="activeViewTitle" style="font-size: 20px; font-weight: 800; color: #0f172a;">Live Notifications Stream</h2>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="filter-pill-container" id="notificationFilterPills">
+                <button type="button" class="filter-pill active" data-filter="all">All Stream <span class="pill-badge" id="countPillAll">0</span></button>
+                <button type="button" class="filter-pill" data-filter="Unread">Unread <span class="pill-badge" id="countPillUnread">0</span></button>
+                <button type="button" class="filter-pill" data-filter="High">High Priority <span class="pill-badge" id="countPillHigh">0</span></button>
+                <button type="button" class="filter-pill" data-filter="Vendor Alert">Vendor Alerts <span class="pill-badge" id="countPillVendor">0</span></button>
+                <button type="button" class="filter-pill" data-filter="Contract Warning">Contract Warnings <span class="pill-badge" id="countPillContract">0</span></button>
+                <button type="button" class="filter-pill" data-filter="Purchase Order">Purchase Orders <span class="pill-badge" id="countPillPO">0</span></button>
+                <button type="button" class="filter-pill" data-filter="System Audit">System Audits <span class="pill-badge" id="countPillSystem">0</span></button>
+            </div>
+        </div>
+
+        <!-- STREAM FEED VIEW (Default View Container) -->
+        <div id="notificationStreamFeed" class="notif-stream-feed">
+            <!-- Dynamic Notification Cards injected via script.js -->
+        </div>
+
+        <!-- DATA TABLE VIEW (Alternative Compact Table Container) -->
+        <div class="table-container" id="notificationTableContainer" style="display: none;">
+            <table id="notificationTable">
+                <thead>
+                    <tr>
+                        <th>Alert ID</th>
+                        <th>Timestamp</th>
+                        <th>Category</th>
+                        <th>Alert Subject & Detailed Message</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="notificationTableBody">
+                    <!-- Populated via script.js -->
+                </tbody>
+            </table>
+        </div>
 
     </div>
 
 </div>
-<script src="js/script.js"></script>
 
+<!-- POST CUSTOM ALERT MODAL OVERLAY -->
+<div class="modal-overlay" id="postAlertModalOverlay">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>🔔 Post Custom Notification Alert</h3>
+            <span class="modal-close" id="closePostAlertModalBtn">✕</span>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label for="alertTitle">Alert Subject / Title</label>
+                <input type="text" id="alertTitle" placeholder="e.g. Supplier Q3 Quality Compliance Inspection Required">
+            </div>
+
+            <div class="form-group">
+                <label for="alertCategory">Category Domain</label>
+                <select id="alertCategory">
+                    <option value="Vendor Alert">🏢 Vendor Alert</option>
+                    <option value="Purchase Order">📦 Purchase Order</option>
+                    <option value="Contract Warning">📄 Contract Warning</option>
+                    <option value="System Audit">⚙️ System Audit</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="alertPriority">Urgency Priority</label>
+                <select id="alertPriority">
+                    <option value="High">🚨 High Priority</option>
+                    <option value="Medium" selected>⚠️ Medium Priority</option>
+                    <option value="Low">ℹ️ Low / Informational</option>
+                </select>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="alertMessage">Notification Details Body</label>
+                <textarea id="alertMessage" rows="4" placeholder="Enter complete alert description, impact metrics, or instructions for team members..."></textarea>
+            </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 15px;">
+            <button type="button" class="cancel-btn" id="cancelPostAlertBtn">Cancel</button>
+            <button type="button" class="save-btn" id="saveNotificationBtn">Publish Notification</button>
+        </div>
+    </div>
+</div>
+
+<!-- VIEW NOTIFICATION DETAIL MODAL OVERLAY -->
+<div class="modal-overlay" id="detailModalOverlay">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 id="detailModalHeaderTitle">🔔 Alert Details</h3>
+            <span class="modal-close" id="closeDetailModalBtn">✕</span>
+        </div>
+
+        <div id="detailModalContent">
+            <!-- Dynamically populated via script.js -->
+        </div>
+
+        <div class="form-actions" style="margin-top: 20px;">
+            <button type="button" class="cancel-btn" id="closeDetailModalActionBtn">Close</button>
+            <button type="button" class="save-btn" id="markReadDetailActionBtn" style="background: #10b981 !important;">✓ Mark Read</button>
+        </div>
+    </div>
+</div>
+
+<!-- FLOATING TOAST NOTIFICATION CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/script.js"></script>
 </body>
 </html>

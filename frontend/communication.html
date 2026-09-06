@@ -1,270 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Communication Log</title>
-
-    <!-- Same CSS as Contracts page -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication & Audit Hub | Vendor Intelligence</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style.css">
-
-    <style>
-.content .card {
-    width: 100%;
-}
-
-.content .form-group input,
-.content .form-group select,
-.content .form-group textarea {
-    width: 100%;
-}
-
-.content #sendMessageBtn {
-    width: 100%;
-}
-
-.content .table-container {
-    width: 100%;
-}
-
-.content table {
-    width: 100%;
-}
-</style>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
-
 <body>
 
 <div class="dashboard">
 
-
-    <!-- ================= SIDEBAR ================= -->
-
+    <!-- Sidebar -->
     <div class="sidebar">
-
-        <h2>Vendor IQ</h2>
+        <div class="sidebar-brand">
+            <span class="brand-icon">V</span>
+            <h2>Vendor IQ</h2>
+        </div>
 
         <ul>
-
-            <li>
-                <a href="dashboard.html">
-                    Dashboard
-                </a>
-            </li>
-
-            <li>
-                <a href="vendors.html">
-                    Vendors
-                </a>
-            </li>
-
-            <li>
-                <a href="procurement.html">
-                    Procurement
-                </a>
-            </li>
-
-            <li>
-                <a href="purchase-orders.html">
-                    Purchase Orders
-                </a>
-            </li>
-
-            <li>
-                <a href="contracts.html">
-                    Contracts
-                </a>
-            </li>
-
-            <li>
-                <a href="communication.html" class="active">
-                    Communication
-                </a>
-            </li>
-
-            <li>
-                <a href="performance.html">
-                    Performance
-                </a>
-            </li>
-
-            <li>
-                <a href="analytics.html">
-                    Analytics
-                </a>
-            </li>
-
-            <li>
-                <a href="reports.html">
-                    Reports
-                </a>
-            </li>
-
-            <li>
-                <a href="notifications.html">
-                    Notifications
-                </a>
-            </li>
-
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="vendors.html">🏢 Vendors</a></li>
+            <li><a href="procurement.html">📋 Procurement</a></li>
+            <li><a href="purchase-orders.html">📦 Purchase Orders</a></li>
+            <li><a href="contracts.html">📄 Contracts</a></li>
+            <li><a href="communication.html" class="active">💬 Communication</a></li>
+            <li><a href="performance.html">⭐ Performance</a></li>
+            <li><a href="analytics.html">📈 Analytics</a></li>
+            <li><a href="reports.html">📑 Reports</a></li>
+            <li><a href="notifications.html">🔔 Notifications</a></li>
         </ul>
-
     </div>
 
-
-    <!-- ================= MAIN CONTENT ================= -->
-
+    <!-- Main Content -->
     <div class="content">
 
-        <h1>Communication Log</h1>
-
-
-        <!-- ================= SEND MESSAGE ================= -->
-
-        <div class="card">
-
-            <h2>Send Message</h2>
-
-
-            <div class="form-group">
-
-                <label for="communicationType">
-                    Related To:
-                </label>
-
-                <select id="communicationType">
-
-                    <option value="PO">
-                        Purchase Order
-                    </option>
-
-                    <option value="Contract">
-                        Contract
-                    </option>
-
-                </select>
-
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchCommunication" class="search-box" placeholder="Search PO/Contract ID, message, or audit logs...">
             </div>
 
-
-            <div class="form-group">
-
-                <label for="communicationId">
-                    PO / Contract ID:
-                </label>
-
-                <input
-                    type="text"
-                    id="communicationId"
-                    placeholder="Enter PO or Contract ID"
-                >
-
+            <div class="top-icons">
+                <div class="icon-btn">🔔<span class="badge-count">3</span></div>
+                <div class="icon-btn">📧<span class="badge-count">5</span></div>
+                <a href="profile.html" class="profile-chip">
+                    <span class="avatar">👤</span>
+                    <span class="user-name">Admin</span>
+                </a>
             </div>
+        </div>
 
-
-            <div class="form-group">
-
-                <label for="message">
-                    Message:
-                </label>
-
-                <textarea
-                    id="message"
-                    rows="5"
-                    placeholder="Enter your message"
-                ></textarea>
-
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>Communication & Audit Hub</h1>
+                <p class="subtitle">Centralized messaging log between procurement team & suppliers, plus immutable audit trails</p>
             </div>
-
-
-            <button
-                type="button"
-                id="sendMessageBtn"
-            >
-                Send Message
+            <button id="toggleMsgBtn" class="action-header-btn" onclick="document.getElementById('sendMessageCard').style.display = document.getElementById('sendMessageCard').style.display === 'none' ? 'block' : 'none'">
+                <span>💬 Dispatch New Message</span>
             </button>
-
         </div>
 
-
-        <!-- ================= COMMUNICATION HISTORY ================= -->
-
-        <div class="card">
-
-            <h2>Communication History</h2>
-
-
-            <div class="table-container">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>Type</th>
-
-                            <th>PO / Contract ID</th>
-
-                            <th>Message</th>
-
-                            <th>Date & Time</th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody id="communicationTableBody">
-
-                    </tbody>
-
-                </table>
-                <!-- Audit Log -->
-
-<div class="card">
-
-    <h2>Audit Log</h2>
-
-    <div class="table-container">
-
-        <table>
-
-            <thead>
-                <tr>
-                    <th>Action</th>
-                    <th>User / Vendor</th>
-                    <th>Date & Time</th>
-                </tr>
-            </thead>
-
-            <tbody id="auditTableBody">
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
+        <!-- KPI Metric Cards -->
+        <div class="cards">
+            <div class="card card1">
+                <div class="card-icon-wrapper blue">💬</div>
+                <div class="card-info">
+                    <h3>Total Messages</h3>
+                    <p id="totalMessagesCount">0</p>
+                </div>
             </div>
 
+            <div class="card card2">
+                <div class="card-icon-wrapper green">📦</div>
+                <div class="card-info">
+                    <h3>PO Messages</h3>
+                    <p id="poMessagesCount">0</p>
+                </div>
+            </div>
+
+            <div class="card card3">
+                <div class="card-icon-wrapper purple">📄</div>
+                <div class="card-info">
+                    <h3>Contract Messages</h3>
+                    <p id="contractMessagesCount">0</p>
+                </div>
+            </div>
+
+            <div class="card card4">
+                <div class="card-icon-wrapper orange">🛡️</div>
+                <div class="card-info">
+                    <h3>Audit Log Entries</h3>
+                    <p id="auditLogsCount">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Send Message Card / Modal -->
+        <div id="sendMessageCard" class="form-card" style="display:none;">
+            <div class="form-header">
+                <h3>Dispatch Supplier Communication</h3>
+                <span class="close-form-btn" onclick="document.getElementById('sendMessageCard').style.display='none'">✕</span>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="communicationType">Related Entity</label>
+                    <select id="communicationType">
+                        <option value="PO">Purchase Order</option>
+                        <option value="Contract">Contract</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="communicationId">PO / Contract Reference ID</label>
+                    <input type="text" id="communicationId" placeholder="e.g. PO1700000000 or CON1002">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="message">Message Content</label>
+                    <textarea id="message" rows="4" placeholder="Enter details regarding order status, delivery, terms, or inquiry..."></textarea>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button id="sendMessageBtn" class="save-btn">🚀 Dispatch Message</button>
+                <button type="button" class="cancel-btn" onclick="document.getElementById('sendMessageCard').style.display='none'">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Charts Container -->
+        <div class="chart-container">
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📊 Message Volume by Entity</h3>
+                    <small>Distribution of Purchase Order vs Contract Communications</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="commTypeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📈 System Audit Activity</h3>
+                    <small>Immutable Operations & User Activity Logs</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="commAuditChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Communication History Directory Header -->
+        <div class="section-title-wrapper">
+            <h2>Communication History</h2>
+            <span class="live-indicator">Active Messages</span>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Reference ID</th>
+                        <th>Message Snippet</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody id="communicationTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Audit Log Directory Header -->
+        <div class="section-title-wrapper" style="margin-top: 40px;">
+            <h2>System Audit Log</h2>
+            <span class="live-indicator">Security Trail</span>
+        </div>
+
+        <!-- Audit Log Table Container -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Action Performed</th>
+                        <th>User / Actor</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody id="auditTableBody">
+                </tbody>
+            </table>
         </div>
 
     </div>
 
 </div>
 
-
-
-<!-- Same JS path as Contracts page -->
 <script src="js/script.js"></script>
 
 </body>
-
 </html>

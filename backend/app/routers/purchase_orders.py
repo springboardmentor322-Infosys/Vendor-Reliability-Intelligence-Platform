@@ -94,3 +94,23 @@ def update_purchase_order_status(
     db.refresh(order)
 
     return order
+
+@router.delete("/{order_identifier}")
+def delete_purchase_order(
+    order_identifier: str,
+    db: Session = Depends(get_db)
+):
+    order = None
+    if order_identifier.isdigit():
+        order = db.query(PurchaseOrder).filter(PurchaseOrder.id == int(order_identifier)).first()
+    
+    if not order:
+        order = db.query(PurchaseOrder).filter(PurchaseOrder.order_id == order_identifier).first()
+        
+    if not order:
+        return {"message": "Purchase Order not found"}
+
+    db.delete(order)
+    db.commit()
+
+    return {"message": f"Purchase Order {order_identifier} deleted successfully"}

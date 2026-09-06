@@ -3,128 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchase Orders</title>
+    <title>Purchase Orders | Vendor Intelligence</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <div class="dashboard">
 
+    <!-- Sidebar -->
     <div class="sidebar">
-        <h2>Vendor IQ</h2>
+        <div class="sidebar-brand">
+            <span class="brand-icon">V</span>
+            <h2>Vendor IQ</h2>
+        </div>
+
         <ul>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="vendors.html">Vendors</a></li>
-            <li><a href="procurement.html">Procurement</a></li>
-            <li><a href="purchase-orders.html">Purchase Orders</a></li>
-            <li><a href="contracts.html">Contracts</a></li>
-            <li><a href="communication.html">Communication</a></li>
-            <li><a href="performance.html">Performance</a></li>
-            <li><a href="analytics.html">Analytics</a></li>
-            <li><a href="reports.html">Reports</a></li>
-            <li><a href="notifications.html">Notifications</a></li>
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="vendors.html">🏢 Vendors</a></li>
+            <li><a href="procurement.html">📋 Procurement</a></li>
+            <li><a href="purchase-orders.html" class="active">📦 Purchase Orders</a></li>
+            <li><a href="contracts.html">📄 Contracts</a></li>
+            <li><a href="communication.html">💬 Communication</a></li>
+            <li><a href="performance.html">⭐ Performance</a></li>
+            <li><a href="analytics.html">📈 Analytics</a></li>
+            <li><a href="reports.html">📑 Reports</a></li>
+            <li><a href="notifications.html">🔔 Notifications</a></li>
         </ul>
     </div>
 
+    <!-- Main Content -->
     <div class="content">
 
-        <h1>Purchase Orders</h1>
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchOrders" class="search-box" placeholder="Search order ID, vendor, product, or status...">
+            </div>
 
-        <button id="addOrderBtn">Add Order</button>
-        <div id="orderForm" style="display:none; margin-top:20px;">
+            <div class="top-icons">
+                <div class="icon-btn">🔔<span class="badge-count">3</span></div>
+                <div class="icon-btn">📧<span class="badge-count">5</span></div>
+                <a href="profile.html" class="profile-chip">
+                    <span class="avatar">👤</span>
+                    <span class="user-name">Admin</span>
+                </a>
+            </div>
+        </div>
 
-    <h3>Create Purchase Order</h3>
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>Purchase Orders</h1>
+                <p class="subtitle">Manage purchase requisitions, order status, amounts, and invoice tracking</p>
+            </div>
+            <button id="addOrderBtn" class="action-header-btn">
+                <span>📦 Create Purchase Order</span>
+            </button>
+        </div>
 
-    <label>Vendor:</label>
-    <input type="text" id="orderVendor">
+        <!-- KPI Metric Cards -->
+        <div class="cards">
+            <div class="card card1">
+                <div class="card-icon-wrapper green">📦</div>
+                <div class="card-info">
+                    <h3>Total Orders</h3>
+                    <p id="totalOrdersCount">0</p>
+                </div>
+            </div>
 
-    <br><br>
+            <div class="card card2">
+                <div class="card-icon-wrapper teal">💰</div>
+                <div class="card-info">
+                    <h3>Total PO Value</h3>
+                    <p id="totalOrdersAmount">₹0</p>
+                </div>
+            </div>
 
-    <label>Product:</label>
-    <input type="text" id="orderProduct">
+            <div class="card card3">
+                <div class="card-icon-wrapper orange">⏳</div>
+                <div class="card-info">
+                    <h3>In Progress / Pending</h3>
+                    <p id="pendingOrdersCount">0</p>
+                </div>
+            </div>
 
-    <br><br>
+            <div class="card card4">
+                <div class="card-icon-wrapper purple">✅</div>
+                <div class="card-info">
+                    <h3>Delivered / Paid</h3>
+                    <p id="completedOrdersCount">0</p>
+                </div>
+            </div>
+        </div>
 
-    <label>Amount:</label>
-    <input type="number" id="orderAmount">
+        <!-- Order Form Card / Modal -->
+        <div id="orderForm" class="form-card" style="display:none;">
+            <div class="form-header">
+                <h3>Create / Edit Purchase Order</h3>
+                <span class="close-form-btn" onclick="document.getElementById('orderForm').style.display='none'">✕</span>
+            </div>
 
-    <br><br>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="orderVendor">Vendor Name</label>
+                    <input type="text" id="orderVendor" placeholder="e.g. Acme Supplies">
+                </div>
 
-    <label>Status:</label>
-    <select id="orderStatus">
-        <option value="Pending">Pending</option>
-        <option value="Received">Received</option>
-        <option value="Paid">Paid</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Shipped">Shipped</option>
-        <option value="Partial Delivery">Partial Delivery</option>
-        <option value="Delivered">Delivered</option>
-    </select>
+                <div class="form-group">
+                    <label for="orderProduct">Product / Description</label>
+                    <input type="text" id="orderProduct" placeholder="e.g. Industrial Hardware">
+                </div>
 
-    <br><br>
+                <div class="form-group">
+                    <label for="orderAmount">Amount (₹)</label>
+                    <input type="number" id="orderAmount" placeholder="e.g. 150000">
+                </div>
 
-<label>Invoice Number:</label>
-<input type="text" id="invoiceNumber">
+                <div class="form-group">
+                    <label for="orderStatus">Order Status</label>
+                    <select id="orderStatus">
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Partial Delivery">Partial Delivery</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Received">Received</option>
+                        <option value="Paid">Paid</option>
+                    </select>
+                </div>
 
-<br><br>
+                <div class="form-group">
+                    <label for="invoiceNumber">Invoice Number</label>
+                    <input type="text" id="invoiceNumber" placeholder="e.g. INV-2026-001">
+                </div>
 
-<label>Invoice Status:</label>
-<select id="invoiceStatus">
-    <option value="Pending">Pending</option>
-    <option value="Received">Received</option>
-    <option value="Paid">Paid</option>
-</select>
+                <div class="form-group">
+                    <label for="invoiceStatus">Invoice Status</label>
+                    <select id="invoiceStatus">
+                        <option value="Pending">Pending</option>
+                        <option value="Received">Received</option>
+                        <option value="Paid">Paid</option>
+                    </select>
+                </div>
 
-<br><br>
+                <div class="form-group">
+                    <label for="invoiceFile">Invoice File (PDF/Image)</label>
+                    <input type="file" id="invoiceFile" accept=".pdf,.jpg,.jpeg,.png">
+                </div>
 
-<label>Invoice File:</label>
-<input type="file" id="invoiceFile" accept=".pdf,.jpg,.jpeg,.png">
+                <div class="form-group">
+                    <label for="proofOfDelivery">Proof of Delivery (PDF/Image)</label>
+                    <input type="file" id="proofOfDelivery" accept=".pdf,.jpg,.jpeg,.png">
+                </div>
+            </div>
 
-<br><br>
+            <div class="form-actions">
+                <button id="saveOrderBtn" class="save-btn">Save Order</button>
+                <button type="button" class="cancel-btn" onclick="document.getElementById('orderForm').style.display='none'">Cancel</button>
+            </div>
+        </div>
 
-<label>Proof of Delivery:</label>
-<input type="file" id="proofOfDelivery" accept=".pdf,.jpg,.jpeg,.png">
+        <!-- Charts Container -->
+        <div class="chart-container">
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📊 Purchase Orders Status</h3>
+                    <small>Distribution of Order Statuses</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="poStatusChart"></canvas>
+                </div>
+            </div>
 
-    <br><br>
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📈 Order Spend by Vendor</h3>
+                    <small>Total Purchase Order Amount per Vendor</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="poVendorChart"></canvas>
+                </div>
+            </div>
+        </div>
 
-    <button id="saveOrderBtn">Save Order</button>
+        <!-- Order Directory Header -->
+        <div class="section-title-wrapper">
+            <h2>Purchase Order Directory</h2>
+            <span class="live-indicator">Active Orders</span>
+        </div>
 
-</div>
-
-        <br><br>
-
-        <table border="1" width="100%" cellpadding="10">
-
-            <tr>
-                <th>Order ID</th>
-                <th>Vendor</th>
-                <th>Product</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Invoice Number</th>
-                <th>Invoice Status</th>
-                <th>Actions</th>
-            </tr>
-            <tbody id="purchaseOrderTableBody">
-            </tbody>
-
-            <tr>
-                <td>PO101</td>
-                <td>ABC Pvt Ltd</td>
-                <td>Laptop</td>
-                <td>₹50,000</td>
-                <td>Completed</td>
-            </tr>
-
-            <tr>
-                <td>PO102</td>
-                <td>XYZ Pvt Ltd</td>
-                <td>Printer</td>
-                <td>₹20,000</td>
-                <td>Pending</td>
-            </tr>
-
-        </table>
+        <!-- Table Container -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Vendor</th>
+                        <th>Product</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Invoice Number</th>
+                        <th>Invoice Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="purchaseOrderTableBody">
+                </tbody>
+            </table>
+        </div>
 
     </div>
 

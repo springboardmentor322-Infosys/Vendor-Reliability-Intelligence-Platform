@@ -3,84 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Procurement Request</title>
+    <title>Procurement Management | Vendor Intelligence</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
  <div class="dashboard">
 
+    <!-- Sidebar -->
     <div class="sidebar">
-        <h2>Vendor IQ</h2>
+        <div class="sidebar-brand">
+            <span class="brand-icon">V</span>
+            <h2>Vendor IQ</h2>
+        </div>
 
         <ul>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="vendors.html">Vendors</a></li>
-            <li><a href="procurement.html">Procurement</a></li>
-            <li><a href="purchase-orders.html">Purchase Orders</a></li>
-            <li><a href="contracts.html">Contracts</a></li>
-            <li><a href="communication.html">Communication</a></li>
-            <li><a href="performance.html">Performance</a></li>
-            <li><a href="analytics.html">Analytics</a></li>
-            <li><a href="reports.html">Reports</a></li>
-            <li><a href="notifications.html">Notifications</a></li>
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="vendors.html">🏢 Vendors</a></li>
+            <li><a href="procurement.html" class="active">📋 Procurement</a></li>
+            <li><a href="purchase-orders.html">📦 Purchase Orders</a></li>
+            <li><a href="contracts.html">📄 Contracts</a></li>
+            <li><a href="communication.html">💬 Communication</a></li>
+            <li><a href="performance.html">⭐ Performance</a></li>
+            <li><a href="analytics.html">📈 Analytics</a></li>
+            <li><a href="reports.html">📑 Reports</a></li>
+            <li><a href="notifications.html">🔔 Notifications</a></li>
         </ul>
-   </div>  
-   <div class="content"> 
+    </div>
 
-  <h1>Procurement Request</h1>
+    <!-- Main Content -->
+    <div class="content">
 
-<button id="addProcurementBtn" onclick="document.getElementById('procurementForm').style.display='block'">
-    Add Procurement Request
-</button>
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchProcurement" class="search-box" placeholder="Search item name, department, or status...">
+            </div>
 
-<br><br>
+            <div class="top-icons">
+                <div class="icon-btn">🔔<span class="badge-count">3</span></div>
+                <div class="icon-btn">📧<span class="badge-count">5</span></div>
+                <a href="profile.html" class="profile-chip">
+                    <span class="avatar">👤</span>
+                    <span class="user-name">Admin</span>
+                </a>
+            </div>
+        </div>
 
-<input type="text" id="searchProcurement" placeholder="Search Procurement Request">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>Procurement Management</h1>
+                <p class="subtitle">Track requisition requests, estimated costs, departmental budgets, and approvals</p>
+            </div>
+            <button id="addProcurementBtn" class="action-header-btn">
+                <span>➕ Add Requisition Request</span>
+            </button>
+        </div>
 
-<br><br>
+        <!-- KPI Metric Cards -->
+        <div class="cards">
+            <div class="card card1">
+                <div class="card-icon-wrapper blue">📋</div>
+                <div class="card-info">
+                    <h3>Total Requisitions</h3>
+                    <p id="totalProcurements">0</p>
+                </div>
+            </div>
 
-<div id="procurementForm" style="display:none; margin-top:20px;">
+            <div class="card card2">
+                <div class="card-icon-wrapper green">💰</div>
+                <div class="card-info">
+                    <h3>Total Estimated Cost</h3>
+                    <p id="totalEstimatedCost">₹0</p>
+                </div>
+            </div>
 
-    <h3>Add Procurement Request</h3>
-    <input type="hidden" id="procurementId">
+            <div class="card card3">
+                <div class="card-icon-wrapper orange">⏳</div>
+                <div class="card-info">
+                    <h3>Pending Approvals</h3>
+                    <p id="pendingProcurements">0</p>
+                </div>
+            </div>
 
-    <input type="text" id="itemName" placeholder="Item Name">
-    <br><br>
+            <div class="card card4">
+                <div class="card-icon-wrapper teal">✅</div>
+                <div class="card-info">
+                    <h3>Approved Requests</h3>
+                    <p id="approvedProcurements">0</p>
+                </div>
+            </div>
+        </div>
 
-    <input type="number" id="quantity" placeholder="Quantity">
-    <br><br>
+        <!-- Procurement Form Modal / Card -->
+        <div id="procurementForm" class="form-card" style="display:none;">
+            <div class="form-header">
+                <h3>Add / Edit Procurement Requisition</h3>
+                <span class="close-form-btn" onclick="document.getElementById('procurementForm').style.display='none'">✕</span>
+            </div>
 
-    <input type="number" id="estimatedCost" placeholder="Estimated Cost">
-    <br><br>
+            <div class="form-grid">
+                <input type="hidden" id="procurementId">
 
-    <input type="text" id="department" placeholder="Department">
-    <br><br>
+                <div class="form-group">
+                    <label for="itemName">Item Name</label>
+                    <input type="text" id="itemName" placeholder="e.g. Workstation Laptops">
+                </div>
 
-    <button id="saveProcurementBtn">Save Request</button>
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" id="quantity" placeholder="e.g. 10" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="estimatedCost">Estimated Cost (₹)</label>
+                    <input type="number" id="estimatedCost" placeholder="e.g. 75000">
+                </div>
+
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <input type="text" id="department" placeholder="e.g. IT Infrastructure">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button id="saveProcurementBtn" class="save-btn">Save Request</button>
+                <button type="button" class="cancel-btn" onclick="document.getElementById('procurementForm').style.display='none'">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Charts Container -->
+        <div class="chart-container">
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📊 Procurement Status</h3>
+                    <small>Distribution of Requisition Statuses</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="procurementStatusChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📈 Procurement by Department</h3>
+                    <small>Requisition Count per Department</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="procurementDepartmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Procurement Table Header -->
+        <div class="section-title-wrapper">
+            <h2>Procurement Requisition List</h2>
+            <span class="live-indicator">Active Requests</span>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table id="procurementTable">
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Quantity</th>
+                        <th>Estimated Cost</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="procurementTableBody">
+                </tbody>
+            </table>
+        </div>
+
+    </div>
 
 </div>
-<h3>Procurement Request List</h3>
-
-<table border="1" id="procurementTable">
-
-    <thead>
-        <tr>
-            <th>Item Name</th>
-            <th>Quantity</th>
-            <th>Estimated Cost</th>
-            <th>Department</th>
-             <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-
-    <tbody id="procurementTableBody">
-
-    </tbody>
-
-</table>
 
 <script src="js/script.js"></script>
 

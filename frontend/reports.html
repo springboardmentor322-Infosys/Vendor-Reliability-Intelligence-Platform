@@ -1,63 +1,223 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports</title>
+    <title>Executive Reports | Vendor Intelligence</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body><div class="dashboard"><div class="sidebar">
-    <h2>Vendor IQ</h2>
+<body>
 
-    <ul>
-        <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="vendors.html">Vendors</a></li>
-        <li><a href="procurement.html">Procurement</a></li>
-        <li><a href="purchase-orders.html">Purchase Orders</a></li>
-        <li><a href="contracts.html">Contracts</a></li>
-        <li><a href="communication.html">Communication</a></li>
-        <li><a href="performance.html">Performance</a></li>
-        <li><a href="analytics.html">Analytics</a></li>
-        <li><a href="reports.html">Reports</a></li>
-        <li><a href="notifications.html">Notifications</a></li>
-    </ul>
+<div class="dashboard">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-icon">V</span>
+            <h2>Vendor IQ</h2>
+        </div>
+
+        <ul>
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="vendors.html">🏢 Vendors</a></li>
+            <li><a href="procurement.html">📋 Procurement</a></li>
+            <li><a href="purchase-orders.html">📦 Purchase Orders</a></li>
+            <li><a href="contracts.html">📄 Contracts</a></li>
+            <li><a href="communication.html">💬 Communication</a></li>
+            <li><a href="performance.html">⭐ Performance</a></li>
+            <li><a href="analytics.html">📈 Analytics</a></li>
+            <li><a href="reports.html" class="active">📑 Reports</a></li>
+            <li><a href="notifications.html">🔔 Notifications</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchReports" class="search-box" placeholder="Search reports by ID, name, category, or status...">
+            </div>
+
+            <div class="top-icons">
+                <div class="icon-btn">🔔<span class="badge-count">3</span></div>
+                <div class="icon-btn">📧<span class="badge-count">5</span></div>
+                <a href="profile.html" class="profile-chip">
+                    <span class="avatar">👤</span>
+                    <span class="user-name">Admin</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>Executive Reports & Intelligence Export</h1>
+                <p class="subtitle">Generate, schedule, export, and audit comprehensive vendor reliability & procurement analytics</p>
+            </div>
+            <button class="action-header-btn" id="addReportBtn">
+                <span>➕</span> Generate New Report
+            </button>
+        </div>
+
+        <!-- KPI Metric Cards -->
+        <div class="cards">
+            <div class="card card1">
+                <div class="card-icon-wrapper blue">📑</div>
+                <div class="card-info">
+                    <h3>Total Reports</h3>
+                    <p id="totalReportsCount">0</p>
+                </div>
+            </div>
+
+            <div class="card card2">
+                <div class="card-icon-wrapper green">✅</div>
+                <div class="card-info">
+                    <h3>Generated</h3>
+                    <p id="generatedReportsCount">0</p>
+                </div>
+            </div>
+
+            <div class="card card3">
+                <div class="card-icon-wrapper purple">📥</div>
+                <div class="card-info">
+                    <h3>PDF Exports</h3>
+                    <p id="pdfReportsCount">0</p>
+                </div>
+            </div>
+
+            <div class="card card4">
+                <div class="card-icon-wrapper orange">⏰</div>
+                <div class="card-info">
+                    <h3>Scheduled Reports</h3>
+                    <p id="scheduledReportsCount">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Form Card (Modal) -->
+        <div class="form-card" id="reportFormCard" style="display: none;">
+            <div class="form-header">
+                <h3>📑 Generate Executive Intelligence Report</h3>
+                <span class="close-form-btn" id="closeReportFormBtn">✕</span>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="reportName">Report Title / Name</label>
+                    <input type="text" id="reportName" placeholder="e.g. Q3 Vendor Performance Audit">
+                </div>
+
+                <div class="form-group">
+                    <label for="reportCategory">Report Category</label>
+                    <select id="reportCategory">
+                        <option value="Vendor Performance">Vendor Performance</option>
+                        <option value="Purchase Orders">Purchase Orders</option>
+                        <option value="Contracts Audit">Contracts Audit</option>
+                        <option value="Compliance Summary">Compliance Summary</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportFormat">Export Format</label>
+                    <select id="reportFormat">
+                        <option value="PDF Document">PDF Document</option>
+                        <option value="Excel Spreadsheet">Excel Spreadsheet</option>
+                        <option value="CSV Data">CSV Data</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportFrequency">Frequency / Status</label>
+                    <select id="reportFrequency">
+                        <option value="Generated">Instant (Generated)</option>
+                        <option value="Scheduled">Scheduled Recurrent</option>
+                        <option value="Pending">Pending Queue</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="cancel-btn" id="cancelReportBtn">Cancel</button>
+                <button type="button" class="save-btn" id="saveReportBtn">Generate & Save</button>
+            </div>
+        </div>
+
+        <!-- Charts Container -->
+        <div class="chart-container">
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📊 Report Category Distribution</h3>
+                    <small>Breakdown by intelligence report category</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="reportTypeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <div class="chart-header">
+                    <h3>📈 Monthly Report Volume</h3>
+                    <small>Report generation frequency over time</small>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="reportVolumeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Directory Header Section & Quick Actions -->
+        <div class="section-title-wrapper" style="justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <h2>Generated Reports Directory</h2>
+                <span class="live-indicator">Active Archive</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="action-header-btn" id="generateReportBtn" style="padding: 8px 16px !important; font-size: 13px !important;">
+                    ⚡ Quick Generate
+                </button>
+                <button class="action-header-btn" id="downloadPdfBtn" style="padding: 8px 16px !important; font-size: 13px !important; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%) !important;">
+                    📄 Batch PDF
+                </button>
+                <button class="action-header-btn" id="downloadExcelBtn" style="padding: 8px 16px !important; font-size: 13px !important; background: linear-gradient(135deg, #10b981 0%, #047857 100%) !important;">
+                    📊 Batch Excel
+                </button>
+            </div>
+        </div>
+
+        <!-- Reports Directory Table -->
+        <div class="table-container">
+            <table id="reportsTable">
+                <thead>
+                    <tr>
+                        <th>Report ID</th>
+                        <th>Report Name</th>
+                        <th>Category</th>
+                        <th>Date Generated</th>
+                        <th>Format</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="reportsTableBody">
+                    <!-- Populated via script.js -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
 </div>
 
-<div class="content">
-
-    <h1>Reports</h1>
-
-    <button id="generateReportBtn">Generate Report</button>
-    <button id="downloadPdfBtn">Download PDF</button>
-    <button id="downloadExcelBtn">Download Excel</button>
-
-    <br><br>
-
-    <table id="reportsTable" border="1" width="100%" cellpadding="10">
-
-        <tr>
-            <th>Report ID</th>
-            <th>Report Name</th>
-            <th>Date</th>
-            <th>Status</th>
-        </tr>
-
-        <tr>
-            <td>R001</td>
-            <td>Vendor Performance Report</td>
-            <td>27-07-2026</td>
-            <td>Generated</td>
-        </tr>
-
-        <tr>
-            <td>R002</td>
-            <td>Purchase Order Report</td>
-            <td>27-07-2026</td>
-            <td>Generated</td>
-        </tr>
-
-    </table>
-
-</div>
-
-</div><script src="js/script.js"></script></body>
+<script src="js/script.js"></script>
+</body>
 </html>
