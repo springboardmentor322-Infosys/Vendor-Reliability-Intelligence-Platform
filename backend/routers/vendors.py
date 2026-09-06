@@ -10,6 +10,7 @@ from database import get_db
 from auth import get_current_user, require_roles
 from models import RoleEnum
 from file_storage import save_upload, get_upload_path
+from routers.procurement import create_audit_log
 
 router = APIRouter(prefix="/api/vendors", tags=["Vendor Management"])
 
@@ -24,12 +25,29 @@ def list_vendors(
     current_user: models.User = Depends(get_current_user),
 ):
     query = db.query(models.Vendor)
-    if status:
-        query = query.filter(models.Vendor.status == status)
-    if category:
-        query = query.filter(models.Vendor.category == category)
-    return query.order_by(models.Vendor.created_at.desc()).all()
 
+    # Vendor users can only see their own vendor/company
+    if current_user.role == RoleEnum.VENDOR:
+        if not current_user.vendor_id:
+            return []
+
+        query = query.filter(
+            models.Vendor.id == current_user.vendor_id
+        )
+
+    if status:
+        query = query.filter(
+            models.Vendor.status == status
+        )
+
+    if category:
+        query = query.filter(
+            models.Vendor.category == category
+        )
+
+    return query.order_by(
+        models.Vendor.created_at.desc()
+    ).all()
 
 @router.get("/me", response_model=schemas.VendorOut)
 def get_my_vendor_profile(
@@ -52,14 +70,6 @@ def get_my_vendor_profile(
     return vendor
 
 
-@router.get("/{vendor_id}", response_model=schemas.VendorOut)
-def get_vendor(vendor_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
-    if not vendor:
-        raise HTTPException(status_code=404, detail="Vendor not found")
-    return vendor
-
-
 @router.post("", response_model=schemas.VendorOut, status_code=201)
 def create_vendor(
     payload: schemas.VendorCreate,
@@ -73,20 +83,34 @@ def create_vendor(
     return vendor
 
 
-@router.put("/{vendor_id}", response_model=schemas.VendorOut)
-def update_vendor(
+@router.get("/{vendor_id}", response_model=schemas.VendorOut)
+def get_vendor(
     vendor_id: int,
-    payload: schemas.VendorUpdate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(require_roles(*MANAGE_ROLES)),
+    current_user: models.User = Depends(get_current_user),
 ):
-    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    if current_user.role == RoleEnum.VENDOR:
+        if (
+            not current_user.vendor_id
+            or current_user.vendor_id != vendor_id
+        ):
+            raise HTTPException(
+                status_code=403,
+                detail="You can only view your own vendor profile."
+            )
+
+    vendor = (
+        db.query(models.Vendor)
+        .filter(models.Vendor.id == vendor_id)
+        .first()
+    )
+
     if not vendor:
-        raise HTTPException(status_code=404, detail="Vendor not found")
-    for field, value in payload.dict(exclude_unset=True).items():
-        setattr(vendor, field, value)
-    db.commit()
-    db.refresh(vendor)
+        raise HTTPException(
+            status_code=404,
+            detail="Vendor not found"
+        )
+
     return vendor
 
 
@@ -94,22 +118,54 @@ def update_vendor(
 def approve_vendor(
     vendor_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(require_roles(RoleEnum.ADMIN, RoleEnum.PROCUREMENT_MANAGER)),
+    current_user: models.User = Depends(
+        require_roles(
+            RoleEnum.ADMIN,
+            RoleEnum.PROCUREMENT_MANAGER
+        )
+    ),
 ):
-    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    vendor = (
+        db.query(models.Vendor)
+        .filter(models.Vendor.id == vendor_id)
+        .first()
+    )
+
     if not vendor:
-        raise HTTPException(status_code=404, detail="Vendor not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Vendor not found"
+        )
+
     vendor.status = models.VendorStatusEnum.APPROVED
+
     db.commit()
     db.refresh(vendor)
 
     notif = models.Notification(
+        vendor_id=vendor.id,
         title="Vendor Approved",
         message=f"Vendor '{vendor.name}' has been approved.",
         category="Vendor Approval",
     )
+
     db.add(notif)
     db.commit()
+
+    create_audit_log(
+        db=db,
+        current_user=current_user,
+        action="APPROVE",
+        module="Vendor",
+        details=(
+            f"Approved vendor {vendor.name} "
+            f"(Vendor ID: {vendor.id})"
+        ),
+        record_id=vendor.id,
+    )
+
+    db.commit()
+
     return vendor
 
 
@@ -117,14 +173,44 @@ def approve_vendor(
 def reject_vendor(
     vendor_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(require_roles(RoleEnum.ADMIN, RoleEnum.PROCUREMENT_MANAGER)),
+    current_user: models.User = Depends(
+        require_roles(
+            RoleEnum.ADMIN,
+            RoleEnum.PROCUREMENT_MANAGER
+        )
+    ),
 ):
-    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    vendor = (
+        db.query(models.Vendor)
+        .filter(models.Vendor.id == vendor_id)
+        .first()
+    )
+
     if not vendor:
-        raise HTTPException(status_code=404, detail="Vendor not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Vendor not found"
+        )
+
     vendor.status = models.VendorStatusEnum.REJECTED
+
     db.commit()
     db.refresh(vendor)
+
+    create_audit_log(
+        db=db,
+        current_user=current_user,
+        action="REJECT",
+        module="Vendor",
+        details=(
+            f"Rejected vendor {vendor.name} "
+            f"(Vendor ID: {vendor.id})"
+        ),
+        record_id=vendor.id,
+    )
+
+    db.commit()
+
     return vendor
 
 
@@ -149,37 +235,88 @@ def delete_vendor(
 
 @router.get("/{vendor_id}/documents", response_model=List[schemas.VendorDocumentOut])
 def list_vendor_documents(
-    vendor_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)
+    vendor_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
 ):
+    vendor = (
+        db.query(models.Vendor)
+        .filter(models.Vendor.id == vendor_id)
+        .first()
+    )
+
+    if not vendor:
+        raise HTTPException(
+            status_code=404,
+            detail="Vendor not found"
+        )
+
+    if (
+        current_user.role == RoleEnum.VENDOR
+        and (
+            not current_user.vendor_id
+            or current_user.vendor_id != vendor_id
+        )
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="You can only access documents for your own vendor."
+        )
+
     return (
         db.query(models.VendorDocument)
-        .filter(models.VendorDocument.vendor_id == vendor_id)
-        .order_by(models.VendorDocument.uploaded_at.desc())
+        .filter(
+            models.VendorDocument.vendor_id == vendor_id
+        )
+        .order_by(
+            models.VendorDocument.uploaded_at.desc()
+        )
         .all()
     )
 
 
-@router.post("/{vendor_id}/documents", response_model=schemas.VendorDocumentOut, status_code=201)
+@router.post(
+    "/{vendor_id}/documents",
+    response_model=schemas.VendorDocumentOut,
+    status_code=201
+)
 def upload_vendor_document(
     vendor_id: int,
     document_type: str = Form(...),
     expiry_date: Optional[str] = Form(None),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(require_roles(*MANAGE_ROLES)),
+    current_user: models.User = Depends(
+        require_roles(*MANAGE_ROLES)
+    ),
 ):
-    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+    vendor = (
+        db.query(models.Vendor)
+        .filter(models.Vendor.id == vendor_id)
+        .first()
+    )
+
     if not vendor:
-        raise HTTPException(status_code=404, detail="Vendor not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Vendor not found"
+        )
 
     parsed_expiry = None
+
     if expiry_date:
         try:
             parsed_expiry = dt.datetime.fromisoformat(expiry_date)
         except ValueError:
-            raise HTTPException(status_code=400, detail="expiry_date must be a valid date")
+            raise HTTPException(
+                status_code=400,
+                detail="expiry_date must be a valid date"
+            )
 
-    relative_path, original_name = save_upload(file, subfolder=f"vendor_docs/{vendor_id}")
+    relative_path, original_name = save_upload(
+        file,
+        subfolder=f"vendor_docs/{vendor_id}"
+    )
 
     doc = models.VendorDocument(
         vendor_id=vendor_id,
@@ -188,31 +325,112 @@ def upload_vendor_document(
         file_path=relative_path,
         expiry_date=parsed_expiry,
     )
+
     db.add(doc)
     db.commit()
     db.refresh(doc)
-    return doc
 
+    create_audit_log(
+        db=db,
+        current_user=current_user,
+        action="UPLOAD",
+        module="Vendor Document",
+        details=(
+            f"Uploaded document '{doc.file_name}' "
+            f"for vendor {vendor.name}. "
+            f"Document type: {doc.document_type}"
+        ),
+        record_id=doc.id,
+    )
+
+    db.commit()
+
+    return doc
 
 @router.get("/documents/{document_id}/download")
 def download_vendor_document(
-    document_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)
+    document_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
 ):
-    doc = db.query(models.VendorDocument).filter(models.VendorDocument.id == document_id).first()
+    doc = (
+        db.query(models.VendorDocument)
+        .filter(models.VendorDocument.id == document_id)
+        .first()
+    )
+
     if not doc:
-        raise HTTPException(status_code=404, detail="Document not found")
-    return FileResponse(get_upload_path(doc.file_path), filename=doc.file_name)
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found"
+        )
+
+    if (
+        current_user.role == RoleEnum.VENDOR
+        and (
+            not current_user.vendor_id
+            or doc.vendor_id != current_user.vendor_id
+        )
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="You can only download documents for your own vendor."
+        )
+
+    return FileResponse(
+        get_upload_path(doc.file_path),
+        filename=doc.file_name
+    )
 
 
 @router.delete("/documents/{document_id}", status_code=204)
 def delete_vendor_document(
     document_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(require_roles(*MANAGE_ROLES)),
+    current_user: models.User = Depends(
+        require_roles(*MANAGE_ROLES)
+    ),
 ):
-    doc = db.query(models.VendorDocument).filter(models.VendorDocument.id == document_id).first()
+    doc = (
+        db.query(models.VendorDocument)
+        .filter(
+            models.VendorDocument.id == document_id
+        )
+        .first()
+    )
+
     if not doc:
-        raise HTTPException(status_code=404, detail="Document not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found"
+        )
+
+    vendor = (
+        db.query(models.Vendor)
+        .filter(
+            models.Vendor.id == doc.vendor_id
+        )
+        .first()
+    )
+
+    document_name = doc.file_name
+    vendor_name = vendor.name if vendor else "Unknown Vendor"
+
     db.delete(doc)
     db.commit()
+
+    create_audit_log(
+        db=db,
+        current_user=current_user,
+        action="DELETE",
+        module="Vendor Document",
+        details=(
+            f"Deleted document '{document_name}' "
+            f"from vendor {vendor_name}."
+        ),
+        record_id=document_id,
+    )
+
+    db.commit()
+
     return None

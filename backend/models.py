@@ -109,6 +109,45 @@ class PurchaseOrder(Base):
 
     vendor = relationship("Vendor", back_populates="purchase_orders")
 
+class ProcurementRequestStatusEnum(str, enum.Enum):
+    PENDING = "Pending"
+    APPROVED = "Approved"
+    REJECTED = "Rejected"
+    PO_CREATED = "PO Created"
+
+
+class ProcurementRequest(Base):
+    __tablename__ = "procurement_requests"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    request_number = Column(String, unique=True, index=True)
+
+    item_description = Column(String, nullable=False)
+
+    quantity = Column(Integer, default=1)
+
+    requested_by = Column(String, nullable=False)
+
+    priority = Column(String, default="Medium")
+
+    status = Column(
+        Enum(ProcurementRequestStatusEnum),
+        default=ProcurementRequestStatusEnum.PENDING
+    )
+
+    vendor_id = Column(
+        Integer,
+        ForeignKey("vendors.id"),
+        nullable=True
+    )
+
+    created_at = Column(
+        DateTime,
+        default=dt.datetime.utcnow
+    )
+
+    vendor = relationship("Vendor")
 
 class PerformanceRecord(Base):
     __tablename__ = "performance_records"
@@ -175,8 +214,65 @@ class Message(Base):
 class Notification(Base):
     __tablename__ = "notifications"
     id = Column(Integer, primary_key=True, index=True)
+    vendor_id = Column(Integer, ForeignKey("vendors.id"), nullable=True)
     title = Column(String)
     message = Column(Text)
     category = Column(String)  # e.g. "Contract Expiry", "Delivery Delay", "Vendor Approval"
     is_read = Column(Boolean, default=False)
     created_at = Column(DateTime, default=dt.datetime.utcnow)
+
+# ---------- Audit Logs ----------
+
+class AuditLog(Base):
+    """
+    Stores a history of important actions performed in the system.
+    Only Administrators and Auditors should be able to view audit logs.
+    """
+
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True
+    )
+
+    user_name = Column(
+        String,
+        nullable=False
+    )
+
+    user_role = Column(
+        String,
+        nullable=False
+    )
+
+    action = Column(
+        String,
+        nullable=False
+    )
+
+    module = Column(
+        String,
+        nullable=False
+    )
+
+    details = Column(
+        Text,
+        nullable=True
+    )
+
+    record_id = Column(
+        Integer,
+        nullable=True
+    )
+
+    created_at = Column(
+        DateTime,
+        default=dt.datetime.utcnow,
+        nullable=False
+    )
+
+    user = relationship("User")

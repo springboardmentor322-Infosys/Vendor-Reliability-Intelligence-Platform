@@ -6,8 +6,7 @@ from fastapi.responses import FileResponse
 
 from database import engine, Base, SessionLocal
 from notifications_engine import check_expiring_contracts
-from routers import auth_router, vendors, procurement, performance, contracts, communication, notifications, dashboard, reports
-
+from routers import auth_router, vendors, procurement, performance, contracts, communication, notifications, dashboard, reports, audit
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -46,12 +45,15 @@ app.include_router(communication.router)
 app.include_router(notifications.router)
 app.include_router(dashboard.router)
 app.include_router(reports.router)
+app.include_router(audit.router)
 
-FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "frontend")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 app.mount("/css", StaticFiles(directory=os.path.join(FRONTEND_DIR, "css")), name="css")
 app.mount("/js", StaticFiles(directory=os.path.join(FRONTEND_DIR, "js")), name="js")
+
 
 @app.get("/")
 def serve_index():

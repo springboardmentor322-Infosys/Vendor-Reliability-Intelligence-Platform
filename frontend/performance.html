@@ -5,153 +5,906 @@
 <title>VendorIQ | Performance & Reliability</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
+
 <div class="app-shell" id="app-shell"></div>
 
 <script src="js/api.js"></script>
-<script>
-requireAuth();
-renderShell("performance.html", "Vendor Performance & Reliability");
 
+<script>
+
+requireAuth();
+
+renderShell(
+  "performance.html",
+  "Vendor Performance & Reliability"
+);
+
+
+// Get the vendor from the URL if one was selected
 const params = new URLSearchParams(window.location.search);
-let selectedVendorId = params.get("vendor_id") ? Number(params.get("vendor_id")) : null;
+
+let selectedVendorId =
+  params.get("vendor_id")
+    ? Number(params.get("vendor_id"))
+    : null;
+
 let vendors = [];
 
+
+// Check the logged-in user's role
+const user = getUser();
+
+
+// These roles are allowed to add performance records
+const canLogPerformance =
+  user &&
+  [
+    "Administrator",
+    "Procurement Manager",
+    "Supply Chain Manager"
+  ].includes(user.role);
+
+
+// --------------------------------------------------
+// LOAD PERFORMANCE PAGE
+// --------------------------------------------------
+
 async function load() {
-  const content = document.getElementById("page-content");
-  vendors = await api("/vendors");
-  if (!selectedVendorId && vendors.length) selectedVendorId = vendors[0].id;
 
-  content.innerHTML = `
-    <div class="charts-grid" style="grid-template-columns: 1fr 2fr;">
-      <div class="panel">
-        <h3>Vendor Ranking</h3>
-        <table>
-          <thead><tr><th>#</th><th>Vendor</th><th>Score</th></tr></thead>
-          <tbody id="ranking-rows"></tbody>
-        </table>
-      </div>
+  const content =
+    document.getElementById("page-content");
 
-      <div class="panel">
-        <div class="flex-between mb-16">
-          <h3 style="margin:0;">Performance History</h3>
-          <div>
-            <select id="vendor-select" onchange="selectVendor(this.value)">
-              ${vendors.map(v => `<option value="${v.id}" ${v.id === selectedVendorId ? "selected" : ""}>${v.name}</option>`).join("")}
-            </select>
-            <button class="btn small" onclick="openModal()">+ Log Performance</button>
+  try {
+
+    // Load all vendors
+    vendors = await api("/vendors");
+
+    // Select the first vendor if none was selected
+    if (!selectedVendorId && vendors.length) {
+
+      selectedVendorId =
+        vendors[0].id;
+
+    }
+
+
+    content.innerHTML = `
+
+      <div
+        class="charts-grid"
+        style="grid-template-columns: 1fr 2fr;"
+      >
+
+        <!-- Vendor ranking -->
+
+        <div class="panel">
+
+          <h3>Vendor Ranking</h3>
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>#</th>
+                <th>Vendor</th>
+                <th>Score</th>
+              </tr>
+
+            </thead>
+
+            <tbody id="ranking-rows">
+
+              <tr>
+                <td colspan="3"
+                    class="text-muted">
+                  Loading...
+                </td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        <!-- Performance details -->
+
+        <div class="panel">
+
+          <div
+            class="flex-between mb-16"
+          >
+
+            <h3 style="margin:0;">
+              Performance History
+            </h3>
+
+
+           <div>
+  <select id="vendor-select" onchange="selectVendor(this.value)">
+    ${vendors.map(v => `<option value="${v.id}" ${v.id === selectedVendorId ? "selected" : ""}>${v.name}</option>`).join("")}
+  </select>
+
+${hasRole("Supply Chain Manager") ? `
+  <button class="btn small" onclick="openModal()">+ Log Performance</button>
+` : ""}
+</div>
+
           </div>
+
+
+          <!-- Vendor summary -->
+
+          <div
+            id="vendor-summary"
+            class="stat-grid"
+            style="margin-bottom:16px;"
+          ></div>
+
+
+          <!-- Performance history -->
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>Date</th>
+                <th>On-Time</th>
+                <th>Delayed</th>
+                <th>Quality</th>
+                <th>Response (hrs)</th>
+                <th>Resolution (hrs)</th>
+                <th>Completion %</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="perf-rows">
+
+              <tr>
+
+                <td
+                  colspan="7"
+                  class="text-muted"
+                >
+                  Loading...
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+
+          <!-- Recommendations -->
+
+          <h3 style="margin-top:24px;">
+            Procurement Recommendations
+          </h3>
+
+          <div id="recommendations-list">
+
+            <p class="text-muted">
+              Loading...
+            </p>
+
+          </div>
+
         </div>
-        <div id="vendor-summary" class="stat-grid" style="margin-bottom:16px;"></div>
-        <table>
-          <thead><tr><th>Date</th><th>On-Time</th><th>Delayed</th><th>Quality</th><th>Response (hrs)</th><th>Resolution (hrs)</th><th>Completion %</th></tr></thead>
-          <tbody id="perf-rows"></tbody>
-        </table>
 
-        <h3 style="margin-top:24px;">Procurement Recommendations</h3>
-        <div id="recommendations-list"></div>
       </div>
-    </div>
 
-    <div class="modal-backdrop hidden" id="modal">
-      <div class="modal">
-        <h3>Log Performance Record</h3>
-        <div class="field"><label>On-Time Deliveries</label><input id="f-ontime" type="number" value="0" min="0"></div>
-        <div class="field"><label>Delayed Deliveries</label><input id="f-delayed" type="number" value="0" min="0"></div>
-        <div class="field"><label>Quality Rating (0-5)</label><input id="f-quality" type="number" value="4" min="0" max="5" step="0.1"></div>
-        <div class="field"><label>Avg. Response Time (hours)</label><input id="f-response" type="number" value="6" min="0"></div>
-        <div class="field"><label>Avg. Issue Resolution Time (hours)</label><input id="f-resolution" type="number" value="12" min="0"></div>
-        <div class="field"><label>Order Completion Rate (%)</label><input id="f-completion" type="number" value="90" min="0" max="100"></div>
-        <div class="error-msg" id="f-error"></div>
-        <div class="modal-actions">
-          <button class="btn secondary" onclick="closeModal()">Cancel</button>
-          <button class="btn" onclick="submitPerf()">Save</button>
-        </div>
-      </div>
-    </div>
-  `;
 
-  await loadRanking();
-  await loadVendorDetail();
+      ${
+        canLogPerformance
+          ? `
+
+            <!-- Performance entry form -->
+
+            <div
+              class="modal-backdrop hidden"
+              id="modal"
+            >
+
+              <div class="modal">
+
+                <h3>
+                  Log Performance Record
+                </h3>
+
+
+                <div class="field">
+
+                  <label>
+                    On-Time Deliveries
+                  </label>
+
+                  <input
+                    id="f-ontime"
+                    type="number"
+                    value="0"
+                    min="0"
+                  >
+
+                </div>
+
+
+                <div class="field">
+
+                  <label>
+                    Delayed Deliveries
+                  </label>
+
+                  <input
+                    id="f-delayed"
+                    type="number"
+                    value="0"
+                    min="0"
+                  >
+
+                </div>
+
+
+                <div class="field">
+
+                  <label>
+                    Quality Rating (0-5)
+                  </label>
+
+                  <input
+                    id="f-quality"
+                    type="number"
+                    value="4"
+                    min="0"
+                    max="5"
+                    step="0.1"
+                  >
+
+                </div>
+
+
+                <div class="field">
+
+                  <label>
+                    Avg. Response Time (hours)
+                  </label>
+
+                  <input
+                    id="f-response"
+                    type="number"
+                    value="6"
+                    min="0"
+                  >
+
+                </div>
+
+
+                <div class="field">
+
+                  <label>
+                    Avg. Issue Resolution Time (hours)
+                  </label>
+
+                  <input
+                    id="f-resolution"
+                    type="number"
+                    value="12"
+                    min="0"
+                  >
+
+                </div>
+
+
+                <div class="field">
+
+                  <label>
+                    Order Completion Rate (%)
+                  </label>
+
+                  <input
+                    id="f-completion"
+                    type="number"
+                    value="90"
+                    min="0"
+                    max="100"
+                  >
+
+                </div>
+
+
+                <div
+                  class="error-msg"
+                  id="f-error"
+                ></div>
+
+
+                <div class="modal-actions">
+
+                  <button
+                    class="btn secondary"
+                    onclick="closeModal()"
+                  >
+                    Cancel
+                  </button>
+
+
+                  <button
+                    class="btn"
+                    onclick="submitPerf()"
+                  >
+                    Save
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          `
+          : ""
+      }
+
+    `;
+
+
+    // Load the ranking and selected vendor information
+    await loadRanking();
+
+    await loadVendorDetail();
+
+
+  } catch (err) {
+
+    console.error(
+      "PERFORMANCE PAGE ERROR:",
+      err
+    );
+
+    content.innerHTML = `
+
+      <p class="error-msg">
+        ${err.message}
+      </p>
+
+    `;
+
+  }
+
 }
+
+
+// --------------------------------------------------
+// VENDOR RANKING
+// --------------------------------------------------
 
 async function loadRanking() {
-  const ranking = await api("/performance/ranking");
-  document.getElementById("ranking-rows").innerHTML = ranking.map((v, i) => `
-    <tr style="cursor:pointer;" onclick="selectVendor(${v.id})">
-      <td>${i + 1}</td><td>${v.name}</td><td><strong>${v.reliability_score}</strong> ${statusBadge(v.risk_level)}</td>
-    </tr>
-  `).join("");
+
+  try {
+
+    const ranking =
+      await api("/performance/ranking");
+
+    const rows =
+      document.getElementById("ranking-rows");
+
+
+    if (!ranking.length) {
+
+      rows.innerHTML = `
+
+        <tr>
+
+          <td
+            colspan="3"
+            class="text-muted"
+          >
+            No vendor performance data found.
+          </td>
+
+        </tr>
+
+      `;
+
+      return;
+
+    }
+
+
+    rows.innerHTML =
+      ranking.map((v, i) => `
+
+        <tr
+          style="cursor:pointer;"
+          onclick="selectVendor(${v.id})"
+        >
+
+          <td>
+            ${i + 1}
+          </td>
+
+          <td>
+            ${v.name}
+          </td>
+
+          <td>
+
+            <strong>
+              ${v.reliability_score}
+            </strong>
+
+            ${statusBadge(v.risk_level)}
+
+          </td>
+
+        </tr>
+
+      `).join("");
+
+
+  } catch (err) {
+
+    document.getElementById(
+      "ranking-rows"
+    ).innerHTML = `
+
+      <tr>
+
+        <td
+          colspan="3"
+          class="error-msg"
+        >
+          ${err.message}
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
 }
+
+
+// --------------------------------------------------
+// SELECT A VENDOR
+// --------------------------------------------------
 
 function selectVendor(id) {
-  selectedVendorId = Number(id);
+
+  selectedVendorId =
+    Number(id);
+
+
   loadVendorDetail();
-  document.getElementById("vendor-select").value = selectedVendorId;
+
+
+  const select =
+    document.getElementById(
+      "vendor-select"
+    );
+
+
+  if (select) {
+
+    select.value =
+      selectedVendorId;
+
+  }
+
 }
+
+
+// --------------------------------------------------
+// LOAD SELECTED VENDOR DETAILS
+// --------------------------------------------------
 
 async function loadVendorDetail() {
-  if (!selectedVendorId) return;
-  const vendor = vendors.find(v => v.id === selectedVendorId) || (await api(`/vendors/${selectedVendorId}`));
-  document.getElementById("vendor-summary").innerHTML = `
-    <div class="stat-card"><div class="label">Reliability Score</div><div class="value">${vendor.reliability_score}</div></div>
-    <div class="stat-card"><div class="label">Risk Level</div><div class="value" style="font-size:18px;">${statusBadge(vendor.risk_level)}</div></div>
-    <div class="stat-card"><div class="label">Status</div><div class="value" style="font-size:18px;">${statusBadge(vendor.status)}</div></div>
-  `;
 
-  const history = await api(`/performance/vendor/${selectedVendorId}`);
-  document.getElementById("perf-rows").innerHTML = history.length ? history.map(r => `
-    <tr>
-      <td>${fmtDate(r.recorded_at)}</td>
-      <td>${r.on_time_deliveries}</td>
-      <td>${r.delayed_deliveries}</td>
-      <td>${r.quality_rating}</td>
-      <td>${r.response_time_hours}</td>
-      <td>${r.issue_resolution_hours}</td>
-      <td>${r.order_completion_rate}%</td>
-    </tr>
-  `).join("") : `<tr><td colspan="7" class="text-muted">No performance records logged yet.</td></tr>`;
-
-  const recoBox = document.getElementById("recommendations-list");
-  try {
-    const reco = await api(`/performance/vendor/${selectedVendorId}/recommendations`);
-    recoBox.innerHTML = reco.recommendations.length
-      ? `<ul style="margin:0; padding-left:20px; line-height:1.7;">${reco.recommendations.map(r => `<li>${r}</li>`).join("")}</ul>`
-      : `<p class="text-muted">No recommendations yet.</p>`;
-  } catch (err) {
-    recoBox.innerHTML = `<p class="error-msg">${err.message}</p>`;
+  if (!selectedVendorId) {
+    return;
   }
+
+
+  try {
+
+    const vendor =
+      vendors.find(
+        v => v.id === selectedVendorId
+      ) ||
+      await api(
+        `/vendors/${selectedVendorId}`
+      );
+
+
+    // Show the vendor's main scores
+    document.getElementById(
+      "vendor-summary"
+    ).innerHTML = `
+
+      <div class="stat-card">
+
+        <div class="label">
+          Reliability Score
+        </div>
+
+        <div class="value">
+          ${vendor.reliability_score}
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="label">
+          Risk Level
+        </div>
+
+        <div
+          class="value"
+          style="font-size:18px;"
+        >
+          ${statusBadge(vendor.risk_level)}
+        </div>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <div class="label">
+          Status
+        </div>
+
+        <div
+          class="value"
+          style="font-size:18px;"
+        >
+          ${statusBadge(vendor.status)}
+        </div>
+
+      </div>
+
+    `;
+
+
+    // Load performance history
+    const history =
+      await api(
+        `/performance/vendor/${selectedVendorId}`
+      );
+
+
+    const rows =
+      document.getElementById(
+        "perf-rows"
+      );
+
+
+    if (!history.length) {
+
+      rows.innerHTML = `
+
+        <tr>
+
+          <td
+            colspan="7"
+            class="text-muted"
+          >
+            No performance records logged yet.
+          </td>
+
+        </tr>
+
+      `;
+
+    } else {
+
+      rows.innerHTML =
+        history.map(r => `
+
+          <tr>
+
+            <td>
+              ${fmtDate(r.recorded_at)}
+            </td>
+
+            <td>
+              ${r.on_time_deliveries}
+            </td>
+
+            <td>
+              ${r.delayed_deliveries}
+            </td>
+
+            <td>
+              ${r.quality_rating}
+            </td>
+
+            <td>
+              ${r.response_time_hours}
+            </td>
+
+            <td>
+              ${r.issue_resolution_hours}
+            </td>
+
+            <td>
+              ${r.order_completion_rate}%
+            </td>
+
+          </tr>
+
+        `).join("");
+
+    }
+
+
+    // Load recommendations for the selected vendor
+    const recoBox =
+      document.getElementById(
+        "recommendations-list"
+      );
+
+
+    try {
+
+      const reco =
+        await api(
+          `/performance/vendor/${selectedVendorId}/recommendations`
+        );
+
+
+      if (
+        reco.recommendations &&
+        reco.recommendations.length
+      ) {
+
+        recoBox.innerHTML = `
+
+          <ul
+            style="
+              margin:0;
+              padding-left:20px;
+              line-height:1.7;
+            "
+          >
+
+            ${reco.recommendations
+              .map(
+                r => `<li>${r}</li>`
+              )
+              .join("")}
+
+          </ul>
+
+        `;
+
+      } else {
+
+        recoBox.innerHTML = `
+
+          <p class="text-muted">
+            No recommendations yet.
+          </p>
+
+        `;
+
+      }
+
+
+    } catch (err) {
+
+      recoBox.innerHTML = `
+
+        <p class="error-msg">
+          ${err.message}
+        </p>
+
+      `;
+
+    }
+
+
+  } catch (err) {
+
+    document.getElementById(
+      "vendor-summary"
+    ).innerHTML = `
+
+      <p class="error-msg">
+        ${err.message}
+      </p>
+
+    `;
+
+  }
+
 }
 
-function openModal() { document.getElementById("modal").classList.remove("hidden"); }
-function closeModal() { document.getElementById("modal").classList.add("hidden"); }
+
+// --------------------------------------------------
+// OPEN PERFORMANCE FORM
+// --------------------------------------------------
+
+function openModal() {
+
+  // Extra protection in case somebody calls the
+  // function manually from the browser console
+  if (!canLogPerformance) {
+
+    alert(
+      "You do not have permission to log performance."
+    );
+
+    return;
+
+  }
+
+
+  const modal =
+    document.getElementById("modal");
+
+
+  if (modal) {
+
+    modal.classList.remove("hidden");
+
+  }
+
+}
+
+
+// --------------------------------------------------
+// CLOSE PERFORMANCE FORM
+// --------------------------------------------------
+
+function closeModal() {
+
+  const modal =
+    document.getElementById("modal");
+
+
+  if (modal) {
+
+    modal.classList.add("hidden");
+
+  }
+
+}
+
+
+// --------------------------------------------------
+// SAVE PERFORMANCE RECORD
+// --------------------------------------------------
 
 async function submitPerf() {
-  const errorEl = document.getElementById("f-error");
-  errorEl.textContent = "";
-  try {
-    await api("/performance", {
-      method: "POST",
-      body: {
-        vendor_id: selectedVendorId,
-        on_time_deliveries: Number(document.getElementById("f-ontime").value),
-        delayed_deliveries: Number(document.getElementById("f-delayed").value),
-        quality_rating: Number(document.getElementById("f-quality").value),
-        response_time_hours: Number(document.getElementById("f-response").value),
-        issue_resolution_hours: Number(document.getElementById("f-resolution").value),
-        order_completion_rate: Number(document.getElementById("f-completion").value),
-      },
-    });
-    closeModal();
-    vendors = await api("/vendors"); // refresh scores
-    await loadRanking();
-    await loadVendorDetail();
-  } catch (err) {
-    errorEl.textContent = err.message;
+
+  if (!canLogPerformance) {
+
+    alert(
+      "You do not have permission to log performance."
+    );
+
+    return;
+
   }
+
+
+  if (!selectedVendorId) {
+
+    alert(
+      "Please select a vendor first."
+    );
+
+    return;
+
+  }
+
+
+  const errorEl =
+    document.getElementById("f-error");
+
+
+  errorEl.textContent = "";
+
+
+  try {
+
+    await api(
+      "/performance",
+      {
+        method: "POST",
+
+        body: {
+
+          vendor_id:
+            selectedVendorId,
+
+          on_time_deliveries:
+            Number(
+              document.getElementById(
+                "f-ontime"
+              ).value
+            ),
+
+          delayed_deliveries:
+            Number(
+              document.getElementById(
+                "f-delayed"
+              ).value
+            ),
+
+          quality_rating:
+            Number(
+              document.getElementById(
+                "f-quality"
+              ).value
+            ),
+
+          response_time_hours:
+            Number(
+              document.getElementById(
+                "f-response"
+              ).value
+            ),
+
+          issue_resolution_hours:
+            Number(
+              document.getElementById(
+                "f-resolution"
+              ).value
+            ),
+
+          order_completion_rate:
+            Number(
+              document.getElementById(
+                "f-completion"
+              ).value
+            )
+
+        }
+
+      }
+    );
+
+
+    closeModal();
+
+
+    // Refresh vendor scores after saving
+    vendors =
+      await api("/vendors");
+
+
+    await loadRanking();
+
+    await loadVendorDetail();
+
+
+  } catch (err) {
+
+    errorEl.textContent =
+      err.message;
+
+  }
+
 }
 
+
+// Start the page
 load();
+
 </script>
+
 </body>
 </html>

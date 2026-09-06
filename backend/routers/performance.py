@@ -19,17 +19,29 @@ MANAGE_ROLES = (RoleEnum.ADMIN, RoleEnum.PROCUREMENT_MANAGER, RoleEnum.SUPPLY_CH
 def vendor_recommendations(
     vendor_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)
 ):
-    vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
-    if not vendor:
-        raise HTTPException(status_code=404, detail="Vendor not found")
-    return {"vendor_id": vendor_id, "recommendations": generate_recommendations(db, vendor_id)}
+        if current_user.role == RoleEnum.VENDOR:
+         if not current_user.vendor_id or current_user.vendor_id != vendor_id:
+            raise HTTPException(
+                status_code=403,
+                detail="You can only view your own recommendations."
+            )
+        vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
+        if not vendor:
+         raise HTTPException(status_code=404, detail="Vendor not found")
+        return {"vendor_id": vendor_id, "recommendations": generate_recommendations(db, vendor_id)}
 
 
 @router.get("/vendor/{vendor_id}", response_model=List[schemas.PerformanceOut])
 def vendor_performance_history(
     vendor_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)
 ):
-    return (
+        if current_user.role == RoleEnum.VENDOR:
+         if not current_user.vendor_id or current_user.vendor_id != vendor_id:
+            raise HTTPException(
+                status_code=403,
+                detail="You can only view your own performance."
+            )
+        return (
         db.query(models.PerformanceRecord)
         .filter(models.PerformanceRecord.vendor_id == vendor_id)
         .order_by(models.PerformanceRecord.recorded_at.desc())
@@ -59,5 +71,22 @@ def record_performance(
 
 
 @router.get("/ranking", response_model=List[schemas.VendorOut])
-def vendor_ranking(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    return db.query(models.Vendor).order_by(models.Vendor.reliability_score.desc()).all()
+def vendor_ranking(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    if current_user.role == RoleEnum.VENDOR:
+        if not current_user.vendor_id:
+            return []
+
+        return (
+            db.query(models.Vendor)
+            .filter(models.Vendor.id == current_user.vendor_id)
+            .all()
+        )
+
+    return (
+        db.query(models.Vendor)
+        .order_by(models.Vendor.reliability_score.desc())
+        .all()
+    )

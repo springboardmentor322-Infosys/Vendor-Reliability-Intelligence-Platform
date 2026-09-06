@@ -1,99 +1,2228 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
+
 <title>VendorIQ | Dashboard</title>
+
 <link rel="stylesheet" href="css/style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+
+<style>
+/* =========================================================
+   VendorIQ — Unified Dashboard Design
+   Applies consistently to every role dashboard.
+   ========================================================= */
+
+:root {
+    --vq-bg: #f4f7fb;
+    --vq-surface: #ffffff;
+    --vq-border: #e5eaf1;
+    --vq-text: #172033;
+    --vq-muted: #6b7280;
+    --vq-primary: #2563eb;
+    --vq-primary-dark: #1d4ed8;
+    --vq-radius: 16px;
+    --vq-shadow: 0 8px 24px rgba(15, 23, 42, .07);
+    --vq-shadow-hover: 0 12px 30px rgba(15, 23, 42, .11);
+}
+
+/* Main dashboard background and spacing */
+#page-content {
+    background: var(--vq-bg);
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+#page-content > h1 {
+    margin: 0 0 22px;
+    color: var(--vq-text);
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 750;
+    letter-spacing: -.02em;
+}
+
+/* ---------- KPI GRID ---------- */
+.stat-grid,
+.stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+    margin: 0 0 22px;
+    align-items: stretch;
+}
+
+.stat-grid .stat-card,
+.stats-grid .stat-card {
+    min-width: 0;
+    min-height: 122px;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 18px 18px 16px;
+    border: 1px solid var(--vq-border);
+    border-radius: var(--vq-radius);
+    background: var(--vq-surface);
+    box-shadow: var(--vq-shadow);
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.stat-grid .stat-card:hover,
+.stats-grid .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--vq-shadow-hover);
+    border-color: #d7e0ee;
+}
+
+.stat-card .label,
+.stat-card h3 {
+    margin: 0 0 8px;
+    color: var(--vq-muted);
+    font-size: 12px;
+    line-height: 1.35;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .045em;
+}
+
+.stat-card .value,
+.stat-card .stat-value {
+    margin: 0;
+    color: var(--vq-text);
+    font-size: clamp(22px, 2.2vw, 30px);
+    line-height: 1.15;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.stat-card .sub {
+    margin-top: 8px;
+    color: var(--vq-muted);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.stat-card > span {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: #eef4ff;
+    color: var(--vq-primary-dark);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* ---------- CHART GRIDS ---------- */
+.charts-grid,
+.dashboard-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    width: 100%;
+    margin: 0 0 22px;
+    align-items: stretch;
+}
+
+/* Make every chart panel the same height */
+.charts-grid > .panel,
+.dashboard-grid > .panel,
+.dashboard-grid > .chart-card {
+    min-width: 0;
+    height: 310px;
+    min-height: 310px;
+    box-sizing: border-box;
+    margin: 0 !important;
+    padding: 18px 18px 14px;
+    border: 1px solid var(--vq-border);
+    border-radius: var(--vq-radius);
+    background: var(--vq-surface);
+    box-shadow: var(--vq-shadow);
+    overflow: hidden;
+}
+
+.charts-grid > .panel h3,
+.dashboard-grid > .panel h3,
+.dashboard-grid > .chart-card h2 {
+    margin: 0 0 10px;
+    color: var(--vq-text);
+    font-size: 15px;
+    line-height: 1.35;
+    font-weight: 750;
+}
+
+.charts-grid > .panel canvas,
+.dashboard-grid > .panel canvas,
+.dashboard-grid > .chart-card canvas {
+    display: block;
+    width: 100% !important;
+    height: 245px !important;
+    max-height: 245px !important;
+}
+
+/* ---------- NORMAL PANELS / TABLE SECTIONS ---------- */
+#page-content > .panel,
+#page-content > .dashboard-section {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0 0 22px;
+    padding: 20px;
+    border: 1px solid var(--vq-border);
+    border-radius: var(--vq-radius);
+    background: var(--vq-surface);
+    box-shadow: var(--vq-shadow);
+    overflow: hidden;
+}
+
+#page-content > .panel > h3,
+#page-content > .dashboard-section > h2 {
+    margin: 0 0 16px;
+    color: var(--vq-text);
+    font-size: 17px;
+    line-height: 1.35;
+    font-weight: 750;
+}
+
+#page-content > .dashboard-section > table,
+#page-content > .panel > table {
+    margin-top: 0;
+}
+
+/* ---------- TABLES ---------- */
+#page-content table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+#page-content th {
+    background: #f8fafc;
+    color: #596579;
+    font-size: 11px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    white-space: nowrap;
+}
+
+#page-content th,
+#page-content td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #edf0f5;
+    text-align: left;
+    vertical-align: middle;
+}
+
+#page-content tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+#page-content tbody tr:hover {
+    background: #f8fbff;
+}
+
+#page-content td {
+    color: #273247;
+    font-size: 13px;
+}
+
+#page-content td strong {
+    color: var(--vq-text);
+}
+
+/* ---------- LINKS / EMPTY STATES ---------- */
+#page-content a {
+    color: var(--vq-primary);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+#page-content a:hover {
+    color: var(--vq-primary-dark);
+    text-decoration: underline;
+}
+
+#page-content .text-muted {
+    color: var(--vq-muted);
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1100px) {
+    .stat-grid,
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .charts-grid,
+    .dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    #page-content {
+        padding: 16px;
+    }
+
+    .stat-grid,
+    .stats-grid,
+    .charts-grid,
+    .dashboard-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .charts-grid > .panel,
+    .dashboard-grid > .panel,
+    .dashboard-grid > .chart-card {
+        height: 285px;
+        min-height: 285px;
+    }
+
+    .charts-grid > .panel canvas,
+    .dashboard-grid > .panel canvas,
+    .dashboard-grid > .chart-card canvas {
+        height: 220px !important;
+        max-height: 220px !important;
+    }
+
+    #page-content > .panel,
+    #page-content > .dashboard-section {
+        padding: 16px;
+    }
+
+    #page-content {
+        overflow-x: auto;
+    }
+
+    #page-content table {
+        min-width: 620px;
+    }
+}
+
+@media (max-width: 480px) {
+    #page-content {
+        padding: 12px;
+    }
+
+    .stat-grid,
+    .stats-grid {
+        gap: 12px;
+    }
+
+    .stat-grid .stat-card,
+    .stats-grid .stat-card {
+        min-height: 108px;
+        padding: 15px;
+    }
+}
+</style>
+
+
+<script src="./js/chart.umd.min.js"></script>
+
 </head>
+
 <body>
+
 <div class="app-shell" id="app-shell"></div>
 
 <script src="js/api.js"></script>
+
 <script>
+
 requireAuth();
-renderShell("dashboard.html", "Procurement Dashboard");
+
+renderShell("dashboard.html", "Dashboard");
+
+
+/* =========================================================
+   LOAD DASHBOARD
+   ========================================================= */
 
 async function load() {
-  const content = document.getElementById("page-content");
-  try {
-    const s = await api("/dashboard/summary");
+
+    const content = document.getElementById("page-content");
+
+    try {
+
+        const data = await api("/dashboard/summary");
+
+        console.log("Dashboard data:", data);
+
+        const role = data.role;
+
+        if (role === "Administrator") {
+
+            renderAdministratorDashboard(data);
+
+        } else if (role === "Procurement Manager") {
+
+            renderProcurementDashboard(data);
+
+        } else if (role === "Supply Chain Manager") {
+
+            renderSupplyChainDashboard(data);
+
+        } else if (role === "Vendor") {
+
+            renderVendorDashboard(data);
+
+        } else if (role === "Finance Officer") {
+
+            renderFinanceDashboard(data);
+
+        } else if (role === "Auditor") {
+
+            await renderAuditorDashboard(data);
+
+        } else {
+
+            content.innerHTML = `
+                <div class="panel">
+
+                    <h3>Dashboard</h3>
+
+                    <p class="text-muted">
+                        Dashboard for ${role || "this user"} is not configured.
+                    </p>
+
+                </div>
+            `;
+
+        }
+
+    } catch (err) {
+
+        console.error("DASHBOARD ERROR:", err);
+
+        content.innerHTML = `
+            <div class="panel">
+
+                <p class="error-msg">
+                    ${err.message}
+                </p>
+
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   ADMINISTRATOR
+   ========================================================= */
+
+function renderAdministratorDashboard(data) {
+
+    const content = document.getElementById("page-content");
+
+    const users = data.users || {};
+    const vendors = data.vendors || {};
+    const procurement = data.procurement || {};
+    const contracts = data.contracts || {};
+    const system = data.system || {};
+
+    const usersByRole = users.by_role || {};
+    const vendorRisk = vendors.risk_distribution || {};
+    const compliance = contracts.compliance || {};
 
     content.innerHTML = `
-      <div class="stat-grid">
-        <div class="stat-card">
-          <div class="label">Total Vendors</div>
-          <div class="value">${s.vendors.total}</div>
-          <div class="sub">${s.vendors.approved} approved · ${s.vendors.pending} pending</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Active Purchase Orders</div>
-          <div class="value">${s.procurement.active_purchase_orders}</div>
-          <div class="sub">${s.procurement.total_purchase_orders} total raised</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Total Procurement Spend</div>
-          <div class="value">${fmtMoney(s.procurement.total_spend)}</div>
-          <div class="sub">${s.procurement.completed_purchase_orders} orders completed</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Avg. Reliability Score</div>
-          <div class="value">${s.vendors.average_reliability_score}</div>
-          <div class="sub">${s.contracts_expiring_next_30_days} contracts expiring in 30 days</div>
-        </div>
-      </div>
 
-      <div class="charts-grid">
-        <div class="panel">
-          <h3>Purchase Orders by Status</h3>
-          <canvas id="poChart" height="200"></canvas>
+        <div class="stat-grid">
+
+            <div class="stat-card">
+                <div class="label">Total Users</div>
+                <div class="value">${users.total || 0}</div>
+                <div class="sub">All registered users</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Active Users</div>
+                <div class="value">${users.active || 0}</div>
+                <div class="sub">Currently active</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Total Vendors</div>
+                <div class="value">${vendors.total || 0}</div>
+                <div class="sub">${vendors.approved || 0} approved vendors</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Purchase Orders</div>
+                <div class="value">
+                    ${procurement.total_purchase_orders || 0}
+                </div>
+                <div class="sub">Total purchase orders</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Procurement Spend</div>
+                <div class="value">
+                    ${fmtMoney(procurement.total_spend || 0)}
+                </div>
+                <div class="sub">Total procurement value</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Total Contracts</div>
+                <div class="value">${contracts.total || 0}</div>
+                <div class="sub">Registered contracts</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Expiring Contracts</div>
+                <div class="value">
+                    ${contracts.expiring_next_30_days || 0}
+                </div>
+                <div class="sub">Next 30 days</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Unread Notifications</div>
+                <div class="value">
+                    ${system.unread_notifications || 0}
+                </div>
+                <div class="sub">Require attention</div>
+            </div>
+
         </div>
-        <div class="panel">
-          <h3>Vendors by Category</h3>
-          <canvas id="categoryChart" height="200"></canvas>
+
+
+        <div class="charts-grid">
+
+            <div class="panel">
+
+                <h3>Users by Role</h3>
+
+                <canvas id="userRoleChart" height="200"></canvas>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h3>Vendor Risk Distribution</h3>
+
+                <canvas id="vendorRiskChart" height="200"></canvas>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h3>Contract Compliance</h3>
+
+                <canvas id="complianceChart" height="200"></canvas>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h3>System Activity</h3>
+
+                <div class="stat-grid">
+
+                    <div class="stat-card">
+                        <div class="label">Messages</div>
+                        <div class="value">
+                            ${system.total_messages || 0}
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="label">Notifications</div>
+                        <div class="value">
+                            ${system.total_notifications || 0}
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
+
+
         <div class="panel">
-          <h3>Vendor Risk Distribution</h3>
-          <canvas id="riskChart" height="200"></canvas>
+
+            <h3>Vendor Summary</h3>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Vendor Information</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>Total Vendors</td>
+                        <td>${vendors.total || 0}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Approved Vendors</td>
+                        <td>${vendors.approved || 0}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Pending Vendors</td>
+                        <td>${vendors.pending || 0}</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
         </div>
-        <div class="panel">
-          <h3>Top 5 Vendors by Reliability Score</h3>
-          <table>
-            <thead><tr><th>Vendor</th><th>Score</th><th>Risk</th></tr></thead>
-            <tbody>
-              ${s.top_vendors.map(v => `<tr><td>${v.name}</td><td>${v.reliability_score}</td><td>${statusBadge(v.risk_level)}</td></tr>`).join("") || `<tr><td colspan="3" class="text-muted">No performance data yet</td></tr>`}
-            </tbody>
-          </table>
-        </div>
-      </div>
     `;
 
-    drawChart("poChart", "doughnut", Object.keys(s.procurement.by_status), Object.values(s.procurement.by_status), ["#3182ce","#c05621","#2f855a","#805ad5","#c53030","#718096"]);
-    drawChart("categoryChart", "bar", Object.keys(s.vendors.by_category), Object.values(s.vendors.by_category), ["#2c5282"]);
-    drawChart("riskChart", "pie", Object.keys(s.vendors.by_risk_level), Object.values(s.vendors.by_risk_level), ["#2f855a","#c05621","#c53030"]);
 
-  } catch (err) {
-    content.innerHTML = `<p class="error-msg">${err.message}</p>`;
-  }
+    drawChart(
+        "userRoleChart",
+        "doughnut",
+        Object.keys(usersByRole),
+        Object.values(usersByRole)
+    );
+
+    drawChart(
+        "vendorRiskChart",
+        "pie",
+        Object.keys(vendorRisk),
+        Object.values(vendorRisk)
+    );
+
+    drawChart(
+        "complianceChart",
+        "doughnut",
+        Object.keys(compliance),
+        Object.values(compliance)
+    );
+
 }
 
-function drawChart(canvasId, type, labels, data, colors) {
-  const ctx = document.getElementById(canvasId);
-  if (!ctx) return;
-  new Chart(ctx, {
-    type,
-    data: {
-      labels,
-      datasets: [{ data, backgroundColor: colors, borderWidth: type === "bar" ? 0 : 1 }],
-    },
-    options: {
-      plugins: { legend: { display: type !== "bar", position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } },
-      scales: type === "bar" ? { y: { beginAtZero: true } } : {},
-    },
-  });
+
+/* =========================================================
+   PROCUREMENT MANAGER
+   ========================================================= */
+
+function renderProcurementDashboard(data) {
+
+    const content = document.getElementById("page-content");
+
+    const overview = data.procurement_overview || {};
+    const vendors = data.vendor_performance || [];
+    const delivery = data.delivery_status || {};
+
+    const statusData = overview.by_status || {};
+
+    content.innerHTML = `
+
+        <div class="stat-grid">
+
+            <div class="stat-card">
+                <div class="label">Total Purchase Orders</div>
+                <div class="value">
+                    ${overview.total_purchase_orders || 0}
+                </div>
+                <div class="sub">All purchase orders</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Pending Approval</div>
+                <div class="value">
+                    ${overview.pending_approval || 0}
+                </div>
+                <div class="sub">Require approval</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Active Orders</div>
+                <div class="value">
+                    ${overview.active_orders || 0}
+                </div>
+                <div class="sub">Currently active</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Delivered</div>
+                <div class="value">
+                    ${overview.delivered_orders || 0}
+                </div>
+                <div class="sub">Delivered orders</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Completed</div>
+                <div class="value">
+                    ${overview.completed_orders || 0}
+                </div>
+                <div class="sub">Completed orders</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Delayed</div>
+                <div class="value">
+                    ${overview.delayed_orders || 0}
+                </div>
+                <div class="sub">Delayed deliveries</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Procurement Spend</div>
+                <div class="value">
+                    ${fmtMoney(overview.total_spend || 0)}
+                </div>
+                <div class="sub">Total order value</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Contracts Expiring</div>
+                <div class="value">
+                    ${delivery.upcoming_contracts || 0}
+                </div>
+                <div class="sub">Next 30 days</div>
+            </div>
+
+        </div>
+
+
+        <div class="charts-grid">
+
+            <div class="panel">
+
+                <h3>Purchase Order Status</h3>
+
+                <canvas
+                    id="procurementStatusChart"
+                    height="220">
+                </canvas>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h3>Top Vendor Performance</h3>
+
+                <canvas
+                    id="vendorPerformanceChart"
+                    height="220">
+                </canvas>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h3>Vendor Performance Summary</h3>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>#</th>
+                        <th>Vendor</th>
+                        <th>Reliability</th>
+                        <th>Risk</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${
+                        vendors.length
+
+                        ? vendors.map((vendor, index) => `
+
+                            <tr>
+
+                                <td>${index + 1}</td>
+
+                                <td>${vendor.name}</td>
+
+                                <td>${vendor.reliability_score || 0}</td>
+
+                                <td>
+                                    ${statusBadge(
+                                        vendor.risk_level || "Unknown"
+                                    )}
+                                </td>
+
+                            </tr>
+
+                        `).join("")
+
+                        : `
+                            <tr>
+                                <td colspan="4" class="text-muted">
+                                    No vendor performance records found.
+                                </td>
+                            </tr>
+                        `
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    `;
+
+
+    drawChart(
+        "procurementStatusChart",
+        "doughnut",
+        Object.keys(statusData),
+        Object.values(statusData)
+    );
+
+
+    drawChart(
+        "vendorPerformanceChart",
+        "bar",
+        vendors.map(v => v.name),
+        vendors.map(v => Number(v.reliability_score || 0))
+    );
+
 }
+
+
+/* =========================================================
+   SUPPLY CHAIN MANAGER
+   ========================================================= */
+
+function renderSupplyChainDashboard(data) {
+
+    const content = document.getElementById("page-content");
+
+    const reliability =
+        data.supplier_reliability || {};
+
+    const risk =
+        data.risk_distribution || {};
+
+    const vendors =
+        Array.isArray(data.vendors)
+            ? data.vendors
+            : [];
+
+    const delayedOrders =
+        Array.isArray(data.delayed_orders)
+            ? data.delayed_orders
+            : [];
+
+    content.innerHTML = `
+
+        <div class="stat-grid">
+
+            <div class="stat-card">
+
+                <div class="label">
+                    Average Reliability
+                </div>
+
+                <div class="value">
+                    ${reliability.average_score || 0}
+                </div>
+
+                <div class="sub">
+                    Across all suppliers
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="label">
+                    On-Time Deliveries
+                </div>
+
+                <div class="value">
+                    ${reliability.total_on_time_deliveries || 0}
+                </div>
+
+                <div class="sub">
+                    Historical deliveries
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="label">
+                    Delayed Deliveries
+                </div>
+
+                <div class="value">
+                    ${reliability.total_delayed_deliveries || 0}
+                </div>
+
+                <div class="sub">
+                    Historical delays
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="label">
+                    Average Quality
+                </div>
+
+                <div class="value">
+                    ${reliability.average_quality_rating || 0}
+                </div>
+
+                <div class="sub">
+                    Supplier quality rating
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="label">
+                    Delayed Orders
+                </div>
+
+                <div class="value">
+                    ${delayedOrders.length}
+                </div>
+
+                <div class="sub">
+                    Require attention
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="label">
+                    Contracts Expiring
+                </div>
+
+                <div class="value">
+                    ${data.contracts_expiring_next_30_days || 0}
+                </div>
+
+                <div class="sub">
+                    Next 30 days
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="charts-grid">
+
+            <div class="panel">
+
+                <h3>Supplier Risk Distribution</h3>
+
+                <canvas
+                    id="supplyRiskChart"
+                    height="220">
+                </canvas>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h3>Supplier Reliability</h3>
+
+                <canvas
+                    id="supplyReliabilityChart"
+                    height="220">
+                </canvas>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h3>Supplier Performance</h3>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Vendor</th>
+                        <th>Status</th>
+                        <th>Reliability</th>
+                        <th>Risk</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${
+                        vendors.length
+
+                        ? vendors.map(vendor => `
+
+                            <tr>
+
+                                <td>${vendor.name}</td>
+
+                                <td>
+                                    ${statusBadge(
+                                        vendor.status || "Unknown"
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${vendor.reliability_score || 0}
+                                </td>
+
+                                <td>
+                                    ${statusBadge(
+                                        vendor.risk_level || "Unknown"
+                                    )}
+                                </td>
+
+                            </tr>
+
+                        `).join("")
+
+                        : `
+                            <tr>
+                                <td colspan="4" class="text-muted">
+                                    No supplier records found.
+                                </td>
+                            </tr>
+                        `
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h3>Delayed Orders</h3>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>PO Number</th>
+                        <th>Item</th>
+                        <th>Expected Delivery</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${
+                        delayedOrders.length
+
+                        ? delayedOrders.map(po => `
+
+                            <tr>
+
+                                <td>${po.po_number}</td>
+
+                                <td>${po.item || "-"}</td>
+
+                                <td>
+                                    ${formatDate(po.expected_delivery)}
+                                </td>
+
+                                <td>
+                                    ${statusBadge(
+                                        po.status || "Unknown"
+                                    )}
+                                </td>
+
+                            </tr>
+
+                        `).join("")
+
+                        : `
+                            <tr>
+                                <td colspan="4" class="text-muted">
+                                    No delayed orders.
+                                </td>
+                            </tr>
+                        `
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    `;
+
+
+    drawChart(
+        "supplyRiskChart",
+        "doughnut",
+        Object.keys(risk),
+        Object.values(risk)
+    );
+
+
+    drawChart(
+        "supplyReliabilityChart",
+        "bar",
+        vendors.map(v => v.name),
+        vendors.map(v => Number(v.reliability_score || 0))
+    );
+
+}
+
+/* =========================================================
+   VENDOR
+   ========================================================= */
+
+function renderVendorDashboard(data) {
+    const content = document.getElementById("page-content");
+
+    const vendor = data.vendor || {};
+    const performance = data.performance || {};
+    const contracts = data.contracts || [];
+    const orders = data.orders || [];
+
+    content.innerHTML = `
+        <h1>My Vendor Dashboard</h1>
+
+        <!-- KPI CARDS -->
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <h3>Reliability Score</h3>
+                <div class="stat-value">
+                    ${vendor.reliability_score ?? 0}
+                </div>
+                <span>${vendor.risk_level ?? "Low"}</span>
+            </div>
+
+            <div class="stat-card">
+                <h3>Account Status</h3>
+                <div class="stat-value">
+                    ${vendor.status ?? "N/A"}
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Category</h3>
+                <div class="stat-value">
+                    ${vendor.category ?? "N/A"}
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Vendor ID</h3>
+                <div class="stat-value">
+                    ${vendor.vendor_id ?? "VDR-0001"}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CHARTS -->
+        <div class="dashboard-grid">
+
+            <div class="chart-card">
+                <h2>Delivery Performance</h2>
+                <canvas id="vendorDeliveryChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <h2>Vendor Performance</h2>
+                <canvas id="vendorPerformanceChart"></canvas>
+            </div>
+
+        </div>
+
+        <!-- PROFILE -->
+        <div class="dashboard-section">
+            <h2>My Vendor Profile</h2>
+
+            <table>
+                <tr>
+                    <th>Vendor ID</th>
+                    <td>${vendor.vendor_id ?? "VDR-0001"}</td>
+                </tr>
+                <tr>
+                    <th>Vendor Name</th>
+                    <td>${vendor.name ?? "N/A"}</td>
+                </tr>
+                <tr>
+                    <th>Category</th>
+                    <td>${vendor.category ?? "N/A"}</td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td>${vendor.status ?? "N/A"}</td>
+                </tr>
+                <tr>
+                    <th>Contact</th>
+                    <td>${vendor.contact_email ?? "N/A"}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- PERFORMANCE -->
+        <div class="dashboard-section">
+            <h2>Performance History</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>On-Time</th>
+                        <th>Delayed</th>
+                        <th>Quality</th>
+                        <th>Completion</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>${performance.date
+                            ? new Date(performance.date).toLocaleDateString("en-GB", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric"
+                            })
+                            : "24 Aug 2026"}
+                        </td>
+
+                        <td>${performance.on_time_deliveries ?? 0}</td>
+
+                        <td>${performance.delayed_deliveries ?? 0}</td>
+
+                        <td>${performance.quality_rating ?? 0} / 5</td>
+
+                        <td>${performance.completion_rate ?? 0}%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- CONTRACTS -->
+        <div class="dashboard-section">
+            <h2>Contract Status</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>End Date</th>
+                        <th>Compliance</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    ${
+                        contracts.length
+                        ? contracts.map(contract => `
+                            <tr>
+                                <td>${contract.title ?? "N/A"}</td>
+                                <td>
+                                    ${contract.end_date
+                                        ? new Date(contract.end_date).toLocaleDateString(
+                                            "en-GB",
+                                            {
+                                                day: "2-digit",
+                                                month: "short",
+                                                year: "numeric"
+                                            }
+                                        )
+                                        : "N/A"
+                                    }
+                                </td>
+                                <td>${contract.compliance ?? "N/A"}</td>
+                            </tr>
+                        `).join("")
+                        : `
+                            <tr>
+                                <td colspan="3">No contracts found.</td>
+                            </tr>
+                        `
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ORDERS -->
+        <div class="dashboard-section">
+            <h2>Order History</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>PO Number</th>
+                        <th>Item</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    ${
+                        orders.length
+                        ? orders.map(order => `
+                            <tr>
+                                <td>${order.po_number ?? "N/A"}</td>
+                                <td>${order.item_description ?? "N/A"}</td>
+                                <td>₹${Number(order.total_amount ?? 0).toLocaleString("en-IN")}</td>
+                                <td>${order.status ?? "N/A"}</td>
+                            </tr>
+                        `).join("")
+                        : `
+                            <tr>
+                                <td colspan="4">No purchase orders found.</td>
+                            </tr>
+                        `
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- COMMUNICATION -->
+        <div class="dashboard-section">
+            <h2>Communication Activity</h2>
+
+            <p>
+                <a href="messages.html">Open Inbox</a>
+            </p>
+        </div>
+    `;
+
+    // Draw charts AFTER the HTML/canvas elements exist
+    setTimeout(() => {
+
+        drawChart(
+            "vendorDeliveryChart",
+            "bar",
+            ["On-Time", "Delayed"],
+            [
+                performance.on_time_deliveries ?? 0,
+                performance.delayed_deliveries ?? 0
+            ]
+        );
+
+        drawChart(
+            "vendorPerformanceChart",
+            "bar",
+            ["Quality", "Completion"],
+            [
+                performance.quality_rating ?? 0,
+                performance.completion_rate ?? 0
+            ]
+        );
+
+    }, 100);
+}
+
+/* =========================================================
+   FINANCE OFFICER
+   ========================================================= */
+function renderFinanceDashboard(data) {
+
+    const content = document.getElementById("page-content");
+
+    const financial = data.financial_overview || {};
+
+    const spending = Array.isArray(data.vendor_spending)
+        ? data.vendor_spending
+        : [];
+
+    const paymentHistory = Array.isArray(data.payment_history)
+        ? data.payment_history
+        : [];
+
+
+    content.innerHTML = `
+
+        <div class="stat-grid">
+
+            <div class="stat-card">
+                <div class="label">
+                    Total Procurement Spend
+                </div>
+
+                <div class="value">
+                    ${fmtMoney(
+                        financial.total_procurement_spend || 0
+                    )}
+                </div>
+
+                <div class="sub">
+                    Total transaction value
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="label">
+                    Paid Amount
+                </div>
+
+                <div class="value">
+                    ${fmtMoney(financial.paid_amount || 0)}
+                </div>
+
+                <div class="sub">
+                    Paid purchase orders
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="label">
+                    Unpaid Amount
+                </div>
+
+                <div class="value">
+                    ${fmtMoney(financial.unpaid_amount || 0)}
+                </div>
+
+                <div class="sub">
+                    Pending payments
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="label">
+                    Paid Orders
+                </div>
+
+                <div class="value">
+                    ${financial.paid_orders || 0}
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="label">
+                    Unpaid Orders
+                </div>
+
+                <div class="value">
+                    ${financial.unpaid_orders || 0}
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="label">
+                    Invoiced Orders
+                </div>
+
+                <div class="value">
+                    ${financial.invoiced_orders || 0}
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="label">
+                    Uninvoiced Orders
+                </div>
+
+                <div class="value">
+                    ${financial.uninvoiced_orders || 0}
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="charts-grid">
+
+            <div class="panel">
+
+                <h3>Spending by Vendor</h3>
+
+                <canvas
+                    id="vendorSpendingChart"
+                    height="240">
+                </canvas>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h3>Payment Overview</h3>
+
+                <canvas
+                    id="paymentChart"
+                    height="240">
+                </canvas>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h3>Vendor Spending</h3>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Vendor</th>
+                        <th>Amount</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${
+                        spending.length
+
+                        ? spending.map(item => `
+
+                            <tr>
+
+                                <td>${item.vendor}</td>
+
+                                <td>
+                                    ${fmtMoney(item.amount || 0)}
+                                </td>
+
+                            </tr>
+
+                        `).join("")
+
+                        : `
+                            <tr>
+                                <td colspan="2" class="text-muted">
+                                    No spending records found.
+                                </td>
+                            </tr>
+                        `
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h3>Vendor Payment History</h3>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Vendor</th>
+                        <th>PO Number</th>
+                        <th>Item</th>
+                        <th>Amount</th>
+                        <th>Invoice</th>
+                        <th>Payment Status</th>
+                        <th>Order Date</th>
+                        <th>PO Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${
+                        paymentHistory.length
+
+                        ? paymentHistory.map(item => `
+
+                            <tr>
+
+                                <td>
+                                    ${item.vendor || "-"}
+                                </td>
+
+                                <td>
+                                    ${item.po_number || "-"}
+                                </td>
+
+                                <td>
+                                    ${item.item || "-"}
+                                </td>
+
+                                <td>
+                                    ${fmtMoney(item.amount || 0)}
+                                </td>
+
+                                <td>
+                                    ${item.invoice_number || "Not Invoiced"}
+                                </td>
+
+                                <td>
+                                    ${item.payment_status || "-"}
+                                </td>
+
+                                <td>
+                                    ${
+                                        item.order_date
+                                            ? new Date(
+                                                item.order_date
+                                            ).toLocaleDateString()
+                                            : "-"
+                                    }
+                                </td>
+
+                                <td>
+                                    ${item.status || "-"}
+                                </td>
+
+                            </tr>
+
+                        `).join("")
+
+                        : `
+                            <tr>
+                                <td colspan="8" class="text-muted">
+                                    No payment history found.
+                                </td>
+                            </tr>
+                        `
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    `;
+
+
+    drawChart(
+        "vendorSpendingChart",
+        "bar",
+        spending.map(item => item.vendor),
+        spending.map(item => Number(item.amount || 0))
+    );
+
+
+    drawChart(
+        "paymentChart",
+        "doughnut",
+        ["Paid", "Unpaid"],
+        [
+            Number(financial.paid_amount || 0),
+            Number(financial.unpaid_amount || 0)
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   AUDITOR
+   ========================================================= */
+
+async function renderAuditorDashboard(data) {
+
+    const content = document.getElementById("page-content");
+        let auditLogs = [];
+
+    try {
+        auditLogs = await api("/audit-logs");
+        console.log("Auditor audit logs:", auditLogs);
+    } catch (error) {
+        console.error("Failed to load audit logs:", error);
+    }
+
+    const compliance = data.compliance || {};
+
+    const vendors =
+        Array.isArray(data.vendor_review)
+            ? data.vendor_review
+            : [];
+
+    const purchaseOrders =
+        Array.isArray(data.recent_purchase_orders)
+            ? data.recent_purchase_orders
+            : [];
+
+    const activity = data.system_activity || {};
+
+    const complianceStatus =
+        compliance.by_status || {};
+
+
+    const riskDistribution = {};
+
+    vendors.forEach(vendor => {
+
+        const risk =
+            vendor.risk_level || "Unknown";
+
+        riskDistribution[risk] =
+            (riskDistribution[risk] || 0) + 1;
+
+    });
+
+
+    content.innerHTML = `
+
+        <div class="stat-grid">
+
+            <div class="stat-card">
+                <div class="label">Total Contracts</div>
+                <div class="value">
+                    ${compliance.total_contracts || 0}
+                </div>
+                <div class="sub">All registered contracts</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Expiring Soon</div>
+                <div class="value">
+                    ${compliance.expiring_next_30_days || 0}
+                </div>
+                <div class="sub">Next 30 days</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Missing Documents</div>
+                <div class="value">
+                    ${compliance.vendors_without_documents || 0}
+                </div>
+                <div class="sub">Vendors without documents</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="label">Vendors Reviewed</div>
+                <div class="value">
+                    ${vendors.length}
+                </div>
+                <div class="sub">Vendor risk records</div>
+            </div>
+
+        </div>
+
+
+        <div class="charts-grid">
+
+            <div class="panel">
+
+                <h3>Contract Compliance</h3>
+
+                <canvas
+                    id="auditorComplianceChart"
+                    height="200">
+                </canvas>
+
+            </div>
+
+
+            <div class="panel">
+
+                <h3>Vendor Risk Distribution</h3>
+
+                <canvas
+                    id="auditorRiskChart"
+                    height="200">
+                </canvas>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h3>Vendor Review</h3>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Vendor</th>
+                        <th>Status</th>
+                        <th>Reliability</th>
+                        <th>Risk</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${
+                        vendors.length
+
+                        ? vendors
+                            .sort(
+                                (a, b) =>
+                                    Number(
+                                        b.reliability_score || 0
+                                    ) -
+                                    Number(
+                                        a.reliability_score || 0
+                                    )
+                            )
+                            .map(vendor => `
+
+                                <tr>
+
+                                    <td>
+                                        ${vendor.vendor || "-"}
+                                    </td>
+
+                                    <td>
+                                        ${statusBadge(
+                                            vendor.status || "Unknown"
+                                        )}
+                                    </td>
+
+                                    <td>
+                                        ${vendor.reliability_score || 0}
+                                    </td>
+
+                                    <td>
+                                        ${statusBadge(
+                                            vendor.risk_level || "Unknown"
+                                        )}
+                                    </td>
+
+                                </tr>
+
+                            `)
+                            .join("")
+
+                        : `
+                            <tr>
+                                <td colspan="4" class="text-muted">
+                                    No vendor records found.
+                                </td>
+                            </tr>
+                        `
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h3>Recent Purchase Orders</h3>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>PO Number</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Requested By</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${
+                        purchaseOrders.length
+
+                        ? purchaseOrders.map(po => `
+
+                            <tr>
+
+                                <td>
+                                    <strong>
+                                        ${po.po_number}
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    ${fmtMoney(po.amount || 0)}
+                                </td>
+
+                                <td>
+                                    ${statusBadge(
+                                        po.status || "Unknown"
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${po.requested_by || "-"}
+                                </td>
+
+                            </tr>
+
+                        `).join("")
+
+                        : `
+                            <tr>
+                                <td colspan="4" class="text-muted">
+                                    No purchase orders found.
+                                </td>
+                            </tr>
+                        `
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h3>Compliance Overview</h3>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Compliance Status</th>
+                        <th>Contracts</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${
+                        Object.entries(complianceStatus).length
+
+                        ? Object.entries(complianceStatus)
+                            .map(
+                                ([status, count]) => `
+
+                                    <tr>
+
+                                        <td>
+                                            ${statusBadge(status)}
+                                        </td>
+
+                                        <td>
+                                            ${count}
+                                        </td>
+
+                                    </tr>
+
+                                `
+                            )
+                            .join("")
+
+                        : `
+                            <tr>
+                                <td colspan="2" class="text-muted">
+                                    No compliance data found.
+                                </td>
+                            </tr>
+                        `
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+                <div class="panel">
+
+            <h3>Audit Trail</h3>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Date / Time</th>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                        <th>Module</th>
+                        <th>Record ID</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    ${
+                        auditLogs.length
+
+                        ? auditLogs.map(log => `
+
+                            <tr>
+
+                                <td>
+                                    ${
+                                        log.created_at
+                                            ? new Date(
+                                                log.created_at
+                                            ).toLocaleString()
+                                            : "-"
+                                    }
+                                </td>
+
+                                <td>
+                                    ${log.user_name || "-"}
+                                </td>
+
+                                <td>
+                                    ${log.user_role || "-"}
+                                </td>
+
+                                <td>
+                                    ${statusBadge(log.action || "-")}
+                                </td>
+
+                                <td>
+                                    ${log.module || "-"}
+                                </td>
+
+                                <td>
+                                    ${log.record_id ?? "-"}
+                                </td>
+
+                                <td>
+                                    ${log.details || "-"}
+                                </td>
+
+                            </tr>
+
+                        `).join("")
+
+                        : `
+                            <tr>
+                                <td colspan="7" class="text-muted">
+                                    No audit records found.
+                                </td>
+                            </tr>
+                        `
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="panel">
+
+            <h3>System Activity</h3>
+
+
+            <div class="stat-grid">
+
+                <div class="stat-card">
+
+                    <div class="label">
+                        Messages
+                    </div>
+
+                    <div class="value">
+                        ${activity.messages || 0}
+                    </div>
+
+                </div>
+
+                <div class="stat-card">
+
+                    <div class="label">
+                        Notifications
+                    </div>
+
+                    <div class="value">
+                        ${activity.notifications || 0}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    drawChart(
+        "auditorComplianceChart",
+        "doughnut",
+        Object.keys(complianceStatus),
+        Object.values(complianceStatus)
+    );
+
+
+    drawChart(
+        "auditorRiskChart",
+        "pie",
+        Object.keys(riskDistribution),
+        Object.values(riskDistribution)
+    );
+
+}
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function drawChart(canvasId, type, labels, data) {
+
+    const canvas = document.getElementById(canvasId);
+
+    if (!canvas) {
+        console.error("Canvas not found:", canvasId);
+        return;
+    }
+
+    if (typeof Chart === "undefined") {
+        console.error("Chart.js is not loaded");
+        return;
+    }
+
+    // Destroy existing chart on this canvas
+    const existingChart = Chart.getChart(canvas);
+
+    if (existingChart) {
+        existingChart.destroy();
+    }
+
+    new Chart(canvas, {
+        type: type,
+
+        data: {
+            labels: labels,
+
+            datasets: [{
+                label: type === "bar" ? "Performance" : "Performance",
+                data: data,
+                borderWidth: 1
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            animation: {
+                duration: 500
+            },
+
+            plugins: {
+                legend: {
+                    display: true,
+                    position: "bottom",
+                    labels: {
+                        boxWidth: 10,
+                        boxHeight: 10,
+                        padding: 14,
+                        usePointStyle: true
+                    }
+                }
+            },
+
+            scales: type === "bar" ? {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        maxRotation: 0,
+                        minRotation: 0
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: "rgba(148, 163, 184, .16)"
+                    }
+                }
+            } : undefined
+        }
+    });
+}
+
+
+function formatDate(value) {
+
+    if (!value) {
+        return "-";
+    }
+
+    try {
+
+        return new Date(value).toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }
+        );
+
+    } catch {
+
+        return value;
+
+    }
+
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
 
 load();
+
 </script>
+
 </body>
+
 </html>
+
+
+
+
+

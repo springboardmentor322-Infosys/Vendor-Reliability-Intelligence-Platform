@@ -44,11 +44,12 @@ def check_expiring_contracts(db: Session, warning_days: int = EXPIRY_WARNING_DAY
         days_left = (contract.end_date - now).days
 
         notif = models.Notification(
-            title="Contract Expiring Soon",
-            message=f"'{contract.contract_title}' with {vendor_name} expires in {days_left} day(s) "
-                     f"(on {contract.end_date.strftime('%d %b %Y')}).",
-            category="Contract Expiry Alerts",
-        )
+    vendor_id=contract.vendor_id,
+    title="Contract Expiring Soon",
+    message=f"'{contract.contract_title}' with {vendor_name} expires in {days_left} day(s) "
+             f"(on {contract.end_date.strftime('%d %b %Y')}).",
+    category="Contract Expiry Alerts",
+)
         db.add(notif)
         contract.expiry_notified = True
         created += 1

@@ -1,9 +1,8 @@
 // ---------- Core API helper ----------
-const API_BASE = "/api";
+const API_BASE = "http://localhost:8000/api";
 // NOTE: hardcoded for local dev because the frontend is being opened separately
 // from the FastAPI server. Change back to "/api" once you deploy both together
 // (e.g. behind the same Nginx/Docker setup), or it will break in production.
-
 function getToken() {
   return localStorage.getItem("vq_token");
 }
@@ -11,6 +10,17 @@ function getToken() {
 function getUser() {
   const raw = localStorage.getItem("vq_user");
   return raw ? JSON.parse(raw) : null;
+}
+
+// Get the role of the currently logged-in user.
+function getUserRole() {
+  const user = getUser();
+  return user ? user.role : null;
+}
+
+// Check whether the logged-in user has one of the given roles.
+function hasRole(...roles) {
+  return roles.includes(getUserRole());
 }
 
 function setSession(token, user) {

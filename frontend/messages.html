@@ -5,10 +5,13 @@
 <title>VendorIQ | Communication</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
+
 <div class="app-shell" id="app-shell"></div>
 
 <script src="js/api.js"></script>
+
 <script>
 requireAuth();
 renderShell("messages.html", "Communication");
@@ -16,65 +19,317 @@ renderShell("messages.html", "Communication");
 let vendors = [];
 let selectedVendorId = null;
 
+
+/* =========================================
+   LOAD COMMUNICATION PAGE
+========================================= */
+
 async function load() {
+
   const content = document.getElementById("page-content");
+
   vendors = await api("/vendors");
-  if (!selectedVendorId && vendors.length) selectedVendorId = vendors[0].id;
+
+  if (!selectedVendorId && vendors.length) {
+    selectedVendorId = vendors[0].id;
+  }
+
+  const user = getUser();
+
+  /*
+    Roles allowed to SEND messages:
+    - Administrator
+    - Procurement Manager
+    - Supply Chain Manager
+    - Vendor
+
+    Finance Officer and Auditor are VIEW ONLY.
+  */
+
+  const canSendMessages = [
+    "Administrator",
+    "Procurement Manager",
+    "Supply Chain Manager",
+    "Vendor"
+  ].includes(user.role);
+
 
   content.innerHTML = `
     <div class="panel">
+
       <div class="flex-between mb-16">
-        <h3 style="margin:0;">Vendor Messaging</h3>
-        <select id="vendor-select" onchange="selectVendor(this.value)">
-          ${vendors.map(v => `<option value="${v.id}" ${v.id === selectedVendorId ? "selected" : ""}>${v.name}</option>`).join("")}
+
+        <h3 style="margin:0;">
+          Vendor Messaging
+        </h3>
+
+        <select
+          id="vendor-select"
+          onchange="selectVendor(this.value)"
+        >
+          ${vendors.map(v => `
+            <option
+              value="${v.id}"
+              ${v.id === selectedVendorId ? "selected" : ""}
+            >
+              ${v.name}
+            </option>
+          `).join("")}
         </select>
+
       </div>
-      <div id="thread" style="max-height:360px; overflow-y:auto; border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:14px; background:#fafcff;"></div>
-      <div style="display:flex; gap:10px;">
-        <input id="msg-input" placeholder="Type a message..." style="flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:6px;">
-        <button class="btn" onclick="sendMsg()">Send</button>
-      </div>
+
+
+      <!-- MESSAGE THREAD -->
+
+      <div
+        id="thread"
+        style="
+          max-height:360px;
+          overflow-y:auto;
+          border:1px solid var(--border);
+          border-radius:8px;
+          padding:14px;
+          margin-bottom:14px;
+          background:#fafcff;
+        "
+      ></div>
+
+
+      <!-- MESSAGE INPUT -->
+
+      ${
+        canSendMessages
+          ? `
+            <div style="display:flex; gap:10px;">
+
+              <input
+                id="msg-input"
+                placeholder="Type a message..."
+                style="
+                  flex:1;
+                  padding:10px 12px;
+                  border:1px solid var(--border);
+                  border-radius:6px;
+                "
+              >
+
+              <button
+                class="btn"
+                onclick="sendMsg()"
+              >
+                Send
+              </button>
+
+            </div>
+          `
+          : `
+            <div
+              style="
+                padding:10px 12px;
+                color:var(--muted);
+              "
+            >
+              View only — you do not have permission to send messages.
+            </div>
+          `
+      }
+
     </div>
   `;
+
+
   await loadThread();
 }
 
+
+/* =========================================
+   SELECT VENDOR
+========================================= */
+
 function selectVendor(id) {
+
   selectedVendorId = Number(id);
+
   loadThread();
 }
 
+
+/* =========================================
+   LOAD MESSAGE THREAD
+========================================= */
+
 async function loadThread() {
+
   const thread = document.getElementById("thread");
-  const messages = await api(`/messages/vendor/${selectedVendorId}`);
-  thread.innerHTML = messages.length ? messages.map(m => `
-    <div style="margin-bottom:12px;">
-      <div style="font-size:12px; font-weight:700; color:var(--primary);">${m.sender} <span class="text-muted" style="font-weight:400;">· ${fmtDate(m.sent_at)}</span></div>
-      <div style="font-size:14px;">${m.content}</div>
-    </div>
-  `).join("") : `<p class="text-muted">No messages yet. Start the conversation below.</p>`;
-  thread.scrollTop = thread.scrollHeight;
+
+  if (!selectedVendorId) {
+
+    thread.innerHTML = `
+      <p class="text-muted">
+        No vendor selected.
+      </p>
+    `;
+
+    return;
+  }
+
+
+  try {
+
+    const messages = await api(
+      `/messages/vendor/${selectedVendorId}`
+    );
+
+
+    thread.innerHTML = messages.length
+      ? messages.map(m => `
+          <div style="margin-bottom:12px;">
+
+            <div
+              style="
+                font-size:12px;
+                font-weight:700;
+                color:var(--primary);
+              "
+            >
+              ${m.sender}
+
+              <span
+                class="text-muted"
+                style="font-weight:400;"
+              >
+                · ${fmtDate(m.sent_at)}
+              </span>
+
+            </div>
+
+            <div style="font-size:14px;">
+              ${m.content}
+            </div>
+
+          </div>
+        `).join("")
+      : `
+          <p class="text-muted">
+            No messages yet.
+          </p>
+        `;
+
+
+    thread.scrollTop = thread.scrollHeight;
+
+  } catch (err) {
+
+    thread.innerHTML = `
+      <p class="text-muted">
+        Unable to load messages.
+      </p>
+    `;
+
+    console.error(err);
+  }
 }
+
+
+/* =========================================
+   SEND MESSAGE
+========================================= */
 
 async function sendMsg() {
+
   const input = document.getElementById("msg-input");
-  if (!input.value.trim()) return;
+
+  if (!input) {
+    return;
+  }
+
+
+  if (!input.value.trim()) {
+    return;
+  }
+
+
   const user = getUser();
+
+
+  /*
+    Vendor is allowed to send messages.
+    Finance Officer and Auditor are view-only.
+  */
+
+  const canSendMessages = [
+    "Administrator",
+    "Procurement Manager",
+    "Supply Chain Manager",
+    "Vendor"
+  ].includes(user.role);
+
+
+  if (!canSendMessages) {
+
+    alert(
+      "You do not have permission to send messages."
+    );
+
+    return;
+  }
+
+
   try {
+
     await api("/messages", {
+
       method: "POST",
-      body: { vendor_id: selectedVendorId, sender: user.full_name, content: input.value.trim() },
+
+      body: {
+        vendor_id: selectedVendorId,
+        sender: user.full_name,
+        content: input.value.trim()
+      },
+
     });
+
+
     input.value = "";
-    loadThread();
-  } catch (err) { alert(err.message); }
+
+    await loadThread();
+
+
+  } catch (err) {
+
+    alert(err.message);
+
+  }
 }
 
+
+/* =========================================
+   ENTER KEY TO SEND MESSAGE
+========================================= */
+
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && document.activeElement.id === "msg-input") sendMsg();
+
+  if (
+    e.key === "Enter" &&
+    document.activeElement &&
+    document.activeElement.id === "msg-input"
+  ) {
+
+    sendMsg();
+
+  }
+
 });
 
+
+/* =========================================
+   START PAGE
+========================================= */
+
 load();
+
 </script>
+
 </body>
 </html>

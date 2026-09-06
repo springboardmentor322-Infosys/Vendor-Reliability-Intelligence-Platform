@@ -1,126 +1,1794 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>VendorIQ | Procurement</title>
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <title>VendorIQ | Procurement</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-<div class="app-shell" id="app-shell"></div>
 
-<script src="js/api.js"></script>
-<script>
-requireAuth();
-renderShell("procurement.html", "Procurement & Purchase Orders");
+  <div class="app-shell" id="app-shell"></div>
 
-const STATUS_FLOW = ["Pending","Approved","Ordered","Delivered","Completed","Cancelled"];
-let approvedVendors = [];
+  <script src="js/api.js"></script>
 
-async function load() {
-  const content = document.getElementById("page-content");
-  content.innerHTML = `
-    <div class="table-toolbar">
-      <select id="filter-status" onchange="load()">
-        <option value="">All Statuses</option>
-        ${STATUS_FLOW.map(s => `<option>${s}</option>`).join("")}
-      </select>
-      <button class="btn" onclick="openModal()">+ Raise Purchase Order</button>
-    </div>
-    <table>
-      <thead><tr><th>PO Number</th><th>Vendor</th><th>Item</th><th>Qty</th><th>Total</th><th>Status</th><th>Expected Delivery</th><th>Actions</th></tr></thead>
-      <tbody id="po-rows"><tr><td colspan="8" class="text-muted">Loading...</td></tr></tbody>
-    </table>
+  <script>
 
-    <div class="modal-backdrop hidden" id="modal">
-      <div class="modal">
-        <h3>Raise Purchase Order</h3>
-        <div class="field"><label>Vendor (approved only)</label>
-          <select id="p-vendor"></select>
+    // Check whether the user is logged in.
+    requireAuth();
+
+    // Set up the common page layout.
+    renderShell(
+      "procurement.html",
+      "Procurement & Purchase Orders"
+    );
+
+
+    // Keep the allowed purchase order statuses in one place.
+    const STATUS_FLOW = [
+      "Pending",
+      "Approved",
+      "Ordered",
+      "Delivered",
+      "Completed",
+      "Cancelled"
+    ];
+
+    // Keep the statuses used by procurement requests.
+    const REQUEST_STATUS = [
+      "Pending",
+      "Approved",
+      "Rejected",
+      "PO Created"
+    ];
+
+    let approvedVendors = [];
+
+
+    // Get the currently logged-in user.
+    const user = getUser();
+
+
+    // Check which procurement actions this user can perform.
+// Roles that can create and manage procurement requests.
+const canManageProcurement = user && [
+  "Administrator",
+  "Procurement Manager"
+].includes(user.role);
+
+const canUpdatePO = user && [
+  "Administrator",
+  "Procurement Manager"
+].includes(user.role);
+
+const canMarkDelivered = user && [
+  "Administrator",
+  "Procurement Manager",
+  "Supply Chain Manager"
+].includes(user.role);
+
+const canUpdateInvoice = user && [
+  "Administrator",
+  "Procurement Manager",
+  "Finance Officer"
+].includes(user.role);
+
+const canCancelPO = user && [
+  "Administrator",
+  "Procurement Manager"
+].includes(user.role);
+
+    // Build the page and load the required data.
+    async function load() {
+
+      // Find the main content area of the page.
+      const content =
+        document.getElementById("page-content");
+
+      if (!content) {
+        console.error("page-content not found");
+        return;
+      }
+
+
+      // Show the procurement request and purchase order sections.
+      content.innerHTML = `
+
+        <div style="margin-bottom: 30px;">
+
+          <div class="table-toolbar">
+
+            <h2 style="margin: 0;">
+              Procurement Requests
+            </h2>
+
+            ${
+              canManageProcurement
+                ? `
+                  <button
+                    class="btn"
+                    onclick="openRequestModal()">
+
+                    + New Procurement Request
+
+                  </button>
+                `
+                : ""
+            }
+
+          </div>
+
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>Request Number</th>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Requested By</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Vendor</th>
+                <th>Actions</th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody id="request-rows">
+
+              <tr>
+
+                <td
+                  colspan="8"
+                  class="text-muted">
+
+                  Loading...
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
         </div>
-        <div class="field"><label>Item Description</label><input id="p-item"></div>
-        <div class="field"><label>Quantity</label><input id="p-qty" type="number" value="1" min="1"></div>
-        <div class="field"><label>Unit Price (₹)</label><input id="p-price" type="number" value="0" min="0" step="0.01"></div>
-        <div class="field"><label>Expected Delivery Date</label><input id="p-delivery" type="date"></div>
-        <div class="error-msg" id="p-error"></div>
-        <div class="modal-actions">
-          <button class="btn secondary" onclick="closeModal()">Cancel</button>
-          <button class="btn" onclick="submitPO()">Create PO</button>
+
+
+        <div>
+
+          <div class="table-toolbar">
+
+            <h2 style="margin: 0;">
+              Purchase Orders
+            </h2>
+
+
+            <select
+              id="filter-status"
+              onchange="loadPurchaseOrders()">
+
+              <option value="">
+                All Statuses
+              </option>
+
+              ${STATUS_FLOW.map(
+                status =>
+                  `<option value="${status}">
+                    ${status}
+                  </option>`
+              ).join("")}
+
+            </select>
+
+
+            ${
+              canManageProcurement
+                ? `
+                  <button
+                    class="btn"
+                    onclick="openModal()">
+
+                    + Raise Purchase Order
+
+                  </button>
+                `
+                : ""
+            }
+
+          </div>
+
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>PO Number</th>
+                <th>Vendor</th>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Expected Delivery</th>
+                <th>Invoice</th>
+                <th>Actions</th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody id="po-rows">
+
+              <tr>
+
+                <td
+                  colspan="8"
+                  class="text-muted">
+
+                  Loading...
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
         </div>
-      </div>
-    </div>
+
+
+        ${
+          canManageProcurement
+            ? `
+
+              <div
+                class="modal-backdrop hidden"
+                id="request-modal">
+
+                <div class="modal">
+
+                  <h3>
+                    New Procurement Request
+                  </h3>
+
+
+                  <div class="field">
+
+                    <label>
+                      Item Description
+                    </label>
+
+                    <input
+                      id="r-item"
+                      type="text"
+                      placeholder="Enter item description">
+
+                  </div>
+
+
+                  <div class="field">
+
+                    <label>
+                      Quantity
+                    </label>
+
+                    <input
+                      id="r-qty"
+                      type="number"
+                      value="1"
+                      min="1">
+
+                  </div>
+
+
+                  <div class="field">
+
+                    <label>
+                      Priority
+                    </label>
+
+                    <select id="r-priority">
+
+                      <option value="Low">
+                        Low
+                      </option>
+
+                      <option value="Medium" selected>
+                        Medium
+                      </option>
+
+                      <option value="High">
+                        High
+                      </option>
+
+                      <option value="Urgent">
+                        Urgent
+                      </option>
+
+                    </select>
+
+                  </div>
+
+
+                  <div
+                    class="error-msg"
+                    id="r-error">
+                  </div>
+
+
+                  <div class="modal-actions">
+
+                    <button
+                      class="btn secondary"
+                      onclick="closeRequestModal()">
+
+                      Cancel
+
+                    </button>
+
+
+                    <button
+                      class="btn"
+                      onclick="submitRequest()">
+
+                      Create Request
+
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            `
+            : ""
+        }
+
+
+        ${
+          canManageProcurement
+            ? `
+
+              <div
+                class="modal-backdrop hidden"
+                id="modal">
+
+                <div class="modal">
+
+                  <h3>
+                    Raise Purchase Order
+                  </h3>
+
+
+                  <div class="field">
+
+                    <label>
+                      Vendor (approved only)
+                    </label>
+
+                    <select id="p-vendor"></select>
+
+                  </div>
+
+
+                  <div class="field">
+
+                    <label>
+                      Item Description
+                    </label>
+
+                    <input
+                      id="p-item"
+                      type="text"
+                      placeholder="Enter item description">
+
+                  </div>
+
+
+                  <div class="field">
+
+                    <label>
+                      Quantity
+                    </label>
+
+                    <input
+                      id="p-qty"
+                      type="number"
+                      value="1"
+                      min="1">
+
+                  </div>
+
+
+                  <div class="field">
+
+                    <label>
+                      Unit Price (₹)
+                    </label>
+
+                    <input
+                      id="p-price"
+                      type="number"
+                      value="0"
+                      min="0"
+                      step="0.01">
+
+                  </div>
+
+
+                  <div class="field">
+
+                    <label>
+                      Expected Delivery Date
+                    </label>
+
+                    <input
+                      id="p-delivery"
+                      type="date">
+
+                  </div>
+
+
+                  <div
+                    class="error-msg"
+                    id="p-error">
+                  </div>
+
+
+                  <div class="modal-actions">
+
+                    <button
+                      class="btn secondary"
+                      onclick="closeModal()">
+
+                      Cancel
+
+                    </button>
+
+
+                    <button
+                      class="btn"
+                      onclick="submitPO()">
+
+                      Create PO
+
+                    </button>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            `
+            : ""
+        }
+
+      `;
+
+
+      // Load approved vendors before showing the forms.
+      await loadApprovedVendors();
+
+      // Load procurement requests into the table.
+      await loadRequests();
+
+      // Load purchase orders into the table.
+      await loadPurchaseOrders();
+
+    }
+
+
+    // Get the approved vendors from the backend.
+    async function loadApprovedVendors() {
+
+      if (!canManageProcurement) {
+        return;
+      }
+
+      try {
+
+        approvedVendors =
+          await api(
+            "/vendors?status=Approved"
+          );
+
+        const vendorSelect =
+          document.getElementById("p-vendor");
+
+        if (!vendorSelect) {
+          return;
+        }
+
+        // Fill the vendor dropdown with approved vendors.
+        if (approvedVendors.length) {
+
+          vendorSelect.innerHTML =
+            approvedVendors
+              .map(
+                vendor =>
+                  `<option value="${vendor.id}">
+                    ${vendor.name}
+                  </option>`
+              )
+              .join("");
+
+        } else {
+
+          // Show a message when no approved vendors are available.
+          vendorSelect.innerHTML =
+            `<option value="">
+              No approved vendors
+            </option>`;
+
+        }
+
+      } catch (err) {
+
+        console.error(
+          "Could not load approved vendors:",
+          err
+        );
+
+      }
+
+    }
+
+
+    // Load procurement requests from the backend.
+    async function loadRequests() {
+
+      const rows =
+        document.getElementById("request-rows");
+
+      if (!rows) {
+        return;
+      }
+
+      try {
+
+        const requests =
+          await api(
+            "/procurement/requests"
+          );
+
+        // Get all vendors so their names can be shown in the table.
+        const vendors =
+          await api(
+            "/vendors"
+          );
+
+        // Create a quick lookup from vendor ID to vendor name.
+        const vendorMap = {};
+
+        vendors.forEach(vendor => {
+
+          vendorMap[vendor.id] =
+            vendor.name;
+
+        });
+
+        // Show a message when there are no procurement requests.
+        if (!requests || !requests.length) {
+
+          rows.innerHTML = `
+
+            <tr>
+
+              <td
+                colspan="8"
+                class="text-muted">
+
+                No procurement requests found.
+
+              </td>
+
+            </tr>
+
+          `;
+
+          return;
+
+        }
+
+        // Display each procurement request in the table.
+        rows.innerHTML =
+          requests
+            .map(request => `
+
+              <tr>
+
+                <td>
+                  <strong>
+                    ${request.request_number}
+                  </strong>
+                </td>
+
+                <td>
+                  ${request.item_description}
+                </td>
+
+                <td>
+                  ${request.quantity}
+                </td>
+
+                <td>
+                  ${request.requested_by}
+                </td>
+
+                <td>
+                  ${request.priority}
+                </td>
+
+                <td>
+                  ${request.status}
+                </td>
+
+                <td>
+
+                  ${
+                    request.vendor_id
+                      ? (
+                          vendorMap[request.vendor_id]
+                          || request.vendor_id
+                        )
+                      : "Not Assigned"
+                  }
+
+                </td>
+
+                <td>
+                  ${renderRequestActions(request)}
+                </td>
+
+              </tr>
+
+            `)
+            .join("");
+
+      } catch (err) {
+
+        // Show an error if the requests cannot be loaded.
+        console.error(
+          "REQUEST LOAD ERROR:",
+          err
+        );
+
+        rows.innerHTML = `
+
+          <tr>
+
+            <td
+              colspan="8"
+              class="error-msg">
+
+              ${err.message}
+
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+
+    }
+
+
+    // Show the actions available for this procurement request.
+    function renderRequestActions(request) {
+
+      if (!canManageProcurement) {
+
+        return `
+          <span class="text-muted">
+            View only
+          </span>
+        `;
+
+      }
+
+      // Completed request states should not be changed.
+      if (
+        request.status === "PO Created" ||
+        request.status === "Rejected"
+      ) {
+
+        return `
+          <span class="text-muted">
+            —
+          </span>
+        `;
+
+      }
+
+      let buttons = "";
+
+      // Allow managers to approve or reject pending requests.
+      if (request.status === "Pending") {
+
+        buttons += `
+
+          <button
+            class="btn small success"
+            onclick="updateRequest(
+              ${request.id},
+              'Approved'
+            )">
+
+            Approve
+
+          </button>
+
+
+          <button
+            class="btn small danger"
+            onclick="updateRequest(
+              ${request.id},
+              'Rejected'
+            )">
+
+            Reject
+
+          </button>
+
+        `;
+
+      }
+
+      // Allow managers to assign a vendor after approval.
+      if (
+        request.status === "Approved" &&
+        !request.vendor_id
+      ) {
+
+        buttons += `
+
+          <button
+            class="btn small"
+            onclick="assignVendor(
+              ${request.id}
+            )">
+
+            Assign Vendor
+
+          </button>
+
+        `;
+
+      }
+
+      // Allow managers to create a PO after assigning a vendor.
+      if (
+        request.status === "Approved" &&
+        request.vendor_id
+      ) {
+
+        buttons += `
+
+          <button
+            class="btn small success"
+            onclick="openCreatePOFromRequest(
+              ${request.id},
+              '${escapeJs(request.item_description)}',
+              ${request.quantity}
+            )">
+
+            Create PO
+
+          </button>
+
+        `;
+
+      }
+
+      return buttons || `
+
+        <span class="text-muted">
+          View only
+        </span>
+
+      `;
+
+    }
+
+
+    // Update the status of a procurement request.
+    async function updateRequest(
+      requestId,
+      status
+    ) {
+
+      if (!canManageProcurement) {
+
+        alert(
+          "You do not have permission to manage procurement requests."
+        );
+
+        return;
+
+      }
+
+      try {
+
+        await api(
+          `/procurement/requests/${requestId}`,
+          {
+            method: "PUT",
+
+            body: {
+              status: status
+            }
+
+          }
+        );
+
+        // Refresh the request list after the update.
+        await loadRequests();
+
+      } catch (err) {
+
+        alert(err.message);
+
+      }
+
+    }
+
+
+    // Load approved vendors before assigning one.
+    async function assignVendor(requestId) {
+
+      if (!canManageProcurement) {
+        return;
+      }
+
+      try {
+
+        const vendors =
+          await api(
+            "/vendors?status=Approved"
+          );
+
+        if (!vendors.length) {
+
+          alert(
+            "No approved vendors available."
+          );
+
+          return;
+
+        }
+
+        // Show the available vendors so the user can choose one.
+        let message =
+          "Select approved vendor by ID:\n\n";
+
+        vendors.forEach(vendor => {
+
+          message +=
+            `${vendor.id} - ${vendor.name}\n`;
+
+        });
+
+        const selected =
+          prompt(message);
+
+        if (
+          selected === null ||
+          selected.trim() === ""
+        ) {
+
+          return;
+
+        }
+
+        const vendorId =
+          Number(selected);
+
+        if (!vendorId) {
+
+          alert(
+            "Please enter a valid vendor ID."
+          );
+
+          return;
+
+        }
+
+        // Send the selected vendor to the backend.
+        await api(
+          `/procurement/requests/${requestId}`,
+          {
+            method: "PUT",
+
+            body: {
+              vendor_id: vendorId
+            }
+
+          }
+        );
+
+        // Refresh the requests after assigning the vendor.
+        await loadRequests();
+
+      } catch (err) {
+
+        alert(err.message);
+
+      }
+
+    }
+
+
+    // Ask for the price and delivery date before creating the PO.
+    function openCreatePOFromRequest(
+      requestId,
+      itemDescription,
+      quantity
+    ) {
+
+      const price =
+        prompt(
+          `Enter unit price for "${itemDescription}":`
+        );
+
+      if (price === null) {
+        return;
+      }
+
+      const unitPrice =
+        Number(price);
+
+      if (
+        isNaN(unitPrice) ||
+        unitPrice < 0
+      ) {
+
+        alert(
+          "Please enter a valid unit price."
+        );
+
+        return;
+
+      }
+
+      const delivery =
+        prompt(
+          "Enter expected delivery date (YYYY-MM-DD), or leave blank:"
+        );
+
+      createPOFromRequest(
+        requestId,
+        unitPrice,
+        delivery
+      );
+
+    }
+
+
+    // Create a purchase order using the approved request.
+    async function createPOFromRequest(
+      requestId,
+      unitPrice,
+      delivery
+    ) {
+
+      try {
+
+        let url =
+          `/procurement/requests/${requestId}/create-po?unit_price=${encodeURIComponent(unitPrice)}`;
+
+        if (delivery) {
+
+          url +=
+            `&expected_delivery=${encodeURIComponent(
+              new Date(delivery).toISOString()
+            )}`;
+
+        }
+
+        // Send the purchase order request to the backend.
+        await api(
+          url,
+          {
+            method: "POST"
+          }
+        );
+
+        alert(
+          "Purchase Order created successfully."
+        );
+
+        // Refresh both tables after creating the PO.
+        await loadRequests();
+        await loadPurchaseOrders();
+
+      } catch (err) {
+
+        alert(err.message);
+
+      }
+
+    }
+
+
+    // Open the new procurement request form.
+    function openRequestModal() {
+
+      if (!canManageProcurement) {
+
+        alert(
+          "You do not have permission to create procurement requests."
+        );
+
+        return;
+
+      }
+
+      const modal =
+        document.getElementById(
+          "request-modal"
+        );
+
+      if (modal) {
+
+        modal.classList.remove("hidden");
+
+      }
+
+    }
+
+
+    // Close the new procurement request form.
+    function closeRequestModal() {
+
+      const modal =
+        document.getElementById(
+          "request-modal"
+        );
+
+      if (modal) {
+
+        modal.classList.add("hidden");
+
+      }
+
+    }
+
+
+    // Create a new procurement request.
+    async function submitRequest() {
+
+      if (!canManageProcurement) {
+        return;
+      }
+
+      const errorEl =
+        document.getElementById(
+          "r-error"
+        );
+
+      errorEl.textContent = "";
+
+      // Read the values entered in the request form.
+      const item =
+        document
+          .getElementById("r-item")
+          .value
+          .trim();
+
+      const quantity =
+        Number(
+          document
+            .getElementById("r-qty")
+            .value
+        );
+
+      const priority =
+        document
+          .getElementById("r-priority")
+          .value;
+
+      // Check that the request contains valid information.
+      if (!item) {
+
+        errorEl.textContent =
+          "Please enter an item description.";
+
+        return;
+
+      }
+
+      if (quantity <= 0) {
+
+        errorEl.textContent =
+          "Quantity must be greater than 0.";
+
+        return;
+
+      }
+
+      try {
+
+        // Send the new request to the backend.
+        await api(
+          "/procurement/requests",
+          {
+            method: "POST",
+
+            body: {
+
+              item_description:
+                item,
+
+              quantity:
+                quantity,
+
+              priority:
+                priority
+
+            }
+
+          }
+        );
+
+        closeRequestModal();
+
+        // Clear the form after creating the request.
+        document
+          .getElementById("r-item")
+          .value = "";
+
+        document
+          .getElementById("r-qty")
+          .value = 1;
+
+        document
+          .getElementById("r-priority")
+          .value = "Medium";
+
+        // Refresh the request list.
+        await loadRequests();
+
+      } catch (err) {
+
+        errorEl.textContent =
+          err.message;
+
+      }
+
+    }
+
+
+    // Load purchase orders from the backend.
+    async function loadPurchaseOrders() {
+
+      const rows =
+        document.getElementById("po-rows");
+
+      if (!rows) {
+        return;
+      }
+
+      // Read the selected status filter.
+      const filterElement =
+        document.getElementById(
+          "filter-status"
+        );
+
+      const status =
+        filterElement
+          ? filterElement.value
+          : "";
+
+      try {
+
+        const pos =
+          await api(
+            `/procurement${
+              status
+                ? `?status=${encodeURIComponent(status)}`
+                : ""
+            }`
+          );
+
+        // Get all vendors so their names can be displayed.
+        const vendors =
+          await api("/vendors");
+
+        // Create a quick lookup from vendor ID to vendor name.
+        const vendorMap = {};
+
+        vendors.forEach(vendor => {
+
+          vendorMap[vendor.id] =
+            vendor.name;
+
+        });
+
+        // Show a message when no purchase orders are found.
+        if (!pos || !pos.length) {
+
+          rows.innerHTML = `
+
+            <tr>
+
+              <td
+                colspan="8"
+                class="text-muted">
+
+                No purchase orders found.
+
+              </td>
+
+            </tr>
+
+          `;
+
+          return;
+
+        }
+
+        // Display each purchase order in the table.
+        rows.innerHTML =
+          pos
+            .map(po => `
+
+              <tr>
+
+                <td>
+
+                  <strong>
+                    ${po.po_number}
+                  </strong>
+
+                </td>
+
+                <td>
+
+                  ${
+                    vendorMap[po.vendor_id]
+                      || po.vendor_id
+                  }
+
+                </td>
+
+                <td>
+                  ${po.item_description}
+                </td>
+
+                <td>
+                  ${po.quantity}
+                </td>
+
+                <td>
+                  ${fmtMoney(po.total_amount)}
+                </td>
+
+                <td>
+                  ${statusBadge(po.status)}
+                </td>
+
+               <td>
+  ${fmtDate(po.expected_delivery)}
+</td>
+
+<td>
+
+  ${
+    po.invoice_number
+      ? `
+        <div>
+          <strong>${po.invoice_number}</strong>
+          <br>
+          <span class="text-muted">
+            ${po.invoice_paid ? "Paid" : "Unpaid"}
+          </span>
+        </div>
+      `
+      : `
+        <span class="text-muted">
+          No Invoice
+        </span>
+      `
+  }
+
+  ${
+ canUpdateInvoice && po.status !== "Cancelled"
+    ? `
+      <br>
+      <button
+        class="btn small"
+        onclick="updateInvoice(${po.id})">
+
+        ${po.invoice_number ? "Update Invoice" : "Add Invoice"}
+
+      </button>
+    `
+    : ""
+}
+
+</td>
+
+<td>
+  ${renderActions(po)}
+</td>
+
+              </tr>
+
+            `)
+            .join("");
+
+      } catch (err) {
+
+        // Show an error if purchase orders cannot be loaded.
+        console.error(
+          "PROCUREMENT LOAD ERROR:",
+          err
+        );
+
+        rows.innerHTML = `
+
+          <tr>
+
+            <td
+              colspan="8"
+              class="error-msg">
+
+              ${err.message}
+
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+
+    }
+
+
+    // Show the actions available for this purchase order.
+    function renderActions(po) {
+
+  // Completed and cancelled orders cannot be changed.
+  if (
+    po.status === "Completed" ||
+    po.status === "Cancelled"
+  ) {
+    return `
+      <span class="text-muted">
+        —
+      </span>
+    `;
+  }
+
+  let buttons = "";
+
+  /*
+   * Procurement Manager / Administrator
+   *
+   * Full PO workflow:
+   * Approved → Ordered → Delivered → Completed
+   */
+  if (
+    canUpdatePO
+  ) {
+
+    const idx =
+      STATUS_FLOW.indexOf(po.status);
+
+    const nextStatus =
+      STATUS_FLOW[idx + 1];
+
+    if (
+      nextStatus &&
+      nextStatus !== "Cancelled"
+    ) {
+
+      buttons += `
+        <button
+          class="btn small success"
+          onclick="advance(
+            ${po.id},
+            '${nextStatus}'
+          )">
+
+          Mark ${nextStatus}
+
+        </button>
+      `;
+
+    }
+  }
+
+
+  /*
+   * Supply Chain Manager
+   *
+   * Responsible for delivery/operational tracking.
+   * They should NOT:
+   * - approve POs
+   * - create POs
+   * - cancel POs
+   * - mark POs ordered
+   * - complete financial workflow
+   *
+   * They can only mark an Ordered PO as Delivered.
+   */
+  if (
+    canMarkDelivered &&
+    po.status === "Ordered"
+  ) {
+
+    buttons += `
+      <button
+        class="btn small success"
+        onclick="advance(
+          ${po.id},
+          'Delivered'
+        )">
+
+        Mark Delivered
+
+      </button>
+    `;
+
+  }
+
+
+  /*
+   * Administrator / Procurement Manager
+   *
+   * Can cancel an active PO.
+   */
+  if (
+    canCancelPO
+  ) {
+
+    buttons += `
+      <button
+        class="btn small danger"
+        onclick="advance(
+          ${po.id},
+          'Cancelled'
+        )">
+
+        Cancel
+
+      </button>
+    `;
+
+  }
+
+
+  return buttons || `
+    <span class="text-muted">
+      View only
+    </span>
   `;
 
-  approvedVendors = await api("/vendors?status=Approved");
-  document.getElementById("p-vendor").innerHTML = approvedVendors.map(v => `<option value="${v.id}">${v.name}</option>`).join("") || `<option value="">No approved vendors</option>`;
-
-  const status = document.getElementById("filter-status").value;
-  try {
-    const pos = await api(`/procurement${status ? `?status=${encodeURIComponent(status)}` : ""}`);
-    const vendorMap = {};
-    (await api("/vendors")).forEach(v => vendorMap[v.id] = v.name);
-
-    document.getElementById("po-rows").innerHTML = pos.length ? pos.map(po => `
-      <tr>
-        <td><strong>${po.po_number}</strong></td>
-        <td>${vendorMap[po.vendor_id] || po.vendor_id}</td>
-        <td>${po.item_description}</td>
-        <td>${po.quantity}</td>
-        <td>${fmtMoney(po.total_amount)}</td>
-        <td>${statusBadge(po.status)}</td>
-        <td>${fmtDate(po.expected_delivery)}</td>
-        <td>${renderActions(po)}</td>
-      </tr>
-    `).join("") : `<tr><td colspan="8" class="text-muted">No purchase orders found.</td></tr>`;
-  } catch (err) {
-    document.getElementById("po-rows").innerHTML = `<tr><td colspan="8" class="error-msg">${err.message}</td></tr>`;
-  }
 }
 
-function renderActions(po) {
-  const idx = STATUS_FLOW.indexOf(po.status);
-  if (po.status === "Completed" || po.status === "Cancelled") return `<span class="text-muted">—</span>`;
-  const nextStatus = STATUS_FLOW[idx + 1];
-  let btns = "";
-  if (nextStatus && nextStatus !== "Cancelled") {
-    btns += `<button class="btn small success" onclick="advance(${po.id}, '${nextStatus}')">Mark ${nextStatus}</button> `;
-  }
-  btns += `<button class="btn small danger" onclick="advance(${po.id}, 'Cancelled')">Cancel</button>`;
-  return btns;
-}
 
+    // Update the status of a purchase order.
+
+// Update the status of a purchase order.
 async function advance(id, status) {
-  try {
-    await api(`/procurement/${id}`, { method: "PUT", body: { status } });
-    load();
-  } catch (err) { alert(err.message); }
-}
 
-function openModal() { document.getElementById("modal").classList.remove("hidden"); }
-function closeModal() { document.getElementById("modal").classList.add("hidden"); }
-
-async function submitPO() {
-  const errorEl = document.getElementById("p-error");
-  errorEl.textContent = "";
-  const deliveryVal = document.getElementById("p-delivery").value;
-  try {
-    await api("/procurement", {
-      method: "POST",
-      body: {
-        vendor_id: Number(document.getElementById("p-vendor").value),
-        item_description: document.getElementById("p-item").value,
-        quantity: Number(document.getElementById("p-qty").value),
-        unit_price: Number(document.getElementById("p-price").value),
-        expected_delivery: deliveryVal ? new Date(deliveryVal).toISOString() : null,
-      },
-    });
-    closeModal();
-    load();
-  } catch (err) {
-    errorEl.textContent = err.message;
+  if (!canUpdatePO && !canMarkDelivered) {
+    alert(
+      "You do not have permission to update purchase orders."
+    );
+    return;
   }
+
+  // Supply Chain Manager can only mark Ordered → Delivered.
+  if (
+    status === "Delivered" &&
+    canMarkDelivered
+  ) {
+    // allowed
+  }
+  else if (!canUpdatePO) {
+    alert(
+      "You do not have permission to perform this purchase-order action."
+    );
+    return;
+  }
+
+  // Cancellation is restricted to Admin / Procurement Manager.
+  if (
+    status === "Cancelled" &&
+    !canCancelPO
+  ) {
+    alert(
+      "You do not have permission to cancel purchase orders."
+    );
+    return;
+  }
+
+  try {
+
+    await api(
+      `/procurement/${id}`,
+      {
+        method: "PUT",
+
+        body: {
+          status: status
+        }
+      }
+    );
+
+    await loadPurchaseOrders();
+
+  } catch (err) {
+
+    alert(err.message);
+
+  }
+
+}
+    // Update invoice details for a purchase order.
+    async function updateInvoice(id) {
+
+  if (!canUpdateInvoice) {
+
+    alert(
+      "You do not have permission to update invoices."
+    );
+
+    return;
+
+  }
+
+  const invoiceNumber = prompt(
+    "Enter invoice number:"
+  );
+
+  if (invoiceNumber === null) {
+    return;
+  }
+
+  const paid = confirm(
+    "Has this invoice been paid?\n\n" +
+    "OK = Paid\n" +
+    "Cancel = Unpaid"
+  );
+
+  try {
+
+    await api(
+      `/procurement/${id}`,
+      {
+        method: "PUT",
+
+        body: {
+          invoice_number:
+            invoiceNumber.trim() || null,
+
+          invoice_paid:
+            paid
+        }
+
+      }
+    );
+
+    await loadPurchaseOrders();
+
+  } catch (err) {
+
+    alert(err.message);
+
+  }
+
 }
 
-load();
-</script>
+    // Open the direct purchase order form.
+    function openModal() {
+
+      if (!canManageProcurement) {
+
+        alert(
+          "You do not have permission to create purchase orders."
+        );
+
+        return;
+
+      }
+
+      const modal =
+        document.getElementById("modal");
+
+      if (modal) {
+
+        modal.classList.remove("hidden");
+
+      }
+
+    }
+
+
+    // Close the purchase order form.
+    function closeModal() {
+
+      const modal =
+        document.getElementById("modal");
+
+      if (modal) {
+
+        modal.classList.add("hidden");
+
+      }
+
+    }
+
+
+    // Create a purchase order directly without a request.
+    async function submitPO() {
+
+      if (!canManageProcurement) {
+
+        alert(
+          "You do not have permission to create purchase orders."
+        );
+
+        return;
+
+      }
+
+      const errorEl =
+        document.getElementById("p-error");
+
+      errorEl.textContent = "";
+
+      // Read the values entered in the purchase order form.
+      const vendorId =
+        Number(
+          document
+            .getElementById("p-vendor")
+            .value
+        );
+
+      const itemDescription =
+        document
+          .getElementById("p-item")
+          .value
+          .trim();
+
+      const quantity =
+        Number(
+          document
+            .getElementById("p-qty")
+            .value
+        );
+
+      const unitPrice =
+        Number(
+          document
+            .getElementById("p-price")
+            .value
+        );
+
+      const deliveryVal =
+        document
+          .getElementById("p-delivery")
+          .value;
+
+      // Check that all purchase order values are valid.
+      if (!vendorId) {
+
+        errorEl.textContent =
+          "Please select an approved vendor.";
+
+        return;
+
+      }
+
+      if (!itemDescription) {
+
+        errorEl.textContent =
+          "Please enter an item description.";
+
+        return;
+
+      }
+
+      if (quantity <= 0) {
+
+        errorEl.textContent =
+          "Quantity must be greater than 0.";
+
+        return;
+
+      }
+
+      if (unitPrice < 0) {
+
+        errorEl.textContent =
+          "Unit price cannot be negative.";
+
+        return;
+
+      }
+
+      try {
+
+        // Send the new purchase order to the backend.
+        await api(
+          "/procurement",
+          {
+            method: "POST",
+
+            body: {
+
+              vendor_id:
+                vendorId,
+
+              item_description:
+                itemDescription,
+
+              quantity:
+                quantity,
+
+              unit_price:
+                unitPrice,
+
+              expected_delivery:
+                deliveryVal
+                  ? new Date(
+                      deliveryVal
+                    ).toISOString()
+                  : null
+
+            }
+
+          }
+        );
+
+        closeModal();
+
+        // Refresh the purchase order list.
+        await loadPurchaseOrders();
+
+      } catch (err) {
+
+        errorEl.textContent =
+          err.message;
+
+      }
+
+    }
+
+
+    // Escape text before putting it inside an onclick handler.
+    function escapeJs(value) {
+
+      return String(value)
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/\n/g, "\\n")
+        .replace(/\r/g, "\\r");
+
+    }
+
+
+    // Start loading the procurement page.
+    load();
+
+  </script>
+
 </body>
 </html>

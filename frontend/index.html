@@ -42,24 +42,51 @@
 </div>
 
 <script src="js/api.js"></script>
+
 <script>
-document.getElementById("login-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const errorEl = document.getElementById("error");
-  errorEl.textContent = "";
-  try {
-    const data = await api("/auth/login", {
-      method: "POST",
-      body: {
-        email: document.getElementById("email").value,
-        password: document.getElementById("password").value,
-      },
-    });
-    setSession(data.access_token, data.user);
-    window.location.href = landingPageForRole(data.user.role);
-  } catch (err) {
-    errorEl.textContent = err.message;
-  }
+document.getElementById("login-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const errorEl = document.getElementById("error");
+    errorEl.textContent = "";
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    try {
+        const formData = new URLSearchParams();
+
+        formData.append("username", email);
+        formData.append("password", password);
+
+        const response = await fetch("http://localhost:8000/api/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail
+                    ? (typeof data.detail === "string"
+                        ? data.detail
+                        : JSON.stringify(data.detail))
+                    : "Login failed"
+            );
+        }
+
+        setSession(data.access_token, data.user);
+
+        window.location.href = landingPageForRole(data.user.role);
+
+    } catch (err) {
+        console.error("LOGIN ERROR:", err);
+        errorEl.textContent = err.message;
+    }
 });
 </script>
 </body>

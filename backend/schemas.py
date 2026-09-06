@@ -2,8 +2,9 @@ import datetime as dt
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr
 from models import (
-    RoleEnum, VendorCategoryEnum, VendorStatusEnum, ProcurementStatusEnum,
-    RiskLevelEnum, ComplianceStatusEnum
+    RoleEnum, VendorCategoryEnum, VendorStatusEnum,
+ProcurementStatusEnum, ProcurementRequestStatusEnum,
+RiskLevelEnum, ComplianceStatusEnum
 )
 
 
@@ -71,6 +72,8 @@ class ProfileUpdate(BaseModel):
     full_name: Optional[str] = None
     email: Optional[EmailStr] = None
 
+class RoleUpdate(BaseModel):
+    role: RoleEnum
 
 # ---------- Vendor ----------
 
@@ -146,6 +149,33 @@ class PurchaseOrderOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+# ---------- Procurement Requests ----------
+
+class ProcurementRequestCreate(BaseModel):
+    item_description: str
+    quantity: int = 1
+    priority: str = "Medium"
+
+
+class ProcurementRequestUpdate(BaseModel):
+    status: Optional[ProcurementRequestStatusEnum] = None
+    vendor_id: Optional[int] = None
+
+
+class ProcurementRequestOut(BaseModel):
+    id: int
+    request_number: str
+    item_description: str
+    quantity: int
+    requested_by: str
+    priority: str
+    status: ProcurementRequestStatusEnum
+    vendor_id: Optional[int]
+    created_at: dt.datetime
+
+    class Config:
+        from_attributes = True        
 
 
 # ---------- Performance ----------

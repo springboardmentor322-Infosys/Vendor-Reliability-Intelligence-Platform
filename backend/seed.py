@@ -111,11 +111,24 @@ if db.query(models.Vendor).count() == 0:
         refresh_vendor_score(db, vid)
 
     # Notifications
-    db.add(models.Notification(title="Contract Expiring Soon", message="Logistics Service Contract expires in 10 days.", category="Contract Expiry Alerts"))
-    db.add(models.Notification(title="Vendor Pending Approval", message="Precision Equipment Co. is awaiting approval.", category="Vendor Approval Notifications"))
+        db.add(models.Notification(
+        vendor_id=vendors[2].id,
+        title="Contract Expiring Soon",
+        message="Logistics Service Contract expires in 10 days.",
+        category="Contract Expiry Alerts"
+    ))
+
+    db.add(models.Notification(
+        vendor_id=vendors[3].id,
+        title="Vendor Pending Approval",
+        message="Precision Equipment Co. is awaiting approval.",
+        category="Vendor Approval Notifications"
+    ))
+
     db.commit()
 
     print("Demo vendors, performance data, contracts, purchase orders and messages seeded.")
+
 else:
     print("Vendors already exist - skipping demo data seeding.")
 

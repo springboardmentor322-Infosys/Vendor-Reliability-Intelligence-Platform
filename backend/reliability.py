@@ -1,4 +1,4 @@
-"""
+﻿"""
 Vendor Reliability Score calculation.
 
 Reliability Factors (from spec): Delivery History, Product Quality,
@@ -39,7 +39,7 @@ def calculate_reliability_score(db: Session, vendor_id: int) -> float:
     )
 
     if not records:
-        return 0.0
+        return 70.0
 
     total_on_time = sum(r.on_time_deliveries for r in records)
     total_delayed = sum(r.delayed_deliveries for r in records)
@@ -92,3 +92,5 @@ def refresh_vendor_score(db: Session, vendor_id: int) -> None:
     vendor.reliability_score = score
     vendor.risk_level = risk_level_from_score(score)
     db.commit()
+
+
