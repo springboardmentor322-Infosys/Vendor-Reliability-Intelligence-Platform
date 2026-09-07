@@ -1,3 +1,4 @@
+<!-- vendor_dash.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,8 +9,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Updated stylesheet link -->
   <link rel="stylesheet" href="vendor_style.css">
-  <script src="vendor_script.js"></script>
 </head>
 <body>
 
@@ -18,9 +19,15 @@
     <div class="logo-title">
       <i class="fa-solid fa-shield-halved"></i> Vendor Reliability Vendor Portal
     </div>
-    <div class="user-profile">
-      <i class="fa-regular fa-circle-user"></i>
-      <span id="vendorDisplayName">LENOVO</span>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <!-- Dark/Light Mode Toggle Button -->
+      <button class="btn-action" onclick="toggleDarkMode()" id="themeToggleBtn" style="font-size: 13px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+        <i class="fa-solid fa-moon" id="themeIcon"></i> <span id="themeText">Dark Mode</span>
+      </button>
+      <div class="user-profile">
+        <i class="fa-regular fa-circle-user"></i>
+        <span id="vendorDisplayName">LENOVO</span>
+      </div>
     </div>
   </header>
 
@@ -47,6 +54,9 @@
           </li>
           <li class="nav-item" onclick="switchTab('transactions-view', this)">
             <i class="fa-solid fa-receipt"></i> Transactions
+          </li>
+          <li class="nav-item" onclick="switchTab('communication-view', this)">
+            <i class="fa-regular fa-comments"></i> Communications
           </li>
           <li class="nav-item" onclick="switchTab('settings-view', this)">
             <i class="fa-solid fa-gear"></i> Profile Settings
@@ -120,7 +130,7 @@
       <section id="notifications-view" class="tab-panel">
         <h1 class="page-title">Notifications</h1>
         <div class="card" id="vendor-notifications-container">
-          <div style="text-align: center; color: #718096; padding: 2rem;">Loading notifications...</div>
+          <div style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading notifications...</div>
         </div>
       </section>
 
@@ -180,7 +190,49 @@
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+          <div class="card" style="margin-bottom: 0;">
+            <h2 style="font-size: 16px; margin-bottom: 16px;">SLA & Operational Responsiveness</h2>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+                  <span style="color: var(--text-muted);">SLA Adherence Rate</span>
+                  <strong id="dyn-sla-rate" style="color: var(--text-main);">100%</strong>
+                </div>
+                <div style="width: 100%; background: rgba(128,128,128,0.2); height: 8px; border-radius: 4px; overflow: hidden;">
+                  <div id="dyn-sla-bar" style="width: 100%; background: #10b981; height: 100%; transition: width 0.4s ease;"></div>
+                </div>
+              </div>
+              <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6; display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 12px;">
+                <span>Avg. Order Acceptance Time:</span>
+                <strong id="dyn-response-time" style="color: var(--text-main);">Calculated in real-time</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom: 0;">
+            <h2 style="font-size: 16px; margin-bottom: 16px;">Category Benchmark Comparison</h2>
+            <div style="display: flex; flex-direction: column; gap: 14px; font-size: 13px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <span style="color: var(--text-muted);">Your On-Time vs Category Avg (82%)</span>
+                  <strong id="dyn-benchmark-ontime" style="color: #10b981;">--</strong>
+                </div>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <span style="color: var(--text-muted);">Your Reliability vs Category Avg (88%)</span>
+                  <strong id="dyn-benchmark-reliability" style="color: #10b981;">--</strong>
+                </div>
+              </div>
+              <div id="benchmark-status-badge" style="margin-top: 4px; padding: 10px 14px; border-radius: 12px; font-weight: 600; text-align: center; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+                Evaluating performance rank...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
           <div class="card">
             <h2 style="font-size: 16px; margin-bottom: 16px;">Performance Trend</h2>
             <div class="chart-container">
@@ -191,6 +243,21 @@
             <h2 style="font-size: 16px; margin-bottom: 16px;">Quality Inspection</h2>
             <div class="chart-container">
               <canvas id="qualityPieChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div class="card">
+            <h2 style="font-size: 16px; margin-bottom: 16px;">Order Fulfillment Status Breakdown</h2>
+            <div class="chart-container">
+              <canvas id="orderStatusColumnChart"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <h2 style="font-size: 16px; margin-bottom: 16px;">Order Volumes by Department</h2>
+            <div class="chart-container">
+              <canvas id="deptVolumeBarChart"></canvas>
             </div>
           </div>
         </div>
@@ -243,7 +310,7 @@
         </div>
 
         <div class="card">
-          <h2 style="font-size: 16px; margin-bottom: 16px;">Rejected Contracts</h2>
+          <h2 style="font-size: 16px; margin-bottom: 16px;">Rejected & Returned Contracts</h2>
           <div class="table-container">
             <table>
               <thead>
@@ -287,6 +354,81 @@
         </div>
       </section>
 
+      <!-- COMMUNICATION VIEW -->
+      <section id="communication-view" class="tab-panel">
+        <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+          <div>
+            <h1 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 4px;">Vendor Communications & Support</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Direct secure communication channel with Department Contacts.</p>
+          </div>
+          <button type="button" class="btn-action" onclick="clearVendorChat()" style="font-size: 0.8rem; padding: 8px 16px; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-trash-can"></i> Clear Chat
+          </button>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 28px;">
+          <div class="card" style="display: flex; flex-direction: column; height: 600px; margin-bottom: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 20px;">
+              <div>
+                <h2 id="vendor-active-chat-title" style="font-size: 16px; color: var(--text-main);">Procurement & Support Desk</h2>
+                <span id="vendor-active-chat-sub" style="font-size: 12px; color: var(--text-muted);">Select a department contact from the right panel to chat</span>
+              </div>
+              <span class="status active" style="font-size: 10px;">Live Channel</span>
+            </div>
+
+            <div id="vendor-chat-messages-container" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding-right: 8px; margin-bottom: 20px;">
+              <div style="display: flex; flex-direction: column; align-items: flex-start; max-width: 80%;">
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px; padding-left: 4px;">System Support Desk • Just now</div>
+                <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 16px; border-top-left-radius: 4px; font-size: 14px; color: var(--text-main); line-height: 1.5;">
+                  Please select either the <strong>Supply Chain Manager</strong> or <strong>Finance Officer</strong> from the right panel to begin direct communication.
+                </div>
+              </div>
+            </div>
+
+            <form onsubmit="sendVendorPortalMessage(event)" style="display: flex; gap: 12px;">
+              <input type="text" id="vendor-chat-input-message" class="form-control" placeholder="Type your message here..." autocomplete="off" style="margin-bottom: 0; flex: 1;" required>
+              <button type="submit" class="btn-primary" style="padding: 14px 24px; flex-shrink: 0;">
+                <i class="fa-solid fa-paper-plane"></i> Send
+              </button>
+            </form>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 28px;">
+            <div class="card" style="margin-bottom: 0;">
+              <h2 style="font-size: 16px; margin-bottom: 16px; color: var(--text-main);">Department Contacts</h2>
+              <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+                
+                <div onclick="selectVendorChatRole('Supply Chain Manager')" id="contact-supply-chain" style="padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s ease; background: var(--input-bg); display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="display: block; color: var(--text-main); margin-bottom: 2px;"><i class="fa-solid fa-user-tie" style="color: #8b5cf6; margin-right: 6px;"></i> Supply Chain Manager</strong>
+                    <span style="font-size: 11px; color: var(--text-muted);">supply.chain@vendorplatform.internal</span>
+                  </div>
+                  <span id="badge-supply-chain" style="display: none; background: #ef4444; color: white; border-radius: 50px; padding: 2px 8px; font-size: 10px; font-weight: 700;">New</span>
+                </div>
+
+                <div onclick="selectVendorChatRole('Finance Officer')" id="contact-finance-officer" style="padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s ease; background: var(--input-bg); display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="display: block; color: var(--text-main); margin-bottom: 2px;"><i class="fa-solid fa-wallet" style="color: #10b981; margin-right: 6px;"></i> Finance Officer</strong>
+                    <span style="font-size: 11px; color: var(--text-muted);">finance.officer@vendorplatform.internal</span>
+                  </div>
+                  <span id="badge-finance-officer" style="display: none; background: #ef4444; color: white; border-radius: 50px; padding: 2px 8px; font-size: 10px; font-weight: 700;">New</span>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 0; background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.3);">
+              <h2 style="font-size: 16px; margin-bottom: 12px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-circle-info" style="color: #8b5cf6;"></i> SLA Notice
+              </h2>
+              <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                Standard response time for operational inquiries is under <strong>24 hours</strong>. Urgent delivery disputes are prioritized automatically.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- PROFILE SETTINGS VIEW -->
       <section id="settings-view" class="tab-panel">
         <h1 class="page-title">Vendor Profile & Settings</h1>
@@ -295,7 +437,7 @@
           <form onsubmit="saveProfileSettings(event)">
             <div class="form-group">
               <label for="setting-vendor-name">Vendor Name</label>
-              <input type="text" id="setting-vendor-name" class="form-control" readonly style="background-color: #f7fafc;">
+              <input type="text" id="setting-vendor-name" class="form-control" readonly style="background-color: var(--input-bg);">
             </div>
 
             <div class="form-group">
@@ -317,7 +459,6 @@
               </select>
             </div>
 
-            <!-- Vendor Category Dropdown -->
             <div class="form-group">
               <label for="setting-vendor-category">Vendor Category</label>
               <select id="setting-vendor-category" class="form-control">
@@ -346,7 +487,7 @@
     <div class="modal-card">
       <div class="modal-header">Update Production Progress</div>
       <input type="hidden" id="modal-po-id">
-      <div style="font-size: 13px; color: #4a5568; line-height: 1.6; margin-bottom: 16px;">
+      <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
         <p><strong>PO Reference:</strong> <span id="modal-invNo"></span></p>
         <p><strong>Product:</strong> <span id="modal-product"></span></p>
         <p><strong>Department:</strong> <span id="modal-dept"></span></p>
@@ -382,7 +523,7 @@
   <div id="contractDetailsModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">Contract Details</div>
-      <div style="font-size: 13px; color: #4a5568; line-height: 1.8;">
+      <div style="font-size: 13px; color: var(--text-muted); line-height: 1.8;">
         <p><strong>PO Ref:</strong> <span id="contract-modal-invno"></span></p>
         <p><strong>Vendor:</strong> <span id="contract-modal-company"></span></p>
         <p><strong>Department:</strong> <span id="contract-modal-dept"></span></p>
@@ -403,7 +544,7 @@
   <div id="transactionDetailsModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">Transaction Receipt</div>
-      <div style="font-size: 13px; color: #4a5568; line-height: 1.8;">
+      <div style="font-size: 13px; color: var(--text-muted); line-height: 1.8;">
         <p><strong>Transaction ID:</strong> <span id="txn-modal-id"></span></p>
         <p><strong>Amount:</strong> <span id="txn-modal-amount"></span></p>
         <p><strong>Timestamp:</strong> <span id="txn-modal-time"></span></p>
@@ -416,6 +557,42 @@
     </div>
   </div>
 
-  <script src="vendor_script_2.js"></script>
+  <script>
+    function toggleDarkMode() {
+      const body = document.body;
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+      
+      body.classList.toggle('dark-mode');
+      const isDark = body.classList.contains('dark-mode');
+      
+      localStorage.setItem('portal_theme', isDark ? 'dark' : 'light');
+      
+      if (isDark) {
+        themeIcon.className = 'fa-solid fa-sun';
+        themeText.textContent = 'Light Mode';
+      } else {
+        themeIcon.className = 'fa-solid fa-moon';
+        themeText.textContent = 'Dark Mode';
+      }
+
+      if (typeof renderCharts === 'function') {
+        renderCharts();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('portal_theme');
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-sun';
+        if (themeText) themeText.textContent = 'Light Mode';
+      }
+    });
+  </script>
+
+  <script src="vendor_script.js"></script>
 </body>
 </html>
