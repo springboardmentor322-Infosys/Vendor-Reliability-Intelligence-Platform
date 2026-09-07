@@ -17,9 +17,15 @@
       <i class="fa-solid fa-shield-halved"></i>
       <span>Vendor Reliability Procurement Portal</span>
     </div>
-    <div class="user-profile">
-      <i class="fa-regular fa-circle-user" style="font-size: 18px;"></i>
-      <span>Procurement Manager</span>
+    <div class="user-profile" style="display: flex; align-items: center; gap: 1rem;">
+      <!-- Dark/Light Mode Toggle Button -->
+      <button class="btn btn-secondary" onclick="toggleDarkMode()" id="themeToggleBtn" style="font-size: 13px; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+        <i class="fa-solid fa-moon" id="themeIcon"></i> <span id="themeText">Dark Mode</span>
+      </button>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <i class="fa-regular fa-circle-user" style="font-size: 18px;"></i>
+        <span>Procurement Manager</span>
+      </div>
     </div>
   </header>
 
@@ -59,7 +65,6 @@
               <span>Contracts & Risk</span>
             </a>
           </li>
-          
           <li>
             <a class="nav-item" onclick="switchTab('analytics', this)">
               <i class="fa-solid fa-chart-line"></i>
@@ -82,7 +87,7 @@
       <div id="dashboard" class="tab-content active">
         <div class="page-header">
           <h1 class="page-title">Procurement Manager Dashboard</h1>
-          <p class="page-subtitle">Monitor organizational spending, track purchase requisitions, and evaluate supplier reliability scoring.</p>
+          <p class="page-subtitle">Monitor organizational spending, track purchase requisitions, and evaluate supplier reliability scoring[cite: 7].</p>
         </div>
 
         <div class="metrics-grid">
@@ -117,24 +122,26 @@
           <div class="card-header">
             <h2 class="card-title">Pending Orders</h2>
           </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Invoice ID</th>
-                <th>Vendor Name</th>
-                <th>Product Name</th>
-                <th>Quantity</th>
-                <th>Department</th>
-                <th>Expiry Date</th>
-                <th>Risk Level</th>
-              </tr>
-            </thead>
-            <tbody id="dashboard-pending-tbody">
-              <tr>
-                <td colspan="7" style="text-align: center; color: #718096; padding: 2rem;">Loading pending orders...</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Invoice ID</th>
+                  <th>Vendor Name</th>
+                  <th>Product Name</th>
+                  <th>Quantity</th>
+                  <th>Department</th>
+                  <th>Expiry Date</th>
+                  <th>Risk Level</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-pending-tbody">
+                <tr>
+                  <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading pending orders...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -142,7 +149,7 @@
       <div id="notifications" class="tab-content">
         <div class="page-header">
           <h1 class="page-title">System Notifications & Alerts</h1>
-          <p class="page-subtitle">Real-time alerts tracking purchase orders, acceptances, contract expirations, and transit updates.</p>
+          <p class="page-subtitle">Real-time alerts tracking purchase orders, acceptances, contract expirations, and transit updates[cite: 7].</p>
         </div>
 
         <div class="content-card">
@@ -150,7 +157,7 @@
             <h2 class="card-title">Activity Feed</h2>
           </div>
           <div class="notifications-list" id="notifications-list-container" style="padding: 20px 24px;">
-            <div style="text-align: center; color: #718096; padding: 2rem;">Loading notifications...</div>
+            <div style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading notifications...</div>
           </div>
         </div>
       </div>
@@ -159,31 +166,33 @@
       <div id="vendor-management" class="tab-content">
         <div class="page-header">
           <h1 class="page-title">Vendor Management</h1>
-          <p class="page-subtitle">View, approve, and manage registered suppliers and their categories.</p>
+          <p class="page-subtitle">View, approve, and manage registered suppliers and their categories[cite: 7].</p>
         </div>
 
         <div class="content-card">
           <div class="card-header">
             <h2 class="card-title">Registered Suppliers Overview</h2>
           </div>
-          <table class="data-table" id="vendorsTable">
-            <thead>
-              <tr>
-                <th>Vendor Name</th>
-                <th>Category</th>
-                <th>Contact Person</th>
-                <th>Email</th>
-                <th>Risk Level</th>
-                <th>Status</th>
-                <th>Details</th>
-              </tr>
-            </thead>
-            <tbody id="vendor-tbody">
-              <tr>
-                <td colspan="7" style="text-align: center; color: #718096; padding: 2rem;">Loading registered suppliers...</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table" id="vendorsTable">
+              <thead>
+                <tr>
+                  <th>Vendor Name</th>
+                  <th>Category</th>
+                  <th>Contact Person</th>
+                  <th>Email</th>
+                  <th>Risk Level</th>
+                  <th>Status</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="vendor-tbody">
+                <tr>
+                  <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading registered suppliers...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -191,7 +200,7 @@
       <div id="purchase-orders" class="tab-content">
         <div class="page-header">
           <h1 class="page-title">Purchase Orders</h1>
-          <p class="page-subtitle">Track and create purchase orders issued to vendors.</p>
+          <p class="page-subtitle">Track and create purchase orders issued to vendors[cite: 7].</p>
         </div>
 
         <div class="content-card">
@@ -202,26 +211,28 @@
               <button class="btn btn-primary" onclick="openCreatePOModal()"><i class="fa-solid fa-plus"></i> Create PO</button>
             </div>
           </div>
-          <table class="data-table" id="poTable">
-            <thead>
-              <tr>
-                <th>Invoice No</th>
-                <th>Vendor</th>
-                <th>Product Name</th>
-                <th>Quantity</th>
-                <th>Department</th>
-                <th>Creation Date</th>
-                <th>Expiry Date</th>
-                <th>Total Value</th>
-                <th>Order Status</th>
-              </tr>
-            </thead>
-            <tbody id="po-tbody">
-              <tr>
-                <td colspan="9" style="text-align: center; color: #718096; padding: 2rem;">Loading purchase orders...</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table" id="poTable">
+              <thead>
+                <tr>
+                  <th>Invoice No</th>
+                  <th>Vendor</th>
+                  <th>Product Name</th>
+                  <th>Quantity</th>
+                  <th>Department</th>
+                  <th>Creation Date</th>
+                  <th>Expiry Date</th>
+                  <th>Total Value</th>
+                  <th>Order Status</th>
+                </tr>
+              </thead>
+              <tbody id="po-tbody">
+                <tr>
+                  <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading purchase orders...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -229,7 +240,7 @@
       <div id="contracts-risk" class="tab-content">
         <div class="page-header">
           <h1 class="page-title">Contracts & Risk Compliance</h1>
-          <p class="page-subtitle">Monitor vendor reliability scores, risk tiers, and upcoming contract expirations.</p>
+          <p class="page-subtitle">Monitor vendor reliability scores, risk tiers, and upcoming contract expirations[cite: 7].</p>
         </div>
 
         <div class="content-card">
@@ -237,35 +248,36 @@
             <h2 class="card-title">Vendor Risk & Contract Evaluation</h2>
             <button class="btn btn-secondary" onclick="exportContractsExcel()"><i class="fa-solid fa-file-excel"></i> Extract</button>
           </div>
-          <table class="data-table" id="contractsTable">
-            <thead>
-              <tr>
-                <th>Invoice No</th>
-                <th>Vendor Name</th>
-                <th>Product Name</th>
-                <th>Produced Qty</th>
-                <th>Contract Status</th>
-                <th>Expiry Date</th>
-                <th>Order Status</th>
-                <th>Reliability Score</th>
-                <th>Risk Tier</th>
-              </tr>
-            </thead>
-            <tbody id="contracts-tbody">
-              <tr>
-                <td colspan="9" style="text-align: center; color: #718096; padding: 2rem;">Loading contracts and risk data...</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table" id="contractsTable">
+              <thead>
+                <tr>
+                  <th>Invoice No</th>
+                  <th>Vendor Name</th>
+                  <th>Product Name</th>
+                  <th>Produced Qty</th>
+                  <th>Contract Status</th>
+                  <th>Expiry Date</th>
+                  <th>Order Status</th>
+                  <th>Reliability Score</th>
+                  <th>Risk Tier</th>
+                </tr>
+              </thead>
+              <tbody id="contracts-tbody">
+                <tr>
+                  <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading contracts and risk data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      
-      <!-- TAB 7: ANALYTICS -->
+      <!-- TAB 6: ANALYTICS -->
       <div id="analytics" class="tab-content">
         <div class="page-header">
           <h1 class="page-title">Procurement Analytics</h1>
-          <p class="page-subtitle">Operational metrics, delivery performance, and cost distribution analysis.</p>
+          <p class="page-subtitle">Operational metrics, delivery performance, and cost distribution analysis[cite: 7].</p>
         </div>
 
         <div class="metrics-grid-analytics">
@@ -323,8 +335,6 @@
       <form id="createPoForm" onsubmit="handleCreatePO(event)">
         <div class="modal-body">
           <div class="form-grid">
-
-            <!-- CATEGORY DROPDOWN -->
             <div class="form-group full-width">
               <label for="poCategory">Category</label>
               <select id="poCategory" onchange="handleCategoryChange()" required>
@@ -337,15 +347,12 @@
                 <option value="Maintenance Vendors">Maintenance Vendors</option>
               </select>
             </div>
-
-            <!-- UNBLOCKED VENDOR NAME DROPDOWN -->
             <div class="form-group full-width">
               <label for="poVendor">Vendor Name</label>
               <select id="poVendor" onchange="handleVendorChange()" required>
                 <option value="">Select Vendor...</option>
               </select>
             </div>
-
             <div class="form-group full-width">
               <label for="poProductName">Product Name</label>
               <input type="text" id="poProductName" placeholder="e.g. Industrial Steel Sheeting" required>
@@ -432,5 +439,37 @@
     </div>
   </div>
 
+  <!-- Theme Toggle & Initialization Script -->
+  <script>
+    function toggleDarkMode() {
+      const body = document.body;
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+      
+      body.classList.toggle('dark-mode');
+      const isDark = body.classList.contains('dark-mode');
+      
+      localStorage.setItem('procurement_portal_theme', isDark ? 'dark' : 'light');
+      
+      if (isDark) {
+        themeIcon.className = 'fa-solid fa-sun';
+        themeText.textContent = 'Light Mode';
+      } else {
+        themeIcon.className = 'fa-solid fa-moon';
+        themeText.textContent = 'Dark Mode';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('procurement_portal_theme');
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-sun';
+        if (themeText) themeText.textContent = 'Light Mode';
+      }
+    });
+  </script>
 </body>
 </html>
