@@ -61,3 +61,29 @@ async def forgot_password(request: ForgotPassword, db: AsyncSession = Depends(ge
 async def reset_password(request: ResetPassword, db: AsyncSession = Depends(get_db)):
     await process_reset_password(db, request.token, request.new_password)
     return {"message": "Password reset successful"}
+
+from app.modules.auth.schemas import SettingsUpdate, SettingsUpdateResponse
+from app.core.security import verify_password, get_password_hash
+
+@router.put("/settings", response_model=SettingsUpdateResponse)
+async def update_settings(
+    settings_data: SettingsUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Verify current password
+    if not verify_password(settings_data.current_password, current_user.password_hash):
+        raise HTTPException(status_code=400, detail="Incorrect current password")
+    
+    # Update fields
+    if settings_data.new_email:
+        existing = await get_user_by_email(db, settings_data.new_email)
+        if existing and existing.id != current_user.id:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        current_user.email = settings_data.new_email
+
+    if settings_data.new_password:
+        current_user.password_hash = get_password_hash(settings_data.new_password)
+
+    await db.commit()
+    return {"message": "Settings updated successfully"}

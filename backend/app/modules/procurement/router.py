@@ -94,6 +94,23 @@ async def get_purchase_orders(db: AsyncSession = Depends(get_db), current_user: 
     pos = await repository.get_purchase_orders(db, vendor_id=vendor_id)
     return pos
 
+@router.get("/purchase-orders/{po_id}", response_model=schemas.PurchaseOrderResponse, dependencies=[Depends(RoleChecker(["Administrator", "Supply Chain Manager", "Finance Officer", "Procurement Manager", "Auditor", "Vendor"]))])
+async def get_purchase_order(po_id: int, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+    po = await repository.get_purchase_order(db, po_id)
+    if not po:
+        raise HTTPException(status_code=404, detail="Purchase order not found")
+        
+    # Vendor restriction
+    if current_user.role.name == "Vendor":
+        from app.modules.vendors.models import VendorContact
+        from sqlalchemy.future import select
+        contact_res = await db.execute(select(VendorContact).filter(VendorContact.email == current_user.email))
+        contact = contact_res.scalars().first()
+        if not contact or po.vendor_id != contact.vendor_id:
+             raise HTTPException(status_code=403, detail="Unauthorized access to this PO")
+             
+    return po
+
 @router.patch("/purchase-orders/{po_id}/status", response_model=schemas.PurchaseOrderResponse, dependencies=[Depends(RoleChecker(["Administrator", "Procurement Manager", "Vendor"]))])
 async def update_purchase_order_status(po_id: int, status_update: schemas.PurchaseOrderUpdateStatus, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     vendor_id = None
@@ -171,3 +188,23 @@ async def upload_po_document(po_id: int, file: UploadFile = File(...), doc_type:
     
     await db.commit()
     return {"message": f"{doc_type.capitalize()} uploaded successfully", "file_path": file_path}
+
+from app.modules.procurement.models import Invoice
+from pydantic import BaseModel
+from typing import Optional
+from sqlalchemy.future import select
+
+class InvoiceResponse(BaseModel):
+    id: int
+    po_id: Optional[int]
+    invoice_number: str
+    amount: float
+    status: str
+
+    class Config:
+        orm_mode = True
+
+@router.get("/invoices", response_model=List[InvoiceResponse], dependencies=[Depends(RoleChecker(["Administrator", "Finance Officer", "Procurement Manager", "Vendor"]))])
+async def list_invoices(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Invoice).order_by(Invoice.id.desc()))
+    return result.scalars().all()

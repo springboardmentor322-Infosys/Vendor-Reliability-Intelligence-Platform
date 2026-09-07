@@ -9,8 +9,9 @@
 <div class="card mt-4">
   <div class="card-head" style="display: flex; gap: 10px; align-items: center; padding-bottom: 10px;">
     <input type="text" class="form-control" placeholder="Search Title or Contract No." [(ngModel)]="filterSearch">
-    <input type="number" class="form-control" placeholder="Vendor ID" [(ngModel)]="filterVendorId" style="max-width: 150px;">
-    
+    <input *ngIf="canUpload" type="number" class="form-control" placeholder="Vendor ID" [(ngModel)]="filterVendorId"
+      style="max-width: 150px;">
+
     <select class="form-control" [(ngModel)]="filterStatus">
       <option value="">All Statuses</option>
       <option value="Draft">Draft</option>
@@ -21,12 +22,12 @@
       <option value="Renewed">Renewed</option>
       <option value="Cancelled">Cancelled</option>
     </select>
-    
+
     <select class="form-control" [(ngModel)]="filterCompliance">
       <option value="">All Compliance Flags</option>
       <option *ngFor="let flag of complianceFlags" [value]="flag">{{flag}}</option>
     </select>
-    
+
     <button class="btn btn-secondary" (click)="applyFilters()">Filter</button>
     <button class="btn btn-secondary" (click)="clearFilters()">Clear</button>
   </div>

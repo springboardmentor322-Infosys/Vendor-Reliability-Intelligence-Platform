@@ -1,0 +1,327 @@
+<div class="p-6 bg-slate-50 min-h-screen text-slate-800">
+  <!-- LOADING -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center p-20 space-y-4">
+    <div class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+    <span class="text-slate-500 font-medium tracking-wide animate-pulse">Loading Auditor Dashboard...</span>
+  </div>
+
+  <div *ngIf="!loading && data">
+    <!-- TOP HEADER -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+          Welcome back, {{ user?.name || 'Auditor' }}! 👋
+        </h1>
+        <p class="text-slate-500 mt-1">Here's your audit overview across vendors, procurement, and compliance.</p>
+      </div>
+      <div class="flex items-center gap-4">
+          <button class="bg-indigo-900 text-white px-4 py-2 rounded-full font-medium hover:bg-slate-800 transition">Open with ⌄</button>
+          
+          <div class="flex items-center gap-3 text-slate-400 bg-white p-2 rounded-full shadow-sm border border-slate-100">
+              <span class="p-2 hover:bg-slate-50 rounded-full cursor-pointer relative"><div class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></div>🔔</span>
+              <span class="p-2 hover:bg-slate-50 rounded-full cursor-pointer relative"><div class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></div>✉️</span>
+          </div>
+          
+          <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
+              🗓️ <span class="font-medium text-slate-700 font-medium">May 21, 2025</span> ⌄
+          </div>
+
+          <div class="flex items-center gap-3 ml-2">
+              <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold">{{ user?.name?.charAt(0) || 'A' }}U</div>
+              <div class="flex flex-col">
+                  <span class="text-sm font-bold text-slate-900 leading-tight">{{ user?.name || 'Auditor' }}</span>
+                  <span class="text-xs text-slate-500">{{ user?.role?.name || 'Auditor' }}</span>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <!-- KPI ROW -->
+    <div class="grid grid-cols-6 gap-4 mb-6">
+      <div *ngFor="let kpi of kpis" class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex flex-col items-start gap-1">
+          <div class="text-xl mb-2"><span class="px-2 py-1 rounded bg-slate-50 border border-slate-100">📋</span></div>
+          <p class="text-xs text-slate-500 font-medium truncate w-full">{{kpi.label}}</p>
+        </div>
+        <div class="mt-2 flex flex-col">
+            <h3 class="text-2xl font-bold text-slate-900 mb-1">{{kpi.value}}</h3>
+            <span class="text-[10px] text-green-600 font-medium flex items-center gap-1">↑ {{kpi.sub}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 1: THREE MAJOR CARDS -->
+    <div class="grid grid-cols-3 gap-6 mb-6">
+      <!-- COMPLIANCE OVERVIEW -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-sm font-bold text-slate-800">Audit Compliance Overview</h2>
+          <span class="text-xs text-slate-500 bg-slate-50 px-2 py-1 border rounded">This Month ⌄</span>
+        </div>
+        <div class="flex-1 flex gap-2 items-center justify-center">
+            <div class="w-1/2">
+                <apx-chart *ngIf="complianceChart" [series]="complianceChart.series" [chart]="complianceChart.chart" [labels]="complianceChart.labels" [colors]="complianceChart.colors" [plotOptions]="complianceChart.plotOptions" [legend]="complianceChart.legend"></apx-chart>
+            </div>
+            <div class="w-1/2 flex flex-col space-y-2 text-xs">
+                <div class="flex justify-between items-center"><span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-emerald-500"></div>Compliant</span> <span class="font-medium">{{data.compliance_overview?.compliant}}</span></div>
+                <div class="flex justify-between items-center"><span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-amber-500"></div>Partially Compliant</span> <span class="font-medium">{{data.compliance_overview?.partially_compliant}}</span></div>
+                <div class="flex justify-between items-center"><span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-red-500"></div>Non-Compliant</span> <span class="font-medium">{{data.compliance_overview?.non_compliant}}</span></div>
+                <div class="flex justify-between items-center"><span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-slate-400"></div>Not Assessed</span> <span class="font-medium">{{data.compliance_overview?.not_assessed}}</span></div>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <a routerLink="/audit-overview" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">View Compliance Details →</a>
+        </div>
+      </div>
+      
+      <!-- FINDINGS SUMMARY -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-sm font-bold text-slate-800">Audit Findings Summary</h2>
+          <span class="text-xs text-slate-500 bg-slate-50 px-2 py-1 border rounded">This Month ⌄</span>
+        </div>
+        <div class="flex gap-2 justify-between mb-2">
+            <div class="text-center bg-slate-50 rounded p-2 flex-1"><div class="text-[10px] text-slate-500 mb-1">Total Findings</div><div class="text-lg font-bold">{{data.findings_summary?.total_findings}}</div></div>
+            <div class="text-center bg-slate-50 rounded p-2 flex-1"><div class="text-[10px] text-slate-500 mb-1">Open ⚠️</div><div class="text-lg font-bold text-red-600">{{data.findings_summary?.open}}</div></div>
+            <div class="text-center bg-slate-50 rounded p-2 flex-1"><div class="text-[10px] text-slate-500 mb-1">In Progress</div><div class="text-lg font-bold text-amber-600">{{data.findings_summary?.in_progress}}</div></div>
+            <div class="text-center bg-slate-50 rounded p-2 flex-1"><div class="text-[10px] text-slate-500 mb-1">Closed ✅</div><div class="text-lg font-bold text-green-600">{{data.findings_summary?.closed}}</div></div>
+        </div>
+        <div class="flex-1 mt-2">
+            <apx-chart *ngIf="findingsChart" [series]="findingsChart.series" [chart]="findingsChart.chart" [labels]="findingsChart.labels" [colors]="findingsChart.colors" [legend]="findingsChart.legend"></apx-chart>
+        </div>
+        <div class="mt-4 text-center">
+            <a routerLink="/audit-reports" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">View All Findings →</a>
+        </div>
+      </div>
+      
+      <!-- RISK ASSESSMENT OVERVIEW -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-sm font-bold text-slate-800">Risk Assessment Overview</h2>
+          <span class="text-xs text-slate-500 bg-slate-50 px-2 py-1 border rounded">This Month ⌄</span>
+        </div>
+        <div class="flex-1 flex gap-2 items-center justify-center">
+            <div class="w-1/2">
+                <apx-chart *ngIf="riskChart" [series]="riskChart.series" [chart]="riskChart.chart" [labels]="riskChart.labels" [colors]="riskChart.colors" [plotOptions]="riskChart.plotOptions" [legend]="riskChart.legend"></apx-chart>
+            </div>
+            <div class="w-1/2 flex flex-col space-y-2 text-xs">
+                <div class="flex justify-between items-center"><span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-red-500"></div>High Risk</span> <span class="font-medium">{{data.risk_assessment?.high_risk}}</span></div>
+                <div class="flex justify-between items-center"><span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-amber-500"></div>Medium Risk</span> <span class="font-medium">{{data.risk_assessment?.medium_risk}}</span></div>
+                <div class="flex justify-between items-center"><span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-emerald-500"></div>Low Risk</span> <span class="font-medium">{{data.risk_assessment?.low_risk}}</span></div>
+                <div class="flex justify-between items-center"><span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-blue-500"></div>Minimal Risk</span> <span class="font-medium">{{data.risk_assessment?.minimal_risk}}</span></div>
+            </div>
+        </div>
+        <div class="mt-4 text-center">
+            <a routerLink="/risk-controls" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">View Risk Assessment →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2: TABLES & LISTS -->
+    <div class="grid grid-cols-3 gap-6 mb-6">
+      
+      <!-- RECENT AUDIT FINDINGS -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-sm font-bold text-slate-800">Recent Audit Findings</h2>
+          <a routerLink="/audit-reports" class="text-xs font-semibold text-indigo-600">View All</a>
+        </div>
+        <div class="overflow-x-auto flex-1">
+            <table class="w-full text-left text-xs align-middle">
+              <thead>
+                <tr class="text-slate-400 border-b border-slate-100">
+                  <th class="py-2 font-medium">Finding ID</th>
+                  <th class="py-2 font-medium">Area</th>
+                  <th class="py-2 font-medium">Vendor</th>
+                  <th class="py-2 font-medium">Risk Level</th>
+                  <th class="py-2 font-medium">Status</th>
+                  <th class="py-2 font-medium">Identified On</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr *ngFor="let f of data.recent_findings?.slice(0,3)" class="border-b border-slate-50 last:border-0 hover:bg-slate-50 cursor-pointer" routerLink="/vendor-audit">
+                  <td class="py-2.5 font-medium">{{f.id}}</td>
+                  <td class="py-2.5">{{f.area}}</td>
+                  <td class="py-2.5">{{f.vendor}}</td>
+                  <td class="py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold" [ngClass]="getBadgeColor(f.risk_level)">{{f.risk_level}}</span></td>
+                  <td class="py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold" [ngClass]="getBadgeColor(f.status)">{{f.status}}</span></td>
+                  <td class="py-2.5 text-slate-500">{{f.identified_on | date:'mediumDate'}}</td>
+                </tr>
+                <tr *ngIf="!data.recent_findings?.length"><td colspan="6" class="py-4 text-center text-slate-400">No findings available.</td></tr>
+              </tbody>
+            </table>
+        </div>
+      </div>
+
+      <!-- UPCOMING AUDIT ACTIVITIES -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-sm font-bold text-slate-800">Upcoming Audit Activities</h2>
+          <a routerLink="/audit-overview" class="text-xs font-semibold text-indigo-600">View Calendar</a>
+        </div>
+        <div class="flex-1 flex flex-col gap-3">
+            <div *ngFor="let a of data.upcoming_activities" class="flex gap-3 items-center">
+                <div class="w-10 h-10 bg-indigo-50 border border-indigo-100 rounded flex justify-center items-center text-indigo-600 text-sm">📅</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-bold text-slate-800 truncate">{{a.activity}}</p>
+                    <p class="text-[10px] text-slate-500 truncate">{{a.vendor}}</p>
+                </div>
+                <div class="flex flex-col text-right">
+                    <span class="text-xs text-slate-700 font-medium">{{a.date | date:'mediumDate'}}</span>
+                    <span class="text-[10px] text-indigo-600 font-semibold">{{a.status}}</span>
+                </div>
+            </div>
+            <div *ngIf="!data.upcoming_activities?.length" class="text-center text-slate-400 text-xs py-4">No activities scheduled.</div>
+        </div>
+      </div>
+
+      <!-- CONTRACTS EXPIRING SOON -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-sm font-bold text-slate-800">Contracts Expiring Soon</h2>
+          <a routerLink="/audit-contracts" class="text-xs font-semibold text-indigo-600">View All</a>
+        </div>
+        <div class="overflow-x-auto flex-1">
+            <table class="w-full text-left text-xs align-middle">
+              <thead>
+                <tr class="text-slate-400 border-b border-slate-100">
+                  <th class="py-2 font-medium">Contract No.</th>
+                  <th class="py-2 font-medium">Vendor</th>
+                  <th class="py-2 font-medium">Expiry Date</th>
+                  <th class="py-2 font-medium text-right">Days Left</th>
+                  <th class="py-2 font-medium text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody class="text-slate-700">
+                <tr *ngFor="let c of data.expiring_contracts" class="border-b border-slate-50 last:border-0">
+                  <td class="py-2.5 font-medium">{{c.contract_no}}</td>
+                  <td class="py-2.5 truncate max-w-[100px]">{{c.vendor}}</td>
+                  <td class="py-2.5 text-slate-500">{{c.expiry_date | date:'mediumDate'}}</td>
+                  <td class="py-2.5 text-right font-medium">{{c.days_left}}</td>
+                  <td class="py-2.5 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold" [ngClass]="getBadgeColor(c.status)">{{c.status}}</span></td>
+                </tr>
+                <tr *ngIf="!data.expiring_contracts?.length"><td colspan="5" class="py-4 text-center text-slate-400">No expiring contracts.</td></tr>
+              </tbody>
+            </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ROW 3: LOWER CARDS -->
+    <div class="grid grid-cols-4 gap-6 mb-6">
+        
+        <!-- AUDIT TRAIL ACTIVITY -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-sm font-bold text-slate-800">Audit Trail Activity</h2>
+                <a routerLink="/audit-logs" class="text-xs font-semibold text-indigo-600">View All</a>
+            </div>
+            <div class="flex-1 flex flex-col gap-3">
+                <div *ngFor="let l of data.audit_trail_activity" class="flex gap-2">
+                    <div class="mt-1"><span class="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">A</span></div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-800">{{l.action}}</p>
+                        <p class="text-[10px] text-slate-500">{{l.actor}} • {{l.timestamp | date:'medium'}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHECKLIST PROGRESS -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-sm font-bold text-slate-800">Audit Checklist Progress</h2>
+                <span class="text-[10px] text-slate-500 bg-slate-50 px-2 py-1 border rounded">This Month ⌄</span>
+            </div>
+            <ng-container *ngIf="data.checklist_progress">
+                <div class="flex-1 flex gap-2">
+                    <div class="w-1/2 flex items-center justify-center">
+                        <apx-chart *ngIf="checklistChart" [series]="checklistChart.series" [chart]="checklistChart.chart" [plotOptions]="checklistChart.plotOptions" [colors]="checklistChart.colors"></apx-chart>
+                    </div>
+                    <div class="w-1/2 flex flex-col justify-center space-y-2 text-xs">
+                        <div class="flex justify-between items-center"><span class="text-slate-500">Total Checklists</span> <span class="font-bold">{{data.checklist_progress.total}}</span></div>
+                        <div class="flex justify-between items-center"><span class="text-slate-500">Completed</span> <span class="font-bold text-emerald-600">{{data.checklist_progress.completed}}</span></div>
+                        <div class="flex justify-between items-center"><span class="text-slate-500">In Progress</span> <span class="font-bold text-blue-600">{{data.checklist_progress.in_progress}}</span></div>
+                        <div class="flex justify-between items-center"><span class="text-slate-500">Overdue</span> <span class="font-bold text-red-600">{{data.checklist_progress.overdue}}</span></div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <a routerLink="/audit-overview" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">View All Checklists →</a>
+                </div>
+            </ng-container>
+            <div *ngIf="!data.checklist_progress" class="flex-1 flex items-center justify-center text-xs text-slate-400">
+                No checklist records available.
+            </div>
+        </div>
+
+        <!-- EVIDENCE SUMMARY -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-sm font-bold text-slate-800">Evidence Summary</h2>
+                <span class="text-[10px] text-slate-500"></span>
+            </div>
+            <ng-container *ngIf="data.evidence_summary">
+                <div class="flex-1 flex gap-2 items-center justify-center">
+                    <div class="w-1/2">
+                        <apx-chart *ngIf="evidenceChart" [series]="evidenceChart.series" [chart]="evidenceChart.chart" [labels]="evidenceChart.labels" [colors]="evidenceChart.colors" [plotOptions]="evidenceChart.plotOptions" [legend]="evidenceChart.legend"></apx-chart>
+                    </div>
+                    <div class="w-1/2 flex flex-col space-y-2 text-xs">
+                        <div class="flex justify-between items-center"><span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-blue-500"></div>Documents</span> <span class="font-medium">{{data.evidence_summary.documents}}</span></div>
+                        <div class="flex justify-between items-center"><span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-emerald-500"></div>Images</span> <span class="font-medium">{{data.evidence_summary.images}}</span></div>
+                        <div class="flex justify-between items-center"><span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-amber-500"></div>Emails</span> <span class="font-medium">{{data.evidence_summary.emails}}</span></div>
+                        <div class="flex justify-between items-center"><span class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-purple-500"></div>Others</span> <span class="font-medium">{{data.evidence_summary.other}}</span></div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <a routerLink="/documents" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">View Evidence Library →</a>
+                </div>
+            </ng-container>
+            <div *ngIf="!data.evidence_summary" class="flex-1 flex items-center justify-center text-xs text-slate-400">
+                No evidence records found.
+            </div>
+        </div>
+
+        <!-- RECENT NOTIFICATIONS -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-sm font-bold text-slate-800">Recent Notifications</h2>
+                <a routerLink="/notifications" class="text-xs font-semibold text-indigo-600">View All</a>
+            </div>
+            <div class="flex-1 flex flex-col gap-3">
+                <div *ngFor="let n of data.notifications" class="flex gap-2">
+                    <div class="mt-1">
+                        <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px]" [ngClass]="n.type === 'alert' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'">⚠️</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-xs text-slate-800 truncate leading-snug">{{n.title}}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-400 whitespace-nowrap">{{n.time}}</p>
+                    </div>
+                </div>
+                <div *ngIf="!data.notifications?.length" class="text-[10px] text-slate-400">No notifications.</div>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- BOTTOM INSIGHT STRIP -->
+    <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-xl text-indigo-600 shadow-sm">💡</div>
+            <div>
+                <p class="text-sm font-bold text-indigo-900">Audit Insight:</p>
+                <p class="text-xs text-indigo-800">{{data.insight?.text}}</p>
+            </div>
+        </div>
+        <div>
+            <button (click)="generateReport()" class="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded font-medium text-xs shadow-sm hover:bg-indigo-700 transition">
+                <span>Generate Audit Report</span>
+                <span>📄</span>
+            </button>
+        </div>
+    </div>
+
+  </div>
+</div>

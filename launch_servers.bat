@@ -1,0 +1,6 @@
+@echo off
+echo Starting Backend...
+start "VendorIQ Backend" cmd /k "cd /d D:\Vendor Reliability Intelligence Platform\backend && python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload"
+
+echo Starting Frontend...
+start "VendorIQ Frontend" cmd /k "cd /d D:\Vendor Reliability Intelligence Platform\frontend && npm start"

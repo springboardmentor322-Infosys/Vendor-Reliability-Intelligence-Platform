@@ -95,8 +95,43 @@ class Invoice(Base):
     due_date = Column(DateTime, nullable=True)
     amount = Column(Float, nullable=False, default=0.0)
     status = Column(String, default="Pending")
+    # tax_amount is nullable; existing rows get 0.0 from migration default — no invented values
+    tax_amount = Column(Float, nullable=True, default=0.0)
+    # rejection reason recorded when Finance Officer rejects
+    rejection_reason = Column(String, nullable=True)
     
     purchase_order = relationship("PurchaseOrder", back_populates="invoices")
+    payments = relationship("Payment", back_populates="invoice", cascade="all, delete-orphan")
+
+
+class Payment(Base):
+    """
+    Records individual payment transactions against an Invoice.
+    Supports partial payments: an invoice may have multiple Payment records.
+    
+    Outstanding balance = invoice.amount - SUM(payment.amount for all payments on this invoice)
+    
+    Invoice status transitions (driven by outstanding balance, set automatically on POST /finance/invoices/{id}/pay):
+      outstanding_balance <= 0  →  Paid
+      outstanding_balance > 0   →  Partially Paid
+    
+    Overdue is NOT stored — always calculated at query time:
+      outstanding_balance > 0 AND due_date < today
+    """
+    __tablename__ = "payments"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    invoice_id = Column(Integer, ForeignKey("invoices.id"), nullable=False)
+    amount = Column(Float, nullable=False)
+    payment_date = Column(DateTime, default=datetime.utcnow)
+    payment_method = Column(String, nullable=True)    # e.g. "Bank Transfer", "Cheque", "NEFT", "RTGS"
+    payment_reference = Column(String, nullable=True) # e.g. UTR number, cheque number
+    notes = Column(String, nullable=True)
+    created_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    invoice = relationship("Invoice", back_populates="payments")
+    created_by = relationship("User", foreign_keys=[created_by_id])
 
 
 class QualityInspection(Base):

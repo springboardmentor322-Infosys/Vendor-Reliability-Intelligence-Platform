@@ -1,0 +1,35 @@
+<div class="p-6 bg-slate-50 min-h-screen text-slate-800">
+  <div class="mb-8 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-slate-900">Invoice & Payment Audit</h2>
+  </div>
+  
+  <div *ngIf="loading" class="flex flex-col items-center justify-center p-20 space-y-4">
+    <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+  <div *ngIf="!loading && data">
+
+        <div class="flex gap-4 mb-6">
+            <select [(ngModel)]="filters.status" class="px-3 py-2 border rounded text-xs w-48">
+                <option value="">All Statuses</option><option value="Rejected">Rejected</option><option value="Paid">Paid</option><option value="Pending">Pending</option>
+            </select>
+            <button (click)="load()" class="text-xs bg-indigo-600 text-white px-4 rounded">Audit Financials</button>
+        </div>
+        <table class="w-full text-left text-xs bg-white rounded-xl shadow-sm">
+            <thead class="bg-slate-50 text-slate-500 border-b">
+                <tr><th class="p-4">Invoice No.</th><th class="p-4">Related PO</th><th class="p-4">Amount</th><th class="p-4">Status</th><th class="p-4">Due Date</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                <tr *ngFor="let i of data" class="hover:bg-slate-50">
+                    <td class="p-4 font-bold text-slate-800 cursor-pointer hover:text-indigo-600">{{i.invoice_number}}</td>
+                    <td class="p-4 text-indigo-600 cursor-pointer hover:underline" routerLink="/procurement-audit">{{i.po_number}}</td>
+                    <td class="p-4 font-medium">{{i.amount | currency}}</td>
+                    <td class="p-4"><span class="px-2 py-0.5 rounded text-[10px]" [ngClass]="{'bg-red-100 text-red-800': i.status==='Rejected', 'bg-green-100 text-green-800': i.status==='Paid', 'bg-slate-100': i.status!=='Rejected'&&i.status!=='Paid'}">{{i.status}}</span></td>
+                    <td class="p-4 text-slate-400">{{i.due_date | date:'shortDate'}}</td>
+                </tr>
+                <tr *ngIf="!data?.length"><td colspan="5" class="p-8 text-center text-slate-400">No invoice anomalies detected based on filters.</td></tr>
+            </tbody>
+        </table>
+        
+  </div>
+</div>

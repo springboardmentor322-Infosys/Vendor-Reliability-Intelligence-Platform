@@ -18,3 +18,7 @@ class DashboardSummaryResponse(BaseModel):
     alerts: List[Any] = []
     unread_messages_count: int = 0
     recent_communications: Optional[List[Dict[str, Any]]] = None
+    chart_data: Dict[str, Any] = {}
+    platform_overview: Dict[str, Any] = {}
+    system_health: Dict[str, Any] = {}
+    spend_by_category: List[Dict[str, Any]] = []

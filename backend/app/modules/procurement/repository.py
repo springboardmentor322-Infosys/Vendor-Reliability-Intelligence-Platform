@@ -87,6 +87,12 @@ async def create_purchase_order_from_pr(db: AsyncSession, pr_id: int, vendor_id:
     if not pr or pr.status != "Approved":
         raise ValueError("PR not found or not approved")
 
+    # Check for existing PO to ensure idempotence
+    result = await db.execute(select(PurchaseOrder).filter(PurchaseOrder.pr_id == pr_id))
+    existing_po = result.scalars().first()
+    if existing_po:
+        return existing_po
+
     po_num = await generate_po_number(db)
     
     # Calculate amount
@@ -125,12 +131,12 @@ async def update_purchase_order_status(db: AsyncSession, po_id: int, status_upda
         raise ValueError("Unauthorized to update this PO")
         
     valid_transitions = {
-        "Pending": ["Accepted"],
-        "Accepted": ["In Progress"],
-        "In Progress": ["Shipped", "Partial Delivery"],
-        "Partial Delivery": ["Shipped", "Delivered"],
-        "Shipped": ["Delivered"],
-        "Delivered": ["Completed"]
+        "Pending": ["Approved", "Cancelled"],
+        "Approved": ["Ordered", "Cancelled"],
+        "Ordered": ["Delivered", "Cancelled"],
+        "Delivered": ["Completed"],
+        "Completed": [],
+        "Cancelled": []
     }
     
     if status_update.status not in valid_transitions.get(db_po.status, []):

@@ -1,0 +1,29 @@
+<div class="p-6 bg-slate-50 min-h-screen text-slate-800">
+  <div class="mb-8 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-slate-900">Order & Delivery Audit (Read-Only)</h2>
+  </div>
+  
+  <div *ngIf="loading" class="flex flex-col items-center justify-center p-20 space-y-4">
+    <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+  <div *ngIf="!loading && data">
+
+        <table class="w-full text-left text-xs bg-white rounded-xl shadow-sm">
+            <thead class="bg-slate-50 text-slate-500 border-b">
+                <tr><th class="p-4">Reference PO</th><th class="p-4">Expected Delivery</th><th class="p-4">Actual Delivery</th><th class="p-4 border-l font-black">Delay Duration</th><th class="p-4">Fulfillment Status</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                <tr *ngFor="let d of data" class="hover:bg-slate-50">
+                    <td class="p-4 font-bold text-slate-800">{{d.po_number}}</td>
+                    <td class="p-4 text-slate-500">{{d.expected | date:'mediumDate'}}</td>
+                    <td class="p-4 font-medium" [ngClass]="d.actual !== '-' ? 'text-indigo-600' : 'text-slate-400'">{{d.actual !== '-' ? (d.actual | date:'mediumDate') : 'Not Delivered'}}</td>
+                    <td class="p-4 border-l font-black text-center" [ngClass]="d.delay_days > 0 ? 'text-red-500 bg-red-50' : 'text-slate-400 bg-slate-50'">{{d.delay_days > 0 ? d.delay_days + ' Days' : '-'}}</td>
+                    <td class="p-4"><span class="px-2 py-0.5 rounded font-bold" [ngClass]="d.status === 'Delayed' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'">{{d.status}}</span></td>
+                </tr>
+                <tr *ngIf="!data?.length"><td colspan="5" class="p-8 text-center text-slate-400">No delivery logs exist.</td></tr>
+            </tbody>
+        </table>
+        
+  </div>
+</div>

@@ -42,3 +42,11 @@ class ForgotPassword(BaseModel):
 class ResetPassword(BaseModel):
     token: str
     new_password: str
+
+class SettingsUpdate(BaseModel):
+    new_email: Optional[EmailStr] = None
+    new_password: Optional[str] = None
+    current_password: str
+
+class SettingsUpdateResponse(BaseModel):
+    message: str

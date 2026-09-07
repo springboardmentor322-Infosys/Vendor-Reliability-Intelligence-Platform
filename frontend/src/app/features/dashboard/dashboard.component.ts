@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AuthService } from '../../core/services/auth.service';
 import { roles, pages } from './dashboard-data';
@@ -20,8 +20,8 @@ import { DashboardService } from '../../core/services/dashboard.service';
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    CommonModule, 
-    VendorDirectoryComponent, 
+    CommonModule,
+    VendorDirectoryComponent,
     PrDashboardComponent,
     AdminDashboardComponent,
     PmDashboardComponent,
@@ -42,17 +42,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
   dashboardData: any = null;
 
   constructor(
-    private authService: AuthService, 
+    private authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
     private dashboardService: DashboardService
-  ) {}
+  ) { }
 
   ngOnInit() {
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        this.currentPage = id;
+        this.renderPage();
+      } else {
+        this.currentPage = 'dashboard';
+        this.renderPage();
+      }
+    });
+
     this.authSub = this.authService.currentUser$.subscribe((user: any) => {
       if (user) {
         this.userEmail = user.email;
-        
+
         const roleMap: Record<string, string> = {
           'Administrator': 'admin',
           'Procurement Manager': 'pm',
@@ -61,11 +73,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
           'Auditor': 'auditor',
           'Vendor': 'vendor'
         };
-        
-        const rawRoleName = user.role?.name || 'Administrator';
-        this.currentRoleKey = roleMap[rawRoleName] || 'admin';
-        
-        this.roleConfig = (roles as any)[this.currentRoleKey] || (roles as any)['admin'];
+
+        const rawRoleName = user.role?.name || user.role_name || null;
+        if (!rawRoleName) {
+          console.error('Role cannot be resolved for user:', user);
+          this.logout();
+          return;
+        }
+
+        this.currentRoleKey = roleMap[rawRoleName];
+        if (!this.currentRoleKey) {
+          console.error('Unrecognized role mapped:', rawRoleName);
+          this.logout();
+          return;
+        }
+
+        this.roleConfig = (roles as any)[this.currentRoleKey];
         this.loadDashboardData();
         this.renderPage();
       }
@@ -73,11 +96,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadDashboardData() {
-    this.dashboardService.getDashboardSummary().subscribe(data => {
-      this.dashboardData = data;
+    // Fetch summary for admin/finance/auditor, or specific role dashboard for scm/pm/vendor
+    this.dashboardService.getRoleDashboard(this.currentRoleKey).subscribe(data => {
+      // If we are scm/pm/vendor, we nest the result into analytics for the child components
+      if (['scm', 'pm', 'vendor'].includes(this.currentRoleKey)) {
+        this.dashboardData = { analytics: data };
+      } else {
+        this.dashboardData = data;
+      }
     });
   }
-  
+
   ngOnDestroy() {
     if (this.authSub) this.authSub.unsubscribe();
   }
@@ -87,17 +116,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.router.navigate(['/login']);
   }
 
+  // Obsolete helper, navigation is now handled in AuthenticatedShell
   goTo(pageId: string) {
-    if (pageId.includes('contracts')) {
-      this.router.navigate(['/contracts']);
-      return;
-    }
-    if (pageId.includes('communication')) {
-      this.router.navigate(['/communications']);
-      return;
-    }
-    this.currentPage = pageId;
-    this.renderPage();
+    // left intentionally blank or can emit
   }
 
   getPageLabel(id: string): string {
@@ -112,7 +133,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   renderPage() {
     if (!this.roleConfig) return;
-    
+
     // Inject global state for the renderer functions
     (window as any).currentRole = this.currentRoleKey;
     (window as any).currentPage = this.currentPage;

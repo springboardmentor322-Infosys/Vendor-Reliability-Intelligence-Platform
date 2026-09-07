@@ -1,0 +1,35 @@
+<div class="p-6 bg-slate-50 min-h-screen text-slate-800">
+  <div class="mb-8 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-slate-900">Communications Review Database</h2>
+  </div>
+  
+  <div *ngIf="loading" class="flex flex-col items-center justify-center p-20 space-y-4">
+    <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+  <div *ngIf="!loading && data">
+
+        <div class="flex gap-4 mb-6">
+            <input type="text" [(ngModel)]="filters.participant" placeholder="Participant Email" class="px-3 py-2 border rounded text-xs w-64">
+            <button (click)="load()" class="text-xs bg-indigo-600 text-white px-4 rounded">Search Threads</button>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 divide-y divide-slate-50">
+            <div *ngFor="let m of data" class="p-5 hover:bg-slate-50 transition cursor-pointer flex gap-4 items-start">
+                <div class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex justify-center items-center font-bold text-lg">✉️</div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 rounded">{{m.thread}}</span>
+                        <span class="text-[10px] text-slate-500 flex items-center gap-2"><span>{{m.created | date:'short'}}</span> <span class="bg-slate-200 px-1">{{m.status}}</span></span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">{{m.sender}} → {{m.recipient}}</div>
+                    <div class="text-xs text-slate-600 bg-white p-3 border border-slate-100 rounded break-words max-h-24 overflow-hidden relative">
+                        {{m.last_message}}
+                        <div class="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-white to-transparent"></div>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="!data?.length" class="p-12 text-center text-slate-400 bg-slate-50">No communication evidence matches criteria.</div>
+        </div>
+        
+  </div>
+</div>

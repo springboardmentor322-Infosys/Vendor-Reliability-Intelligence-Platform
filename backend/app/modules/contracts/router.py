@@ -16,7 +16,7 @@ from app.modules.notifications.models import Notification
 
 router = APIRouter(tags=["Contracts"])
 
-@router.get("/", response_model=List[schemas.ContractResponse], dependencies=[Depends(RoleChecker(["Administrator", "Procurement Manager", "Finance Officer", "Auditor", "Vendor"]))])
+@router.get("/", response_model=List[schemas.ContractResponse], dependencies=[Depends(RoleChecker(["Administrator", "Procurement Manager", "Finance Officer", "Auditor", "Vendor", "Supply Chain Manager"]))])
 async def get_contracts(vendor_id: Optional[int] = None, status: Optional[str] = None, compliance_flag: Optional[str] = None, search: Optional[str] = None, skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     # If user is a Vendor, restrict to their own contracts
     if current_user.role.name == "Vendor":
@@ -69,7 +69,7 @@ async def get_contract_alerts(db: AsyncSession = Depends(get_db)):
         ))
     return alerts
 
-@router.get("/{contract_id}", response_model=schemas.ContractResponse, dependencies=[Depends(RoleChecker(["Administrator", "Procurement Manager", "Finance Officer", "Auditor", "Vendor"]))])
+@router.get("/{contract_id}", response_model=schemas.ContractResponse, dependencies=[Depends(RoleChecker(["Administrator", "Procurement Manager", "Finance Officer", "Auditor", "Vendor", "Supply Chain Manager"]))])
 async def get_contract(contract_id: int, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     contract = await repository.get_contract(db, contract_id)
     if current_user.role.name == "Vendor":
@@ -149,7 +149,7 @@ async def upload_contract_document(contract_id: int, file: UploadFile = File(...
     
     return {"message": "Document uploaded successfully", "file_path": file_path}
 
-@router.get("/{contract_id}/download", dependencies=[Depends(RoleChecker(["Administrator", "Procurement Manager", "Finance Officer", "Auditor", "Vendor"]))])
+@router.get("/{contract_id}/download", dependencies=[Depends(RoleChecker(["Administrator", "Procurement Manager", "Finance Officer", "Auditor", "Vendor", "Supply Chain Manager"]))])
 async def download_contract_document(contract_id: int, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     contract = await repository.get_contract(db, contract_id)
     

@@ -1,0 +1,84 @@
+<div class="p-6 bg-slate-50 min-h-screen text-slate-800">
+  <div class="mb-8 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-slate-900">Generate Audit Reports</h2>
+  </div>
+
+  <div *ngIf="loading" class="flex flex-col items-center justify-center p-20 space-y-4">
+    <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+  <div *ngIf="!loading && data">
+    <!-- DYNAMIC KPIs PORTED FROM DASHBOARD -->
+    <div class="grid grid-cols-6 gap-4 mb-6">
+      <div *ngFor="let kpi of kpis"
+        class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex flex-col items-start gap-1">
+          <p class="text-xs text-slate-500 font-medium truncate w-full">{{kpi.label}}</p>
+        </div>
+        <div class="mt-2 flex flex-col">
+          <h3 class="text-2xl font-bold text-slate-900 mb-1">{{kpi.value}}</h3>
+          <span class="text-[10px] text-green-600 font-medium flex items-center gap-1">↑ {{kpi.sub}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- FINDINGS SUMMARY PORTED FROM DASHBOARD -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-sm font-bold text-slate-800">Audit Findings Summary</h2>
+          <span class="text-xs text-slate-500 bg-slate-50 px-2 py-1 border rounded">This Month ⌄</span>
+        </div>
+        <div class="flex gap-2 justify-between mb-2">
+          <div class="text-center bg-slate-50 rounded p-2 flex-1">
+            <div class="text-[10px] text-slate-500 mb-1">Total Findings</div>
+            <div class="text-lg font-bold text-slate-900">{{data?.findings_summary?.total_findings || 0}}</div>
+          </div>
+          <div class="text-center bg-slate-50 rounded p-2 flex-1">
+            <div class="text-[10px] text-slate-500 mb-1">Open ⚠️</div>
+            <div class="text-lg font-bold text-red-600">{{data?.findings_summary?.open || 0}}</div>
+          </div>
+          <div class="text-center bg-slate-50 rounded p-2 flex-1">
+            <div class="text-[10px] text-slate-500 mb-1">In Progress</div>
+            <div class="text-lg font-bold text-amber-600">{{data?.findings_summary?.in_progress || 0}}</div>
+          </div>
+          <div class="text-center bg-slate-50 rounded p-2 flex-1">
+            <div class="text-[10px] text-slate-500 mb-1">Closed ✅</div>
+            <div class="text-lg font-bold text-green-600">{{data?.findings_summary?.closed || 0}}</div>
+          </div>
+        </div>
+        <div class="flex-1 mt-2">
+          <apx-chart *ngIf="findingsChart" [series]="findingsChart.series" [chart]="findingsChart.chart"
+            [labels]="findingsChart.labels" [colors]="findingsChart.colors" [legend]="findingsChart.legend"></apx-chart>
+        </div>
+      </div>
+
+      <div class="bg-white px-8 py-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+        <h3 class="text-lg font-bold text-slate-800 mb-6">Audit Activity Extraction</h3>
+        <div class="grid gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-2">Report Template Type</label>
+            <select class="w-full border rounded p-2 text-xs">
+              <option>Comprehensive Audit Overview</option>
+              <option>Procurement Summary</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-2">Vendor Scope</label>
+            <input type="text" placeholder="Vendor Name (Optional)" class="w-full border rounded p-2 text-xs">
+          </div>
+        </div>
+        <button
+          class="w-full mt-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded text-sm flex gap-2 justify-center items-center">
+          <span>Generate Extracted PDF Report</span> <span>⬇️</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-100 max-w-3xl">
+      <h3 class="text-sm font-bold text-slate-800 mb-4">Past Report Generation Log</h3>
+      <div class="text-xs text-slate-500 py-8 text-center bg-slate-50 rounded">No past reports tracked for this user.
+      </div>
+    </div>
+  </div>
+</div>

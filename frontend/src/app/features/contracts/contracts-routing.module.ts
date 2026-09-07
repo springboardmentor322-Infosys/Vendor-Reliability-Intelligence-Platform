@@ -5,15 +5,15 @@ import { ContractDetailsComponent } from './components/contract-details/contract
 import { roleGuard } from '../../core/guards/role.guard';
 
 const routes: Routes = [
-  { 
-    path: '', 
+  {
+    path: '',
     component: ContractListComponent,
-    canActivate: [roleGuard(['Administrator', 'Procurement Manager', 'Finance Officer', 'Auditor', 'Vendor'])]
+    canActivate: [roleGuard(['Administrator', 'Procurement Manager', 'Finance Officer', 'Auditor', 'Vendor', 'Supply Chain Manager'])]
   },
-  { 
-    path: ':id', 
+  {
+    path: ':id',
     component: ContractDetailsComponent,
-    canActivate: [roleGuard(['Administrator', 'Procurement Manager', 'Finance Officer', 'Auditor', 'Vendor'])]
+    canActivate: [roleGuard(['Administrator', 'Procurement Manager', 'Finance Officer', 'Auditor', 'Vendor', 'Supply Chain Manager'])]
   }
 ];
 

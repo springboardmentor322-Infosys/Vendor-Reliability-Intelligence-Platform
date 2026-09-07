@@ -27,7 +27,7 @@ import { CommonModule } from '@angular/common';
           <h3>Recent Audit Logs</h3>
         </div>
         <div class="card-body">
-          <div class="text-center py-8 text-[var(--slate)]">Audit Log module coming in Phase 5</div>
+          <div class="text-center py-8 text-[var(--slate)]">Audits available in details views</div>
         </div>
       </div>
       <div class="card">
@@ -35,7 +35,7 @@ import { CommonModule } from '@angular/common';
           <h3>Compliance Alerts</h3>
         </div>
         <div class="card-body">
-          <div class="text-center py-8 text-[var(--slate)]">Compliance reporting coming in Phase 5</div>
+          <div class="text-center py-8 text-[var(--slate)]">Alerts available in details views</div>
         </div>
       </div>
     </div>
