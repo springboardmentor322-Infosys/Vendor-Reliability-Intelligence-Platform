@@ -28,7 +28,6 @@ loadLocalBudgetData();
 async function verifyAuditorSession() {
     const currentUserId = sessionStorage.getItem("user_id") || localStorage.getItem("user_id");
 
-    // Redirects to the main index.html page in the login folder if the session doesn't exist
     if (!currentUserId) {
         window.location.href = "../login/index.html";
         return;
@@ -40,7 +39,6 @@ async function verifyAuditorSession() {
             alert("Your account has been removed or revoked by an administrator.");
             sessionStorage.clear();
             localStorage.clear();
-            // Redirects to the index.html page if the session verification fails
             window.location.href = "../login/index.html"; 
         }
     } catch (err) {
@@ -66,7 +64,6 @@ async function handleLogout(event) {
 
     sessionStorage.clear();
     localStorage.clear();
-    // Route logout back to index.html in the login folder
     window.location.href = '../login/index.html'; 
 }
 
@@ -133,7 +130,6 @@ async function loadAuditLogs() {
             return;
         }
 
-        // Full table processing
         logs.forEach(log => {
             if (tbody) {
                 const row = document.createElement('tr');
@@ -147,7 +143,6 @@ async function loadAuditLogs() {
             }
         });
 
-        // Overview mini-table processing
         if (overviewTbody) {
             const recentLogs = logs.slice(0, 5);
             recentLogs.forEach(log => {
@@ -186,11 +181,13 @@ async function loadVendorOrders() {
         }
 
         orders.forEach(order => {
+            const vendorName = order.vendor_name || order.vendor || 'Unknown Vendor';
+            const items = order.items || order.description || 'N/A';
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${order.id || order.order_id || 'N/A'}</td>
-                <td>${order.vendor_name || order.vendor || 'Unknown Vendor'}</td>
-                <td>${order.items || order.description || 'N/A'}</td>
+                <td class="truncate-cell" title="${vendorName}">${vendorName}</td>
+                <td class="truncate-cell" title="${items}">${items}</td>
                 <td>${formatCurrency(order.total_cost || order.cost || 0)}</td>
                 <td><code>${order.transaction_id || 'N/A'}</code></td>
             `;
@@ -292,7 +289,6 @@ function renderBudgetTable() {
         tfoot.appendChild(footRow);
     }
 
-    // Update Overview Tab Budget Summary
     if (summaryContainer) {
         const percentSpent = grandAllocated > 0 ? Math.min(100, Math.round((grandSpent / grandAllocated) * 100)) : 0;
         const progressBarColor = percentSpent > 90 ? 'var(--danger)' : (percentSpent > 75 ? 'var(--warning)' : 'var(--success)');
@@ -329,7 +325,6 @@ function extractBudgetReport() {
     document.body.removeChild(link);
 }
 
-// --- 8. COMPLIANCE DATA FETCHING & RENDERING ---
 async function loadComplianceData() {
     try {
         const [vendorsRes, invRes, poRes] = await Promise.all([
@@ -346,7 +341,6 @@ async function loadComplianceData() {
         let frameworks = [];
         const today = new Date().toISOString().split('T')[0];
 
-        // 0. Dynamically calculate Vendor Scores
         let vendorScoresMap = {};
         orders.forEach(po => {
             if((po.order_status || "").toLowerCase().includes("reject")) return;
@@ -375,7 +369,6 @@ async function loadComplianceData() {
             vendorScoresMap[vName].push(finalScore);
         });
 
-        // 1. Check Vendor Risk Standard
         let highRiskVendorNames = [];
         vendors.forEach(v => {
             const vName = v.vendor_name || v.fullname || v.username || 'Unknown Vendor';
@@ -400,7 +393,7 @@ async function loadComplianceData() {
 
         let vendorScopeText = 'External Suppliers';
         if (highRiskVendorNames.length > 0) {
-            vendorScopeText = `<span style="color: var(--danger); font-weight: 600;">High Risk: ${highRiskVendorNames.join(', ')}</span>`;
+            vendorScopeText = `<span style="color: var(--danger); font-weight: 600;">${highRiskVendorNames.length} High Risk Vendors Flagged</span>`;
         }
 
         frameworks.push({
@@ -411,7 +404,6 @@ async function loadComplianceData() {
             status: highRiskVendorNames.length === 0 ? 'Passed' : 'Review Required'
         });
 
-        // 2. Check Quality Control Standard
         let pendingQCCount = 0;
         const activeInvoices = invoices.filter(inv => {
             const s = (inv.status || "").toLowerCase();
@@ -445,7 +437,6 @@ async function loadComplianceData() {
             status: pendingQCCount === 0 ? 'Passed' : 'Review Required'
         });
 
-        // 3. Check Financial Allocation Governance
         let overBudgetCount = 0;
         for (const [dept, data] of Object.entries(budgetData)) {
             if (data.spent > data.allocated) {
@@ -466,7 +457,6 @@ async function loadComplianceData() {
             status: overBudgetCount === 0 ? 'Passed' : 'Review Required'
         });
 
-        // Update KPIs
         const passedCount = frameworks.filter(f => f.status === 'Passed').length;
         const reviewRequiredCount = frameworks.filter(f => f.status === 'Review Required').length;
 
@@ -474,11 +464,9 @@ async function loadComplianceData() {
         if(document.getElementById('comp-kpi-passed')) document.getElementById('comp-kpi-passed').innerText = passedCount;
         if(document.getElementById('comp-kpi-violations')) document.getElementById('comp-kpi-violations').innerText = violations.length;
 
-        // Set Flagged Events to the number of frameworks requiring review
         const flaggedEventsEl = document.getElementById('dash-flagged-events');
         if (flaggedEventsEl) flaggedEventsEl.innerText = reviewRequiredCount;
 
-        // Calculate and Update Compliance Rating percentage in Overview tab
         const compRatingEl = document.getElementById('dash-compliance-rating');
         if (compRatingEl) {
             const rating = frameworks.length > 0 ? Math.round((passedCount / frameworks.length) * 100) : 100;
@@ -486,7 +474,6 @@ async function loadComplianceData() {
             compRatingEl.style.color = rating === 100 ? 'var(--text-dark)' : 'var(--danger)';
         }
 
-        // Render Frameworks Table
         const compTbody = document.getElementById('compliance-tbody');
         if(compTbody) {
             compTbody.innerHTML = '';
@@ -504,7 +491,6 @@ async function loadComplianceData() {
             });
         }
 
-        // Render Violations Table
         const logsTbody = document.getElementById('compliance-logs-tbody');
         if(logsTbody) {
             logsTbody.innerHTML = '';
@@ -551,7 +537,7 @@ window.addEventListener('DOMContentLoaded', () => {
     verifyAuditorSession();
     loadAuditLogs();
     fetchBudgetDataFromFinance();
-    loadComplianceData(); // Ensure compliance rating calculates immediately on load
+    loadComplianceData();
 });
 
 window.addEventListener('storage', (event) => {
@@ -570,11 +556,7 @@ window.addEventListener('storage', (event) => {
 
 setInterval(() => {
     loadLocalBudgetData();
-    
-    // Always refresh budget layout for the overview summary
     renderBudgetTable();
-    
-    // Always refresh compliance to update the overview rating
     loadComplianceData(); 
 
     const activeTabId = document.querySelector('.tab-content[style="display: block;"]')?.id;
@@ -583,7 +565,6 @@ setInterval(() => {
     }
 }, 3000);
 
-// Validate user actively
 setInterval(() => {
   const currentUserId = sessionStorage.getItem("user_id") || localStorage.getItem("user_id");
   if (currentUserId) {
