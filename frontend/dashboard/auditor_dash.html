@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Vendor Reliability - Audit Portal</title>
+    <title>Vendor Reliability - Audit Portal</title>
     <!-- FontAwesome CDN for UI Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="auditor_style.css">
@@ -18,9 +18,15 @@
             <i class="fa-solid fa-shield-halved"></i>
             <span>Audit Portal</span>
         </div>
-        <div class="user-info">
-            <i class="fa-regular fa-circle-user"></i>
-            <span>Auditor</span>
+        <div class="user-info" style="display: flex; align-items: center; gap: 1rem;">
+            <!-- Dark/Light Mode Toggle Button -->
+            <button class="btn btn-secondary" onclick="toggleDarkMode()" id="themeToggleBtn" style="font-size: 13px; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                <i class="fa-solid fa-moon" id="themeIcon"></i> <span id="themeText">Dark Mode</span>
+            </button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-regular fa-circle-user"></i>
+                <span>Auditor</span>
+            </div>
         </div>
     </header>
 
@@ -94,9 +100,7 @@
                     </div>
                 </section>
 
-                <!-- NEW: Overview Grid for Recent Activity & Budget Summary -->
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
-                    
                     <!-- Recent Audit Activity -->
                     <section class="data-section" style="margin-bottom: 0;">
                         <div class="section-header">
@@ -127,11 +131,10 @@
                                 Full Report
                             </button>
                         </div>
-                        <div id="overview-budget-summary" style="margin-top: 1.5rem; padding: 1rem; background: #f8fafc; border-radius: 8px; border: 1px solid var(--border);">
+                        <div id="overview-budget-summary" style="margin-top: 1.5rem; padding: 1rem; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border);">
                             <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">Loading financial data...</p>
                         </div>
                     </section>
-
                 </div>
             </div>
 
@@ -182,12 +185,8 @@
                                 <th>Remaining Balance</th>
                             </tr>
                         </thead>
-                        <tbody id="budget-tbody">
-                            <!-- Populated dynamically via JS -->
-                        </tbody>
-                        <tfoot id="budget-tfoot">
-                            <!-- Grand Total populated dynamically via JS -->
-                        </tfoot>
+                        <tbody id="budget-tbody"></tbody>
+                        <tfoot id="budget-tfoot"></tfoot>
                     </table>
                 </section>
             </div>
@@ -223,7 +222,6 @@
 
             <!-- COMPLIANCE VIEW -->
             <div id="view-compliance" class="tab-content" style="display: none;">
-                <!-- KPI metrics for Compliance -->
                 <section class="kpi-grid">
                     <div class="kpi-card">
                         <div class="kpi-header">
@@ -251,7 +249,6 @@
                     </div>
                 </section>
 
-                <!-- Framework checklist table -->
                 <section class="data-section">
                     <div class="section-header">
                         <h3>Regulatory Framework Checklist</h3>
@@ -278,7 +275,6 @@
                     </table>
                 </section>
 
-                <!-- Automated System Controls Log -->
                 <section class="data-section" style="margin-top: 2rem;">
                     <div class="section-header">
                         <h3>Automated Security & Access Controls Log</h3>
@@ -302,5 +298,38 @@
             </div>
         </main>
     </div>
+
+    <!-- Dark Mode Handler Script -->
+    <script>
+        function toggleDarkMode() {
+          const body = document.body;
+          const themeIcon = document.getElementById('themeIcon');
+          const themeText = document.getElementById('themeText');
+          
+          body.classList.toggle('dark-mode');
+          const isDark = body.classList.contains('dark-mode');
+          
+          localStorage.setItem('auditor_portal_theme', isDark ? 'dark' : 'light');
+          
+          if (isDark) {
+            themeIcon.className = 'fa-solid fa-sun';
+            themeText.textContent = 'Light Mode';
+          } else {
+            themeIcon.className = 'fa-solid fa-moon';
+            themeText.textContent = 'Dark Mode';
+          }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+          const savedTheme = localStorage.getItem('auditor_portal_theme');
+          if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            if (themeIcon) themeIcon.className = 'fa-solid fa-sun';
+            if (themeText) themeText.textContent = 'Light Mode';
+          }
+        });
+    </script>
 </body>
 </html>
