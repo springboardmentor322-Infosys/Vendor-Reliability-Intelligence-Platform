@@ -1,11 +1,20 @@
+// vendor_script.js
 const API_BASE = "http://127.0.0.1:8000";
 let cachedOrders = [];
 let cachedInvoices = [];
-let cachedOnTimeRate = null; // Persistent store for synced delivery metric
+let cachedOnTimeRate = null;
 let trendChartInstance = null;
 let qualityChartInstance = null;
+let orderStatusChartInstance = null;
+let deptBarChartInstance = null;
+let activeVendorChatRole = null;
 
-// --- Helper: Format API/FastAPI Pydantic Error Objects into Readable Strings ---
+const initVendorName = sessionStorage.getItem("vendor_name") || localStorage.getItem("vendor_name") || "Vendor";
+let lastKnownVendorMessageCounts = {
+  "Supply Chain Manager": JSON.parse(localStorage.getItem(`vendor_chat_${initVendorName}_Supply Chain Manager`) || "[]").length,
+  "Finance Officer": JSON.parse(localStorage.getItem(`vendor_chat_${initVendorName}_Finance Officer`) || "[]").length
+};
+
 function formatApiError(errData) {
   if (!errData) return "An unknown error occurred.";
   if (Array.isArray(errData.detail)) {
@@ -21,7 +30,6 @@ function formatApiError(errData) {
   return JSON.stringify(errData);
 }
 
-// --- Helper: Flexible String Matcher to Prevent Empty Data Matches ---
 function isVendorMatch(targetVendor, currentVendor) {
   if (!targetVendor || !currentVendor) return false;
   const a = targetVendor.toString().trim().toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -29,14 +37,26 @@ function isVendorMatch(targetVendor, currentVendor) {
   return a === b || a.includes(b) || b.includes(a);
 }
 
-// --- Helper: Centralized Quality Assurance Metric Synchronizer ---
+function applyRiskColor(elementId, score, thresholds = { high: 90, medium: 75 }) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  el.classList.remove('risk-success', 'risk-warning', 'risk-danger');
+
+  if (score >= thresholds.high) {
+    el.style.color = '#10b981';
+  } else if (score >= thresholds.medium) {
+    el.style.color = '#f59e0b';
+  } else {
+    el.style.color = '#ef4444';
+  }
+}
+
 function syncQualityAssuranceMetrics(passedCount, progressCount, faultCount) {
   const totalEvaluated = passedCount + progressCount + faultCount;
   const qaPercentage = totalEvaluated > 0 ? Math.round((passedCount / totalEvaluated) * 100) : 100;
   const formattedRate = `${qaPercentage}%`;
-  const subtextText = `${faultCount} Defect Flag${faultCount === 1 ? '' : 's'}`;
 
-  // 1. Direct ID updates
   const targetIds = [
     "metric-quality-assurance",
     "breakdown-quality",
@@ -47,46 +67,19 @@ function syncQualityAssuranceMetrics(passedCount, progressCount, faultCount) {
 
   targetIds.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.textContent = formattedRate;
-  });
-
-  // 2. Class selector updates
-  document.querySelectorAll(".quality-rate-display, .quality-metric, .quality-value").forEach(el => {
-    el.textContent = formattedRate;
-  });
-
-  // 3. Smart DOM traversal fallback (searches any card header labeled "Quality Assurance")
-  const labels = document.querySelectorAll("h1, h2, h3, h4, h5, h6, div, span, p, label, .subtext, .metric-label");
-  labels.forEach(el => {
-    const txt = el.textContent ? el.textContent.trim().toLowerCase() : "";
-    if (txt === "quality assurance" || txt.startsWith("quality assurance")) {
-      const cardContainer = el.closest(".metric-card, .card, .stat-card, div") || el.parentElement;
-      if (cardContainer) {
-        // Find main percentage metric display text element within this card
-        const valEl = cardContainer.querySelector(".metric-value, .value, .number, h2, h3, strong") ||
-          Array.from(cardContainer.querySelectorAll("div, span, p, h2, h3")).find(node => 
-            node !== el && (node.textContent.includes("%") || /^\d+/.test(node.textContent.trim()))
-          );
-
-        if (valEl) {
-          valEl.textContent = formattedRate;
-        }
-
-        // Find subtext element to update defect count
-        const subEl = cardContainer.querySelector(".subtext, .card-subtext, p, span.sub") ||
-          Array.from(cardContainer.querySelectorAll("div, span, p")).find(node => 
-            node !== el && node !== valEl && node.textContent.toLowerCase().includes("defect")
-          );
-
-        if (subEl) {
-          subEl.textContent = subtextText;
-        }
+    if (el) {
+      el.textContent = formattedRate;
+      if (id === "breakdown-quality" || id === "metric-quality-assurance") {
+        applyRiskColor(id, qaPercentage, { high: 90, medium: 75 });
       }
     }
   });
+
+  document.querySelectorAll(".quality-rate-display, .quality-metric, .quality-value").forEach(el => {
+    el.textContent = formattedRate;
+  });
 }
 
-// --- Helper: Centralized & Bulletproof On-Time Delivery Rate Synchronizer ---
 function syncOnTimeDeliveryMetrics(rate) {
   if (rate !== undefined && rate !== null) {
     const numericRate = typeof rate === 'number' ? rate : parseInt(rate.toString().replace(/\D/g, ''), 10);
@@ -98,7 +91,6 @@ function syncOnTimeDeliveryMetrics(rate) {
   if (cachedOnTimeRate === null) return;
   const formattedRate = `${cachedOnTimeRate}%`;
 
-  // 1. Direct ID updates
   const targetIds = [
     "metric-ontime-rate",
     "breakdown-ontime",
@@ -110,35 +102,13 @@ function syncOnTimeDeliveryMetrics(rate) {
 
   targetIds.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.textContent = formattedRate;
-  });
-
-  // 2. Class selector updates
-  document.querySelectorAll(".ontime-rate-display, .ontime-metric, .ontime-value").forEach(el => {
-    el.textContent = formattedRate;
-  });
-
-  // 3. Smart DOM traversal fallback (searches any card header labeled "On-Time Delivery")
-  const labels = document.querySelectorAll("h1, h2, h3, h4, h5, h6, div, span, p, label, .subtext, .metric-label");
-  labels.forEach(el => {
-    const txt = el.textContent ? el.textContent.trim().toLowerCase() : "";
-    if (txt === "on-time delivery" || txt === "on-time delivery rate" || txt.startsWith("on-time delivery")) {
-      const cardContainer = el.closest(".metric-card, .card, .stat-card, div") || el.parentElement;
-      if (cardContainer) {
-        const valEl = cardContainer.querySelector(".metric-value, .value, .number, h2, h3, strong") ||
-          Array.from(cardContainer.querySelectorAll("div, span, p, h2, h3")).find(node => 
-            node !== el && (node.textContent.includes("%") || /^\d+/.test(node.textContent.trim()))
-          );
-
-        if (valEl) {
-          valEl.textContent = formattedRate;
-        }
-      }
+    if (el) {
+      el.textContent = formattedRate;
+      applyRiskColor(id, cachedOnTimeRate, { high: 90, medium: 75 });
     }
   });
 }
 
-// --- Utility: Robust Fetch with Exponential Backoff & Cache Busting ---
 async function fetchWithRetry(url, options = {}, retries = 3, delay = 200) {
   const defaultHeaders = {
     'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -194,7 +164,6 @@ function determineContractStatus(expiryDateStr, orderStatusText) {
 async function verifyVendorSession() {
   const currentUserId = sessionStorage.getItem("user_id") || localStorage.getItem("user_id");
   if (!currentUserId) {
-    console.warn("No user_id found in storage. Redirecting to login.");
     window.location.href = "../login/index.html";
     return;
   }
@@ -206,20 +175,14 @@ async function verifyVendorSession() {
     if (res.ok) {
       const data = await res.json();
       const dbUser = data.user || data;
-      
       const dbVendor = dbUser.fullname || dbUser.company_name || dbUser.username;
-      if (dbVendor) {
-        vendorName = dbVendor;
-      }
-    } else {
-      console.warn("User verification failed with status:", res.status);
+      if (dbVendor) vendorName = dbVendor;
     }
   } catch (err) {
-    console.error("Session verification network error (Is backend running?):", err);
+    console.error("Session verification network error:", err);
   }
 
   if (!vendorName) {
-    console.warn("Vendor name could not be resolved. Redirecting to login.");
     window.location.href = "../login/index.html";
     return;
   }
@@ -266,15 +229,26 @@ function switchTab(viewId, element) {
   const target = document.getElementById(viewId);
   if (target) target.classList.add('active');
 
-  // Re-sync metrics on tab switch
   syncOnTimeDeliveryMetrics();
 
   if (viewId === 'reliability-view') {
     renderCharts();
+    setTimeout(() => {
+      if (window.Chart && Chart.instances) {
+        Object.values(Chart.instances).forEach(chart => chart.resize());
+      }
+    }, 50);
   } else if (viewId === 'settings-view') {
     loadVendorProfile();
   } else if (viewId === 'notifications-view') {
     renderVendorNotifications();
+  } else if (viewId === 'communication-view') {
+    if (activeVendorChatRole) {
+      const vendorName = sessionStorage.getItem("vendor_name") || "Vendor";
+      localStorage.setItem(`vendor_unread_${vendorName}_${activeVendorChatRole}`, "0");
+    }
+    updateVendorChatBadges();
+    loadVendorPortalMessages();
   }
 }
 
@@ -291,36 +265,22 @@ async function fetchAllVendorData(forcedVendorName = null) {
       );
 
       if (currentVendorObj) {
-        if (currentVendorObj.id) {
-          sessionStorage.setItem("vendor_id_pk", currentVendorObj.id);
-        }
+        if (currentVendorObj.id) sessionStorage.setItem("vendor_id_pk", currentVendorObj.id);
         const rawScore = currentVendorObj.reliability_score ?? currentVendorObj.risk_level ?? 94;
         const numericMatch = rawScore.toString().match(/\d+/);
         let score = numericMatch ? parseInt(numericMatch[0], 10) : 94;
 
         const metricReliability = document.getElementById("metric-reliability");
         if (metricReliability) metricReliability.textContent = `${score}%`;
+        applyRiskColor("metric-reliability", score, { high: 90, medium: 75 });
 
         const breakdownRating = document.getElementById("breakdown-rating");
         if (breakdownRating) breakdownRating.textContent = `${score} / 100`;
+        applyRiskColor("breakdown-rating", score, { high: 90, medium: 75 });
 
         const vendorOnTime = currentVendorObj.on_time_rate ?? currentVendorObj.on_time_delivery;
         if (vendorOnTime !== undefined && vendorOnTime !== null) {
           syncOnTimeDeliveryMetrics(vendorOnTime);
-        }
-
-        const tierText = score >= 90 ? "Top Tier Performance" : (score >= 80 ? "Medium Risk Performance" : "Standard Performance");
-        
-        const reliabilityCard = metricReliability?.closest('.metric-card');
-        if (reliabilityCard) {
-          const sub = reliabilityCard.querySelector('.subtext');
-          if (sub) sub.textContent = tierText;
-        }
-
-        const breakdownCard = breakdownRating?.closest('.metric-card');
-        if (breakdownCard) {
-          const sub = breakdownCard.querySelector('.subtext');
-          if (sub) sub.textContent = score >= 90 ? "Grade: Excellent" : "Grade: Standard";
         }
       }
     }
@@ -329,16 +289,12 @@ async function fetchAllVendorData(forcedVendorName = null) {
     if (poRes.ok) {
       const allOrders = await poRes.json();
       cachedOrders = allOrders.filter(o => isVendorMatch(o.vendor_name, vendorName));
-    } else {
-      console.warn("Failed to fetch purchase orders. Status:", poRes.status);
     }
 
     let invRes = await fetchWithRetry(`${API_BASE}/api/v1/invoices`);
     if (invRes.ok) {
       const allInvoices = await invRes.json();
       cachedInvoices = allInvoices.filter(inv => isVendorMatch(inv.vendor_name, vendorName));
-    } else {
-      console.warn("Failed to fetch invoices. Status:", invRes.status);
     }
 
     renderDashboardData();
@@ -346,13 +302,14 @@ async function fetchAllVendorData(forcedVendorName = null) {
     renderContractsData();
     renderTransactionsData();
     renderCharts();
+    updateVendorChatBadges();
     
     const notifView = document.getElementById('notifications-view');
     if (notifView && notifView.classList.contains('active')) {
       renderVendorNotifications();
     }
   } catch (err) {
-    console.error("Error loading vendor data from DB (Check if backend server is active):", err);
+    console.error("Error loading vendor data from DB:", err);
   }
 }
 
@@ -373,7 +330,9 @@ function renderDashboardData() {
       status.includes("accepted by f.o") ||
       status.includes("accepted by fo") ||
       status.includes("rejected") || 
-      prodStatus.includes("rejected")
+      status.includes("returned") ||
+      prodStatus.includes("rejected") ||
+      prodStatus.includes("returned")
     ) {
       return false;
     }
@@ -387,14 +346,13 @@ function renderDashboardData() {
     );
   });
 
-  // --- CONTRACT TIMELINE-BASED ON-TIME DELIVERY CALCULATION ---
   let totalScorePoints = 0;
   let evaluatedOrdersCount = 0;
 
   const targetOrders = cachedOrders.filter(po => {
     const status = (po.order_status || "").toLowerCase();
     const prodStatus = (po.production_status || "").toLowerCase();
-    return !status.includes("rejected") && !prodStatus.includes("rejected");
+    return !status.includes("rejected") && !status.includes("returned") && !prodStatus.includes("rejected") && !prodStatus.includes("returned");
   });
 
   if (targetOrders.length > 0) {
@@ -431,8 +389,8 @@ function renderDashboardData() {
     : 0;
 
   const pendingTxns = cachedInvoices.filter(inv => {
-    const isRejected = (inv.status && inv.status.toLowerCase().includes("rejected")) ||
-                       (inv.order_status && inv.order_status.toLowerCase().includes("rejected"));
+    const isRejected = (inv.status && (inv.status.toLowerCase().includes("rejected") || inv.status.toLowerCase().includes("returned"))) ||
+                       (inv.order_status && (inv.order_status.toLowerCase().includes("rejected") || inv.order_status.toLowerCase().includes("returned")));
     
     const matchingPO = cachedOrders.find(po => po.invoice_no === inv.invoice_no);
     const poStatus = matchingPO ? (matchingPO.order_status || "").toLowerCase() : "";
@@ -499,6 +457,30 @@ async function handleVendorAcceptance(poId, newStatus) {
   }
 }
 
+async function reinitiateProduction(poId, invoiceNo) {
+  if (!confirm(`Do you want to re-initiate production for PO #${invoiceNo}? This will move the order back to active fulfillment.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetchWithRetry(`${API_BASE}/api/v1/purchase-orders/${poId}/progress`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ completed_units: 0, production_status: 'In Production' })
+    });
+
+    if (res.ok) {
+      alert(`PO #${invoiceNo} has been re-initiated into production.`);
+      await fetchAllVendorData();
+    } else {
+      alert("Failed to re-initiate production.");
+    }
+  } catch (err) {
+    console.error("Error re-initiating production:", err);
+    alert("Network error while updating production status.");
+  }
+}
+
 function renderVendorNotifications() {
   const container = document.getElementById('vendor-notifications-container');
   if (!container) return;
@@ -534,14 +516,14 @@ function renderVendorNotifications() {
       allNotifications.push({
         timestamp: assignTime,
         html: `
-          <div class="notification-item" style="display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid #edf2f7; align-items: flex-start;">
-            <div class="notification-icon" style="background: #e2eeff; color: #1e62c1; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fa-solid fa-cart-shopping"></i></div>
+          <div class="notification-item" style="display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border-color); align-items: flex-start;">
+            <div class="notification-icon" style="background: rgba(30, 98, 193, 0.2); color: #1e62c1; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fa-solid fa-cart-shopping"></i></div>
             <div class="notification-body" style="flex: 1;">
               <div class="notification-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                <span style="font-weight: 600; color: #2d3748; font-size: 14px;">New Order Received: #${invNo}</span>
-                <span class="notification-time" style="font-size: 12px; color: #718096;"><i class="fa-regular fa-clock"></i> ${assignFormatted}</span>
+                <span style="font-weight: 600; color: var(--text-main); font-size: 14px;">New Order Received: #${invNo}</span>
+                <span class="notification-time" style="font-size: 12px; color: var(--text-muted);"><i class="fa-regular fa-clock"></i> ${assignFormatted}</span>
               </div>
-              <div class="notification-desc" style="font-size: 13px; color: #4a5568;">Product: ${po.product_name} | Quantity: ${po.quantity} | Total Value: $${Number(po.total_value || 0).toFixed(2)}</div>
+              <div class="notification-desc" style="font-size: 13px; color: var(--text-body);">Product: ${po.product_name} | Quantity: ${po.quantity} | Total Value: $${Number(po.total_value || 0).toFixed(2)}</div>
             </div>
           </div>
         `
@@ -574,14 +556,14 @@ function renderVendorNotifications() {
       allNotifications.push({
         timestamp: payTime,
         html: `
-          <div class="notification-item" style="display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid #edf2f7; align-items: flex-start;">
-            <div class="notification-icon" style="background: #c6f6d5; color: #22543d; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fa-solid fa-receipt"></i></div>
+          <div class="notification-item" style="display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border-color); align-items: flex-start;">
+            <div class="notification-icon" style="background: rgba(34, 84, 61, 0.2); color: #22543d; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fa-solid fa-receipt"></i></div>
             <div class="notification-body" style="flex: 1;">
               <div class="notification-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                <span style="font-weight: 600; color: #2d3748; font-size: 14px;">Payment Received from F.O.: #${invNo}</span>
-                <span class="notification-time" style="font-size: 12px; color: #718096;"><i class="fa-regular fa-clock"></i> ${payFormatted}</span>
+                <span style="font-weight: 600; color: var(--text-main); font-size: 14px;">Payment Received from F.O.: #${invNo}</span>
+                <span class="notification-time" style="font-size: 12px; color: var(--text-muted);"><i class="fa-regular fa-clock"></i> ${payFormatted}</span>
               </div>
-              <div class="notification-desc" style="font-size: 13px; color: #4a5568;">Amount Paid: $${Number(inv.amount || 0).toFixed(2)} | Transaction ID: ${inv.transaction_id || 'N/A'}</div>
+              <div class="notification-desc" style="font-size: 13px; color: var(--text-body);">Amount Paid: $${Number(inv.amount || 0).toFixed(2)} | Transaction ID: ${inv.transaction_id || 'N/A'}</div>
             </div>
           </div>
         `
@@ -596,7 +578,7 @@ function renderVendorNotifications() {
   allNotifications.sort((a, b) => b.timestamp - a.timestamp);
 
   if (allNotifications.length === 0) {
-    container.innerHTML = '<div style="text-align:center; color: #718096; padding: 2rem;">No new order or payment notifications available.</div>';
+    container.innerHTML = '<div style="text-align:center; color: var(--text-muted); padding: 2rem;">No new order or payment notifications available.</div>';
   } else {
     container.innerHTML = allNotifications.map(n => n.html).join('');
   }
@@ -622,18 +604,17 @@ function renderPurchaseOrders() {
       return false;
     }
 
-    if (orderStatus.includes("rejected") || prodStatus.includes("rejected")) {
+    if (orderStatus.includes("rejected") || orderStatus.includes("returned") || prodStatus.includes("rejected") || prodStatus.includes("returned")) {
       return false;
     }
 
-    const isAccepted =
+    return (
       orderStatus.includes("accepted by vendor") ||
       orderStatus.includes("in production") ||
       orderStatus.includes("in transit") ||
       orderStatus.includes("delivered") ||
-      prodStatus.length > 0;
-
-    return isAccepted;
+      prodStatus.length > 0
+    );
   });
 
   if (activeOrders.length === 0) {
@@ -665,7 +646,6 @@ function renderPurchaseOrders() {
   });
 }
 
-// --- Export Active Purchase Orders to CSV ---
 function exportPurchaseOrders() {
   const activeOrders = cachedOrders.filter(po => {
     const orderStatus = (po.order_status || "").toLowerCase().trim();
@@ -678,7 +658,9 @@ function exportPurchaseOrders() {
       orderStatus.includes("accepted by f.o") ||
       orderStatus.includes("accepted by fo") ||
       orderStatus.includes("rejected") || 
-      prodStatus.includes("rejected")
+      orderStatus.includes("returned") ||
+      prodStatus.includes("rejected") ||
+      prodStatus.includes("returned")
     ) {
       return false;
     }
@@ -694,7 +676,7 @@ function exportPurchaseOrders() {
 
   const ordersToExport = activeOrders.length > 0 ? activeOrders : cachedOrders.filter(po => {
     const orderStatus = (po.order_status || "").toLowerCase().trim();
-    return !orderStatus.includes("rejected");
+    return !orderStatus.includes("rejected") && !orderStatus.includes("returned");
   });
 
   if (ordersToExport.length === 0) {
@@ -733,7 +715,6 @@ function exportPurchaseOrders() {
   URL.revokeObjectURL(url);
 }
 
-// --- Export Payment Transactions to CSV ---
 function exportTransactions() {
   if (!cachedInvoices || cachedInvoices.length === 0) {
     alert("No payment transactions available to export.");
@@ -777,6 +758,7 @@ function getStatusClass(status) {
   if (s.includes('quality')) return 'quality-check';
   if (s.includes('accepted') || s.includes('approved')) return 'active';
   if (s.includes('reject')) return 'rejected';
+  if (s.includes('return')) return 'returned';
   return 'in-production';
 }
 
@@ -836,11 +818,17 @@ function renderContractsData() {
   const expiredTbody = document.getElementById("expired-contracts-body");
   const rejectedTbody = document.getElementById("rejected-contracts-body");
 
-  const validOrders = cachedOrders.filter(o => !o.order_status.toLowerCase().includes("rejected"));
-  const rejectedOrders = cachedOrders.filter(o => 
-    (o.order_status && o.order_status.toLowerCase().includes("rejected")) || 
-    (o.production_status && o.production_status.toLowerCase().includes("rejected"))
-  );
+  const validOrders = cachedOrders.filter(o => {
+    const s = (o.order_status || "").toLowerCase();
+    const ps = (o.production_status || "").toLowerCase();
+    return !s.includes("rejected") && !s.includes("returned") && !ps.includes("rejected") && !ps.includes("returned");
+  });
+  
+  const rejectedOrders = cachedOrders.filter(o => {
+    const s = (o.order_status || "").toLowerCase();
+    const ps = (o.production_status || "").toLowerCase();
+    return s.includes("rejected") || s.includes("returned") || ps.includes("rejected") || ps.includes("returned");
+  });
 
   let activeList = [];
   let completedList = [];
@@ -909,8 +897,16 @@ function renderContractsData() {
 
   if (rejectedTbody) {
     rejectedTbody.innerHTML = rejectedOrders.length === 0 
-      ? '<tr class="empty-row"><td colspan="8">No rejected contracts recorded.</td></tr>' 
-      : rejectedOrders.map(o => `
+      ? '<tr class="empty-row"><td colspan="8">No rejected or returned contracts recorded.</td></tr>' 
+      : rejectedOrders.map(o => {
+        const orderStatusText = (o.order_status || "").toLowerCase();
+        const prodStatusText = (o.production_status || "").toLowerCase();
+        const isReturned = orderStatusText.includes("returned") || prodStatusText.includes("returned");
+        
+        const statusLabel = isReturned ? "Returned" : "Rejected";
+        const badgeClass = isReturned ? "status returned" : "status rejected";
+
+        return `
         <tr>
           <td><strong>#${o.invoice_no}</strong></td>
           <td>${o.vendor_name}</td>
@@ -918,9 +914,15 @@ function renderContractsData() {
           <td>${o.creation_date}</td>
           <td>${o.expiry_date}</td>
           <td>$${Number(o.total_value || 0).toFixed(2)}</td>
-          <td><span class="status rejected">Rejected</span></td>
-          <td><button class="btn-action" onclick="showContractDetails('${o.invoice_no}')">Details</button></td>
-        </tr>`).join('');
+          <td><span class="${badgeClass}">${statusLabel}</span></td>
+          <td>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn-action" onclick="showContractDetails('${o.invoice_no}')">Details</button>
+              ${isReturned ? `<button class="btn-accept" style="padding: 6px 12px; font-size: 11px;" onclick="reinitiateProduction(${o.id}, '${o.invoice_no}')">Re-initiate</button>` : ''}
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
   }
 }
 
@@ -995,9 +997,7 @@ async function loadVendorProfile() {
     const currentVendor = vendors.find(v => isVendorMatch(v.vendor_name, vendorName));
 
     if (currentVendor) {
-      if (currentVendor.id) {
-        sessionStorage.setItem("vendor_id_pk", currentVendor.id);
-      }
+      if (currentVendor.id) sessionStorage.getItem("vendor_id_pk", currentVendor.id);
       if (document.getElementById("setting-contact-email")) {
         document.getElementById("setting-contact-email").value = currentVendor.email || "";
       }
@@ -1068,11 +1068,270 @@ async function saveProfileSettings(e) {
   }
 }
 
+// --- Vendor Communication Portal Role-Based Chat Handlers with Unread Badges ---
+function selectVendorChatRole(roleName) {
+  activeVendorChatRole = roleName;
+  
+  const vendorName = sessionStorage.getItem("vendor_name") || "Vendor";
+  // Explicitly clear unread count in localStorage and update tracking baseline
+  localStorage.setItem(`vendor_unread_${vendorName}_${roleName}`, "0");
+  const storageKey = `vendor_chat_${vendorName}_${roleName}`;
+  const messages = JSON.parse(localStorage.getItem(storageKey) || "[]");
+  lastKnownVendorMessageCounts[roleName] = messages.length;
+
+  updateVendorChatBadges();
+
+  const titleEl = document.getElementById("vendor-active-chat-title");
+  const subEl = document.getElementById("vendor-active-chat-sub");
+  if (titleEl) titleEl.textContent = `Chat with ${roleName}`;
+  if (subEl) subEl.textContent = `Direct secure communication channel`;
+
+  const supplyCard = document.getElementById("contact-supply-chain");
+  const financeCard = document.getElementById("contact-finance-officer");
+
+  if (supplyCard && financeCard) {
+    if (roleName === 'Supply Chain Manager') {
+      supplyCard.style.background = 'rgba(139, 92, 246, 0.2)';
+      supplyCard.style.borderColor = '#8b5cf6';
+      financeCard.style.background = 'var(--input-bg)';
+      financeCard.style.borderColor = 'var(--border-color)';
+    } else {
+      financeCard.style.background = 'rgba(16, 185, 129, 0.2)';
+      financeCard.style.borderColor = '#10b981';
+      supplyCard.style.background = 'var(--input-bg)';
+      supplyCard.style.borderColor = 'var(--border-color)';
+    }
+  }
+
+  loadVendorPortalMessages();
+}
+
+function updateVendorChatBadges() {
+  const vendorName = sessionStorage.getItem("vendor_name") || "Vendor";
+  const roles = ["Supply Chain Manager", "Finance Officer"];
+
+  roles.forEach(roleName => {
+    const storageKey = `vendor_chat_${vendorName}_${roleName}`;
+    const messages = JSON.parse(localStorage.getItem(storageKey) || "[]");
+    const totalMsgs = messages.length;
+
+    if (totalMsgs > lastKnownVendorMessageCounts[roleName]) {
+      const diff = totalMsgs - lastKnownVendorMessageCounts[roleName];
+      lastKnownVendorMessageCounts[roleName] = totalMsgs;
+
+      if (activeVendorChatRole !== roleName) {
+        const unreadKey = `vendor_unread_${vendorName}_${roleName}`;
+        let currentUnread = parseInt(localStorage.getItem(unreadKey) || "0", 10);
+        localStorage.setItem(unreadKey, currentUnread + diff);
+      }
+    }
+  });
+
+  const supplyUnread = parseInt(localStorage.getItem(`vendor_unread_${vendorName}_Supply Chain Manager`) || "0", 10);
+  const financeUnread = parseInt(localStorage.getItem(`vendor_unread_${vendorName}_Finance Officer`) || "0", 10);
+
+  const supplyBadge = document.getElementById("badge-supply-chain");
+  const financeBadge = document.getElementById("badge-finance-officer");
+
+  if (supplyBadge) {
+    if (supplyUnread > 0 && activeVendorChatRole !== 'Supply Chain Manager') {
+      supplyBadge.style.display = 'inline-block';
+      supplyBadge.textContent = supplyUnread > 9 ? '9+' : supplyUnread;
+    } else {
+      supplyBadge.style.display = 'none';
+    }
+  }
+
+  if (financeBadge) {
+    if (financeUnread > 0 && activeVendorChatRole !== 'Finance Officer') {
+      financeBadge.style.display = 'inline-block';
+      financeBadge.textContent = financeUnread > 9 ? '9+' : financeUnread;
+    } else {
+      financeBadge.style.display = 'none';
+    }
+  }
+}
+
+function clearVendorChat() {
+  if (!activeVendorChatRole) {
+    alert("Please select a department contact first.");
+    return;
+  }
+  
+  const vendorName = sessionStorage.getItem("vendor_name") || "Vendor";
+  if (confirm(`Are you sure you want to clear the chat history with ${activeVendorChatRole}?`)) {
+    const storageKey = `vendor_chat_${vendorName}_${activeVendorChatRole}`;
+    localStorage.removeItem(storageKey);
+
+    if (activeVendorChatRole === 'Supply Chain Manager') {
+      localStorage.removeItem(`supply_chain_chat_${vendorName}`);
+    } else if (activeVendorChatRole === 'Finance Officer') {
+      localStorage.removeItem(`finance_chain_chat_${vendorName}`);
+    }
+
+    localStorage.setItem(`vendor_unread_${vendorName}_${activeVendorChatRole}`, "0");
+    lastKnownVendorMessageCounts[activeVendorChatRole] = 0;
+    loadVendorPortalMessages();
+    updateVendorChatBadges();
+  }
+}
+
+function loadVendorPortalMessages() {
+  const container = document.getElementById("vendor-chat-messages-container");
+  if (!container) return;
+
+  if (!activeVendorChatRole) {
+    container.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); text-align: center; padding: 2rem;">
+        <i class="fa-regular fa-comments" style="font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+        <p style="font-size: 14px;">Please select either Supply Chain Manager or Finance Officer from the right panel.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const vendorName = sessionStorage.getItem("vendor_name") || "Vendor";
+  const storageKey = `vendor_chat_${vendorName}_${activeVendorChatRole}`;
+  const savedMessages = JSON.parse(localStorage.getItem(storageKey) || "[]");
+
+  let historyHTML = `
+    <div style="display: flex; flex-direction: column; align-items: flex-start; max-width: 80%;">
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px; padding-left: 4px;">System Desk • Secure Channel</div>
+      <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 16px; border-top-left-radius: 4px; font-size: 14px; color: var(--text-main); line-height: 1.5;">
+        Secure conversation started with <strong>${activeVendorChatRole}</strong>.
+      </div>
+    </div>
+  `;
+
+  savedMessages.forEach(msg => {
+    const timeFormatted = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    if (msg.sender === 'vendor') {
+      historyHTML += `
+        <div style="display: flex; flex-direction: column; align-items: flex-end; align-self: flex-end; max-width: 80%;">
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px; padding-right: 4px;">You • ${timeFormatted}</div>
+          <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.85), rgba(236, 72, 153, 0.85)); color: #ffffff; padding: 12px 16px; border-radius: 16px; border-top-right-radius: 4px; font-size: 14px; line-height: 1.5; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);">
+            ${escapeHtml(msg.text)}
+          </div>
+        </div>
+      `;
+    } else {
+      historyHTML += `
+        <div style="display: flex; flex-direction: column; align-items: flex-start; max-width: 80%;">
+          <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px; padding-left: 4px;">${activeVendorChatRole} • ${timeFormatted}</div>
+          <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 12px 16px; border-radius: 16px; border-top-left-radius: 4px; font-size: 14px; color: var(--text-main); line-height: 1.5;">
+            ${escapeHtml(msg.text)}
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  container.innerHTML = historyHTML;
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendVendorPortalMessage(event) {
+  if (event) event.preventDefault();
+  if (!activeVendorChatRole) {
+    alert("Please select a department contact (Supply Chain Manager or Finance Officer) first.");
+    return;
+  }
+
+  const inputEl = document.getElementById("vendor-chat-input-message");
+  if (!inputEl) return;
+
+  const text = inputEl.value.trim();
+  if (!text) return;
+
+  const vendorName = sessionStorage.getItem("vendor_name") || "Vendor";
+  const storageKey = `vendor_chat_${vendorName}_${activeVendorChatRole}`;
+  let savedMessages = JSON.parse(localStorage.getItem(storageKey) || "[]");
+
+  const newMsg = { sender: 'vendor', text, timestamp: Date.now() };
+  savedMessages.push(newMsg);
+  localStorage.setItem(storageKey, JSON.stringify(savedMessages));
+
+  if (activeVendorChatRole === 'Supply Chain Manager') {
+    const supplyKey = `supply_chain_chat_${vendorName}`;
+    let supplyChatHistory = JSON.parse(localStorage.getItem(supplyKey) || "[]");
+    supplyChatHistory.push({ sender: 'vendor', senderName: vendorName, text, timestamp: Date.now() });
+    localStorage.setItem(supplyKey, JSON.stringify(supplyChatHistory));
+  } else if (activeVendorChatRole === 'Finance Officer') {
+    const financeKey = `finance_chain_chat_${vendorName}`;
+    let financeChatHistory = JSON.parse(localStorage.getItem(financeKey) || "[]");
+    financeChatHistory.push({ sender: 'vendor', senderName: vendorName, text, timestamp: Date.now() });
+    localStorage.setItem(financeKey, JSON.stringify(financeChatHistory));
+  }
+
+  lastKnownVendorMessageCounts[activeVendorChatRole] = savedMessages.length;
+
+  inputEl.value = "";
+  loadVendorPortalMessages();
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function updateDynamicAnalytics() {
+  if (!cachedOrders || cachedOrders.length === 0) return;
+
+  let totalOrders = cachedOrders.length;
+  let onTimeCount = 0;
+  let totalAcceptanceDelayHours = 0;
+  let acceptedOrdersCount = 0;
+
+  cachedOrders.forEach(po => {
+    if (po.expiry_date) {
+      const expiry = new Date(po.expiry_date.split('T')[0]);
+      const checkDate = po.actual_delivery_date ? new Date(po.actual_delivery_date.split('T')[0]) : new Date();
+      if (checkDate <= expiry) {
+        onTimeCount++;
+      }
+    } else {
+      onTimeCount++;
+    }
+
+    if (po.creation_date) {
+      const created = new Date(po.creation_date);
+      if (!isNaN(created.getTime())) {
+        totalAcceptanceDelayHours += 2.4;
+        acceptedOrdersCount++;
+      }
+    }
+  });
+
+  const slaRate = Math.round((onTimeCount / totalOrders) * 100);
+  const avgHours = acceptedOrdersCount > 0 ? (totalAcceptanceDelayHours / acceptedOrdersCount).toFixed(1) : "1.5";
+
+  const slaTextEl = document.getElementById("dyn-sla-rate");
+  const slaBarEl = document.getElementById("dyn-sla-bar");
+  const responseEl = document.getElementById("dyn-response-time");
+
+  if (slaTextEl) {
+    slaTextEl.textContent = `${slaRate}%`;
+    if (slaRate >= 90) slaTextEl.style.color = '#10b981';
+    else if (slaRate >= 75) slaTextEl.style.color = '#f59e0b';
+    else slaTextEl.style.color = '#ef4444';
+  }
+
+  if (slaBarEl) {
+    slaBarEl.style.width = `${slaRate}%`;
+    slaBarEl.style.background = slaRate >= 90 ? '#10b981' : (slaRate >= 75 ? '#f59e0b' : '#ef4444');
+  }
+
+  if (responseEl) {
+    responseEl.textContent = `${avgHours} hours avg.`;
+  }
+}
+
 function renderCharts() {
   syncOnTimeDeliveryMetrics();
 
   const trendCtx = document.getElementById('performanceTrendChart')?.getContext('2d');
   const qualityCtx = document.getElementById('qualityPieChart')?.getContext('2d');
+  const orderStatusCtx = document.getElementById('orderStatusColumnChart')?.getContext('2d');
+  const deptBarCtx = document.getElementById('deptVolumeBarChart')?.getContext('2d');
 
   const currentMetricText = document.getElementById("metric-reliability")?.textContent || "94%";
   const activeScore = parseInt(currentMetricText.replace(/\D/g, ''), 10) || 94;
@@ -1098,18 +1357,22 @@ function renderCharts() {
           datasets: [{ 
             label: 'Reliability Score (%)', 
             data: reliabilityValues, 
-            borderColor: '#1e62c1', 
-            backgroundColor: 'rgba(30, 98, 193, 0.1)',
+            borderColor: '#8b5cf6', 
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
             fill: true,
             tension: 0.3
           }]
         },
-        options: { responsive: true, maintainAspectRatio: false, animation: false }
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
+          animation: false,
+          plugins: { legend: { display: true, position: 'top' } }
+        }
       });
     }
   }
 
-  // --- ORDER QUALITY RATIO COUNTS ---
   let passedCount = 0;
   let progressCount = 0;
   let faultCount = 0;
@@ -1129,7 +1392,6 @@ function renderCharts() {
     passedCount = cachedOrders.length > 0 ? cachedOrders.length : 1;
   }
 
-  // Synchronize Quality Assurance percentage card with the chart counts
   syncQualityAssuranceMetrics(passedCount, progressCount, faultCount);
 
   if (qualityCtx) {
@@ -1143,13 +1405,123 @@ function renderCharts() {
           labels: ['Passed Quality', 'In Progress', 'Defect Flagged'], 
           datasets: [{ 
             data: [passedCount, progressCount, faultCount], 
-            backgroundColor: ['#38a169', '#d69e2e', '#e53e3e'] 
+            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'] 
           }] 
         },
-        options: { responsive: true, maintainAspectRatio: false, animation: false }
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
+          animation: false,
+          plugins: { legend: { display: true, position: 'bottom' } }
+        }
       });
     }
   }
+
+  let deliveredOrders = 0;
+  let inProductionOrders = 0;
+  let transitOrders = 0;
+  let pendingOrdersCount = 0;
+
+  cachedOrders.forEach(po => {
+    const status = (po.production_status || po.order_status || "").toLowerCase();
+    if (status.includes('delivered')) deliveredOrders++;
+    else if (status.includes('transit')) transitOrders++;
+    else if (status.includes('pending') || status.includes('awaiting')) pendingOrdersCount++;
+    else inProductionOrders++;
+  });
+
+  if (orderStatusCtx) {
+    if (orderStatusChartInstance) {
+      orderStatusChartInstance.data.datasets[0].data = [deliveredOrders, inProductionOrders, transitOrders, pendingOrdersCount];
+      orderStatusChartInstance.update();
+    } else {
+      orderStatusChartInstance = new Chart(orderStatusCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Delivered', 'In Production', 'In Transit', 'Pending'],
+          datasets: [{
+            label: 'Orders Count',
+            data: [deliveredOrders, inProductionOrders, transitOrders, pendingOrdersCount],
+            backgroundColor: '#3b82f6',
+            borderRadius: 6
+          }]
+        },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
+          animation: false,
+          plugins: { legend: { display: true, position: 'top' } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+      });
+    }
+  }
+
+  const deptCounts = {};
+  cachedOrders.forEach(po => {
+    const dept = po.department || 'General';
+    deptCounts[dept] = (deptCounts[dept] || 0) + 1;
+  });
+
+  const deptLabels = Object.keys(deptCounts).length > 0 ? Object.keys(deptCounts) : ['No Departments'];
+  const deptDataValues = Object.keys(deptCounts).length > 0 ? Object.values(deptCounts) : [0];
+
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  const radarGridColor = isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)';
+  const radarTextColor = isDarkMode ? '#94a3b8' : '#64748b';
+
+  if (deptBarCtx) {
+    if (deptBarChartInstance) {
+      deptBarChartInstance.data.labels = deptLabels;
+      deptBarChartInstance.data.datasets[0].data = deptDataValues;
+      deptBarChartInstance.options.scales.r.grid.color = radarGridColor;
+      deptBarChartInstance.options.scales.r.angleLines.color = radarGridColor;
+      deptBarChartInstance.options.scales.r.pointLabels.color = radarTextColor;
+      deptBarChartInstance.update();
+    } else {
+      deptBarChartInstance = new Chart(deptBarCtx, {
+        type: 'radar',
+        data: {
+          labels: deptLabels,
+          datasets: [{
+            label: 'Order Volumes by Department',
+            data: deptDataValues,
+            backgroundColor: 'rgba(139, 92, 246, 0.25)',
+            borderColor: '#8b5cf6',
+            pointBackgroundColor: '#8b5cf6',
+            pointBorderColor: '#ffffff',
+            pointHoverBackgroundColor: '#ffffff',
+            pointHoverBorderColor: '#8b5cf6',
+            borderWidth: 2
+          }]
+        },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
+          animation: false,
+          plugins: { 
+            legend: { 
+              display: true, 
+              position: 'top',
+              labels: { boxWidth: 12, padding: 16, color: isDarkMode ? '#f8fafc' : '#0f172a' }
+            } 
+          },
+          scales: { 
+            r: { 
+              beginAtZero: true,
+              ticks: { precision: 0, backdropColor: 'transparent', color: radarTextColor },
+              pointLabels: { font: { size: 12, weight: '600' }, color: radarTextColor },
+              grid: { color: radarGridColor },
+              angleLines: { color: radarGridColor }
+            } 
+          }
+        }
+      });
+    }
+  }
+
+  updateDynamicAnalytics();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -1186,6 +1558,11 @@ setInterval(() => {
       const notifView = document.getElementById("notifications-view");
       if (notifView && notifView.classList.contains("active")) {
         renderVendorNotifications();
+      }
+      const commView = document.getElementById("communication-view");
+      if (commView && commView.classList.contains("active")) {
+        loadVendorPortalMessages();
+        updateVendorChatBadges();
       }
     }).catch(err => console.error("Vendor background poll error:", err));
   }
