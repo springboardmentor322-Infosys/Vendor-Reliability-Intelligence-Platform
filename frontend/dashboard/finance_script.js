@@ -1,8 +1,13 @@
+// finance_script.js
 const API_BASE = "http://127.0.0.1:8000";
 
 let vendorRowCount = 0;
+let deptBarChartInstance = null;
+let vendorShareChartInstance = null;
+let activeFinanceChatVendor = null;
+let lastKnownFinanceMessageCounts = {};
+let globalVendorTotalsCache = {};
 
-// Department Budget Tracking Cache (with LocalStorage Persistence Support)
 const defaultBudgetData = {
     "Software Development": { total: 150000, allocated: 120000, spent: 0 },
     "HR": { total: 50000, allocated: 40000, spent: 0 },
@@ -22,7 +27,6 @@ if (savedBudgets) {
     }
 }
 
-// --- 1. SESSION VERIFICATION & LOGOUT ---
 async function verifyFinanceSession() {
     const currentUserId = sessionStorage.getItem("user_id") || localStorage.getItem("user_id");
     if (!currentUserId) {
@@ -65,7 +69,6 @@ function formatCurrency(amount) {
     return '$' + Number(amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// --- Helper: Badge Class Generator for Order Status ---
 function getOrderStatusBadgeClass(status) {
     if (!status) return "badge-transit";
     const s = status.toLowerCase();
@@ -78,7 +81,6 @@ function getOrderStatusBadgeClass(status) {
     return "badge-transit";
 }
 
-// --- 2. TAB SWITCHING LOGIC ---
 function switchTab(event, viewId) {
     if (event) event.preventDefault();
 
@@ -105,10 +107,15 @@ function switchTab(event, viewId) {
         renderSettingsBudgetControls();
     } else if (viewId === 'view-budget') {
         renderBudgetTable();
+    } else if (viewId === 'view-communication') {
+        if (activeFinanceChatVendor) {
+            localStorage.setItem(`finance_unread_${activeFinanceChatVendor}`, "0");
+        }
+        loadFinanceCommunicationVendors();
+        loadFinanceMessages();
     }
 }
 
-// --- 3. BACKEND DATA FETCHING & UI POPULATION ---
 async function loadInvoicesFromDB() {
     try {
         const res = await fetch(`${API_BASE}/api/v1/invoices`);
@@ -169,7 +176,6 @@ async function loadInvoicesFromDB() {
             }
         });
 
-        // PERSIST UPDATED SPENT AMOUNTS TO LOCALSTORAGE FOR AUDITOR DASHBOARD SYNC
         localStorage.setItem('finance_budget_data', JSON.stringify(budgetData));
 
         const pendingTbody = document.getElementById('invoice-tbody');
@@ -258,9 +264,7 @@ async function loadInvoicesFromDB() {
             if (approvedInvoices.length === 0) {
                 vendorTbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">No approved vendor orders. Approve an invoice in the Dashboard tab to populate this list.</td></tr>';
             } else {
-                vendorRowCount = 0;
                 approvedInvoices.forEach(inv => {
-                    vendorRowCount++;
                     const payCellId = `pay-cell-${inv.id}`;
                     const txCellId = `tx-cell-${inv.id}`;
 
@@ -270,16 +274,11 @@ async function loadInvoicesFromDB() {
                     const inspectionStatus = inv.inspection_status || inv.quality_status || 'In Progress';
                     const paymentStatus = inv.payment_status || 'Unpaid';
 
-                    let inspectionBadge = '';
                     let canPay = true;
-
                     if (inspectionStatus === 'Checked' || inspectionStatus === 'Passed') {
-                        inspectionBadge = '<span class="badge badge-quality-checked"><i class="fa-solid fa-circle-check"></i> Checked</span>';
                         canPay = true;
                     } else if (inspectionStatus === 'Fault' || inspectionStatus === 'Failed') {
-                        inspectionBadge = '<span class="badge badge-quality-fault"><i class="fa-solid fa-triangle-exclamation"></i> Fault</span>';
-                    } else {
-                        inspectionBadge = '<span class="badge badge-quality-progress"><i class="fa-solid fa-spinner fa-spin"></i> In Progress</span>';
+                        canPay = false;
                     }
 
                     let paymentHTML = '';
@@ -297,7 +296,7 @@ async function loadInvoicesFromDB() {
                         <td>${inv.vendor_name}</td>
                         <td>${inv.product_name}</td>
                         <td><span class="badge ${orderBadgeClass}">${currentOrderStatus}</span></td>
-                        <td>${inspectionBadge}</td>
+                        <td>${inspectionStatus}</td>
                         <td id="${payCellId}">${paymentHTML}</td>
                         <td id="${txCellId}" style="color: var(--text-muted); font-family: monospace;">${inv.transaction_id || '-'}</td>
                     `;
@@ -314,7 +313,6 @@ async function loadInvoicesFromDB() {
     }
 }
 
-// --- 4. KPI CARDS UPDATER ---
 function updateDashboardKPIs(pending, approved, rejected) {
     const totalSpend = approved.reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
 
@@ -329,7 +327,6 @@ function updateDashboardKPIs(pending, approved, rejected) {
     if (rejectedEl) rejectedEl.innerText = rejected.length;
 }
 
-// --- 5. ACTION HANDLERS ---
 async function approveInvoiceDB(invoiceId) {
     try {
         const res = await fetch(`${API_BASE}/api/v1/invoices/${invoiceId}/status`, {
@@ -402,7 +399,6 @@ async function processPayment(payCellId, txCellId, invId) {
     }
 }
 
-// --- 6. BUDGET & ALLOCATION VIEWS & EXTRACT ---
 function renderBudgetTable() {
     const tbody = document.getElementById('budget-tbody');
     const tfoot = document.getElementById('budget-tfoot');
@@ -473,46 +469,22 @@ function extractBudgetReport() {
 async function extractVendorOrdersReport() {
     try {
         const res = await fetch(`${API_BASE}/api/v1/invoices`);
-        if (!res.ok) {
-            alert("Failed to fetch invoices. Server returned status: " + res.status);
-            return;
-        }
-        
+        if (!res.ok) return;
         const rawData = await res.json();
-        console.log("RAW API RESPONSE FOR INVOICES:", rawData);
-
-        let invoices = [];
-        if (Array.isArray(rawData)) {
-            invoices = rawData;
-        } else if (rawData && typeof rawData === 'object') {
-            invoices = rawData.data || rawData.invoices || rawData.results || Object.values(rawData).find(val => Array.isArray(val)) || [];
-        }
-
-        if (!invoices || invoices.length === 0) {
-            alert("The database returned 0 invoices. There is no data to export.");
-            return;
-        }
+        let invoices = Array.isArray(rawData) ? rawData : (rawData.data || rawData.invoices || []);
 
         let csvRows = [];
         csvRows.push(["Inv No", "Vendor", "Product Name", "Order Status", "Inspection", "Payment", "Transaction ID"].join(","));
 
         invoices.forEach((inv, index) => {
-            const invNo = inv.invoice_no || inv.invoiceNumber || inv.id || `INV-${index + 1}`;
-            const vendor = inv.vendor_name || inv.vendor || inv.supplier || "Unknown";
-            const product = inv.product_name || inv.product || inv.item || "Unknown";
-            const orderStatus = inv.order_status || inv.status || inv.delivery_status || "In Production";
-            const inspection = inv.inspection_status || inv.quality_status || "In Progress";
-            const payment = inv.payment_status || inv.payment || "Unpaid";
-            const txId = inv.transaction_id || inv.txnId || "-";
-
             const row = [
-                `"#${invNo}"`,
-                `"${String(vendor).replace(/"/g, '""')}"`,
-                `"${String(product).replace(/"/g, '""')}"`,
-                `"${orderStatus}"`,
-                `"${inspection}"`,
-                `"${payment}"`,
-                `"${txId}"`
+                `"#${inv.invoice_no || index}"`,
+                `"${(inv.vendor_name || "").replace(/"/g, '""')}"`,
+                `"${(inv.product_name || "").replace(/"/g, '""')}"`,
+                `"${inv.order_status || 'In Production'}"`,
+                `"${inv.inspection_status || 'In Progress'}"`,
+                `"${inv.payment_status || 'Unpaid'}"`,
+                `"${inv.transaction_id || '-'}"`
             ];
             csvRows.push(row.join(","));
         });
@@ -528,10 +500,8 @@ async function extractVendorOrdersReport() {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-
     } catch (err) {
-        console.error("Error extracting vendor orders report:", err);
-        alert("Error: " + err.message);
+        console.error("Error exporting report:", err);
     }
 }
 
@@ -554,7 +524,7 @@ function renderSettingsBudgetControls() {
                 <input type="number" class="input-inline" value="${data.allocated}" onchange="updateDepartmentBudget('${dept}', 'allocated', this.value)">
             </td>
             <td style="color: var(--text-muted);">${formatCurrency(data.spent)}</td>
-            <td id="settings-rem-${dept.replace(/\s+/g, '')}" style="color: ${remaining < 0 ? 'var(--danger)' : 'inherit'}; font-weight: 600;">
+            <td style="color: ${remaining < 0 ? 'var(--danger)' : 'inherit'}; font-weight: 600;">
                 ${formatCurrency(remaining)}
             </td>
         `;
@@ -566,16 +536,215 @@ function updateDepartmentBudget(dept, field, value) {
     const numVal = parseFloat(value) || 0;
     if (budgetData[dept]) {
         budgetData[dept][field] = numVal;
-        
-        // Persist the updated state to localStorage so it stays after a refresh
         localStorage.setItem('finance_budget_data', JSON.stringify(budgetData));
-
         renderBudgetTable();
         renderSettingsBudgetControls();
     }
 }
 
-// --- 7. ANALYTICS VIEW RENDERER ---
+// --- Finance Communication Chat Handlers with Global Multi-Vendor Unread Tracking ---
+async function loadFinanceCommunicationVendors() {
+    const listContainer = document.getElementById("finance-vendor-channels-list");
+    if (!listContainer) return;
+
+    try {
+        const res = await fetch(`${API_BASE}/api/v1/vendors`);
+        if (!res.ok) return;
+        const vendors = await res.json();
+
+        if (vendors.length === 0) {
+            listContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem; font-size: 0.85rem;">No vendors found.</p>';
+            return;
+        }
+
+        vendors.forEach(v => {
+            const name = v.vendor_name;
+            if (!name) return;
+
+            const storageKey = `finance_chain_chat_${name}`;
+            const messages = JSON.parse(localStorage.getItem(storageKey) || "[]");
+            const totalMsgs = messages.length;
+
+            if (lastKnownFinanceMessageCounts[name] === undefined) {
+                lastKnownFinanceMessageCounts[name] = totalMsgs;
+            } else if (totalMsgs > lastKnownFinanceMessageCounts[name]) {
+                const diff = totalMsgs - lastKnownFinanceMessageCounts[name];
+                lastKnownFinanceMessageCounts[name] = totalMsgs;
+
+                if (activeFinanceChatVendor !== name) {
+                    const unreadKey = `finance_unread_${name}`;
+                    let currentUnread = parseInt(localStorage.getItem(unreadKey) || "0", 10);
+                    localStorage.setItem(unreadKey, currentUnread + diff);
+                }
+            }
+        });
+
+        renderFinanceVendorChannelList(vendors);
+    } catch (err) {
+        console.error("Failed to load communication vendors for finance:", err);
+    }
+}
+
+function renderFinanceVendorChannelList(vendors) {
+    const listContainer = document.getElementById("finance-vendor-channels-list");
+    if (!listContainer) return;
+
+    const searchTerm = (document.getElementById("finance-vendor-search-input")?.value || "").toLowerCase();
+    const filtered = vendors.filter(v => (v.vendor_name || "").toLowerCase().includes(searchTerm));
+
+    if (filtered.length === 0) {
+        listContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem; font-size: 0.85rem;">No matching vendors found.</p>';
+        return;
+    }
+
+    listContainer.innerHTML = filtered.map(v => {
+        const name = v.vendor_name || 'Unknown Vendor';
+        const category = v.category || 'General';
+        const isSelected = activeFinanceChatVendor === name;
+        const bgStyle = isSelected ? 'background: rgba(139, 92, 246, 0.2); border-color: rgba(139, 92, 246, 0.5);' : 'background: rgba(255, 255, 255, 0.05); border-color: var(--border);';
+
+        const unreadKey = `finance_unread_${name}`;
+        const unreadCount = parseInt(localStorage.getItem(unreadKey) || "0", 10);
+        const badgeHTML = (unreadCount > 0 && !isSelected) ? `<span style="background: #ef4444; color: white; border-radius: 50px; padding: 2px 8px; font-size: 10px; font-weight: 700;">${unreadCount > 9 ? '9+' : unreadCount}</span>` : '';
+
+        return `
+            <div onclick="selectFinanceVendorChat('${name.replace(/'/g, "\\'")}')" style="${bgStyle} padding: 12px 14px; border-radius: 12px; border: 1px solid; cursor: pointer; transition: all 0.2s ease; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong style="display: block; color: var(--text-dark); font-size: 0.9rem; margin-bottom: 2px;">${name}</strong>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Category: ${category}</span>
+                </div>
+                ${badgeHTML}
+            </div>
+        `;
+    }).join('');
+}
+
+function filterFinanceVendorChannels() {
+    fetch(`${API_BASE}/api/v1/vendors`)
+        .then(res => res.json())
+        .then(vendors => renderFinanceVendorChannelList(vendors))
+        .catch(() => {});
+}
+
+function selectFinanceVendorChat(vendorName) {
+    activeFinanceChatVendor = vendorName;
+    
+    // Clear unread count when chat is opened
+    localStorage.setItem(`finance_unread_${vendorName}`, "0");
+    
+    const titleEl = document.getElementById("finance-active-chat-vendor-title");
+    const subEl = document.getElementById("finance-active-chat-vendor-sub");
+    if (titleEl) titleEl.textContent = `Chat with ${vendorName}`;
+    if (subEl) subEl.textContent = `Direct secure financial stream`;
+
+    loadFinanceMessages();
+    loadFinanceCommunicationVendors();
+}
+
+function clearFinanceChat() {
+    if (!activeFinanceChatVendor) {
+        alert("Please select a vendor channel first.");
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to clear the chat history with ${activeFinanceChatVendor}?`)) {
+        const storageKey = `finance_chain_chat_${activeFinanceChatVendor}`;
+        localStorage.removeItem(storageKey);
+        localStorage.removeItem(`vendor_chat_${activeFinanceChatVendor}_Finance Officer`);
+        localStorage.setItem(`finance_unread_${activeFinanceChatVendor}`, "0");
+
+        loadFinanceMessages();
+        loadFinanceCommunicationVendors();
+    }
+}
+
+function loadFinanceMessages() {
+    const container = document.getElementById("finance-chat-container");
+    if (!container) return;
+
+    if (!activeFinanceChatVendor) {
+        container.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); text-align: center; padding: 2rem;">
+                <i class="fa-regular fa-comments" style="font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p style="font-size: 0.9rem;">Please select a vendor from the right panel to view and send financial messages.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const storageKey = `finance_chain_chat_${activeFinanceChatVendor}`;
+    const savedMessages = JSON.parse(localStorage.getItem(storageKey) || "[]");
+
+    let historyHTML = `
+        <div style="display: flex; flex-direction: column; align-items: flex-start; max-width: 80%;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; padding-left: 4px;">System Desk • Secure Channel</div>
+            <div style="background: rgba(255, 255, 255, 0.15); border: 1px solid var(--border); padding: 12px 16px; border-radius: 16px; border-top-left-radius: 4px; font-size: 0.9rem; color: var(--text-dark); line-height: 1.5;">
+                Started secure financial conversation thread with <strong>${activeFinanceChatVendor}</strong>.
+            </div>
+        </div>
+    `;
+
+    savedMessages.forEach(msg => {
+        const timeFormatted = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        if (msg.sender === 'finance') {
+            historyHTML += `
+                <div style="display: flex; flex-direction: column; align-items: flex-end; align-self: flex-end; max-width: 80%;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; padding-right: 4px;">Finance Officer • ${timeFormatted}</div>
+                    <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.85), rgba(236, 72, 153, 0.85)); color: #ffffff; padding: 12px 16px; border-radius: 16px; border-top-right-radius: 4px; font-size: 0.9rem; line-height: 1.5; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);">
+                        ${escapeHtml(msg.text)}
+                    </div>
+                </div>
+            `;
+        } else {
+            historyHTML += `
+                <div style="display: flex; flex-direction: column; align-items: flex-start; max-width: 80%;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; padding-left: 4px;">${activeFinanceChatVendor} • ${timeFormatted}</div>
+                    <div style="background: rgba(255, 255, 255, 0.15); border: 1px solid var(--border); padding: 12px 16px; border-radius: 16px; border-top-left-radius: 4px; font-size: 0.9rem; color: var(--text-dark); line-height: 1.5;">
+                        ${escapeHtml(msg.text)}
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    container.innerHTML = historyHTML;
+    container.scrollTop = container.scrollHeight;
+}
+
+function sendFinanceMessage(event) {
+    if (event) event.preventDefault();
+    if (!activeFinanceChatVendor) {
+        alert("Please select a vendor from the right panel first.");
+        return;
+    }
+
+    const inputEl = document.getElementById("finance-chat-input");
+    if (!inputEl) return;
+
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    const newMsg = { sender: 'finance', text, timestamp: Date.now() };
+    const storageKey = `finance_chain_chat_${activeFinanceChatVendor}`;
+    let savedMessages = JSON.parse(localStorage.getItem(storageKey) || "[]");
+    savedMessages.push(newMsg);
+    localStorage.setItem(storageKey, JSON.stringify(savedMessages));
+
+    const vendorChatKey = `vendor_chat_${activeFinanceChatVendor}_Finance Officer`;
+    let vendorChatHistory = JSON.parse(localStorage.getItem(vendorChatKey) || "[]");
+    vendorChatHistory.push({ sender: 'role', senderName: 'Finance Officer', text, timestamp: Date.now() });
+    localStorage.setItem(vendorChatKey, JSON.stringify(vendorChatHistory));
+
+    lastKnownFinanceMessageCounts[activeFinanceChatVendor] = savedMessages.length;
+
+    inputEl.value = "";
+    loadFinanceMessages();
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
 async function renderAnalyticsView() {
     try {
         const res = await fetch(`${API_BASE}/api/v1/invoices`);
@@ -666,46 +835,169 @@ async function renderAnalyticsView() {
                     </span>
                 </div>
                 <div class="segmented-bar-container">
-                    <div class="segment segment-blue" style="width: ${blueWidth > 0 ? blueWidth : 0}%;" title="Allocated Spend: ${formatCurrency(blueSpent)}"></div>
-                    <div class="segment segment-orange" style="width: ${orangeWidth > 0 ? orangeWidth : 0}%;" title="Above Allocation Spend: ${formatCurrency(orangeSpent)}"></div>
-                    <div class="segment segment-red" style="width: ${redWidth > 0 ? redWidth : 0}%;" title="Over Budget Spend: ${formatCurrency(redSpent)}"></div>
+                    <div class="segment segment-blue" style="width: ${blueWidth > 0 ? blueWidth : 0}%;"></div>
+                    <div class="segment segment-orange" style="width: ${orangeWidth > 0 ? orangeWidth : 0}%;"></div>
+                    <div class="segment segment-red" style="width: ${redWidth > 0 ? redWidth : 0}%;"></div>
                 </div>
             `;
             chartContainer.appendChild(card);
         }
 
-        const vendorList = document.getElementById('analytics-vendor-list');
-        vendorList.innerHTML = '';
+        globalVendorTotalsCache = vendorTotals;
+        renderAnalyticsVendorList(globalVendorTotalsCache, totalSpend);
 
-        if (Object.keys(vendorTotals).length === 0) {
-            vendorList.innerHTML = '<p style="text-align:center; color: var(--text-muted); padding: 2rem;">No approved invoices found.</p>';
-        } else {
-            for (const [vendor, val] of Object.entries(vendorTotals)) {
-                const percentage = totalSpend > 0 ? ((val / totalSpend) * 100).toFixed(1) : 0;
+        const deptLabels = Object.keys(budgetData);
+        const spentData = deptLabels.map(dept => budgetData[dept].spent);
+        const allocatedData = deptLabels.map(dept => budgetData[dept].allocated);
 
-                const item = document.createElement('div');
-                item.style.marginBottom = '1.2rem';
-                item.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom: 2px;">
-                        <span>${vendor}</span>
-                        <span>${formatCurrency(val)} (${percentage}%)</span>
-                    </div>
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: ${percentage}%;"></div>
-                    </div>
-                `;
-                vendorList.appendChild(item);
+        const deptCtx = document.getElementById('deptSpendBarChart').getContext('2d');
+        if (deptBarChartInstance) deptBarChartInstance.destroy();
+
+        deptBarChartInstance = new Chart(deptCtx, {
+            type: 'bar',
+            data: {
+                labels: deptLabels,
+                datasets: [
+                    {
+                        label: 'Actual Spend ($)',
+                        data: spentData,
+                        backgroundColor: 'rgba(139, 92, 246, 0.85)',
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Allocated Budget ($)',
+                        data: allocatedData,
+                        backgroundColor: 'rgba(56, 189, 248, 0.5)',
+                        borderColor: 'rgba(56, 189, 248, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: getComputedStyle(document.body).getPropertyValue('--text-dark').trim(),
+                            font: { family: 'Inter', weight: '600' }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-muted').trim() },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    y: {
+                        ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-muted').trim() },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    }
+                }
             }
-        }
+        });
+
+        const vendorLabels = Object.keys(vendorTotals);
+        const vendorValues = Object.values(vendorTotals);
+
+        const vendorCtx = document.getElementById('vendorShareDoughnutChart').getContext('2d');
+        if (vendorShareChartInstance) vendorShareChartInstance.destroy();
+
+        vendorShareChartInstance = new Chart(vendorCtx, {
+            type: 'doughnut',
+            data: {
+                labels: vendorLabels.length > 0 ? vendorLabels : ['No Data'],
+                datasets: [{
+                    data: vendorValues.length > 0 ? vendorValues : [1],
+                    backgroundColor: [
+                        'rgba(139, 92, 246, 0.85)',
+                        'rgba(236, 72, 153, 0.85)',
+                        'rgba(56, 189, 248, 0.85)',
+                        'rgba(16, 185, 129, 0.85)',
+                        'rgba(245, 158, 11, 0.85)',
+                        'rgba(239, 68, 68, 0.85)'
+                    ],
+                    borderWidth: 1,
+                    borderColor: 'rgba(255, 255, 255, 0.2)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: getComputedStyle(document.body).getPropertyValue('--text-dark').trim(),
+                            font: { family: 'Inter', weight: '600' }
+                        }
+                    }
+                }
+            }
+        });
+
     } catch (err) {
         console.error("Error rendering analytics:", err);
     }
 }
 
-// --- 8. INITIALIZATION & POLLING ---
+function renderAnalyticsVendorList(vendorTotalsObj, totalSpend) {
+    const vendorList = document.getElementById('analytics-vendor-scroll-container');
+    if (!vendorList) return;
+
+    const searchTerm = (document.getElementById('analytics-vendor-search')?.value || "").toLowerCase();
+    const filteredEntries = Object.entries(vendorTotalsObj).filter(([vendor]) => 
+        vendor.toLowerCase().includes(searchTerm)
+    );
+
+    vendorList.innerHTML = '';
+
+    if (filteredEntries.length === 0) {
+        vendorList.innerHTML = '<p style="text-align:center; color: var(--text-muted); padding: 2rem;">No matching vendors found.</p>';
+        return;
+    }
+
+    filteredEntries.forEach(([vendor, val]) => {
+        const percentage = totalSpend > 0 ? ((val / totalSpend) * 100).toFixed(1) : 0;
+        const item = document.createElement('div');
+        item.style.marginBottom = '1.2rem';
+        item.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items: flex-start; gap: 12px; font-size:0.85rem; font-weight:600; margin-bottom: 2px;">
+                <span style="word-break: break-word; flex: 1;">${vendor}</span>
+                <span style="white-space: nowrap; text-align: right;">${formatCurrency(val)} (${percentage}%)</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: ${percentage}%;"></div>
+            </div>
+        `;
+        vendorList.appendChild(item);
+    });
+}
+
+function filterAnalyticsVendorAllocations() {
+    const totalSpendEl = document.getElementById('analytics-total-spend');
+    let totalSpend = 0;
+    if (totalSpendEl) {
+        totalSpend = parseFloat(totalSpendEl.innerText.replace(/[^0-9.-]+/g,"")) || 0;
+    }
+    renderAnalyticsVendorList(globalVendorTotalsCache, totalSpend);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     verifyFinanceSession();
     loadInvoicesFromDB();
+
+    const savedTheme = localStorage.getItem('finance_portal_theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-sun';
+        if (themeText) themeText.textContent = 'Light Mode';
+    }
 });
 
 setInterval(() => {
@@ -729,4 +1021,9 @@ window.addEventListener('beforeunload', () => {
 
 setInterval(() => {
   loadInvoicesFromDB().catch(err => console.error("Finance poll error:", err));
+  const commView = document.getElementById('view-communication');
+  if (commView && commView.style.display !== 'none') {
+      loadFinanceMessages();
+      loadFinanceCommunicationVendors();
+  }
 }, 3000);
