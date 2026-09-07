@@ -3,10 +3,13 @@ let currentSelectedRole = 'All';
 let currentActiveView = 'home';
 
 function formatRoleName(role) {
-  if (role === 'procurement_manager') return 'Procurement Manager';
-  if (role === 'auditor' || role === 'finance_officer') return 'Finance Officer';
-  if (role === 'supply_chain_manager') return 'Supply Chain Manager';
-  if (role === 'vendor') return 'Vendor';
+  if (!role) return 'Unknown';
+  const r = role.toLowerCase().trim();
+  if (r === 'procurement_manager' || r === 'procurement manager') return 'Procurement Manager';
+  if (r === 'finance_officer' || r === 'finance officer') return 'Finance Officer';
+  if (r === 'supply_chain_manager' || r === 'supply chain manager') return 'Supply Chain Manager';
+  if (r === 'auditor') return 'Auditor';
+  if (r === 'vendor') return 'Vendor';
   return role;
 }
 
@@ -39,12 +42,13 @@ function navigateTo(pageView, roleFilter = 'All', element = null) {
   } else if (pageView === 'users') {
     document.getElementById('view-users').classList.add('active-view');
     
-    // Map human-readable filter names to database role keys if needed by the backend
     const reverseRoleMap = {
       'Procurement Manager': 'procurement_manager',
       'Finance Officer': 'finance_officer',
       'Supply Chain Manager': 'supply_chain_manager',
-      'Vendor': 'vendor'
+      'Auditor': 'auditor',
+      'Vendor': 'vendor',
+      'All': 'All'
     };
     
     currentSelectedRole = reverseRoleMap[roleFilter] || roleFilter;
@@ -65,8 +69,9 @@ async function loadDashboardData(isInitial = false) {
     updateTextIfChanged('stat-total-users', metrics.total_users);
     updateTextIfChanged('stat-pending-approvals', metrics.pending_approvals);
     updateTextIfChanged('count-pm', metrics.pm_count);
-    updateTextIfChanged('count-fo', metrics.fo_count);
-    updateTextIfChanged('count-scm', metrics.scm_count !== undefined ? metrics.scm_count : (metrics.supply_chain_manager_count !== undefined ? metrics.supply_chain_manager_count : 0));
+    updateTextIfChanged('count-fo', metrics.fo_count !== undefined ? metrics.fo_count : (metrics.finance_officer_count || 0));
+    updateTextIfChanged('count-scm', metrics.scm_count !== undefined ? metrics.scm_count : (metrics.supply_chain_manager_count || 0));
+    updateTextIfChanged('count-auditor', metrics.auditor_count !== undefined ? metrics.auditor_count : 0);
     updateTextIfChanged('count-vendor', metrics.vendor_count);
 
     renderActivityLogs(isInitial);
@@ -105,11 +110,20 @@ async function renderUserTable(isInitial = false) {
   try {
     const res = await fetch(`${API_BASE}/admin/users?role=${encodeURIComponent(currentSelectedRole)}`);
     if (!res.ok) return;
-    const users = await res.json();
+    let users = await res.json();
+
+    // Strict frontend filter to prevent role bleeding
+    if (currentSelectedRole && currentSelectedRole !== 'All') {
+      users = users.filter(user => {
+        const uRole = (user.role || '').toLowerCase().trim();
+        const targetRole = currentSelectedRole.toLowerCase().trim();
+        return uRole === targetRole;
+      });
+    }
 
     let newHTML = '';
     if (users.length === 0) {
-      newHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">No registered users under: ${currentSelectedRole}</td></tr>`;
+      newHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">No registered users found under this category.</td></tr>`;
     } else {
       users.forEach(user => {
         newHTML += `
@@ -144,13 +158,16 @@ function loginAsUser(userId, role) {
   sessionStorage.setItem("user_id", userId);
   sessionStorage.setItem("user_role", role);
 
-  if (role === 'procurement_manager') {
+  const r = (role || '').toLowerCase();
+  if (r === 'procurement_manager') {
     window.location.href = './manager_dash.html';
-  } else if (role === 'finance_officer' || role === 'auditor') {
+  } else if (r === 'finance_officer') {
     window.location.href = './finance_dash.html';
-  } else if (role === 'supply_chain_manager') {
-    window.location.href = './supply_chain_dash.html';
-  } else if (role === 'vendor') {
+  } else if (r === 'supply_chain_manager') {
+    window.location.href = './supply_dash.html';
+  } else if (r === 'auditor') {
+    window.location.href = './auditor_dash.html';
+  } else if (r === 'vendor') {
     window.location.href = './vendor_dash.html';
   } else {
     window.location.href = '../login/login.html';
@@ -326,6 +343,7 @@ async function handleAddUserSubmit(event) {
     'Procurement Manager': 'procurement_manager',
     'Finance Officer': 'finance_officer',
     'Supply Chain Manager': 'supply_chain_manager',
+    'Auditor': 'auditor',
     'Vendor': 'vendor'
   };
   
@@ -363,7 +381,11 @@ async function exportUsersToCSV() {
       alert("Failed to fetch user data for export.");
       return;
     }
-    const users = await res.json();
+    let users = await res.json();
+
+    if (currentSelectedRole && currentSelectedRole !== 'All') {
+      users = users.filter(user => (user.role || '').toLowerCase().trim() === currentSelectedRole.toLowerCase().trim());
+    }
 
     if (users.length === 0) {
       alert("No users available to export under this filter.");
@@ -396,12 +418,23 @@ async function exportUsersToCSV() {
 
 async function exportRoleToCSV(roleName) {
   try {
-    const res = await fetch(`${API_BASE}/admin/users?role=${encodeURIComponent(roleName)}`);
+    const reverseRoleMap = {
+      'Procurement Manager': 'procurement_manager',
+      'Finance Officer': 'finance_officer',
+      'Supply Chain Manager': 'supply_chain_manager',
+      'Auditor': 'auditor',
+      'Vendor': 'vendor'
+    };
+    const dbRole = reverseRoleMap[roleName] || roleName;
+
+    const res = await fetch(`${API_BASE}/admin/users?role=${encodeURIComponent(dbRole)}`);
     if (!res.ok) {
       alert(`Failed to fetch ${roleName} data for export.`);
       return;
     }
-    const users = await res.json();
+    let users = await res.json();
+
+    users = users.filter(user => (user.role || '').toLowerCase().trim() === dbRole.toLowerCase().trim());
 
     if (users.length === 0) {
       alert(`No users available to export for ${roleName}.`);
