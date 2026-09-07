@@ -1,0 +1,38 @@
+<div class="p-6 bg-slate-50 min-h-screen text-slate-800">
+  <div class="mb-8 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-slate-900">Vendor Audit & Reliability</h2>
+  </div>
+  
+  <div *ngIf="loading" class="flex flex-col items-center justify-center p-20 space-y-4">
+    <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+  <div *ngIf="!loading && data">
+
+        <div class="flex gap-4 mb-6">
+            <select [(ngModel)]="filters.risk" class="px-3 py-2 border rounded text-xs w-48">
+                <option value="">All Risk Levels</option><option value="High">High Risk</option><option value="Medium">Medium Risk</option><option value="Low">Low Risk</option>
+            </select>
+            <input type="text" [(ngModel)]="filters.vendor" placeholder="Vendor Name" class="px-3 py-2 border rounded text-xs w-48">
+            <button (click)="load()" class="text-xs bg-indigo-600 text-white px-4 rounded">Search Vendors</button>
+        </div>
+        <div class="grid grid-cols-3 gap-6">
+            <div *ngFor="let v of data" class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-bold text-slate-800">{{v.name}}</h4>
+                    <span class="text-[10px] px-2 py-0.5 rounded font-bold" [ngClass]="v.risk_level === 'High' ? 'bg-red-100 text-red-800' : (v.risk_level === 'Medium' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800')">{{v.risk_level}} Risk</span>
+                </div>
+                <div class="text-xs text-slate-600 mb-4 flex-1">
+                    <p>Status: <b [ngClass]="{'text-green-600': v.status==='Active', 'text-red-600': v.status==='Inactive'}">{{v.status}}</b></p>
+                    <p>Category: {{v.category || 'Standard Vendor'}}</p>
+                </div>
+                <div class="pt-4 border-t border-slate-50 flex justify-between items-center text-xs">
+                    <span class="text-slate-500">Reliability Score</span>
+                    <span class="font-bold text-lg" [ngClass]="v.reliability_score < 70 ? 'text-red-600' : 'text-slate-800'">{{v.reliability_score}}/100</span>
+                </div>
+            </div>
+            <div *ngIf="!data?.length" class="col-span-3 text-center p-12 bg-white rounded-xl text-slate-400 border border-slate-100">No vendor records match current filters.</div>
+        </div>
+        
+  </div>
+</div>

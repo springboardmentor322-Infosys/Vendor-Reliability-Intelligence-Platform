@@ -1,0 +1,54 @@
+<div class="min-h-screen bg-[#132436] flex items-center justify-center p-10 font-sans">
+  <div class="bg-white rounded-xl max-w-[920px] w-full overflow-hidden grid grid-cols-1 md:grid-cols-[1fr_1.15fr] shadow-[0_30px_60px_rgba(0,0,0,0.35)]">
+    
+    <div class="bg-gradient-to-br from-[#1E3A52] to-[#132436] text-white p-10 flex flex-col justify-between hidden md:flex">
+      <div>
+        <div class="text-white text-xl font-semibold flex items-center gap-2">
+          <div class="w-5 h-5 bg-[#00F0B5] rounded-sm"></div> VendorIQ
+        </div>
+      </div>
+      <div class="text-[14.5px] leading-relaxed text-[#CBD7DD]">
+        <b class="text-white block mb-1.5 text-[13px] font-mono tracking-wider uppercase">Why role-based access</b>
+        The screens, data and actions a person sees are determined entirely by the role attached to their account.
+      </div>
+    </div>
+    
+    <div class="p-10">
+      <h2 class="m-0 mb-1 text-[22px] font-semibold text-[#132436]">Sign in to VendorIQ</h2>
+      <div class="text-[#5C7280] text-[13.5px] mb-6">Enter your credentials to access your workspace.</div>
+      
+      <div *ngIf="errorMessage" class="bg-red-50 text-red-600 p-3 rounded-md text-sm mb-4">
+        {{ errorMessage }}
+      </div>
+
+      <div class="mb-3.5">
+        <label class="block text-[12.5px] font-semibold mb-1.5 text-[#132436]">Work email</label>
+        <input type="text" [(ngModel)]="email" class="w-full p-2.5 border border-[#E1E8EC] rounded-md text-[14px] bg-[#F9FAFA] focus:outline-none focus:border-[#00F0B5]" placeholder="you@organization.com">
+      </div>
+      
+      <div class="mb-3.5">
+        <label class="block text-[12.5px] font-semibold mb-1.5 text-[#132436]">Password</label>
+        <input type="password" [(ngModel)]="password" class="w-full p-2.5 border border-[#E1E8EC] rounded-md text-[14px] bg-[#F9FAFA] focus:outline-none focus:border-[#00F0B5]" placeholder="••••••••••">
+      </div>
+      
+      <div class="role-select">
+        <button *ngFor="let role of rolesList" 
+                class="role-pick" 
+                [class.active]="selectedRoleLabel === role.label" 
+                (click)="pickRole(role)">
+          <span class="ic"></span>{{ role.label }}
+        </button>
+      </div>
+
+      <button (click)="onSubmit()" class="w-full bg-[#00B386] hover:bg-[#00F0B5] text-white p-3 rounded-md font-semibold text-[14.5px] mt-4 transition-colors">
+        Continue to workspace →
+      </button>
+      
+      <div class="text-[12px] text-[#8FA3AC] mt-4 text-center">
+        <a routerLink="/forgot-password" class="hover:text-[#00B386] cursor-pointer transition-colors">Forgot password?</a> · 
+        <a routerLink="/register" class="hover:text-[#00B386] cursor-pointer transition-colors">Need an account?</a>
+      </div>
+    </div>
+    
+  </div>
+</div>

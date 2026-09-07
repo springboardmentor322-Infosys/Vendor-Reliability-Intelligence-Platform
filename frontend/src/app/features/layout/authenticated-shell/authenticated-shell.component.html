@@ -1,0 +1,61 @@
+<div id="view-app" class="flex min-h-screen">
+  <aside class="sidebar" [class.vendor-sidebar]="currentRoleKey === 'vendor'"
+    [class.pm-sidebar]="currentRoleKey === 'pm'" [class.scm-sidebar]="currentRoleKey === 'scm'">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>VendorIQ<small id="sb-role-label">{{ roleConfig?.label || 'Workspace' }}</small></div>
+    </div>
+
+    <div class="nav-scroll">
+      <ng-container *ngFor="let g of roleConfig?.groups">
+        <div class="nav-group-label">{{ g.label }}</div>
+        <a *ngFor="let it of g.items" class="nav-item cursor-pointer" [class.active]="it.id === currentPage"
+          (click)="goTo(it.id)">
+          <span class="ic"></span>{{ it.label }}
+        </a>
+      </ng-container>
+    </div>
+
+    <div class="sidebar-foot" *ngIf="currentRoleKey !== 'vendor'">
+      <div class="avatar">{{ roleConfig?.initials }}</div>
+      <div class="who">{{ roleConfig?.name }}<span>{{ roleConfig?.label }}</span></div>
+      <a class="logout cursor-pointer" (click)="logout()">Sign out</a>
+    </div>
+
+    <div class="vendor-foot flex flex-col" *ngIf="currentRoleKey === 'vendor'">
+      <div class="flex items-center gap-3">
+        <div class="v-avatar">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#7DD3FC" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <div class="v-who">
+          <div class="v-name">{{ roleConfig?.name }}</div>
+          <div class="v-id">Vendor ID: VDR-2024-1025</div>
+          <div class="v-badge"><span class="v-dot"></span>Verified Vendor</div>
+        </div>
+      </div>
+      <div class="mt-4 pt-3 border-t border-[rgba(255,255,255,0.1)] text-center">
+        <a class="logout cursor-pointer text-sm text-[var(--slate-4)] hover:text-white transition"
+          (click)="logout()">Sign out</a>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb">Home <span class="mx-2 text-[var(--slate-2)]">›</span> <b>{{ getPageLabel(currentPage) }}</b>
+      </div>
+      <div class="top-actions">
+        <div class="searchbox">Search anything…</div>
+        <div class="icon-btn">🔔<span class="pip">7</span></div>
+        <div class="icon-btn">✉️<span class="pip">3</span></div>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px;">{{ roleConfig?.initials }}</div>
+      </div>
+    </div>
+
+    <router-outlet></router-outlet>
+  </div>
+</div>

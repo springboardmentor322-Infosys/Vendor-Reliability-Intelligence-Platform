@@ -1,0 +1,98 @@
+<div class="card p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-xl font-bold text-[var(--ink)]">Vendor Directory</h2>
+    <div class="flex gap-4">
+      <input type="text" class="input-field w-64" placeholder="Search vendors..." [(ngModel)]="searchQuery" (ngModelChange)="filterVendors()">
+      
+      <select class="input-field" [(ngModel)]="selectedCategory" (ngModelChange)="filterVendors()">
+        <option value="">All Categories</option>
+        <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+      </select>
+      
+      <select class="input-field" [(ngModel)]="selectedStatus" (ngModelChange)="filterVendors()">
+        <option value="">All Statuses</option>
+        <option value="Pending">Pending</option>
+        <option value="Under Review">Under Review</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+    </div>
+  </div>
+
+  <table class="data-table w-full text-left">
+    <thead>
+      <tr>
+        <th>Vendor Name</th>
+        <th>Category</th>
+        <th>Contact Email</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let vendor of filteredVendors">
+        <td class="font-medium text-[var(--ink)]">{{ vendor.name }}</td>
+        <td>{{ vendor.category?.name || 'N/A' }}</td>
+        <td>{{ vendor.contact_email }}</td>
+        <td>
+          <span class="status-badge" [ngClass]="{
+            'status-pending': vendor.status === 'Pending',
+            'status-active': vendor.status === 'Approved',
+            'status-error': vendor.status === 'Rejected',
+            'status-warning': vendor.status === 'Under Review'
+          }">{{ vendor.status }}</span>
+        </td>
+        <td>
+          <button class="btn-ghost text-sm py-1 px-3" (click)="openProfile(vendor)">View Profile</button>
+        </td>
+      </tr>
+      <tr *ngIf="filteredVendors.length === 0">
+        <td colspan="5" class="text-center py-8 text-[var(--slate)]">No vendors found.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content w-full max-w-2xl bg-white rounded-xl shadow-xl p-8" (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-start mb-6">
+      <div>
+        <h2 class="text-2xl font-bold text-[var(--ink)]">{{ selectedVendor?.name }}</h2>
+        <p class="text-[var(--slate)] mt-1">{{ selectedVendor?.category?.name || 'Uncategorized' }}</p>
+      </div>
+      <span class="status-badge" [ngClass]="{
+        'status-pending': selectedVendor?.status === 'Pending',
+        'status-active': selectedVendor?.status === 'Approved',
+        'status-error': selectedVendor?.status === 'Rejected',
+        'status-warning': selectedVendor?.status === 'Under Review'
+      }">{{ selectedVendor?.status }}</span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6 mb-8">
+      <div class="info-block">
+        <label class="text-xs font-semibold text-[var(--slate)] uppercase tracking-wider mb-1 block">Contact Email</label>
+        <div class="text-[var(--ink)]">{{ selectedVendor?.contact_email }}</div>
+      </div>
+      <!-- Placeholder for more fields like Address, Tax ID, etc. -->
+    </div>
+
+    <div class="flex gap-4 border-t border-[var(--slate-border)] pt-6 mt-6 justify-end">
+      <button class="btn-ghost" (click)="closeModal()">Close</button>
+      
+      <!-- Admin/PM Workflow Buttons -->
+      <ng-container *ngIf="selectedVendor?.status === 'Pending'">
+        <button class="btn-secondary" (click)="updateStatus('Under Review')">Start Review</button>
+      </ng-container>
+      
+      <ng-container *ngIf="selectedVendor?.status === 'Under Review'">
+        <button class="btn-secondary text-[var(--error)] border-[var(--error)]" (click)="updateStatus('Rejected')">Reject</button>
+        <button class="btn-primary" (click)="updateStatus('Approved')">Approve Vendor</button>
+      </ng-container>
+      
+      <ng-container *ngIf="selectedVendor?.status === 'Rejected'">
+        <button class="btn-secondary" (click)="updateStatus('Under Review')">Re-Review</button>
+      </ng-container>
+    </div>
+  </div>
+</div>

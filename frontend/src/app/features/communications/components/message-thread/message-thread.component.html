@@ -1,0 +1,93 @@
+<div class="page-head">
+  <div>
+    <a routerLink="/communications" class="btn btn-secondary btn-sm mb-2">&larr; Back to Communications</a>
+    <h1>{{ threadType }} #{{ threadId }}</h1>
+    <p>Message Thread</p>
+  </div>
+</div>
+
+<div class="card mt-4" style="display: flex; flex-direction: column; height: 60vh;">
+  <div class="card-body" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding: 20px; background-color: #f8fafc;">
+    
+    <div *ngFor="let msg of messages" [ngClass]="msg.sender_id === currentUserId ? 'message-sent' : 'message-received'">
+      <div class="message-bubble">
+        <p>{{ msg.message }}</p>
+        
+        <div *ngIf="msg.attachment_path" class="attachment-box mt-2">
+          <button class="btn btn-sm btn-secondary" (click)="downloadAttachment(msg)">
+            📎 {{ msg.attachment_name || 'Attachment' }}
+          </button>
+        </div>
+        
+        <div class="message-meta mt-1">
+          <small>{{ msg.created_at | date:'medium' }}</small>
+          <span *ngIf="msg.sender_id === currentUserId">
+            <small *ngIf="msg.is_read"> • Read</small>
+            <small *ngIf="!msg.is_read"> • Delivered</small>
+          </span>
+        </div>
+      </div>
+      
+      <!-- Upload Attachment Button (only sender can upload attachment to their own message) -->
+      <div class="mt-1 text-right" *ngIf="msg.sender_id === currentUserId && !msg.attachment_path">
+        <label [for]="'fileUpload-' + msg.id" class="btn btn-sm btn-secondary" style="font-size: 0.7rem; padding: 2px 5px; cursor: pointer;">
+          Add Attachment
+        </label>
+        <input type="file" [id]="'fileUpload-' + msg.id" (change)="onFileSelected($event, msg)" style="display: none;" accept=".pdf,.png,.jpg,.jpeg">
+      </div>
+    </div>
+    
+    <div *ngIf="messages.length === 0" class="text-center text-gray-500 py-10">
+      No messages yet. Send a message to start the conversation.
+    </div>
+  </div>
+  
+  <div class="card-footer" style="padding: 15px; border-top: 1px solid #e2e8f0; background: white;">
+    <div style="display: flex; gap: 10px;">
+      <textarea 
+        class="form-control" 
+        style="flex: 1; resize: none; min-height: 50px;" 
+        placeholder="Type your message..." 
+        [(ngModel)]="newMessage"
+        (keyup.enter)="sendMessage()"
+      ></textarea>
+      <button class="btn btn-primary" (click)="sendMessage()" [disabled]="!newMessage.trim()">Send</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .message-sent {
+    align-self: flex-end;
+    text-align: right;
+    max-width: 70%;
+  }
+  .message-sent .message-bubble {
+    background-color: #0ea5e9;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 15px 15px 0 15px;
+    display: inline-block;
+    text-align: left;
+  }
+  .message-sent .message-meta small {
+    color: #e0f2fe;
+  }
+  
+  .message-received {
+    align-self: flex-start;
+    max-width: 70%;
+  }
+  .message-received .message-bubble {
+    background-color: white;
+    color: #334155;
+    padding: 10px 15px;
+    border-radius: 15px 15px 15px 0;
+    display: inline-block;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .message-received .message-meta small {
+    color: #94a3b8;
+  }
+</style>

@@ -1,0 +1,53 @@
+<div class="page-head">
+  <div>
+    <h1>Communication Center</h1>
+    <p>Manage conversations regarding Purchase Orders and Contracts.</p>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-head" style="display: flex; gap: 10px; align-items: center; padding-bottom: 10px;">
+    <input type="text" class="form-control" placeholder="Search message or ID..." [(ngModel)]="filterSearch">
+    
+    <select class="form-control" [(ngModel)]="filterType">
+      <option value="">All Thread Types</option>
+      <option value="Purchase Order">Purchase Order</option>
+      <option value="Contract">Contract</option>
+    </select>
+    
+    <button class="btn btn-secondary" (click)="applyFilters()">Filter</button>
+    <button class="btn btn-secondary" (click)="clearFilters()">Clear</button>
+  </div>
+  
+  <div class="card-body">
+    <table class="data-table w-full text-left">
+      <thead>
+        <tr>
+          <th>Thread Type</th>
+          <th>Thread ID</th>
+          <th>Latest Message</th>
+          <th>Unread</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let thread of groupedThreads">
+          <td>{{ thread.thread_type }}</td>
+          <td>{{ thread.thread_id }}</td>
+          <td>{{ thread.latest_message.message.length > 50 ? (thread.latest_message.message | slice:0:50) + '...' : thread.latest_message.message }}</td>
+          <td>
+            <span class="badge" [ngClass]="{'badge-error': thread.unread_count > 0, 'badge-success': thread.unread_count === 0}">
+              {{ thread.unread_count }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-primary btn-sm" (click)="openThread(thread)">View Thread</button>
+          </td>
+        </tr>
+        <tr *ngIf="groupedThreads.length === 0">
+          <td colspan="5" class="text-center py-4">No active conversations found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

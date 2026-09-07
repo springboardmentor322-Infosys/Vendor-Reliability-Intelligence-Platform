@@ -1,0 +1,85 @@
+<div class="p-6 bg-slate-50 min-h-screen text-slate-800">
+  <div class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <h2 class="text-2xl font-bold text-slate-900">Procurement & Order Audit</h2>
+    <div class="flex gap-2">
+      <input type="text" [(ngModel)]="filters.vendor" placeholder="Search by vendor..."
+        class="border border-slate-200 rounded px-3 py-1.5 text-sm outline-none focus:border-indigo-500">
+      <button (click)="load()"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded font-medium text-sm transition shadow-sm">Audit
+        Filter</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="flex justify-center p-20">
+    <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+  <div *ngIf="!loading">
+
+    <!-- COMPLIANCE CHART INJECTED FROM DASHBOARD FOR PROCUREMENT -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col mb-8 max-w-4xl"
+      *ngIf="dashboard">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-sm font-bold text-slate-800">Procurement Process Compliance</h2>
+      </div>
+      <div class="flex-1 flex gap-2 items-center justify-center">
+        <div class="w-1/2">
+          <apx-chart *ngIf="complianceChart" [series]="complianceChart.series" [chart]="complianceChart.chart"
+            [labels]="complianceChart.labels" [colors]="complianceChart.colors"
+            [plotOptions]="complianceChart.plotOptions" [legend]="complianceChart.legend"></apx-chart>
+        </div>
+        <div class="w-1/2 flex flex-col space-y-2 text-sm bg-slate-50 p-6 rounded border border-slate-100">
+          <div class="flex justify-between items-center"><span class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-emerald-500"></div>Compliant
+            </span> <span class="font-bold text-lg">{{dashboard?.compliance_overview?.compliant || 0}}</span></div>
+          <div class="flex justify-between items-center"><span class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-amber-500"></div>Partially Compliant
+            </span> <span class="font-bold text-lg">{{dashboard?.compliance_overview?.partially_compliant || 0}}</span>
+          </div>
+          <div class="flex justify-between items-center"><span class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-red-500"></div>Non-Compliant
+            </span> <span class="font-bold text-lg">{{dashboard?.compliance_overview?.non_compliant || 0}}</span></div>
+          <div class="flex justify-between items-center"><span class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-slate-400"></div>Not Assessed
+            </span> <span class="font-bold text-lg">{{dashboard?.compliance_overview?.not_assessed || 0}}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROCUREMENT TABLE -->
+    <div class="bg-white shadow-sm border border-slate-100 rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm whitespace-nowrap">
+          <thead class="bg-slate-50 text-slate-400 uppercase font-bold text-[10px] border-b border-slate-100">
+            <tr>
+              <th class="px-6 py-4">PO Number</th>
+              <th class="px-6 py-4">Vendor</th>
+              <th class="px-6 py-4">Origination Date</th>
+              <th class="px-6 py-4 text-right">Value Amount</th>
+              <th class="px-6 py-4">State</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-50">
+            <tr *ngFor="let audit of data" class="hover:bg-slate-50/50 transition truncate">
+              <td class="px-6 py-4 font-bold text-indigo-600">{{audit.po_number}}</td>
+              <td class="px-6 py-4 text-slate-700 font-medium">{{audit.vendor}}</td>
+              <td class="px-6 py-4 text-xs text-slate-500">{{audit.order_date}}</td>
+              <td class="px-6 py-4 text-right font-medium text-slate-800">{{audit.total_amount | currency}}</td>
+              <td class="px-6 py-4 text-[10.5px] uppercase font-bold tracking-wider">
+                <span class="px-2 py-1 rounded" [ngClass]="{'bg-green-100 text-green-700': audit.status==='approved' || audit.status==='received' || audit.status==='completed',
+                                  'bg-amber-100 text-amber-700': audit.status==='pending',
+                                  'bg-red-100 text-red-700': audit.status==='flagged' || audit.status==='cancelled'}">
+                  {{audit.status}}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="!data.length">
+              <td colspan="5" class="p-12 text-center text-slate-400 font-medium">No procurement records found for this
+                auditing cycle.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<div class="p-6 bg-slate-50 min-h-screen text-slate-800">
+  <div class="mb-8 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-slate-900">Centralized Exception Reports</h2>
+  </div>
+
+  <div *ngIf="loading" class="flex flex-col items-center justify-center p-20 space-y-4">
+    <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+  <div *ngIf="!loading && data">
+    <!-- CHART SECTION -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex flex-col mb-8 max-w-4xl"
+      *ngIf="dashboard">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-sm font-bold text-slate-800">Exception & Findings Frequency Trend</h2>
+        <span class="text-xs text-slate-500 bg-slate-50 px-2 py-1 border rounded">This Year ⌄</span>
+      </div>
+      <div class="flex-1 mt-2">
+        <apx-chart *ngIf="findingsChart" [series]="findingsChart.series" [chart]="findingsChart.chart"
+          [labels]="findingsChart.labels" [colors]="findingsChart.colors" [legend]="findingsChart.legend"></apx-chart>
+      </div>
+    </div>
+
+    <!-- TABLE SECTION -->
+    <div class="bg-white shadow-sm border border-slate-100 rounded-xl">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm whitespace-nowrap">
+          <thead class="bg-slate-50 text-slate-400 uppercase font-bold text-[10px] border-b border-slate-100">
+            <tr>
+              <th class="px-6 py-4 tracking-wider">Exception Origin</th>
+              <th class="px-6 py-4 tracking-wider">Entity Type</th>
+              <th class="px-6 py-4 tracking-wider">Link ID</th>
+              <th class="px-6 py-4 tracking-wider">Occurrence Date</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-50">
+            <tr *ngFor="let item of data" class="hover:bg-slate-50/50 transition">
+              <td class="px-6 py-4 font-medium text-slate-700 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-red-500"></span> {{item.origin}}
+              </td>
+              <td class="px-6 py-4 text-slate-500">{{item.entity_type}}</td>
+              <td class="px-6 py-4 font-bold text-indigo-600">{{item.link_id}}</td>
+              <td class="px-6 py-4 text-slate-400">{{item.date}}</td>
+            </tr>
+            <tr *ngIf="!data.length">
+              <td colspan="4" class="p-12 text-center text-slate-400 font-medium">No organizational exceptions recorded.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
