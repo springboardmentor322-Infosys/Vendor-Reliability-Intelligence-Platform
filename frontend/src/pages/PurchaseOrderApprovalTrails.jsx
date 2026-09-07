@@ -56,13 +56,16 @@ export default function PurchaseOrderApprovalTrails() {
       {error ? <div className="page-alert page-alert--error">{error}</div> : null}
 
       <div className="page-toolbar">
-        <input
-          type="text"
-          className="filter-search"
-          placeholder="Search PO, vendor, or status…"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
+        <label className="filter-field">
+          <span className="filter-field__label">Search</span>
+          <input
+            type="text"
+            className="filter-search"
+            placeholder="Search PO, vendor, or status…"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </label>
       </div>
 
       <section className="table-card">
@@ -73,7 +76,7 @@ export default function PurchaseOrderApprovalTrails() {
           </span>
         </div>
         {loading ? (
-          <p className="loading-state" style={{ padding: '1rem' }}>Loading approval trails…</p>
+          <p className="loading-state">Loading approval trails…</p>
         ) : (
           <table>
             <thead>

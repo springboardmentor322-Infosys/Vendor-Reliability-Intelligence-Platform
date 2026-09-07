@@ -82,44 +82,51 @@ export default function AuditLogs() {
         </article>
       </div>
 
-      <div className="page-toolbar" style={{ marginTop: '1rem' }}>
-        <div className="filter-group">
-          <select
-            className="filter-search"
-            style={{ width: 'auto', minWidth: '180px' }}
-            value={entityType}
-            onChange={(e) => setEntityType(e.target.value)}
-          >
-            {ENTITY_TYPES.map((opt) => (
-              <option key={opt.value || 'all'} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <input
-            type="number"
-            className="filter-search"
-            style={{ width: '140px' }}
-            placeholder="Entity ID"
-            value={entityId}
-            onChange={(e) => setEntityId(e.target.value)}
-            min="1"
-          />
-          <input
-            type="search"
-            className="filter-search"
-            placeholder="Search description…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+      <div className="page-toolbar">
+        <div className="page-toolbar__filters">
+          <label className="filter-field">
+            <span className="filter-field__label">Entity type</span>
+            <select
+              value={entityType}
+              onChange={(e) => setEntityType(e.target.value)}
+            >
+              {ENTITY_TYPES.map((opt) => (
+                <option key={opt.value || 'all'} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="filter-field">
+            <span className="filter-field__label">Entity ID</span>
+            <input
+              type="number"
+              className="filter-search"
+              style={{ width: '140px' }}
+              placeholder="Optional"
+              value={entityId}
+              onChange={(e) => setEntityId(e.target.value)}
+              min="1"
+            />
+          </label>
+          <label className="filter-field">
+            <span className="filter-field__label">Search</span>
+            <input
+              type="search"
+              className="filter-search"
+              placeholder="Search description…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </label>
         </div>
       </div>
 
+      {error ? <div className="page-alert page-alert--error">{error}</div> : null}
+
       {loading ? (
         <p className="loading-state">Loading audit logs…</p>
-      ) : error ? (
-        <p className="form-error">{error}</p>
       ) : logs.length === 0 ? (
         <section className="table-card">
-          <p style={{ color: '#64748b' }}>No audit log entries match your filters.</p>
+          <p className="empty-state">No audit log entries match your filters.</p>
         </section>
       ) : (
         <section className="table-card">

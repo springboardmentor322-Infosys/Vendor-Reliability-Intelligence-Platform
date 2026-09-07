@@ -71,7 +71,7 @@ export default function Dashboard() {
 
       <MetricCards cards={data?.cards || []} />
 
-      <div className="dashboard-row" style={{ marginTop: '1rem' }}>
+      <div className="dashboard-row">
         <section className="chart-card">
           <div className="chart-card__header">
             <h3>Vendor Reliability Distribution</h3>
@@ -151,7 +151,7 @@ export default function Dashboard() {
         </section>
       </div>
 
-      <div className="dashboard-row dashboard-row--bottom" style={{ marginTop: '1rem' }}>
+      <div className="dashboard-row dashboard-row--bottom">
         <section className="list-card">
           <div className="list-card__header">
             <h3>User Management</h3>
@@ -216,7 +216,7 @@ export default function Dashboard() {
         </section>
       </div>
 
-      <div className="dashboard-row" style={{ marginTop: '1rem' }}>
+      <div className="dashboard-row">
         <section className="table-card">
           <div className="table-card__header">
             <h3>Recent Purchase Orders</h3>

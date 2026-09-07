@@ -36,9 +36,9 @@ const DELIVERY_STATUSES = ['In Progress', 'Shipped', 'Partial Delivery', 'Delive
 const PM_STATUSES = ['Approved', 'Ordered', 'Completed', 'Cancelled']
 
 const STATUS_PILL_CLASS = {
-  Pending: 'status-pill--neutral',
+  Pending: 'status-pill--warn',
   Approved: 'status-pill--good',
-  Ordered: 'status-pill--good',
+  Ordered: 'status-pill--warn',
   'In Progress': 'status-pill--warn',
   Shipped: 'status-pill--warn',
   'Partial Delivery': 'status-pill--warn',
@@ -737,7 +737,7 @@ export default function PurchaseOrders() {
         )}
       </header>
 
-      {error && <p className="form-error" style={{ marginBottom: '1rem' }}>{error}</p>}
+      {error && <div className="page-alert page-alert--error">{error}</div>}
 
       {/* Status tabs */}
       <StatusTabs statuses={ALL_STATUSES} active={statusFilter} onChange={setStatusFilter} counts={counts} />
@@ -745,24 +745,30 @@ export default function PurchaseOrders() {
       {/* Search & filter toolbar */}
       <div className="page-toolbar">
         <div className="page-toolbar__filters">
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-            <option value="All">All Statuses</option>
-            {Object.entries(STATUS_GROUP).map(([group, statuses]) => (
-              <optgroup key={group} label={group}>
-                {statuses.map((s) => (
-                  <option key={s} value={s}>{s} ({counts[s] ?? 0})</option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
+          <label className="filter-field">
+            <span className="filter-field__label">Status</span>
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+              <option value="All">All statuses</option>
+              {Object.entries(STATUS_GROUP).map(([group, statuses]) => (
+                <optgroup key={group} label={group}>
+                  {statuses.map((s) => (
+                    <option key={s} value={s}>{s} ({counts[s] ?? 0})</option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </label>
         </div>
-        <input
-          type="text"
-          className="filter-search"
-          placeholder="Search by PO number…"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <label className="filter-field">
+          <span className="filter-field__label">Search</span>
+          <input
+            type="text"
+            className="filter-search"
+            placeholder="Search by PO number…"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </label>
       </div>
 
       {/* Orders table */}
@@ -771,6 +777,9 @@ export default function PurchaseOrders() {
           <h3>{statusFilter === 'All' ? 'All Purchase Orders' : statusFilter}</h3>
           <span className="table-card__meta">{loading ? 'Loading…' : `${filtered.length} order${filtered.length === 1 ? '' : 's'}`}</span>
         </div>
+        {loading ? (
+          <p className="loading-state">Loading purchase orders…</p>
+        ) : (
         <table>
           <thead>
             <tr>
@@ -809,6 +818,7 @@ export default function PurchaseOrders() {
             ))}
           </tbody>
         </table>
+        )}
       </section>
 
       {/* PO Detail Modal */}

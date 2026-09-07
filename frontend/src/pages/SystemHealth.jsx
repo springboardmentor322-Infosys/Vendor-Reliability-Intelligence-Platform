@@ -61,7 +61,7 @@ export default function SystemHealth() {
 
       {error ? <div className="page-alert page-alert--error">{error}</div> : null}
 
-      <div className="dashboard-admin-grid dashboard-admin-grid--cards-4" style={{ marginBottom: '1rem' }}>
+      <div className="dashboard-admin-grid dashboard-admin-grid--cards-4">
         <article className="dashboard-card">
           <div className="dashboard-card__label">Uptime</div>
           <div className="dashboard-card__value">{health ? formatUptime(health.uptime_seconds) : '—'}</div>
@@ -79,7 +79,7 @@ export default function SystemHealth() {
           <h3>Status checks</h3>
         </div>
         {loading && !health ? (
-          <p className="loading-state" style={{ padding: '1rem' }}>Running health checks…</p>
+          <p className="loading-state">Running health checks…</p>
         ) : (
           <table>
             <thead>

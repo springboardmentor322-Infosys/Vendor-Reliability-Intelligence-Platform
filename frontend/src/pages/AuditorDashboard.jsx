@@ -57,7 +57,7 @@ export default function AuditorDashboard() {
 
       <MetricCards cards={data?.cards || []} />
 
-      <section className="table-card" style={{ marginTop: '1rem' }}>
+      <section className="table-card">
         <div className="table-card__header">
           <h3>Current Audit Tasks</h3>
           <span className="table-card__meta">Derived from live exceptions</span>
@@ -86,7 +86,7 @@ export default function AuditorDashboard() {
         )}
       </section>
 
-      <section className="list-card" style={{ marginTop: '1rem' }}>
+      <section className="list-card">
         <div className="list-card__header">
           <h3>Audit Insights</h3>
           <span className="list-card__meta">Compliance snapshot</span>
@@ -94,7 +94,7 @@ export default function AuditorDashboard() {
         <MetricCards cards={data?.insights || []} columns="cards-3" />
       </section>
 
-      <section className="list-card" style={{ marginTop: '1rem' }}>
+      <section className="list-card">
         <div className="list-card__header">
           <h3>Recent Audit Events</h3>
           <span className="list-card__meta">Last 14 days</span>

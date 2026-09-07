@@ -23,7 +23,7 @@ export default function RolesPermissions() {
         </div>
       </header>
 
-      <div className="dashboard-admin-grid dashboard-admin-grid--cards-4" style={{ marginBottom: '1rem' }}>
+      <div className="dashboard-admin-grid dashboard-admin-grid--cards-4">
         <article className="dashboard-card">
           <div className="dashboard-card__label">Roles</div>
           <div className="dashboard-card__value">{ROLES.length}</div>
@@ -37,7 +37,7 @@ export default function RolesPermissions() {
           section.items.map((item) => item.label),
         )
         return (
-          <section key={role} className="table-card" style={{ marginBottom: '1rem' }}>
+          <section key={role} className="table-card">
             <div className="table-card__header">
               <h3>{role}</h3>
               <span className="table-card__meta">Home: {ROLE_HOME_ROUTES[role]}</span>

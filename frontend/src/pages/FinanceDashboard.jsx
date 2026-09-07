@@ -81,7 +81,7 @@ export default function FinanceDashboard() {
         columns="cards-4"
       />
 
-      <section className="chart-card" style={{ marginTop: '1rem' }}>
+      <section className="chart-card">
         <div className="chart-card__header">
           <h3>Payment Cycle Trend</h3>
           <span className="chart-card__meta">Monthly PO spend</span>
@@ -100,7 +100,7 @@ export default function FinanceDashboard() {
         </div>
       </section>
 
-      <section className="table-card" style={{ marginTop: '1rem' }}>
+      <section className="table-card">
         <div className="table-card__header">
           <h3>Recent Invoices</h3>
           <span className="table-card__meta">Latest due dates</span>

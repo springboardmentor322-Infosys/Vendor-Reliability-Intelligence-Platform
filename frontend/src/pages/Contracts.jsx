@@ -615,9 +615,7 @@ export default function Contracts() {
       />
 
       {pageTab === 'documents' ? (
-        <div style={{ marginTop: '1rem' }}>
-          <ComplianceDocumentsPanel user={user} />
-        </div>
+        <ComplianceDocumentsPanel user={user} />
       ) : (
         <>
       <div className="dashboard-admin-grid dashboard-admin-grid--cards-4">
@@ -639,30 +637,32 @@ export default function Contracts() {
         </article>
       </div>
 
-      <div className="page-toolbar" style={{ marginTop: '1rem' }}>
-        <div className="filter-group">
-          <select
-            className="filter-search"
-            style={{ width: 'auto', minWidth: '160px' }}
-            value={filters.status}
-            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          >
-            <option value="">All Statuses</option>
-            {CONTRACT_STATUSES.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-          <select
-            className="filter-search"
-            style={{ width: 'auto', minWidth: '160px' }}
-            value={filters.compliance_flag}
-            onChange={(e) => setFilters({ ...filters, compliance_flag: e.target.value })}
-          >
-            <option value="">All Compliance</option>
-            {COMPLIANCE_FLAGS.map((f) => (
-              <option key={f} value={f}>{f}</option>
-            ))}
-          </select>
+      <div className="page-toolbar">
+        <div className="page-toolbar__filters">
+          <label className="filter-field">
+            <span className="filter-field__label">Status</span>
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+            >
+              <option value="">All statuses</option>
+              {CONTRACT_STATUSES.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </label>
+          <label className="filter-field">
+            <span className="filter-field__label">Compliance</span>
+            <select
+              value={filters.compliance_flag}
+              onChange={(e) => setFilters({ ...filters, compliance_flag: e.target.value })}
+            >
+              <option value="">All flags</option>
+              {COMPLIANCE_FLAGS.map((f) => (
+                <option key={f} value={f}>{f}</option>
+              ))}
+            </select>
+          </label>
           {(filters.status || filters.compliance_flag) && (
             <button type="button" className="btn-text" onClick={() => setFilters({ status: '', compliance_flag: '' })}>
               Clear filters
@@ -671,17 +671,19 @@ export default function Contracts() {
         </div>
       </div>
 
+      {error ? <div className="page-alert page-alert--error">{error}</div> : null}
+
       {loading ? (
         <p className="loading-state">Loading contracts…</p>
-      ) : error ? (
-        <p className="form-error">{error}</p>
       ) : contracts.length === 0 ? (
         <section className="table-card">
-          <p style={{ color: '#64748b' }}>No contracts found.</p>
+          <p className="empty-state">No contracts found.</p>
           {canCreate && (
-            <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary" onClick={() => setShowCreate(true)} style={{ marginTop: '0.75rem' }}>
-              Create your first contract
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: '0.5rem' }}>
+              <button type="button" className="dashboard-admin-btn dashboard-admin-btn--primary" onClick={() => setShowCreate(true)}>
+                Create your first contract
+              </button>
+            </div>
           )}
         </section>
       ) : (

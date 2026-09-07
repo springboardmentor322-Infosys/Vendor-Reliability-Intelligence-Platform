@@ -48,7 +48,7 @@ export default function ProcurementDashboard() {
 
       <MetricCards cards={data?.cards || []} columns="cards-4" />
 
-      <section className="table-card" style={{ marginTop: '1rem' }}>
+      <section className="table-card">
         <div className="table-card__header">
           <h3>Purchase Order Pipeline</h3>
           <span className="table-card__meta">From pending through completion</span>

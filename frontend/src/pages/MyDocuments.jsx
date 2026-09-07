@@ -175,7 +175,7 @@ export default function MyDocuments() {
         </div>
       ) : null}
 
-      <div className="dashboard-admin-grid dashboard-admin-grid--cards-4" style={{ marginBottom: '1rem' }}>
+      <div className="dashboard-admin-grid dashboard-admin-grid--cards-4">
         <article className="dashboard-card">
           <div className="dashboard-card__label">Registration documents</div>
           <div className="dashboard-card__value">{stats.vendorCount}</div>
@@ -194,14 +194,14 @@ export default function MyDocuments() {
         </article>
       </div>
 
-      <form className="table-card" style={{ marginBottom: '1rem', padding: '1rem' }} onSubmit={handleVendorUpload}>
+      <form className="table-card" onSubmit={handleVendorUpload}>
         <div className="table-card__header">
           <h3>Upload registration document</h3>
         </div>
-        <p className="table-empty" style={{ padding: '0 0 0.75rem' }}>
+        <p className="helper-text">
           These files are reviewed in Vendor Management as part of Pending → Under Review → Approved/Rejected.
         </p>
-        <div className="page-toolbar" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
+        <div className="page-toolbar">
           <select value={vendorDocType} onChange={(event) => setVendorDocType(event.target.value)}>
             {DOCUMENT_TYPES.map((type) => (
               <option key={type} value={type}>
@@ -220,7 +220,7 @@ export default function MyDocuments() {
         </div>
       </form>
 
-      <section className="table-card" style={{ marginBottom: '1.5rem' }}>
+      <section className="table-card">
         <div className="table-card__header">
           <h3>Registration Documents</h3>
           <span className="table-card__meta">
@@ -228,7 +228,7 @@ export default function MyDocuments() {
           </span>
         </div>
         {loading ? (
-          <p className="loading-state" style={{ padding: '1rem' }}>Loading documents…</p>
+          <p className="loading-state">Loading documents…</p>
         ) : (
           <table>
             <thead>
@@ -263,14 +263,14 @@ export default function MyDocuments() {
         )}
       </section>
 
-      <form className="table-card" style={{ marginBottom: '1rem', padding: '1rem' }} onSubmit={handleComplianceUpload}>
+      <form className="table-card" onSubmit={handleComplianceUpload}>
         <div className="table-card__header">
           <h3>Upload compliance certification</h3>
         </div>
-        <p className="table-empty" style={{ padding: '0 0 0.75rem' }}>
+        <p className="helper-text">
           Ongoing certifications (ISO, insurance, etc.). Status is Approved/Rejected independently of vendor approval.
         </p>
-        <div className="page-toolbar" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
+        <div className="page-toolbar">
           <input
             required
             className="filter-search"
@@ -310,7 +310,7 @@ export default function MyDocuments() {
           </span>
         </div>
         {loading ? (
-          <p className="loading-state" style={{ padding: '1rem' }}>Loading certifications…</p>
+          <p className="loading-state">Loading certifications…</p>
         ) : (
           <table>
             <thead>

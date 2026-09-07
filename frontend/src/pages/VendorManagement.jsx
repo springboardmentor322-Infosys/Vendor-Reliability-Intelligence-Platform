@@ -367,31 +367,42 @@ export default function VendorManagement() {
 
       <div className="page-toolbar">
         <div className="page-toolbar__filters">
-          <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
-            <option value="">All categories</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-            <option value="">All statuses</option>
-            {VENDOR_STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
+          <label className="filter-field">
+            <span className="filter-field__label">Category</span>
+            <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+              <option value="">All categories</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="filter-field">
+            <span className="filter-field__label">Status</span>
+            <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+              <option value="">All statuses</option>
+              {VENDOR_STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
-        <input
-          type="text"
-          className="filter-search"
-          placeholder="Search vendors by name"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
+        <label className="filter-field">
+          <span className="filter-field__label">Search</span>
+          <input
+            type="text"
+            className="filter-search"
+            placeholder="Search vendors by name"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </label>
       </div>
+
+      {error ? <div className="page-alert page-alert--error">{error}</div> : null}
 
       <section className="table-card">
         <div className="table-card__header">
@@ -401,8 +412,9 @@ export default function VendorManagement() {
           </span>
         </div>
 
-        {error && <p className="form-error">{error}</p>}
-
+        {loading ? (
+          <p className="loading-state">Loading vendors…</p>
+        ) : (
         <table>
           <thead>
             <tr>
@@ -435,6 +447,7 @@ export default function VendorManagement() {
             )}
           </tbody>
         </table>
+        )}
       </section>
 
       {selectedVendorId && (

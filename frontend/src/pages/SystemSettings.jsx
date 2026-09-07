@@ -77,7 +77,7 @@ export default function SystemSettings() {
       {error ? <div className="page-alert page-alert--error">{error}</div> : null}
       {notice ? <div className="page-alert page-alert--success">{notice}</div> : null}
 
-      <section className="table-card" style={{ padding: '1rem' }}>
+      <section className="table-card">
         <form className="auth-form settings-form" onSubmit={handleSubmit}>
           <label>
             Contract expiry alert window (days)

@@ -1,7 +1,7 @@
 export const VENDOR_STATUSES = ['Pending', 'Under Review', 'Approved', 'Rejected']
 
 export const STATUS_PILL_CLASS = {
-  Pending: 'status-pill--neutral',
+  Pending: 'status-pill--warn',
   'Under Review': 'status-pill--warn',
   Approved: 'status-pill--good',
   Rejected: 'status-pill--danger',

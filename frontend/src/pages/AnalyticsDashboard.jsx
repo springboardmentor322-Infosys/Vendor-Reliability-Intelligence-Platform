@@ -51,6 +51,7 @@ export default function AnalyticsDashboard() {
   const [categoryData, setCategoryData] = useState(null)
   const [costTrends, setCostTrends] = useState(null)
   const [deliverySummary, setDeliverySummary] = useState(null)
+  const [timeRange, setTimeRange] = useState('12')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -79,15 +80,15 @@ export default function AnalyticsDashboard() {
     loadData()
   }, [loadData])
 
-  const spendChartData = useMemo(
-    () =>
-      (spendData?.points ?? []).map((point) => ({
-        period: formatMonth(point.period),
-        spend: point.total_spend,
-        orders: point.order_count,
-      })),
-    [spendData],
-  )
+  const spendChartData = useMemo(() => {
+    const points = (spendData?.points ?? []).map((point) => ({
+      period: formatMonth(point.period),
+      spend: point.total_spend,
+      orders: point.order_count,
+    }))
+    if (timeRange === 'all') return points
+    return points.slice(-Number(timeRange))
+  }, [spendData, timeRange])
 
   const categoryChartData = useMemo(
     () =>
@@ -101,15 +102,15 @@ export default function AnalyticsDashboard() {
     [categoryData],
   )
 
-  const costTrendChartData = useMemo(
-    () =>
-      (costTrends?.points ?? []).map((point) => ({
-        period: formatMonth(point.period),
-        avgOrder: point.average_order_value,
-        total: point.total_spend,
-      })),
-    [costTrends],
-  )
+  const costTrendChartData = useMemo(() => {
+    const points = (costTrends?.points ?? []).map((point) => ({
+      period: formatMonth(point.period),
+      avgOrder: point.average_order_value,
+      total: point.total_spend,
+    }))
+    if (timeRange === 'all') return points
+    return points.slice(-Number(timeRange))
+  }, [costTrends, timeRange])
 
   const deliveryModeData = useMemo(
     () =>
@@ -166,7 +167,19 @@ export default function AnalyticsDashboard() {
         </article>
       </div>
 
-      <div className="dashboard-row dashboard-row--analytics" style={{ marginTop: '1rem' }}>
+      <div className="chart-toolbar">
+        <label className="filter-field">
+          <span className="filter-field__label">Time range</span>
+          <select value={timeRange} onChange={(event) => setTimeRange(event.target.value)}>
+            <option value="6">Last 6 months</option>
+            <option value="12">Last 12 months</option>
+            <option value="all">All months</option>
+          </select>
+        </label>
+        <p className="chart-toolbar__hint">Applies to Spend Over Time and Procurement Cost Trends.</p>
+      </div>
+
+      <div className="dashboard-row dashboard-row--analytics">
         <section className="chart-card">
           <div className="chart-card__header">
             <h3>Spend Over Time</h3>
@@ -226,7 +239,7 @@ export default function AnalyticsDashboard() {
         </section>
       </div>
 
-      <div className="dashboard-row dashboard-row--analytics" style={{ marginTop: '1rem' }}>
+      <div className="dashboard-row dashboard-row--analytics">
         <section className="chart-card">
           <div className="chart-card__header">
             <h3>Procurement Cost Trends</h3>

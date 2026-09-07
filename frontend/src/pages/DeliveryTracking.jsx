@@ -69,22 +69,28 @@ export default function DeliveryTracking() {
 
       <div className="page-toolbar">
         <div className="page-toolbar__filters">
-          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-            <option value="">All statuses</option>
-            {statuses.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
+          <label className="filter-field">
+            <span className="filter-field__label">Status</span>
+            <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+              <option value="">All statuses</option>
+              {statuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
-        <input
-          type="text"
-          className="filter-search"
-          placeholder="Search PO, vendor, or mode…"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
+        <label className="filter-field">
+          <span className="filter-field__label">Search</span>
+          <input
+            type="text"
+            className="filter-search"
+            placeholder="Search PO, vendor, or mode…"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </label>
       </div>
 
       <section className="table-card">
@@ -93,7 +99,7 @@ export default function DeliveryTracking() {
           <span className="table-card__meta">{loading ? 'Loading…' : `${filtered.length} record${filtered.length === 1 ? '' : 's'}`}</span>
         </div>
         {loading ? (
-          <p className="loading-state" style={{ padding: '1rem' }}>Loading deliveries…</p>
+          <p className="loading-state">Loading deliveries…</p>
         ) : (
           <table>
             <thead>

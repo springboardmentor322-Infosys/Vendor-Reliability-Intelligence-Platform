@@ -136,13 +136,13 @@ export default function ComplianceDocumentsPanel({ user }) {
   }
 
   return (
-    <div>
-      <p className="table-empty" style={{ padding: '0 0 1rem' }}>
+    <div className="stack">
+      <p className="helper-text">
         Compliance Certifications are ongoing ISO, insurance, and similar certificates.
         Approve or reject them here — this does not change vendor registration status
         (Pending → Under Review → Approved/Rejected).
       </p>
-      <div className="dashboard-admin-grid dashboard-admin-grid--cards-4" style={{ marginBottom: '1rem' }}>
+      <div className="dashboard-admin-grid dashboard-admin-grid--cards-4">
         <article className="dashboard-card">
           <div className="dashboard-card__label">Certifications</div>
           <div className="dashboard-card__value">{stats.total}</div>
@@ -161,11 +161,11 @@ export default function ComplianceDocumentsPanel({ user }) {
       {notice ? <div className="page-alert page-alert--success">{notice}</div> : null}
 
       {canUpload ? (
-        <form className="table-card" style={{ marginBottom: '1rem', padding: '1rem' }} onSubmit={handleUpload}>
+        <form className="table-card" onSubmit={handleUpload}>
           <div className="table-card__header">
             <h3>Upload compliance certification</h3>
           </div>
-          <div className="page-toolbar" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div className="page-toolbar">
             {!isVendor ? (
               <select
                 required
@@ -230,7 +230,7 @@ export default function ComplianceDocumentsPanel({ user }) {
           <span className="table-card__meta">{loading ? 'Loading…' : `${documents.length} record${documents.length === 1 ? '' : 's'}`}</span>
         </div>
         {loading ? (
-          <p className="loading-state" style={{ padding: '1rem' }}>Loading certifications…</p>
+          <p className="loading-state">Loading certifications…</p>
         ) : (
           <table>
             <thead>

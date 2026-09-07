@@ -57,7 +57,7 @@ export default function SupplyChainDashboard() {
 
       <MetricCards cards={data?.cards || []} />
 
-      <section className="table-card" style={{ marginTop: '1rem' }}>
+      <section className="table-card">
         <div className="table-card__header">
           <h3>Recent Procurement Requests</h3>
           <span className="table-card__meta">Created by you</span>
@@ -88,7 +88,7 @@ export default function SupplyChainDashboard() {
         )}
       </section>
 
-      <section className="list-card" style={{ marginTop: '1rem' }}>
+      <section className="list-card">
         <div className="list-card__header">
           <h3>Quick Links</h3>
           <span className="list-card__meta">Actions</span>

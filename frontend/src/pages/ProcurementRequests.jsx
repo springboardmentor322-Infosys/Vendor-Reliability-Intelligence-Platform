@@ -11,12 +11,10 @@ import { formatDateTime } from '../utils/vendorStatus'
 import '../dashboard-admin.css'
 import '../vendor-management.css'
 
-const FINANCE_THRESHOLD = 10000
-
 const PROCUREMENT_STATUSES = ['Pending', 'Approved', 'Ordered', 'Delivered', 'Completed', 'Cancelled']
 
 const PROCUREMENT_PILL_CLASS = {
-  Pending: 'status-pill--neutral',
+  Pending: 'status-pill--warn',
   Approved: 'status-pill--good',
   Ordered: 'status-pill--warn',
   Delivered: 'status-pill--good',
@@ -33,10 +31,6 @@ function StatusBadge({ status }) {
 
 function formatCurrency(value) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
-}
-
-function requiresFinanceApproval(total) {
-  return total > FINANCE_THRESHOLD
 }
 
 /* ---------- Create Request Form (SCM only) ---------- */
@@ -113,7 +107,7 @@ function CreateRequestForm({ onCreated }) {
   }
 
   return (
-    <section className="table-card" style={{ marginBottom: '1.25rem' }}>
+    <section className="table-card">
       <div className="table-card__header">
         <h3>Create Procurement Request</h3>
         <span className="table-card__meta">Supply Chain Manager</span>
@@ -169,10 +163,6 @@ function CreateRequestForm({ onCreated }) {
               </tr>
             </tfoot>
           </table>
-
-          {requiresFinanceApproval(total) && (
-            <p className="pr-finance-flag">Requests over {formatCurrency(FINANCE_THRESHOLD)} require Finance Officer approval.</p>
-          )}
         </div>
 
         {error && <p className="form-error">{error}</p>}
@@ -257,9 +247,9 @@ function MyRequestsList({ requests, loading }) {
   )
 }
 
-/* ---------- Approval Queue (PM / FO view) ---------- */
+/* ---------- Approval Queue (PM / Admin view) ---------- */
 
-function ApprovalQueue({ requests, loading, userRole, onUpdated }) {
+function ApprovalQueue({ requests, loading, onUpdated }) {
   const [expandedId, setExpandedId] = useState(null)
   const [rejectingId, setRejectingId] = useState(null)
   const [reason, setReason] = useState('')
@@ -299,16 +289,9 @@ function ApprovalQueue({ requests, loading, userRole, onUpdated }) {
     }
   }
 
-  const canApprove = (pr) => {
-    if (requiresFinanceApproval(pr.total_estimated_cost)) {
-      return userRole === 'Finance Officer'
-    }
-    return userRole === 'Procurement Manager' || userRole === 'Finance Officer'
-  }
-
   return (
     <>
-      <section className="table-card" style={{ marginBottom: '1.25rem' }}>
+      <section className="table-card">
         <div className="table-card__header">
           <h3>Pending Approval</h3>
           <span className="table-card__meta">{pendingRequests.length} pending</span>
@@ -320,7 +303,7 @@ function ApprovalQueue({ requests, loading, userRole, onUpdated }) {
               <th>#</th>
               <th>Department</th>
               <th>Total est. cost</th>
-              <th>Approval</th>
+              <th>Status</th>
               <th>Created</th>
             </tr>
           </thead>
@@ -334,13 +317,7 @@ function ApprovalQueue({ requests, loading, userRole, onUpdated }) {
                   <td>{pr.id}</td>
                   <td>{pr.department}</td>
                   <td style={{ fontWeight: 600 }}>{formatCurrency(pr.total_estimated_cost)}</td>
-                  <td>
-                    {requiresFinanceApproval(pr.total_estimated_cost) ? (
-                      <span className="pr-finance-flag pr-finance-flag--inline">Requires Finance Approval</span>
-                    ) : (
-                      <span className="status-pill status-pill--warn">PM / FO</span>
-                    )}
-                  </td>
+                  <td><StatusBadge status={pr.status} /></td>
                   <td>{formatDateTime(pr.created_at)}</td>
                 </tr>
                 {expandedId === pr.id && (
@@ -384,9 +361,8 @@ function ApprovalQueue({ requests, loading, userRole, onUpdated }) {
                             <button
                               type="button"
                               className="dashboard-admin-btn dashboard-admin-btn--primary"
-                              disabled={submitting || !canApprove(pr)}
+                              disabled={submitting}
                               onClick={() => handleApprove(pr)}
-                              title={!canApprove(pr) ? 'Only Finance Officers can approve requests over $10,000' : ''}
                             >
                               {submitting ? 'Approving…' : 'Approve'}
                             </button>
@@ -398,11 +374,6 @@ function ApprovalQueue({ requests, loading, userRole, onUpdated }) {
                             >
                               Reject
                             </button>
-                            {!canApprove(pr) && (
-                              <span style={{ fontSize: '0.85rem', color: '#92400e', alignSelf: 'center' }}>
-                                This request requires Finance Officer approval.
-                              </span>
-                            )}
                           </>
                         )}
                       </div>
@@ -484,7 +455,7 @@ export default function ProcurementRequests() {
 
   const role = user?.role
   const isSCM = role === 'Supply Chain Manager'
-  const isApprover = role === 'Procurement Manager' || role === 'Finance Officer'
+  const isApprover = role === 'Procurement Manager' || role === 'Administrator'
 
   const loadRequests = useCallback(async () => {
     setLoading(true)
@@ -534,11 +505,11 @@ export default function ProcurementRequests() {
         </div>
       </header>
 
-      {error && <p className="form-error" style={{ marginBottom: '1rem' }}>{error}</p>}
+      {error && <div className="page-alert page-alert--error">{error}</div>}
 
       {isSCM && <CreateRequestForm onCreated={handleCreated} />}
       {isSCM && <MyRequestsList requests={myRequests} loading={loading} />}
-      {isApprover && <ApprovalQueue requests={allRequests} loading={loading} userRole={role} onUpdated={handleUpdated} />}
+      {isApprover && <ApprovalQueue requests={allRequests} loading={loading} onUpdated={handleUpdated} />}
 
       {!isSCM && !isApprover && (
         <section className="table-card">

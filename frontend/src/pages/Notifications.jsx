@@ -116,6 +116,8 @@ export default function Notifications() {
         </div>
       </header>
 
+      {error ? <div className="page-alert page-alert--error">{error}</div> : null}
+
       <section className="list-card">
         <div className="list-card__header">
           <h3>Notification Feed</h3>
@@ -124,12 +126,10 @@ export default function Notifications() {
           </span>
         </div>
 
-        {error && <p className="auth-error">{error}</p>}
-
         {loading ? (
-          <p className="list-card__meta">Loading notifications…</p>
+          <p className="loading-state">Loading notifications…</p>
         ) : items.length === 0 ? (
-          <p className="list-card__meta">No notifications yet.</p>
+          <p className="empty-state">No notifications yet.</p>
         ) : (
           <div className="notification-list">
             {items.map((item) => (

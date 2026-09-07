@@ -64,7 +64,7 @@ export default function VendorDashboard() {
 
       <MetricCards cards={data?.cards || []} />
 
-      <div className="dashboard-row" style={{ marginTop: '1rem' }}>
+      <div className="dashboard-row">
         <section className="chart-card">
           <div className="chart-card__header">
             <h3>Overall Reliability Score</h3>
@@ -151,7 +151,7 @@ export default function VendorDashboard() {
         </section>
       </div>
 
-      <div className="dashboard-row dashboard-row--bottom" style={{ marginTop: '1rem' }}>
+      <div className="dashboard-row dashboard-row--bottom">
         <section className="list-card">
           <div className="list-card__header">
             <h3>Contract Alerts</h3>
@@ -214,7 +214,7 @@ export default function VendorDashboard() {
         </section>
       </div>
 
-      <div className="dashboard-row" style={{ marginTop: '1rem' }}>
+      <div className="dashboard-row">
         <section className="chart-card">
           <div className="chart-card__header">
             <h3>Contract Status</h3>

@@ -269,8 +269,8 @@ export default function VendorProfile() {
         )}
       </header>
 
-      {error && <p className="form-error">{error}</p>}
-      {success && <p className="form-success">{success}</p>}
+      {error && <div className="page-alert page-alert--error">{error}</div>}
+      {success && <div className="page-alert page-alert--success">{success}</div>}
 
       {showCreateForm ? (
         <section className="table-card">
@@ -446,7 +446,7 @@ export default function VendorProfile() {
               </dl>
             </section>
 
-            <section className="table-card" style={{ marginTop: '1rem' }}>
+            <section className="table-card">
               <div className="table-card__header">
                 <h3>Contacts</h3>
               </div>
@@ -467,11 +467,11 @@ export default function VendorProfile() {
               )}
             </section>
 
-            <section className="table-card" style={{ marginTop: '1rem' }}>
+            <section className="table-card">
               <div className="table-card__header">
                 <h3>Registration Documents</h3>
               </div>
-              <p className="table-empty" style={{ padding: '0 1rem' }}>
+              <p className="helper-text">
                 Used only for vendor approval (Pending → Under Review → Approved/Rejected).
               </p>
               {vendor.documents?.length ? (
@@ -489,13 +489,13 @@ export default function VendorProfile() {
               ) : (
                 <p className="table-empty">No registration documents uploaded yet.</p>
               )}
-              <section className="vendor-section" style={{ marginTop: '1rem' }}>
+              <section className="vendor-section">
                 <h3>Upload registration document</h3>
                 <DocumentUploadPanel vendorId={vendor.id} onUploaded={loadProfile} />
               </section>
             </section>
 
-            <section className="table-card" style={{ marginTop: '1rem' }}>
+            <section className="table-card">
               <div className="table-card__header">
                 <h3>Status history</h3>
               </div>

@@ -22,7 +22,7 @@ from app.services.in_app_notifications import create_notification
 
 router = APIRouter(prefix="/procurement-requests", tags=["procurement-requests"])
 
-HIGH_VALUE_THRESHOLD = Decimal("10000")
+PR_APPROVERS = [Role.PROCUREMENT_MANAGER, Role.ADMINISTRATOR]
 
 
 def _get_request_or_404(request_id: int, db: Session) -> ProcurementRequest:
@@ -116,13 +116,11 @@ def get_procurement_request(
 def approve_procurement_request(
     request_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user_with_role(PR_APPROVERS)),
 ) -> ProcurementRequest:
     """Approve a procurement request.
 
-    Approval rules:
-    - If total_estimated_cost > $10,000: only Finance Officer can approve.
-    - If total_estimated_cost <= $10,000: Procurement Manager or Finance Officer can approve.
+    Only Procurement Managers and Administrators may approve, regardless of cost.
     """
     pr = _get_request_or_404(request_id, db)
 
@@ -132,21 +130,6 @@ def approve_procurement_request(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Cannot approve a request with status '{current}'",
         )
-
-    is_high_value = pr.total_estimated_cost > HIGH_VALUE_THRESHOLD
-
-    if is_high_value:
-        if current_user.role != Role.FINANCE_OFFICER:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Requests over $10,000 require Finance Officer approval",
-            )
-    else:
-        if current_user.role not in {Role.PROCUREMENT_MANAGER, Role.FINANCE_OFFICER}:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Only Procurement Managers or Finance Officers can approve requests",
-            )
 
     pr.status = ProcurementRequestStatus.APPROVED
     pr.rejection_reason = None
@@ -181,11 +164,12 @@ def reject_procurement_request(
     request_id: int,
     payload: ProcurementRequestReject,
     db: Session = Depends(get_db),
-    current_user: User = Depends(
-        get_current_user_with_role([Role.PROCUREMENT_MANAGER, Role.FINANCE_OFFICER])
-    ),
+    current_user: User = Depends(get_current_user_with_role(PR_APPROVERS)),
 ) -> ProcurementRequest:
-    """Reject a procurement request with a reason."""
+    """Reject a procurement request with a reason.
+
+    Only Procurement Managers and Administrators may reject, regardless of cost.
+    """
     pr = _get_request_or_404(request_id, db)
 
     if pr.status != ProcurementRequestStatus.PENDING:

@@ -9,16 +9,38 @@ export function formatMoney(value) {
 
 export function statusPillClass(status) {
   const value = String(status || '').toLowerCase()
-  if (['approved', 'completed', 'delivered', 'paid', 'healthy', 'active', 'low', 'excellent', 'clear', 'compliant'].some((item) => value.includes(item))) {
-    return 'status-pill--good'
-  }
-  if (['pending', 'review', 'warn', 'medium', 'expir', 'in progress', 'shipped', 'partial'].some((item) => value.includes(item))) {
-    return 'status-pill--warn'
-  }
-  if (['cancel', 'overdue', 'high', 'urgent', 'rejected', 'non-compliant'].some((item) => value.includes(item))) {
+  if (!value) return 'status-pill--neutral'
+
+  if (
+    ['expired', 'cancel', 'overdue', 'rejected', 'non-compliant', 'late', 'urgent', 'high', 'danger'].some((item) =>
+      value.includes(item),
+    )
+  ) {
     return 'status-pill--danger'
   }
-  return 'status-pill--warn'
+  if (
+    ['approved', 'completed', 'delivered', 'paid', 'healthy', 'active', 'low', 'excellent', 'compliant', 'on track'].some(
+      (item) => value.includes(item),
+    )
+  ) {
+    return 'status-pill--good'
+  }
+  if (
+    [
+      'pending',
+      'review',
+      'medium',
+      'expir',
+      'in progress',
+      'shipped',
+      'partial',
+      'ordered',
+      'warn',
+    ].some((item) => value.includes(item))
+  ) {
+    return 'status-pill--warn'
+  }
+  return 'status-pill--neutral'
 }
 
 export function MetricCards({ cards = [], columns = 'cards' }) {
@@ -36,5 +58,5 @@ export function MetricCards({ cards = [], columns = 'cards' }) {
 }
 
 export function EmptyState({ message = 'No records yet.' }) {
-  return <p className="chart-empty">{message}</p>
+  return <p className="empty-state">{message}</p>
 }

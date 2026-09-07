@@ -88,22 +88,28 @@ export default function QualityInspection() {
       <div className="page-toolbar">
         <div className="page-toolbar__filters">
           {!isVendor ? (
-            <select value={vendorFilter} onChange={(event) => setVendorFilter(event.target.value)}>
-              <option value="">All vendors</option>
-              {vendors.map((vendor) => (
-                <option key={vendor.id} value={vendor.id}>
-                  {vendor.name}
-                </option>
-              ))}
-            </select>
+            <label className="filter-field">
+              <span className="filter-field__label">Vendor</span>
+              <select value={vendorFilter} onChange={(event) => setVendorFilter(event.target.value)}>
+                <option value="">All vendors</option>
+                {vendors.map((vendor) => (
+                  <option key={vendor.id} value={vendor.id}>
+                    {vendor.name}
+                  </option>
+                ))}
+              </select>
+            </label>
           ) : null}
-          <input
-            type="text"
-            className="filter-search"
-            placeholder="Filter by PO ref…"
-            value={poFilter}
-            onChange={(event) => setPoFilter(event.target.value)}
-          />
+          <label className="filter-field">
+            <span className="filter-field__label">PO reference</span>
+            <input
+              type="text"
+              className="filter-search"
+              placeholder="Filter by PO ref…"
+              value={poFilter}
+              onChange={(event) => setPoFilter(event.target.value)}
+            />
+          </label>
         </div>
       </div>
 
@@ -113,7 +119,7 @@ export default function QualityInspection() {
           <span className="table-card__meta">{loading ? 'Loading…' : `${filtered.length} record${filtered.length === 1 ? '' : 's'}`}</span>
         </div>
         {loading ? (
-          <p className="loading-state" style={{ padding: '1rem' }}>Loading inspections…</p>
+          <p className="loading-state">Loading inspections…</p>
         ) : (
           <table>
             <thead>

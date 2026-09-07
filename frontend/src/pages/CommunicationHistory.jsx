@@ -94,43 +94,52 @@ export default function CommunicationHistory() {
       <div className="page-toolbar">
         <div className="page-toolbar__filters">
           {!isVendor ? (
-            <select value={vendorFilter} onChange={(event) => setVendorFilter(event.target.value)}>
-              <option value="">All vendors</option>
-              {vendors.map((vendor) => (
-                <option key={vendor.id} value={vendor.id}>
-                  {vendor.name}
-                </option>
-              ))}
-            </select>
+            <label className="filter-field">
+              <span className="filter-field__label">Vendor</span>
+              <select value={vendorFilter} onChange={(event) => setVendorFilter(event.target.value)}>
+                <option value="">All vendors</option>
+                {vendors.map((vendor) => (
+                  <option key={vendor.id} value={vendor.id}>
+                    {vendor.name}
+                  </option>
+                ))}
+              </select>
+            </label>
           ) : null}
-          <select
-            value={poFilter}
-            onChange={(event) => {
-              setPoFilter(event.target.value)
-              if (event.target.value) setContractFilter('')
-            }}
-          >
+          <label className="filter-field">
+            <span className="filter-field__label">Purchase order</span>
+            <select
+              value={poFilter}
+              onChange={(event) => {
+                setPoFilter(event.target.value)
+                if (event.target.value) setContractFilter('')
+              }}
+            >
             <option value="">All purchase orders</option>
             {visiblePos.map((po) => (
               <option key={po.id} value={po.id}>
                 {po.po_number}
               </option>
             ))}
-          </select>
-          <select
-            value={contractFilter}
-            onChange={(event) => {
-              setContractFilter(event.target.value)
-              if (event.target.value) setPoFilter('')
-            }}
-          >
-            <option value="">All contracts</option>
-            {visibleContracts.map((contract) => (
-              <option key={contract.id} value={contract.id}>
-                {contract.contract_number}
-              </option>
-            ))}
-          </select>
+            </select>
+          </label>
+          <label className="filter-field">
+            <span className="filter-field__label">Contract</span>
+            <select
+              value={contractFilter}
+              onChange={(event) => {
+                setContractFilter(event.target.value)
+                if (event.target.value) setPoFilter('')
+              }}
+            >
+              <option value="">All contracts</option>
+              {visibleContracts.map((contract) => (
+                <option key={contract.id} value={contract.id}>
+                  {contract.contract_number}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </div>
 
@@ -142,7 +151,7 @@ export default function CommunicationHistory() {
           </span>
         </div>
         {loading ? (
-          <p className="loading-state" style={{ padding: '1rem' }}>Loading messages…</p>
+          <p className="loading-state">Loading messages…</p>
         ) : (
           <table>
             <thead>

@@ -97,27 +97,36 @@ export default function UserManagement() {
 
       <div className="page-toolbar">
         <div className="page-toolbar__filters">
-          <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}>
-            <option value="">All roles</option>
-            {ALL_ROLES.map((role) => (
-              <option key={role} value={role}>
-                {role}
-              </option>
-            ))}
-          </select>
-          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-            <option value="">All statuses</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
+          <label className="filter-field">
+            <span className="filter-field__label">Role</span>
+            <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}>
+              <option value="">All roles</option>
+              {ALL_ROLES.map((role) => (
+                <option key={role} value={role}>
+                  {role}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="filter-field">
+            <span className="filter-field__label">Status</span>
+            <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+              <option value="">All statuses</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </label>
         </div>
-        <input
-          type="text"
-          className="filter-search"
-          placeholder="Search name or email…"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
+        <label className="filter-field">
+          <span className="filter-field__label">Search</span>
+          <input
+            type="text"
+            className="filter-search"
+            placeholder="Search name or email…"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </label>
       </div>
 
       <section className="table-card">
@@ -128,7 +137,7 @@ export default function UserManagement() {
           </span>
         </div>
         {loading ? (
-          <p className="loading-state" style={{ padding: '1rem' }}>Loading users…</p>
+          <p className="loading-state">Loading users…</p>
         ) : (
           <table>
             <thead>

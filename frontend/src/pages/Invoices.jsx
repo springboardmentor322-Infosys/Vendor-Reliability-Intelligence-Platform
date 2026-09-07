@@ -91,22 +91,28 @@ export default function Invoices() {
 
       <div className="page-toolbar">
         <div className="page-toolbar__filters">
-          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-            <option value="">All statuses</option>
-            {STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
+          <label className="filter-field">
+            <span className="filter-field__label">Status</span>
+            <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+              <option value="">All statuses</option>
+              {STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
-        <input
-          type="text"
-          className="filter-search"
-          placeholder="Search invoice, PO, or vendor…"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
+        <label className="filter-field">
+          <span className="filter-field__label">Search</span>
+          <input
+            type="text"
+            className="filter-search"
+            placeholder="Search invoice, PO, or vendor…"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </label>
       </div>
 
       <section className="table-card">
@@ -114,6 +120,9 @@ export default function Invoices() {
           <h3>Invoices</h3>
           <span className="table-card__meta">{loading ? 'Loading…' : `${filtered.length} record${filtered.length === 1 ? '' : 's'}`}</span>
         </div>
+        {loading ? (
+          <p className="loading-state">Loading invoices…</p>
+        ) : (
         <table>
           <thead>
             <tr>
@@ -163,6 +172,7 @@ export default function Invoices() {
             ))}
           </tbody>
         </table>
+        )}
       </section>
     </section>
   )

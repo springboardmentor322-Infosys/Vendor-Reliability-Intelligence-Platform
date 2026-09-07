@@ -34,6 +34,7 @@ function formatHours(value) {
 function riskClass(level) {
   if (level === 'Low') return 'status-pill--good'
   if (level === 'Medium') return 'status-pill--warn'
+  if (level === 'Unscored') return 'status-pill--neutral'
   return 'status-pill--danger'
 }
 
@@ -166,18 +167,21 @@ export default function VendorPerformance() {
           </div>
           <div className="dashboard-admin-header__actions">
           {!isVendor ? (
-            <select
-              className="dashboard-select"
-              value={selectedVendorId}
-              onChange={handleVendorChange}
-              disabled={loading || vendors.length === 0}
-            >
-              {vendors.map((vendor) => (
-                <option key={vendor.id} value={vendor.id}>
-                  {vendor.name}
-                </option>
-              ))}
-            </select>
+            <label className="filter-field">
+              <span className="filter-field__label">Vendor</span>
+              <select
+                className="dashboard-select"
+                value={selectedVendorId}
+                onChange={handleVendorChange}
+                disabled={loading || vendors.length === 0}
+              >
+                {vendors.map((vendor) => (
+                  <option key={vendor.id} value={vendor.id}>
+                    {vendor.name}
+                  </option>
+                ))}
+              </select>
+            </label>
           ) : null}
           <button
             type="button"
@@ -229,7 +233,7 @@ export default function VendorPerformance() {
         </div>
         </div>
 
-        <div className="dashboard-row" style={{ marginTop: '1rem' }}>
+        <div className="dashboard-row">
         <section className="chart-card" style={{ minHeight: '360px' }}>
             <div className="chart-card__header">
             <h3>{isVendor ? 'Factor Breakdown' : 'Vendor Comparison'}</h3>
