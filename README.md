@@ -9,6 +9,7 @@
     <a href="#-architecture--tech-stack"><img src="https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi" alt="FastAPI" /></a>
     <a href="#-architecture--tech-stack"><img src="https://img.shields.io/badge/Frontend-Vanilla_JS_%7C_Tailwind-orange.svg" alt="Frontend" /></a>
   </p>
+  <p><strong>🚀 Live Deployment:</strong> <a href="https://vendor-reliability-intelligence-platform-e471.onrender.com">https://vendor-reliability-intelligence-platform-e471.onrender.com</a></p>
 </div>
 
 ---
@@ -81,6 +82,7 @@ Detailed release notes and milestone tracking documentation can be viewed below:
 - 📖 [Milestone 1 Documentation](README_MILESTONES/milestone_documentation.md)
 - 📖 [Milestone 2 Documentation](README_MILESTONES/milestone_2_documentation.md)
 - 📖 [Milestone 3 Documentation](README_MILESTONES/Milestone_3_README.md)
+- 📖 [Milestone 4 Documentation](README_MILESTONES/Milestone_4_README.md)
 
 ---
 
