@@ -124,11 +124,11 @@ python -m http.server 5500
 
 ---
 
-## 🎥 Project Demos
+## 🎥 Live Demo & Screen Recordings
 
+- 🚀 **Live Application (Deployed)**: [VendorIntel Platform on Render](https://vendor-reliability-intelligence-platform-e471.onrender.com)
 - 📺 **Milestone 1 & 2 Screen Recording**: [Watch Video on Google Drive](https://drive.google.com/file/d/1UMZ9P47Xoc13c0lfobyR8mvrX4cRYfwV/view?usp=sharing)
-
- 📺 **Milestone 3 & 4 Screen Recording**:[Watch Video on Google Drive](https://drive.google.com/file/d/1vEpmly3ctNDfBxwI3hPOF9l2YNpOX5Ri/view?usp=sharing)
+- 📺 **Milestone 3 & 4 Screen Recording**: [Watch Video on Google Drive](https://drive.google.com/file/d/1vEpmly3ctNDfBxwI3hPOF9l2YNpOX5Ri/view?usp=sharing)
 <br>
 <p align="center">
   <i>Built with ❤️ for better procurement.</i>
