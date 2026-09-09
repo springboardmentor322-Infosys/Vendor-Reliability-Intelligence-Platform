@@ -168,6 +168,15 @@ External email and SMS delivery requires valid provider credentials. In-app noti
 
 The demo credentials in this document are public evaluation credentials. Do not use them in production. Configure strong secrets, production database credentials, and external notification providers before deployment.
 
+
+## Project Demo
+
+Click below to watch the complete project demonstration:
+
+👉 [Watch Project Demo](https://drive.google.com/file/d/1vRl4FIlfsd2f8CBk1tJ30y35QYGwt_zY/view?usp=drive_link)
+
+
+
 ## License
 
 See [LICENSE](LICENSE) for licensing information.
