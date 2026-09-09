@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
 from app.database import get_db
 
@@ -54,13 +55,10 @@ def get_notifications(
     )
 ):
 
-    notifications = (
-        db.query(Notification)
-        .order_by(
-            Notification.created_at.desc()
-        )
-        .all()
-    )
+    query = db.query(Notification)
+    if current_user.role == VENDOR:
+        query = query.filter(or_(Notification.user_id == current_user.id, Notification.vendor_id == current_user.vendor_id))
+    notifications = query.order_by(Notification.created_at.desc()).all()
 
     return notifications
 
@@ -88,16 +86,10 @@ def get_unread_notifications(
     )
 ):
 
-    notifications = (
-        db.query(Notification)
-        .filter(
-            Notification.is_read == False
-        )
-        .order_by(
-            Notification.created_at.desc()
-        )
-        .all()
-    )
+    query = db.query(Notification).filter(Notification.is_read == False)
+    if current_user.role == VENDOR:
+        query = query.filter(or_(Notification.user_id == current_user.id, Notification.vendor_id == current_user.vendor_id))
+    notifications = query.order_by(Notification.created_at.desc()).all()
 
     return notifications
 
@@ -122,13 +114,10 @@ def get_unread_count(
     )
 ):
 
-    count = (
-        db.query(Notification)
-        .filter(
-            Notification.is_read == False
-        )
-        .count()
-    )
+    query = db.query(Notification).filter(Notification.is_read == False)
+    if current_user.role == VENDOR:
+        query = query.filter(or_(Notification.user_id == current_user.id, Notification.vendor_id == current_user.vendor_id))
+    count = query.count()
 
     return {
         "count": count

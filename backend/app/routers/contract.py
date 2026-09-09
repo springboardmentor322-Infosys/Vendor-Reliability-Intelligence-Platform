@@ -15,7 +15,8 @@ from app.utils.permissions import (
     SUPPLY_CHAIN_MANAGER,
     VENDOR,
     FINANCE_OFFICER,
-    AUDITOR
+    AUDITOR,
+    ensure_vendor_access
 )
 
 
@@ -56,12 +57,12 @@ def get_contracts(
     )
 ):
 
-    contracts = (
-        db.query(Contract)
-        .all()
-    )
-
-    return contracts
+    query = db.query(Contract)
+    if current_user.role == VENDOR:
+        if not current_user.vendor_id:
+            return []
+        query = query.filter(Contract.vendor_id == current_user.vendor_id)
+    return query.all()
 
 
 # ==========================================

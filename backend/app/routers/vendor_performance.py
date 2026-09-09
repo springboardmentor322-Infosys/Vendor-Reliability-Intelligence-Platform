@@ -15,7 +15,8 @@ from app.utils.permissions import (
     SUPPLY_CHAIN_MANAGER,
     VENDOR,
     FINANCE_OFFICER,
-    AUDITOR
+    AUDITOR,
+    ensure_vendor_access
 )
 
 from app.utils.reliability import (
@@ -276,12 +277,12 @@ def get_performance(
     )
 ):
 
-    performance = db.query(
-        VendorPerformance
-    ).all()
-
-
-    return performance
+    query = db.query(VendorPerformance)
+    if current_user.role == VENDOR:
+        if not current_user.vendor_id:
+            return []
+        query = query.filter(VendorPerformance.vendor_id == current_user.vendor_id)
+    return query.all()
 
 
 # ==========================================
@@ -317,6 +318,7 @@ def get_vendor_performance(
             detail="Vendor not found"
         )
 
+    ensure_vendor_access(current_user, vendor_id)
 
     performance = db.query(
         VendorPerformance
@@ -348,9 +350,12 @@ def get_vendor_reliability(
     )
 ):
 
-    performances = db.query(
-        VendorPerformance
-    ).all()
+    query = db.query(VendorPerformance)
+    if current_user.role == VENDOR:
+        if not current_user.vendor_id:
+            return []
+        query = query.filter(VendorPerformance.vendor_id == current_user.vendor_id)
+    performances = query.all()
 
 
     result = []
@@ -896,6 +901,7 @@ def get_performance_trend(
             detail="Vendor not found"
         )
 
+    ensure_vendor_access(current_user, vendor_id)
 
     # Get performance records
 
@@ -984,7 +990,7 @@ def get_single_performance(
             detail="Performance record not found"
         )
 
-
+    ensure_vendor_access(current_user, performance.vendor_id)
     return performance
 
 

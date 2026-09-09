@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from datetime import date
 
 
 class ProcurementRequestCreate(BaseModel):
@@ -18,3 +19,10 @@ class ProcurementRequestCreate(BaseModel):
         default=0,
         ge=0
     )
+
+    department: str = Field(
+        default="General",
+        min_length=1
+    )
+
+    expected_delivery_date: date

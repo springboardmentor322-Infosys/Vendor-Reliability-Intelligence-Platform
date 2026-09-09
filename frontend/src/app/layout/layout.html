@@ -43,7 +43,8 @@
         <h2>{{ currentUser?.role || 'User' }} Workspace</h2>
       </div>
       <div class="profile">
-        <span>🔔</span>
+        <button type="button" class="header-action" (click)="openChat()">💬 Chat</button>
+        <button type="button" class="header-action notification-button" (click)="toggleNotifications()">🔔 @if (unreadNotifications > 0) {<b>{{ unreadNotifications }}</b>}</button>
         <span>👤 {{ currentUser?.full_name || 'User' }}</span>
       </div>
     </header>
@@ -52,3 +53,24 @@
     </div>
   </div>
 </div>
+
+@if (showNotifications) {
+  <div class="notification-popover">
+    <div class="popover-title"><strong>Notifications</strong><button (click)="showNotifications=false">×</button></div>
+    @for (n of notifications; track n.id) {
+      <button class="notification-item" [class.unread]="!n.is_read" (click)="markNotificationRead(n)"><strong>{{ n.title }}</strong><small>{{ n.message }}</small></button>
+    }
+    @if (!notifications.length) { <div class="empty-popover">No notifications.</div> }
+  </div>
+}
+
+@if (showChat) {
+  <div class="chat-overlay">
+    <div class="chat-modal">
+      <div class="chat-head"><div><strong>Communication Hub</strong><small>Vendor conversation</small></div><button (click)="closeChat()">×</button></div>
+      <select [(ngModel)]="selectedChatVendorId" (change)="loadChat()"><option [ngValue]="null">Select vendor</option>@for(v of chatVendors; track v.id){<option [ngValue]="v.id">{{ v.vendor_name }}</option>}</select>
+      <div class="chat-messages">@for(m of chatMessages; track m.id){<div class="chat-message" [class.mine]="m.sender_id === currentUser?.id"><strong>{{ m.sender_name }}</strong><span>{{ m.content }}</span><small>{{ m.timestamp }}</small></div>}@if(!chatMessages.length){<div class="empty-popover">No messages yet.</div>}</div>
+      <form class="chat-form" (ngSubmit)="sendChat()"><input name="chatDraft" [(ngModel)]="chatDraft" placeholder="Type your message..." autocomplete="off"><button type="submit">Send</button></form>
+    </div>
+  </div>
+}

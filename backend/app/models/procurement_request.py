@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, Date
 from app.database import Base
 
 
@@ -30,6 +30,17 @@ class ProcurementRequest(Base):
     estimated_amount = Column(
         Float,
         nullable=False
+    )
+
+    department = Column(
+        String,
+        nullable=False,
+        default="General"
+    )
+
+    expected_delivery_date = Column(
+        Date,
+        nullable=True
     )
 
     status = Column(

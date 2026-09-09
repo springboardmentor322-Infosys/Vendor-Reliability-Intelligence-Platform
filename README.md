@@ -74,3 +74,15 @@ Auditor: dashboard, vendors, procurement, purchase orders, contracts/compliance,
 - Run `python seed_database.py` from `backend/` to clear existing business data and rebuild the database from the DataCo dataset. Existing user accounts are preserved when present.
 - If you create a completely new database, run `python create_test_accounts.py` after the import to create the six demo logins.
 - DataCo does not contain vendor master, contracts, invoices, communications, certifications, notifications, or quality-inspection tables, so those VendorIQ-only records are generated as supplemental business data and clearly documented in `data/README.md`.
+
+## Reference-aligned enhancements
+The implementation also includes the strongest relevant features from the reference Vendor Reliability Intelligence Platform branch while preserving this project's Angular + FastAPI architecture:
+- Dedicated Finance Officer dashboard with database-backed department budgets, approval queue, invoices and procurement totals.
+- Finance approval can create an operational purchase order automatically, while budget limits are enforced.
+- Global in-app Communication Hub with threaded vendor conversations and automatic chat notifications.
+- Notification badge/popover with automatic refresh.
+- Vendor-account-to-company linkage and backend vendor data isolation so a Vendor account can access only its assigned vendor records.
+- Contract/dispute evidence URL support through the backend collaboration/compliance layer.
+- `DATABASE_URL` support for PostgreSQL while retaining SQLite as the local evaluation default.
+
+After creating the six demo accounts, run `python seed_reference_features.py` from `backend/` to create the reference-aligned budget records and link the demo Vendor account to vendor #1.

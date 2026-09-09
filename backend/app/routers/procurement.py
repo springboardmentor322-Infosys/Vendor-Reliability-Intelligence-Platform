@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.procurement_request import ProcurementRequest
 from app.models.vendor import Vendor
+from app.models.order import Order
+from app.models.budget import Budget
 from app.schemas.procurement_request import ProcurementRequestCreate
 
 from app.utils.permissions import (
@@ -13,7 +15,8 @@ from app.utils.permissions import (
     SUPPLY_CHAIN_MANAGER,
     VENDOR,
     FINANCE_OFFICER,
-    AUDITOR
+    AUDITOR,
+    ensure_vendor_access
 )
 
 
@@ -62,7 +65,9 @@ def create_procurement_request(
 
         quantity=data.quantity,
 
-        estimated_amount=data.estimated_amount
+        estimated_amount=data.estimated_amount,
+        department=data.department,
+        expected_delivery_date=data.expected_delivery_date
 
     )
 
@@ -97,12 +102,12 @@ def get_procurement_requests(
     )
 ):
 
-    requests = db.query(
-        ProcurementRequest
-    ).all()
-
-
-    return requests
+    query = db.query(ProcurementRequest)
+    if current_user.role == VENDOR:
+        if not current_user.vendor_id:
+            return []
+        query = query.filter(ProcurementRequest.vendor_id == current_user.vendor_id)
+    return query.all()
 
 
 # ==========================================
@@ -140,7 +145,7 @@ def get_procurement_request(
             detail="Procurement request not found"
         )
 
-
+    ensure_vendor_access(current_user, request.vendor_id)
     return request
 
 
@@ -197,6 +202,8 @@ def update_procurement_request(
     request.quantity = data.quantity
 
     request.estimated_amount = data.estimated_amount
+    request.department = data.department
+    request.expected_delivery_date = data.expected_delivery_date
 
 
     db.commit()
@@ -261,7 +268,8 @@ def approve_procurement_request(
     current_user = Depends(
         require_roles(
             ADMINISTRATOR,
-            PROCUREMENT_MANAGER
+            PROCUREMENT_MANAGER,
+            FINANCE_OFFICER
         )
     )
 ):
@@ -288,9 +296,28 @@ def approve_procurement_request(
             detail="Only pending requests can be approved"
         )
 
+    if current_user.role == FINANCE_OFFICER:
+        budget = db.query(Budget).filter(Budget.department == (request.department or "General")).first()
+        if budget:
+            approved_total = sum(float(r.estimated_amount or 0) for r in db.query(ProcurementRequest).filter(ProcurementRequest.department == budget.department, ProcurementRequest.status == "Approved").all())
+            if approved_total + float(request.estimated_amount or 0) > budget.allocated_limit:
+                raise HTTPException(status_code=400, detail=f"Approval would exceed the {budget.department} budget limit")
 
     request.status = "Approved"
 
+    # Finance approval follows the reference workflow: immediately create
+    # the operational PO so approval is not merely a status change.
+    if current_user.role == FINANCE_OFFICER:
+        existing_order = db.query(Order).filter(Order.source_order_id == f"PR-{request.id}").first()
+        if not existing_order:
+            db.add(Order(
+                vendor_id=request.vendor_id,
+                product_name=request.product_name,
+                quantity=request.quantity,
+                amount=request.estimated_amount,
+                status="Ordered",
+                source_order_id=f"PR-{request.id}"
+            ))
 
     db.commit()
 
@@ -312,7 +339,8 @@ def reject_procurement_request(
     current_user = Depends(
         require_roles(
             ADMINISTRATOR,
-            PROCUREMENT_MANAGER
+            PROCUREMENT_MANAGER,
+            FINANCE_OFFICER
         )
     )
 ):

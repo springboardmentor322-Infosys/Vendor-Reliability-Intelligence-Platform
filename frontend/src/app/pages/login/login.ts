@@ -50,9 +50,8 @@ export class Login {
 
         next: () => {
 
-          this.router.navigate([
-            '/dashboard'
-          ]);
+          const role = this.auth.getRole();
+          this.router.navigate([role === 'Finance Officer' ? '/finance-dashboard' : '/dashboard']);
 
         },
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 
 from app.database import Base
 
@@ -33,4 +33,11 @@ class User(Base):
         String,
         nullable=False,
         default="Vendor"
+    )
+
+    vendor_id = Column(
+        Integer,
+        ForeignKey("vendors.id"),
+        nullable=True,
+        index=True
     )

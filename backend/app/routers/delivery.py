@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, or_, String
 from datetime import date
 
 from app.database import get_db
@@ -21,7 +21,8 @@ from app.utils.permissions import (
     SUPPLY_CHAIN_MANAGER,
     FINANCE_OFFICER,
     AUDITOR,
-    VENDOR
+    VENDOR,
+    ensure_vendor_access
 )
 
 
@@ -68,32 +69,24 @@ def create_delivery(
 
 
     # ======================================
-    # CHECK VENDOR
+    # DERIVE VENDOR FROM ORDER
     # ======================================
+    # The purchase order already identifies its vendor. Do not require
+    # users to manually enter a vendor ID when creating a delivery.
+    if not order.vendor_id:
+        raise HTTPException(
+            status_code=400,
+            detail="The order does not have a vendor assigned"
+        )
 
-    vendor = db.query(
-        Vendor
-    ).filter(
-        Vendor.id == data.vendor_id
+    vendor = db.query(Vendor).filter(
+        Vendor.id == order.vendor_id
     ).first()
 
     if not vendor:
-
         raise HTTPException(
             status_code=404,
-            detail="Vendor not found"
-        )
-
-
-    # ======================================
-    # CHECK ORDER-VENDOR MATCH
-    # ======================================
-
-    if order.vendor_id != data.vendor_id:
-
-        raise HTTPException(
-            status_code=400,
-            detail="Vendor does not match the order vendor"
+            detail="Vendor assigned to the order was not found"
         )
 
 
@@ -123,7 +116,7 @@ def create_delivery(
 
         order_id=data.order_id,
 
-        vendor_id=data.vendor_id,
+        vendor_id=order.vendor_id,
 
         expected_delivery_date=
             data.expected_delivery_date,
@@ -170,83 +163,18 @@ def get_delivery_summary(
 ):
 
     today = date.today()
+    base = db.query(Delivery)
+    if current_user.role == VENDOR:
+        if not current_user.vendor_id:
+            return {"total_deliveries":0,"pending_deliveries":0,"in_transit_deliveries":0,"delivered_deliveries":0,"delayed_deliveries":0,"cancelled_deliveries":0}
+        base = base.filter(Delivery.vendor_id == current_user.vendor_id)
 
-
-    # ======================================
-    # TOTAL
-    # ======================================
-
-    total_deliveries = db.query(
-        func.count(Delivery.id)
-    ).scalar() or 0
-
-
-    # ======================================
-    # PENDING
-    # ======================================
-
-    pending_deliveries = db.query(
-        func.count(Delivery.id)
-    ).filter(
-        Delivery.status == "Pending"
-    ).scalar() or 0
-
-
-    # ======================================
-    # IN TRANSIT
-    # ======================================
-
-    in_transit_deliveries = db.query(
-        func.count(Delivery.id)
-    ).filter(
-        Delivery.status == "In Transit"
-    ).scalar() or 0
-
-
-    # ======================================
-    # DELIVERED
-    # ======================================
-
-    delivered_deliveries = db.query(
-        func.count(Delivery.id)
-    ).filter(
-        Delivery.status.in_(
-            [
-                "Delivered",
-                "Completed"
-            ]
-        )
-    ).scalar() or 0
-
-
-    # ======================================
-    # DELAYED
-    # ======================================
-
-    delayed_deliveries = db.query(
-        func.count(Delivery.id)
-    ).filter(
-        Delivery.expected_delivery_date < today,
-        Delivery.status.notin_(
-            [
-                "Delivered",
-                "Completed",
-                "Cancelled"
-            ]
-        )
-    ).scalar() or 0
-
-
-    # ======================================
-    # CANCELLED
-    # ======================================
-
-    cancelled_deliveries = db.query(
-        func.count(Delivery.id)
-    ).filter(
-        Delivery.status == "Cancelled"
-    ).scalar() or 0
-
+    total_deliveries = base.count()
+    pending_deliveries = base.filter(Delivery.status == "Pending").count()
+    in_transit_deliveries = base.filter(Delivery.status == "In Transit").count()
+    delivered_deliveries = base.filter(Delivery.status.in_(["Delivered", "Completed"])).count()
+    delayed_deliveries = base.filter(Delivery.expected_delivery_date < today, Delivery.status.notin_(["Delivered", "Completed", "Cancelled"])).count()
+    cancelled_deliveries = base.filter(Delivery.status == "Cancelled").count()
 
     return {
 
@@ -340,13 +268,11 @@ def get_order_deliveries(
     )
 ):
 
-    deliveries = db.query(
-        Delivery
-    ).filter(
-        Delivery.order_id == order_id
-    ).order_by(
-        Delivery.id.desc()
-    ).all()
+    order = db.query(Order).filter(Order.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    ensure_vendor_access(current_user, order.vendor_id)
+    deliveries = db.query(Delivery).filter(Delivery.order_id == order_id).order_by(Delivery.id.desc()).all()
 
 
     return deliveries
@@ -373,6 +299,7 @@ def get_vendor_deliveries(
     )
 ):
 
+    ensure_vendor_access(current_user, vendor_id)
     deliveries = db.query(
         Delivery
     ).filter(
@@ -402,6 +329,11 @@ def get_deliveries(
         le=100
     ),
 
+    search: str = Query(
+        "",
+        description="Search by order ID, vendor ID, tracking number, or status"
+    ),
+
     db: Session = Depends(get_db),
 
     current_user=Depends(
@@ -420,10 +352,58 @@ def get_deliveries(
     # TOTAL COUNT
     # ======================================
 
-    total = db.query(
-        func.count(Delivery.id)
-    ).scalar() or 0
+    base = db.query(Delivery)
 
+    if current_user.role == VENDOR:
+        if not current_user.vendor_id:
+            return {
+                "items": [],
+                "total": 0,
+                "page": page,
+                "limit": limit
+            }
+
+        base = base.filter(
+            Delivery.vendor_id == current_user.vendor_id
+        )
+
+
+    # ======================================
+    # SEARCH
+    # ======================================
+
+    if search.strip():
+
+        search_value = search.strip()
+
+        search_filters = [
+            func.cast(Delivery.id, String).ilike(
+                f"%{search_value}%"
+            ),
+
+            func.cast(Delivery.order_id, String).ilike(
+                f"%{search_value}%"
+            ),
+
+            func.cast(Delivery.vendor_id, String).ilike(
+                f"%{search_value}%"
+            ),
+
+            Delivery.tracking_number.ilike(
+                f"%{search_value}%"
+            ),
+
+            Delivery.status.ilike(
+                f"%{search_value}%"
+            )
+        ]
+
+        base = base.filter(
+            or_(*search_filters)
+        )
+
+
+    total = base.count()
 
     # ======================================
     # OFFSET
@@ -438,15 +418,7 @@ def get_deliveries(
     # GET CURRENT PAGE
     # ======================================
 
-    deliveries = db.query(
-        Delivery
-    ).order_by(
-        Delivery.id.desc()
-    ).offset(
-        offset
-    ).limit(
-        limit
-    ).all()
+    deliveries = base.order_by(Delivery.id.desc()).offset(offset).limit(limit).all()
 
 
     # ======================================
@@ -516,7 +488,7 @@ def get_delivery(
             detail="Delivery not found"
         )
 
-
+    ensure_vendor_access(current_user, delivery.vendor_id)
     return delivery
 
 

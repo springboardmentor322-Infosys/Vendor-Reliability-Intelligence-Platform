@@ -1,163 +1,129 @@
-import {
-  Component,
-  OnInit,
-  signal
-} from '@angular/core';
-
+import { Component, OnInit, ChangeDetectorRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+import { AuditPlanService } from '../../services/audit-plan';
+import { Vendor } from '../../services/vendor';
+import { ToastService } from '../../services/toast';
 
 @Component({
   selector: 'app-audit-plan',
   standalone: true,
-
-  imports: [
-    CommonModule,
-    FormsModule
-  ],
-
+  imports: [CommonModule, FormsModule],
   templateUrl: './audit-plan.html',
   styleUrl: './audit-plan.css'
 })
 export class AuditPlan implements OnInit {
 
-  // ==========================================
-  // SEARCH
-  // ==========================================
-
   searchText = '';
-
   selectedStatus = 'All';
   selectedPriority = 'All';
 
-
-  // ==========================================
-  // LOADING
-  // ==========================================
-
   loading = signal(false);
+  saving = signal(false);
 
+  // IMPORTANT: use signal for form visibility
+  showForm = signal(false);
 
-  // ==========================================
-  // AUDIT PLANS
-  // ==========================================
+  selectedAudit: any = null;
+  vendors: any[] = [];
 
-  auditPlans = signal<any[]>([
-    {
-      id: 'AUD-2026-001',
-      title: 'Vendor Compliance Audit',
-      vendor: 'National Supplies',
-      auditor: 'Auditor',
-      auditType: 'Compliance',
-      priority: 'High',
-      startDate: '05 Sep 2026',
-      dueDate: '12 Sep 2026',
-      status: 'Scheduled',
-      progress: 0,
-      scope: 'Contract compliance, certifications and documentation'
-    },
+  form: any = {
+    title: '',
+    vendor_id: null,
+    auditor: 'Auditor',
+    audit_type: 'Compliance',
+    priority: 'Medium',
+    start_date: '',
+    due_date: '',
+    status: 'Planned',
+    progress: 0,
+    scope: ''
+  };
 
-    {
-      id: 'AUD-2026-002',
-      title: 'Procurement Process Audit',
-      vendor: 'Western Solutions',
-      auditor: 'Auditor',
-      auditType: 'Procurement',
-      priority: 'Medium',
-      startDate: '08 Sep 2026',
-      dueDate: '18 Sep 2026',
-      status: 'In Progress',
-      progress: 55,
-      scope: 'Purchase requests, approvals and purchase orders'
-    },
-
-    {
-      id: 'AUD-2026-003',
-      title: 'Vendor Performance Review',
-      vendor: 'Apex Logistics',
-      auditor: 'Auditor',
-      auditType: 'Performance',
-      priority: 'Medium',
-      startDate: '10 Sep 2026',
-      dueDate: '20 Sep 2026',
-      status: 'Scheduled',
-      progress: 0,
-      scope: 'Delivery performance, quality and reliability'
-    },
-
-    {
-      id: 'AUD-2026-004',
-      title: 'Contract Compliance Audit',
-      vendor: 'Global Components',
-      auditor: 'Auditor',
-      auditType: 'Contract',
-      priority: 'High',
-      startDate: '01 Sep 2026',
-      dueDate: '07 Sep 2026',
-      status: 'In Progress',
-      progress: 70,
-      scope: 'Contract terms, renewal status and compliance'
-    },
-
-    {
-      id: 'AUD-2026-005',
-      title: 'Purchase Order Audit',
-      vendor: 'Reliable Technologies',
-      auditor: 'Auditor',
-      auditType: 'Purchase Order',
-      priority: 'Low',
-      startDate: '15 Aug 2026',
-      dueDate: '25 Aug 2026',
-      status: 'Completed',
-      progress: 100,
-      scope: 'Purchase order accuracy and approval workflow'
-    },
-
-    {
-      id: 'AUD-2026-006',
-      title: 'Supplier Risk Assessment',
-      vendor: 'Dynamic Supplies',
-      auditor: 'Auditor',
-      auditType: 'Risk',
-      priority: 'High',
-      startDate: '20 Sep 2026',
-      dueDate: '30 Sep 2026',
-      status: 'Planned',
-      progress: 0,
-      scope: 'Vendor risk profile, operational risks and controls'
-    }
-  ]);
-
-
-  // ==========================================
-  // SUMMARY
-  // ==========================================
+  auditPlans = signal<any[]>([]);
 
   totalAudits = signal(0);
-
   plannedAudits = signal(0);
-
   inProgressAudits = signal(0);
-
   completedAudits = signal(0);
-
   highPriorityAudits = signal(0);
 
-
-  // ==========================================
-  // INITIALIZE
-  // ==========================================
+  constructor(
+    private auditPlanService: AuditPlanService,
+    private vendorService: Vendor,
+    private toastService: ToastService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
+    this.loadAuditPlans();
+    this.loadVendors();
+  }
 
-    this.calculateSummary();
+  loadAuditPlans(): void {
+
+    this.loading.set(true);
+
+    this.auditPlanService.getAuditPlans().subscribe({
+
+      next: (data) => {
+
+        this.auditPlans.set(data || []);
+
+        this.calculateSummary();
+
+        this.loading.set(false);
+
+        this.cdr.detectChanges();
+
+      },
+
+      error: (error) => {
+
+        console.error('Failed to load audit plans:', error);
+
+        this.auditPlans.set([]);
+
+        this.loading.set(false);
+
+        this.toastService.show(
+          'Unable to load audit plans.',
+          'error'
+        );
+
+        this.cdr.detectChanges();
+
+      }
+
+    });
 
   }
 
+  loadVendors(): void {
 
-  // ==========================================
-  // CALCULATE SUMMARY
-  // ==========================================
+    this.vendorService.getVendors().subscribe({
+
+      next: (data) => {
+
+        this.vendors = data || [];
+
+        this.cdr.detectChanges();
+
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Failed to load vendors:',
+          error
+        );
+
+      }
+
+    });
+
+  }
 
   calculateSummary(): void {
 
@@ -175,31 +141,23 @@ export class AuditPlan implements OnInit {
 
     this.inProgressAudits.set(
       plans.filter(
-        audit =>
-          audit.status === 'In Progress'
+        audit => audit.status === 'In Progress'
       ).length
     );
 
     this.completedAudits.set(
       plans.filter(
-        audit =>
-          audit.status === 'Completed'
+        audit => audit.status === 'Completed'
       ).length
     );
 
     this.highPriorityAudits.set(
       plans.filter(
-        audit =>
-          audit.priority === 'High'
+        audit => audit.priority === 'High'
       ).length
     );
 
   }
-
-
-  // ==========================================
-  // FILTERED AUDITS
-  // ==========================================
 
   get filteredAudits(): any[] {
 
@@ -208,69 +166,64 @@ export class AuditPlan implements OnInit {
         .toLowerCase()
         .trim();
 
-    return this.auditPlans().filter(
-      audit => {
+    return this.auditPlans().filter(audit => {
 
-        const matchesSearch =
-          !search ||
-          audit.id
-            .toLowerCase()
-            .includes(search) ||
-          audit.title
-            .toLowerCase()
-            .includes(search) ||
-          audit.vendor
-            .toLowerCase()
-            .includes(search) ||
-          audit.auditType
-            .toLowerCase()
-            .includes(search);
+      const matchesSearch =
+        !search ||
 
-        const matchesStatus =
-          this.selectedStatus === 'All' ||
-          audit.status === this.selectedStatus;
+        String(
+          audit.audit_id ||
+          audit.id ||
+          ''
+        )
+          .toLowerCase()
+          .includes(search) ||
 
-        const matchesPriority =
-          this.selectedPriority === 'All' ||
-          audit.priority === this.selectedPriority;
+        String(
+          audit.title || ''
+        )
+          .toLowerCase()
+          .includes(search) ||
 
-        return (
-          matchesSearch &&
-          matchesStatus &&
-          matchesPriority
-        );
+        String(
+          audit.vendor || ''
+        )
+          .toLowerCase()
+          .includes(search) ||
 
-      }
-    );
+        String(
+          audit.audit_type ||
+          audit.auditType ||
+          ''
+        )
+          .toLowerCase()
+          .includes(search);
+
+      const matchesStatus =
+        this.selectedStatus === 'All' ||
+        audit.status === this.selectedStatus;
+
+      const matchesPriority =
+        this.selectedPriority === 'All' ||
+        audit.priority === this.selectedPriority;
+
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesPriority
+      );
+
+    });
 
   }
-
-
-  // ==========================================
-  // STATUS FILTER
-  // ==========================================
 
   setStatus(status: string): void {
-
     this.selectedStatus = status;
-
   }
-
-
-  // ==========================================
-  // PRIORITY FILTER
-  // ==========================================
 
   setPriority(priority: string): void {
-
     this.selectedPriority = priority;
-
   }
-
-
-  // ==========================================
-  // STATUS CLASS
-  // ==========================================
 
   getStatusClass(status: string): string {
 
@@ -295,11 +248,6 @@ export class AuditPlan implements OnInit {
 
   }
 
-
-  // ==========================================
-  // PRIORITY CLASS
-  // ==========================================
-
   getPriorityClass(priority: string): string {
 
     switch (priority) {
@@ -320,36 +268,369 @@ export class AuditPlan implements OnInit {
 
   }
 
+  // ================================
+  // CREATE AUDIT
+  // ================================
 
-  // ==========================================
+  createAudit(): void {
+
+    console.log('Create Audit Plan button clicked');
+
+    this.selectedAudit = null;
+
+    this.form = {
+
+      title: '',
+      vendor_id: null,
+      auditor: 'Auditor',
+      audit_type: 'Compliance',
+      priority: 'Medium',
+      start_date: '',
+      due_date: '',
+      status: 'Planned',
+      progress: 0,
+      scope: ''
+
+    };
+
+    this.showForm.set(true);
+
+    this.cdr.detectChanges();
+
+  }
+
+  // ================================
+  // EDIT AUDIT
+  // ================================
+
+  editAudit(audit: any): void {
+
+    this.selectedAudit = audit;
+
+    this.form = {
+
+      title: audit.title || '',
+
+      vendor_id:
+        audit.vendor_id || null,
+
+      auditor:
+        audit.auditor || 'Auditor',
+
+      audit_type:
+        audit.audit_type ||
+        audit.auditType ||
+        'Compliance',
+
+      priority:
+        audit.priority ||
+        'Medium',
+
+      start_date:
+        audit.start_date ||
+        audit.startDate ||
+        '',
+
+      due_date:
+        audit.due_date ||
+        audit.dueDate ||
+        '',
+
+      status:
+        audit.status ||
+        'Planned',
+
+      progress:
+        audit.progress ?? 0,
+
+      scope:
+        audit.scope || ''
+
+    };
+
+    this.showForm.set(true);
+
+    this.cdr.detectChanges();
+
+  }
+
+  // ================================
+  // CLOSE FORM
+  // ================================
+
+  closeForm(): void {
+
+    this.showForm.set(false);
+
+    this.selectedAudit = null;
+
+    this.cdr.detectChanges();
+
+  }
+
+  // ================================
+  // SAVE AUDIT
+  // ================================
+
+  saveAudit(): void {
+
+    if (!this.form.title?.trim()) {
+
+      this.toastService.show(
+        'Please enter an audit title.',
+        'error'
+      );
+
+      return;
+
+    }
+
+    if (!this.form.audit_type) {
+
+      this.toastService.show(
+        'Please select an audit type.',
+        'error'
+      );
+
+      return;
+
+    }
+
+    if (!this.form.start_date) {
+
+      this.toastService.show(
+        'Please select a start date.',
+        'error'
+      );
+
+      return;
+
+    }
+
+    if (!this.form.due_date) {
+
+      this.toastService.show(
+        'Please select a due date.',
+        'error'
+      );
+
+      return;
+
+    }
+
+    if (
+      this.form.start_date >
+      this.form.due_date
+    ) {
+
+      this.toastService.show(
+        'Due date cannot be before the start date.',
+        'error'
+      );
+
+      return;
+
+    }
+
+    const payload = {
+
+      title:
+        this.form.title.trim(),
+
+      vendor_id:
+        this.form.vendor_id
+          ? Number(this.form.vendor_id)
+          : null,
+
+      auditor:
+        this.form.auditor?.trim() ||
+        'Auditor',
+
+      audit_type:
+        this.form.audit_type,
+
+      priority:
+        this.form.priority,
+
+      start_date:
+        this.form.start_date,
+
+      due_date:
+        this.form.due_date,
+
+      status:
+        this.form.status,
+
+      progress:
+        Number(this.form.progress || 0),
+
+      scope:
+        this.form.scope?.trim() ||
+        null
+
+    };
+
+    this.saving.set(true);
+
+    const request = this.selectedAudit
+
+      ? this.auditPlanService.updateAuditPlan(
+          this.selectedAudit.id,
+          payload
+        )
+
+      : this.auditPlanService.createAuditPlan(
+          payload
+        );
+
+    request.subscribe({
+
+      next: () => {
+
+        const wasEditing =
+          !!this.selectedAudit;
+
+        this.saving.set(false);
+
+        this.closeForm();
+
+        this.loadAuditPlans();
+
+        this.toastService.show(
+
+          wasEditing
+            ? 'Audit plan updated successfully.'
+            : 'Audit plan created successfully.',
+
+          'success'
+
+        );
+
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Failed to save audit plan:',
+          error
+        );
+
+        this.saving.set(false);
+
+        this.toastService.show(
+
+          error?.error?.detail ||
+          'Unable to save audit plan.',
+
+          'error'
+
+        );
+
+        this.cdr.detectChanges();
+
+      }
+
+    });
+
+  }
+
+  // ================================
   // VIEW AUDIT
-  // ==========================================
+  // ================================
 
   viewAudit(audit: any): void {
 
     alert(
+
       `Audit Plan\n\n` +
-      `ID: ${audit.id}\n` +
-      `Title: ${audit.title}\n` +
-      `Vendor: ${audit.vendor}\n` +
-      `Type: ${audit.auditType}\n` +
-      `Priority: ${audit.priority}\n` +
-      `Status: ${audit.status}\n\n` +
-      `Scope:\n${audit.scope}`
+
+      `ID: ${
+        audit.audit_id ||
+        audit.id
+      }\n` +
+
+      `Title: ${
+        audit.title
+      }\n` +
+
+      `Vendor: ${
+        audit.vendor ||
+        '—'
+      }\n` +
+
+      `Type: ${
+        audit.audit_type ||
+        audit.auditType ||
+        '—'
+      }\n` +
+
+      `Priority: ${
+        audit.priority
+      }\n` +
+
+      `Status: ${
+        audit.status
+      }\n\n` +
+
+      `Scope:\n${
+        audit.scope ||
+        '—'
+      }`
+
     );
 
   }
 
+  // ================================
+  // DELETE AUDIT
+  // ================================
 
-  // ==========================================
-  // CREATE AUDIT
-  // ==========================================
+  deleteAudit(audit: any): void {
 
-  createAudit(): void {
+    const auditId =
+      audit.audit_id ||
+      audit.id;
 
-    alert(
-      'Create Audit Plan functionality can be connected to the backend here.'
-    );
+    if (
+      !confirm(
+        `Delete ${auditId}?`
+      )
+    ) {
+
+      return;
+
+    }
+
+    this.auditPlanService
+      .deleteAuditPlan(audit.id)
+      .subscribe({
+
+        next: () => {
+
+          this.loadAuditPlans();
+
+          this.toastService.show(
+            'Audit plan deleted successfully.',
+            'success'
+          );
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Failed to delete audit plan:',
+            error
+          );
+
+          this.toastService.show(
+            'Unable to delete audit plan.',
+            'error'
+          );
+
+        }
+
+      });
 
   }
 

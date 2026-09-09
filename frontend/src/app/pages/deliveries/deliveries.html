@@ -215,22 +215,6 @@
       </div>
 
 
-      <!-- VENDOR -->
-
-      <div class="form-group">
-
-        <label>
-          Vendor ID
-        </label>
-
-        <input
-          type="number"
-          [(ngModel)]="newDelivery.vendor_id"
-          placeholder="Enter vendor ID">
-
-      </div>
-
-
       <!-- EXPECTED DATE -->
 
       <div class="form-group">
@@ -346,26 +330,10 @@
 
 
   <!-- ========================================= -->
-  <!-- LOADING -->
+  <!-- DELIVERY HISTORY -->
   <!-- ========================================= -->
 
-  <div
-    class="loading"
-    *ngIf="loading">
-
-    Loading deliveries...
-
-  </div>
-
-
-  <!-- ========================================= -->
-  <!-- TABLE -->
-  <!-- ========================================= -->
-
-  <div
-    class="table-card"
-    *ngIf="!loading">
-
+  <div class="table-card">
 
     <!-- TABLE HEADER -->
 
@@ -397,12 +365,66 @@
 
 
     <!-- ======================================= -->
+    <!-- SEARCH -->
+    <!-- ======================================= -->
+
+    <div class="delivery-search">
+
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="onSearch()"
+        placeholder="Search order, tracking number or status..."
+        aria-label="Search deliveries"
+      />
+
+
+      <button
+        type="button"
+        class="primary-button"
+        (click)="onSearch()">
+
+        🔍 Search
+
+      </button>
+
+
+      <button
+        *ngIf="searchTerm"
+        type="button"
+        class="secondary-button"
+        (click)="clearSearch()">
+
+        Clear
+
+      </button>
+
+    </div>
+
+
+    <!-- ======================================= -->
+    <!-- LOADING -->
+    <!-- ======================================= -->
+
+    <div
+      class="loading"
+      *ngIf="loading">
+
+      Loading deliveries...
+
+    </div>
+
+
+    <!-- ======================================= -->
     <!-- EMPTY -->
     <!-- ======================================= -->
 
     <div
       class="empty-state"
-      *ngIf="deliveries.length === 0">
+      *ngIf="
+        !loading &&
+        deliveries.length === 0
+      ">
 
       <h3>
         No deliveries found
@@ -423,48 +445,29 @@
       class="table-wrapper"
       *ngIf="deliveries.length > 0">
 
-
       <table>
 
         <thead>
 
           <tr>
 
-            <th>
-              ID
-            </th>
+            <th>ID</th>
 
-            <th>
-              Order
-            </th>
+            <th>Order</th>
 
-            <th>
-              Vendor
-            </th>
+            <th>Vendor</th>
 
-            <th>
-              Expected
-            </th>
+            <th>Expected</th>
 
-            <th>
-              Actual
-            </th>
+            <th>Actual</th>
 
-            <th>
-              Tracking
-            </th>
+            <th>Tracking</th>
 
-            <th>
-              Status
-            </th>
+            <th>Status</th>
 
-            <th>
-              Delay
-            </th>
+            <th>Delay</th>
 
-            <th>
-              Actions
-            </th>
+            <th>Actions</th>
 
           </tr>
 
@@ -475,7 +478,6 @@
 
           <tr
             *ngFor="let delivery of deliveries">
-
 
             <!-- ID -->
 
@@ -510,8 +512,8 @@
             <td>
 
               {{
-                delivery.actual_delivery_date
-                  || '—'
+                delivery.actual_delivery_date ||
+                '—'
               }}
 
             </td>
@@ -522,8 +524,8 @@
             <td>
 
               {{
-                delivery.tracking_number
-                  || '—'
+                delivery.tracking_number ||
+                '—'
               }}
 
             </td>
@@ -577,7 +579,6 @@
             <td>
 
               <div class="actions">
-
 
                 <!-- MARK DELIVERED -->
 
@@ -666,7 +667,6 @@
 
       <div class="pagination-buttons">
 
-
         <!-- PREVIOUS -->
 
         <button
@@ -718,4 +718,4 @@
 
   </div>
 
-</div>
+

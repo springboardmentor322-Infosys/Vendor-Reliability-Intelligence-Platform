@@ -1,5 +1,7 @@
 <div class="checklist-page">
 
+  <!-- PAGE HEADER -->
+
   <div class="page-header">
 
     <div>
@@ -7,8 +9,12 @@
       <p>Create, manage and track audit checklists.</p>
     </div>
 
-    <button class="primary-btn">
+    <button
+      class="primary-btn"
+      (click)="openCreateForm()">
+
       + Create Checklist
+
     </button>
 
   </div>
@@ -19,23 +25,54 @@
   <div class="summary-grid">
 
     <div class="summary-card">
-      <div class="card-label">Total Checklists</div>
-      <div class="card-value">{{ totalChecklists }}</div>
+
+      <div class="card-label">
+        Total Checklists
+      </div>
+
+      <div class="card-value">
+        {{ totalChecklists }}
+      </div>
+
     </div>
+
 
     <div class="summary-card success">
-      <div class="card-label">Completed</div>
-      <div class="card-value">{{ completedChecklists }}</div>
+
+      <div class="card-label">
+        Completed
+      </div>
+
+      <div class="card-value">
+        {{ completedChecklists }}
+      </div>
+
     </div>
+
 
     <div class="summary-card warning">
-      <div class="card-label">In Progress</div>
-      <div class="card-value">{{ inProgressChecklists }}</div>
+
+      <div class="card-label">
+        In Progress
+      </div>
+
+      <div class="card-value">
+        {{ inProgressChecklists }}
+      </div>
+
     </div>
 
+
     <div class="summary-card">
-      <div class="card-label">Total Checklist Items</div>
-      <div class="card-value">{{ totalItems }}</div>
+
+      <div class="card-label">
+        Total Checklist Items
+      </div>
+
+      <div class="card-value">
+        {{ totalItems }}
+      </div>
+
     </div>
 
   </div>
@@ -47,25 +84,61 @@
 
     <input
       type="text"
+      [(ngModel)]="searchTerm"
       placeholder="Search checklist or vendor..."
     />
 
-    <select>
-      <option>All Categories</option>
-      <option>Compliance</option>
-      <option>Procurement</option>
-      <option>Contracts</option>
-      <option>Quality</option>
+
+    <select
+      [(ngModel)]="selectedCategory">
+
+      <option>
+        All Categories
+      </option>
+
+      <option>
+        Compliance
+      </option>
+
+      <option>
+        Procurement
+      </option>
+
+      <option>
+        Contracts
+      </option>
+
+      <option>
+        Quality
+      </option>
+
     </select>
 
-    <select>
-      <option>All Status</option>
-      <option>Completed</option>
-      <option>In Progress</option>
+
+    <select
+      [(ngModel)]="selectedStatus">
+
+      <option>
+        All Status
+      </option>
+
+      <option>
+        Completed
+      </option>
+
+      <option>
+        In Progress
+      </option>
+
     </select>
 
-    <button class="refresh-btn" (click)="refresh()">
+
+    <button
+      class="refresh-btn"
+      (click)="refresh()">
+
       ↻ Refresh
+
     </button>
 
   </div>
@@ -78,11 +151,20 @@
     <div class="table-header">
 
       <div>
-        <h2>Audit Checklists</h2>
-        <p>Track checklist completion and audit readiness.</p>
+
+        <h2>
+          Audit Checklists
+        </h2>
+
+        <p>
+          Track checklist completion and audit readiness.
+        </p>
+
       </div>
 
-      <span>{{ totalChecklists }} checklists</span>
+      <span>
+        {{ filteredChecklists.length }} checklists
+      </span>
 
     </div>
 
@@ -94,52 +176,97 @@
         <thead>
 
           <tr>
-            <th>Checklist ID</th>
-            <th>Checklist</th>
-            <th>Category</th>
-            <th>Vendor</th>
-            <th>Items</th>
-            <th>Progress</th>
-            <th>Status</th>
-            <th>Actions</th>
+
+            <th>
+              Checklist ID
+            </th>
+
+            <th>
+              Checklist
+            </th>
+
+            <th>
+              Category
+            </th>
+
+            <th>
+              Vendor
+            </th>
+
+            <th>
+              Items
+            </th>
+
+            <th>
+              Progress
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Actions
+            </th>
+
           </tr>
 
         </thead>
 
+
         <tbody>
 
-          @for (checklist of checklists; track checklist.id) {
+          @for (
+            checklist of filteredChecklists;
+            track checklist.id
+          ) {
 
             <tr>
 
-              <td>{{ checklist.id }}</td>
+              <td>
+                {{ checklist.id }}
+              </td>
+
 
               <td class="checklist-name">
                 {{ checklist.name }}
               </td>
 
+
               <td>
+
                 <span class="category">
                   {{ checklist.category }}
                 </span>
+
               </td>
 
-              <td>{{ checklist.vendor }}</td>
 
               <td>
-                {{ checklist.completed }} /
-                {{ checklist.items }}
+                {{ checklist.vendor }}
               </td>
+
+
+              <td>
+
+                {{ checklist.completed }}
+                /
+                {{ checklist.items }}
+
+              </td>
+
 
               <td>
 
                 <div class="progress-container">
 
                   <div class="progress-bar">
+
                     <div
                       class="progress-fill"
                       [style.width.%]="getProgress(checklist)">
                     </div>
+
                   </div>
 
                   <span>
@@ -150,26 +277,62 @@
 
               </td>
 
+
               <td>
 
-                @if (checklist.status === 'Completed') {
+                @if (
+                  checklist.status === 'Completed'
+                ) {
+
                   <span class="status completed">
                     ● Completed
                   </span>
+
                 }
 
-                @if (checklist.status === 'In Progress') {
+
+                @if (
+                  checklist.status === 'In Progress'
+                ) {
+
                   <span class="status progress">
                     ● In Progress
                   </span>
+
                 }
 
               </td>
 
+
               <td>
-                <button class="view-btn">
+
+                <button
+                  class="view-btn"
+                  (click)="viewChecklist(checklist)">
+
                   View
+
                 </button>
+
+              </td>
+
+            </tr>
+
+          }
+
+
+          @if (
+            filteredChecklists.length === 0
+          ) {
+
+            <tr>
+
+              <td
+                colspan="8"
+                class="empty-table">
+
+                No checklists found.
+
               </td>
 
             </tr>
@@ -183,5 +346,358 @@
     </div>
 
   </div>
+
+
+  <!-- CREATE CHECKLIST MODAL -->
+
+  @if (showCreateForm) {
+
+    <div
+      class="modal-backdrop"
+      (click)="closeCreateForm()">
+
+      <div
+        class="modal-card"
+        (click)="$event.stopPropagation()">
+
+
+        <div class="modal-header">
+
+          <div>
+
+            <h2>
+              Create Checklist
+            </h2>
+
+            <p>
+              Create a new audit checklist.
+            </p>
+
+          </div>
+
+
+          <button
+            class="modal-close"
+            (click)="closeCreateForm()">
+
+            ×
+
+          </button>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+          <!-- CHECKLIST NAME -->
+
+          <div class="form-group full-width">
+
+            <label>
+              Checklist Name
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="newChecklist.name"
+              placeholder="Enter checklist name"
+            />
+
+          </div>
+
+
+          <!-- CATEGORY -->
+
+          <div class="form-group">
+
+            <label>
+              Category
+            </label>
+
+            <select
+              [(ngModel)]="newChecklist.category">
+
+              <option>
+                Compliance
+              </option>
+
+              <option>
+                Procurement
+              </option>
+
+              <option>
+                Contracts
+              </option>
+
+              <option>
+                Quality
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <!-- VENDOR -->
+
+          <div class="form-group">
+
+            <label>
+              Vendor
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="newChecklist.vendor"
+              placeholder="Enter vendor name"
+            />
+
+          </div>
+
+
+          <!-- TOTAL ITEMS -->
+
+          <div class="form-group">
+
+            <label>
+              Total Items
+            </label>
+
+            <input
+              type="number"
+              [(ngModel)]="newChecklist.items"
+              min="1"
+            />
+
+          </div>
+
+
+          <!-- COMPLETED ITEMS -->
+
+          <div class="form-group">
+
+            <label>
+              Completed Items
+            </label>
+
+            <input
+              type="number"
+              [(ngModel)]="newChecklist.completed"
+              min="0"
+              [max]="newChecklist.items"
+            />
+
+          </div>
+
+
+        </div>
+
+
+        <!-- MODAL ACTIONS -->
+
+        <div class="modal-actions">
+
+          <button
+            class="secondary-btn"
+            (click)="closeCreateForm()">
+
+            Cancel
+
+          </button>
+
+
+          <button
+            class="primary-btn"
+            (click)="createChecklist()">
+
+            Create Checklist
+
+          </button>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  }
+
+
+  <!-- VIEW CHECKLIST MODAL -->
+
+  @if (
+    showViewModal &&
+    selectedChecklist
+  ) {
+
+    <div
+      class="modal-backdrop"
+      (click)="closeViewModal()">
+
+      <div
+        class="modal-card view-modal"
+        (click)="$event.stopPropagation()">
+
+
+        <div class="modal-header">
+
+          <div>
+
+            <h2>
+              Checklist Details
+            </h2>
+
+            <p>
+              {{ selectedChecklist.id }}
+            </p>
+
+          </div>
+
+
+          <button
+            class="modal-close"
+            (click)="closeViewModal()">
+
+            ×
+
+          </button>
+
+        </div>
+
+
+        <div class="detail-grid">
+
+
+          <div class="detail-item">
+
+            <span>
+              Checklist
+            </span>
+
+            <strong>
+              {{ selectedChecklist.name }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-item">
+
+            <span>
+              Category
+            </span>
+
+            <strong>
+              {{ selectedChecklist.category }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-item">
+
+            <span>
+              Vendor
+            </span>
+
+            <strong>
+              {{ selectedChecklist.vendor }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-item">
+
+            <span>
+              Status
+            </span>
+
+            <strong>
+              {{ selectedChecklist.status }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-item">
+
+            <span>
+              Completed Items
+            </span>
+
+            <strong>
+              {{ selectedChecklist.completed }}
+              /
+              {{ selectedChecklist.items }}
+            </strong>
+
+          </div>
+
+
+          <div class="detail-item">
+
+            <span>
+              Progress
+            </span>
+
+            <strong>
+              {{ getProgress(selectedChecklist) }}%
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- PROGRESS -->
+
+        <div class="modal-progress">
+
+          <div class="modal-progress-header">
+
+            <span>
+              Checklist Progress
+            </span>
+
+            <strong>
+              {{ getProgress(selectedChecklist) }}%
+            </strong>
+
+          </div>
+
+
+          <div class="progress-bar large">
+
+            <div
+              class="progress-fill"
+              [style.width.%]="getProgress(selectedChecklist)">
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+          <button
+            class="secondary-btn"
+            (click)="closeViewModal()">
+
+            Close
+
+          </button>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  }
 
 </div>

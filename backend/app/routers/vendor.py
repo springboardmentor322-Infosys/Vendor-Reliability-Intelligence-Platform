@@ -20,7 +20,8 @@ from app.utils.permissions import (
     SUPPLY_CHAIN_MANAGER,
     VENDOR,
     FINANCE_OFFICER,
-    AUDITOR
+    AUDITOR,
+    ensure_vendor_access
 )
 
 
@@ -175,12 +176,12 @@ def get_vendors(
     )
 ):
 
-    vendors = db.query(
-        Vendor
-    ).all()
-
-
-    return vendors
+    query = db.query(Vendor)
+    if current_user.role == VENDOR:
+        if not current_user.vendor_id:
+            return []
+        query = query.filter(Vendor.id == current_user.vendor_id)
+    return query.all()
 
 
 # ==========================================
@@ -218,7 +219,7 @@ def get_vendor(
             detail="Vendor not found"
         )
 
-
+    ensure_vendor_access(current_user, vendor.id)
     return vendor
 
 

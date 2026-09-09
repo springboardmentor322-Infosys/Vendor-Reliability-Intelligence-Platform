@@ -1,154 +1,364 @@
 <div class="assessment-page">
 
+
+  <!-- ==========================================
+       HEADER
+  =========================================== -->
+
   <div class="page-header">
+
     <div>
-      <h1>Control Assessment</h1>
-      <p>Evaluate vendor controls and monitor compliance performance.</p>
+
+      <h1>
+        Control Assessment
+      </h1>
+
+      <p>
+        Evaluate vendor controls and monitor
+        compliance performance.
+      </p>
+
     </div>
 
-    <button class="primary-btn">
+
+    <button
+      type="button"
+      class="primary-btn"
+      (click)="openNewAssessment()"
+    >
       + New Assessment
     </button>
+
   </div>
 
 
-  <!-- SUMMARY CARDS -->
+
+  <!-- ==========================================
+       SUMMARY CARDS
+  =========================================== -->
 
   <div class="summary-grid">
 
+
     <div class="summary-card">
-      <div class="card-label">Total Controls</div>
-      <div class="card-value">{{ totalControls }}</div>
+
+      <div class="card-label">
+        Total Controls
+      </div>
+
+      <div class="card-value">
+        {{ totalControls }}
+      </div>
+
     </div>
+
 
     <div class="summary-card success">
-      <div class="card-label">Passed</div>
-      <div class="card-value">{{ passedControls }}</div>
+
+      <div class="card-label">
+        Passed
+      </div>
+
+      <div class="card-value">
+        {{ passedControls }}
+      </div>
+
     </div>
+
 
     <div class="summary-card warning">
-      <div class="card-label">Needs Review</div>
-      <div class="card-value">{{ reviewControls }}</div>
+
+      <div class="card-label">
+        Needs Review
+      </div>
+
+      <div class="card-value">
+        {{ reviewControls }}
+      </div>
+
     </div>
 
+
     <div class="summary-card">
-      <div class="card-label">Average Score</div>
-      <div class="card-value">{{ averageScore }}%</div>
+
+      <div class="card-label">
+        Average Score
+      </div>
+
+      <div class="card-value">
+        {{ averageScore }}%
+      </div>
+
     </div>
 
   </div>
 
 
-  <!-- FILTERS -->
+
+  <!-- ==========================================
+       FILTERS
+  =========================================== -->
 
   <div class="filter-card">
 
+
     <input
       type="text"
+      [(ngModel)]="searchText"
       placeholder="Search control, vendor..."
     />
 
-    <select>
-      <option>All Categories</option>
-      <option>Compliance</option>
-      <option>Procurement</option>
-      <option>Contracts</option>
-      <option>Supply Chain</option>
-      <option>Quality</option>
+
+    <select
+      [(ngModel)]="selectedCategory"
+    >
+
+      <option>
+        All Categories
+      </option>
+
+      <option>
+        Compliance
+      </option>
+
+      <option>
+        Procurement
+      </option>
+
+      <option>
+        Contracts
+      </option>
+
+      <option>
+        Supply Chain
+      </option>
+
+      <option>
+        Quality
+      </option>
+
     </select>
 
-    <select>
-      <option>All Status</option>
-      <option>Passed</option>
-      <option>Needs Review</option>
+
+    <select
+      [(ngModel)]="selectedStatus"
+    >
+
+      <option>
+        All Status
+      </option>
+
+      <option>
+        Passed
+      </option>
+
+      <option>
+        Needs Review
+      </option>
+
     </select>
 
-    <button class="refresh-btn" (click)="refresh()">
+
+    <button
+      type="button"
+      class="refresh-btn"
+      (click)="refresh()"
+    >
       ↻ Refresh
     </button>
 
   </div>
 
 
-  <!-- CONTROL TABLE -->
+
+  <!-- ==========================================
+       CONTROL TABLE
+  =========================================== -->
 
   <div class="table-card">
 
+
     <div class="table-header">
+
       <div>
-        <h2>Control Assessments</h2>
-        <p>Review and evaluate vendor control performance.</p>
+
+        <h2>
+          Control Assessments
+        </h2>
+
+        <p>
+          Review and evaluate vendor
+          control performance.
+        </p>
+
       </div>
 
-      <span>{{ totalControls }} controls</span>
+
+      <span>
+        {{ filteredControls.length }}
+        controls
+      </span>
+
     </div>
+
 
 
     <div class="table-wrapper">
 
       <table>
 
+
         <thead>
+
           <tr>
-            <th>Control ID</th>
-            <th>Control</th>
-            <th>Category</th>
-            <th>Vendor</th>
-            <th>Auditor</th>
-            <th>Score</th>
-            <th>Status</th>
-            <th>Actions</th>
+
+            <th>
+              Control ID
+            </th>
+
+            <th>
+              Control
+            </th>
+
+            <th>
+              Category
+            </th>
+
+            <th>
+              Vendor
+            </th>
+
+            <th>
+              Auditor
+            </th>
+
+            <th>
+              Score
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Actions
+            </th>
+
           </tr>
+
         </thead>
+
+
 
         <tbody>
 
-          @for (control of controls; track control.id) {
+
+          @for (
+            control of filteredControls;
+            track control.id
+          ) {
 
             <tr>
 
-              <td>{{ control.id }}</td>
+
+              <td>
+                {{ control.id }}
+              </td>
+
 
               <td class="control-name">
                 {{ control.control }}
               </td>
 
+
               <td>
+
                 <span class="category">
                   {{ control.category }}
                 </span>
+
               </td>
 
-              <td>{{ control.vendor }}</td>
-
-              <td>{{ control.auditor }}</td>
 
               <td>
+                {{ control.vendor }}
+              </td>
+
+
+              <td>
+                {{ control.auditor }}
+              </td>
+
+
+              <td>
+
                 <span class="score">
                   {{ control.score }}%
                 </span>
+
               </td>
+
 
               <td>
 
-                @if (control.status === 'Passed') {
-                  <span class="status passed">
+
+                @if (
+                  control.status === 'Passed'
+                ) {
+
+                  <span
+                    class="status passed"
+                  >
                     ● Passed
                   </span>
+
                 }
 
-                @if (control.status === 'Needs Review') {
-                  <span class="status review">
+
+                @if (
+                  control.status === 'Needs Review'
+                ) {
+
+                  <span
+                    class="status review"
+                  >
                     ● Needs Review
                   </span>
+
                 }
 
               </td>
 
+
               <td>
-                <button class="view-btn">
+
+                <button
+                  type="button"
+                  class="view-btn"
+                  (click)="viewAssessment(control)"
+                >
                   View
                 </button>
+
+              </td>
+
+
+            </tr>
+
+          }
+
+
+          @if (
+            filteredControls.length === 0
+          ) {
+
+            <tr>
+
+              <td
+                colspan="8"
+                style="text-align: center; padding: 30px;"
+              >
+                No control assessments found.
               </td>
 
             </tr>
@@ -162,5 +372,243 @@
     </div>
 
   </div>
+
+
+
+  <!-- ==========================================
+       NEW / VIEW ASSESSMENT MODAL
+  =========================================== -->
+
+  @if (showForm) {
+
+    <div
+      class="assessment-modal-backdrop"
+      (click)="closeForm()"
+    >
+
+      <div
+        class="assessment-modal"
+        (click)="$event.stopPropagation()"
+      >
+
+
+        <div class="assessment-modal-header">
+
+          <div>
+
+            <h2>
+
+              {{
+                formMode === 'create'
+                  ? 'New Control Assessment'
+                  : 'Control Assessment Details'
+              }}
+
+            </h2>
+
+            <p>
+
+              {{
+                formMode === 'create'
+                  ? 'Create a new vendor control assessment.'
+                  : 'Review the selected control assessment.'
+              }}
+
+            </p>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="modal-close-btn"
+            (click)="closeForm()"
+          >
+            ×
+          </button>
+
+        </div>
+
+
+
+        <!-- ======================================
+             FORM
+        ======================================= -->
+
+        <div class="assessment-form">
+
+
+          <div class="form-field">
+
+            <label>
+              Control *
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="form.control"
+              [readonly]="formMode === 'view'"
+              placeholder="e.g. Vendor Compliance"
+            />
+
+          </div>
+
+
+
+          <div class="form-field">
+
+            <label>
+              Category
+            </label>
+
+            <select
+              [(ngModel)]="form.category"
+              [disabled]="formMode === 'view'"
+            >
+
+              <option>
+                Compliance
+              </option>
+
+              <option>
+                Procurement
+              </option>
+
+              <option>
+                Contracts
+              </option>
+
+              <option>
+                Supply Chain
+              </option>
+
+              <option>
+                Quality
+              </option>
+
+            </select>
+
+          </div>
+
+
+
+          <div class="form-field">
+
+            <label>
+              Vendor *
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="form.vendor"
+              [readonly]="formMode === 'view'"
+              placeholder="Enter vendor name"
+            />
+
+          </div>
+
+
+
+          <div class="form-field">
+
+            <label>
+              Auditor
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="form.auditor"
+              [readonly]="formMode === 'view'"
+              placeholder="Auditor name"
+            />
+
+          </div>
+
+
+
+          <div class="form-field">
+
+            <label>
+              Score
+            </label>
+
+            <input
+              type="number"
+              [(ngModel)]="form.score"
+              [readonly]="formMode === 'view'"
+              min="0"
+              max="100"
+            />
+
+          </div>
+
+
+
+          <div class="form-field">
+
+            <label>
+              Status
+            </label>
+
+            <select
+              [(ngModel)]="form.status"
+              [disabled]="formMode === 'view'"
+            >
+
+              <option>
+                Passed
+              </option>
+
+              <option>
+                Needs Review
+              </option>
+
+            </select>
+
+          </div>
+
+
+        </div>
+
+
+
+        <!-- ======================================
+             ACTIONS
+        ======================================= -->
+
+        <div class="assessment-modal-actions">
+
+
+          <button
+            type="button"
+            class="cancel-btn"
+            (click)="closeForm()"
+          >
+            Close
+          </button>
+
+
+          @if (formMode === 'create') {
+
+            <button
+              type="button"
+              class="primary-btn"
+              (click)="saveAssessment()"
+            >
+              Save Assessment
+            </button>
+
+          }
+
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  }
+
 
 </div>

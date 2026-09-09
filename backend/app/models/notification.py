@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey
 from datetime import datetime
 
 from app.database import Base
@@ -34,6 +34,18 @@ class Notification(Base):
     contract_id = Column(
         Integer,
         nullable=True
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True,
+        index=True
+    )
+
+    severity = Column(
+        String,
+        default="Info"
     )
 
     is_read = Column(

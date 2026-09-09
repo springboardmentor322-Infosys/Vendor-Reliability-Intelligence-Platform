@@ -1,6 +1,7 @@
 import {
   Component,
-  OnInit
+  OnInit,
+  ChangeDetectorRef
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -15,14 +16,18 @@ import { ToastService } from '../../services/toast';
 @Component({
   selector: 'app-procurement',
   standalone: true,
+
   imports: [
     CommonModule,
     FormsModule,
     RoleDirective
   ],
+
   templateUrl: './procurement.html',
   styleUrl: './procurement.css'
 })
+
+
 export class ProcurementPage implements OnInit {
 
   // ==========================================
@@ -72,15 +77,24 @@ export class ProcurementPage implements OnInit {
 
     quantity: 1,
 
-    estimated_amount: 0
+    estimated_amount: 0,
+
+    department: 'General',
+
+    expected_delivery_date: ''
 
   };
 
 
+  // ==========================================
+  // CONSTRUCTOR
+  // ==========================================
+
   constructor(
     private procurementService: Procurement,
     private vendorService: Vendor,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private cdr: ChangeDetectorRef
   ) {}
 
 
@@ -105,6 +119,8 @@ export class ProcurementPage implements OnInit {
 
     this.loading = true;
 
+    this.cdr.detectChanges();
+
 
     this.procurementService
       .getProcurementRequests()
@@ -112,11 +128,16 @@ export class ProcurementPage implements OnInit {
 
         next: (response) => {
 
-          this.requests = response;
+          this.requests = response || [];
 
           this.loading = false;
 
+          // Force Angular to refresh the table immediately.
+
+          this.cdr.detectChanges();
+
         },
+
 
         error: (error) => {
 
@@ -125,9 +146,14 @@ export class ProcurementPage implements OnInit {
             error
           );
 
+
           this.requests = [];
 
           this.loading = false;
+
+          // Force Angular to refresh the loading state.
+
+          this.cdr.detectChanges();
 
 
           this.toastService.show(
@@ -154,9 +180,14 @@ export class ProcurementPage implements OnInit {
 
         next: (response) => {
 
-          this.vendors = response;
+          this.vendors = response || [];
+
+          // Vendor names are used by the filtered table.
+
+          this.cdr.detectChanges();
 
         },
+
 
         error: (error) => {
 
@@ -165,7 +196,10 @@ export class ProcurementPage implements OnInit {
             error
           );
 
+
           this.vendors = [];
+
+          this.cdr.detectChanges();
 
         }
 
@@ -191,12 +225,18 @@ export class ProcurementPage implements OnInit {
 
       quantity: 1,
 
-      estimated_amount: 0
+      estimated_amount: 0,
+
+      department: 'General',
+
+      expected_delivery_date: ''
 
     };
 
 
     this.showForm = true;
+
+    this.cdr.detectChanges();
 
   }
 
@@ -221,12 +261,20 @@ export class ProcurementPage implements OnInit {
       quantity: request.quantity,
 
       estimated_amount:
-        request.estimated_amount
+        request.estimated_amount,
+
+      department:
+        request.department || 'General',
+
+      expected_delivery_date:
+        request.expected_delivery_date || ''
 
     };
 
 
     this.showForm = true;
+
+    this.cdr.detectChanges();
 
   }
 
@@ -240,6 +288,8 @@ export class ProcurementPage implements OnInit {
     this.showForm = false;
 
     this.editingRequest = null;
+
+    this.cdr.detectChanges();
 
   }
 
@@ -286,6 +336,30 @@ export class ProcurementPage implements OnInit {
     }
 
 
+    if (!this.form.department.trim()) {
+
+      this.toastService.show(
+        'Department is required.',
+        'error'
+      );
+
+      return;
+
+    }
+
+
+    if (!this.form.expected_delivery_date) {
+
+      this.toastService.show(
+        'Expected delivery date is required.',
+        'error'
+      );
+
+      return;
+
+    }
+
+
     if (this.form.estimated_amount < 0) {
 
       this.toastService.show(
@@ -310,7 +384,13 @@ export class ProcurementPage implements OnInit {
         Number(this.form.quantity),
 
       estimated_amount:
-        Number(this.form.estimated_amount)
+        Number(this.form.estimated_amount),
+
+      department:
+        this.form.department.trim(),
+
+      expected_delivery_date:
+        this.form.expected_delivery_date
 
     };
 
@@ -335,11 +415,13 @@ export class ProcurementPage implements OnInit {
               'success'
             );
 
+
             this.closeForm();
 
             this.loadRequests();
 
           },
+
 
           error: (error) => {
 
@@ -347,6 +429,7 @@ export class ProcurementPage implements OnInit {
               'Failed to update procurement request:',
               error
             );
+
 
             this.toastService.show(
               error?.error?.detail ||
@@ -357,6 +440,7 @@ export class ProcurementPage implements OnInit {
           }
 
         });
+
 
       return;
 
@@ -378,11 +462,13 @@ export class ProcurementPage implements OnInit {
             'success'
           );
 
+
           this.closeForm();
 
           this.loadRequests();
 
         },
+
 
         error: (error) => {
 
@@ -390,6 +476,7 @@ export class ProcurementPage implements OnInit {
             'Failed to create procurement request:',
             error
           );
+
 
           this.toastService.show(
             error?.error?.detail ||
@@ -419,10 +506,9 @@ export class ProcurementPage implements OnInit {
     }
 
 
-    const confirmed =
-      confirm(
-        'Are you sure you want to approve this procurement request?'
-      );
+    const confirmed = confirm(
+      'Are you sure you want to approve this procurement request?'
+    );
 
 
     if (!confirmed) {
@@ -433,21 +519,42 @@ export class ProcurementPage implements OnInit {
 
 
     this.procurementService
-      .approveProcurementRequest(
-        request.id
-      )
+      .approveProcurementRequest(request.id)
       .subscribe({
 
-        next: () => {
+        next: (response) => {
+
+          // Update the clicked request immediately.
+
+          request.status = 'Approved';
+
+
+          // Replace array reference so Angular detects the change.
+
+          this.requests =
+            this.requests.map(
+              r =>
+                r.id === request.id
+                  ? {
+                      ...r,
+                      status: 'Approved'
+                    }
+                  : r
+            );
+
 
           this.toastService.show(
             'Procurement request approved!',
             'success'
           );
 
-          this.loadRequests();
+
+          // Force UI update.
+
+          this.cdr.detectChanges();
 
         },
+
 
         error: (error) => {
 
@@ -455,6 +562,7 @@ export class ProcurementPage implements OnInit {
             'Failed to approve request:',
             error
           );
+
 
           this.toastService.show(
             error?.error?.detail ||
@@ -510,9 +618,11 @@ export class ProcurementPage implements OnInit {
             'success'
           );
 
+
           this.loadRequests();
 
         },
+
 
         error: (error) => {
 
@@ -520,6 +630,7 @@ export class ProcurementPage implements OnInit {
             'Failed to reject request:',
             error
           );
+
 
           this.toastService.show(
             error?.error?.detail ||
@@ -549,10 +660,9 @@ export class ProcurementPage implements OnInit {
     }
 
 
-    const confirmed =
-      confirm(
-        'Create a purchase order from this approved request?'
-      );
+    const confirmed = confirm(
+      'Create a purchase order from this approved request?'
+    );
 
 
     if (!confirmed) {
@@ -568,16 +678,39 @@ export class ProcurementPage implements OnInit {
       )
       .subscribe({
 
-        next: () => {
+        next: (response) => {
+
+          // Update the request immediately.
+
+          request.status = 'Ordered';
+
+
+          // Replace array reference so Angular detects the change.
+
+          this.requests =
+            this.requests.map(
+              r =>
+                r.id === request.id
+                  ? {
+                      ...r,
+                      status: 'Ordered'
+                    }
+                  : r
+            );
+
 
           this.toastService.show(
             'Purchase order created successfully!',
             'success'
           );
 
-          this.loadRequests();
+
+          // Force UI update.
+
+          this.cdr.detectChanges();
 
         },
+
 
         error: (error) => {
 
@@ -585,6 +718,7 @@ export class ProcurementPage implements OnInit {
             'Failed to create purchase order:',
             error
           );
+
 
           this.toastService.show(
             error?.error?.detail ||
@@ -631,9 +765,11 @@ export class ProcurementPage implements OnInit {
             'success'
           );
 
+
           this.loadRequests();
 
         },
+
 
         error: (error) => {
 
@@ -641,6 +777,7 @@ export class ProcurementPage implements OnInit {
             'Failed to delete procurement request:',
             error
           );
+
 
           this.toastService.show(
             error?.error?.detail ||
@@ -761,18 +898,27 @@ export class ProcurementPage implements OnInit {
     switch (status) {
 
       case 'Pending':
+
         return 'pending';
 
+
       case 'Approved':
+
         return 'approved';
 
+
       case 'Rejected':
+
         return 'rejected';
 
+
       case 'Ordered':
+
         return 'ordered';
 
+
       default:
+
         return '';
 
     }

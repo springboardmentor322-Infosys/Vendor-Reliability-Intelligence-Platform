@@ -1,5 +1,6 @@
 from app.database import Base, engine, SessionLocal
 from app.models.user import User
+from app.models.vendor import Vendor
 from app.utils.security import hash_password
 
 # Demo/test credentials for local evaluation only. Change passwords in production.
@@ -24,6 +25,11 @@ try:
             user.full_name = full_name
             user.role = role
             user.password = hash_password(password)
+    vendor_user = db.query(User).filter(User.email == "vendor@vendoriq.com").first()
+    vendor = db.query(Vendor).filter(Vendor.id == 1).first()
+    if vendor_user and vendor:
+        vendor_user.vendor_id = vendor.id
+        vendor.user_id = vendor_user.id
     db.commit()
     print("VendorIQ test accounts are ready.")
     for _, email, password, role in ACCOUNTS:

@@ -37,7 +37,7 @@ import { DemandPlanning } from './pages/demand-planning/demand-planning';
 import { SupplierPerformance } from './pages/supplier-performance/supplier-performance';
 import { RiskReliability } from './pages/risk-reliability/risk-reliability';
 import { RiskAssessment } from './pages/risk-assessment/risk-assessment';
-
+import { FinanceDashboard } from './pages/finance-dashboard/finance-dashboard';
 
 // Procurement
 import { ProcurementPage } from './pages/procurement/procurement';
@@ -107,6 +107,23 @@ export const routes: Routes = [
     children: [
 
       // ==========================================
+      // FINANCE DASHBOARD
+      // ==========================================
+
+      {
+        path: 'finance-dashboard',
+        component: FinanceDashboard,
+        canActivate: [roleGuard],
+        data: {
+          roles: [
+            'Administrator',
+            'Finance Officer'
+          ]
+        }
+      },
+
+
+      // ==========================================
       // DASHBOARD
       // ==========================================
 
@@ -137,7 +154,8 @@ export const routes: Routes = [
         data: {
           roles: [
             'Administrator',
-            'Procurement Manager'
+            'Procurement Manager',
+            'Supply Chain Manager'
           ]
         }
       },
@@ -174,7 +192,8 @@ export const routes: Routes = [
         data: {
           roles: [
             'Administrator',
-            'Procurement Manager'
+            'Procurement Manager',
+            'Supply Chain Manager'
           ]
         }
       },
@@ -230,6 +249,7 @@ export const routes: Routes = [
           ]
         }
       },
+
 
       // ==========================================
       // AUDIT TRAILS
@@ -379,6 +399,7 @@ export const routes: Routes = [
         pathMatch: 'full'
       },
 
+
       // ==========================================
       // AUDITOR
       // ==========================================
@@ -387,6 +408,7 @@ export const routes: Routes = [
         path: 'control-assessment',
         component: ControlAssessment
       },
+
 
       // ==========================================
       // CHECKLIST MANAGEMENT
@@ -397,10 +419,11 @@ export const routes: Routes = [
         component: ChecklistManagement
       },
 
+
       // ==========================================
       // BUDGET SPEND ANALYSIS
       // ==========================================
-      
+
       {
         path: 'budget-spend-analysis',
         component: BudgetSpendAnalysis,
@@ -411,6 +434,7 @@ export const routes: Routes = [
           ]
         }
       },
+
 
       // ==========================================
       // INVENTORY OVERVIEW
@@ -427,6 +451,7 @@ export const routes: Routes = [
         }
       },
 
+
       // ==========================================
       // DEMAND PLANNING
       // ==========================================
@@ -442,6 +467,7 @@ export const routes: Routes = [
         }
       },
 
+
       // ==========================================
       // SUPPLIER PERFORMANCE
       // ==========================================
@@ -451,19 +477,21 @@ export const routes: Routes = [
         component: SupplierPerformance
       },
 
+
       // ==========================================
       // RISK & RELIABILITY
       // ==========================================
-      
+
       {
         path: 'risk-reliability',
         component: RiskReliability
       },
 
+
       // ==========================================
       // RISK ASSESSMENT
       // ==========================================
-      
+
       {
         path: 'risk-assessment',
         component: RiskAssessment,
@@ -473,8 +501,7 @@ export const routes: Routes = [
             'Auditor'
           ]
         }
-      },
-
+      }
 
     ]
   },

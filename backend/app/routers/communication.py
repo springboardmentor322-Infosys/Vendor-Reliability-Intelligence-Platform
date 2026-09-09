@@ -31,7 +31,8 @@ from app.utils.permissions import (
     SUPPLY_CHAIN_MANAGER,
     VENDOR,
     FINANCE_OFFICER,
-    AUDITOR
+    AUDITOR,
+    ensure_vendor_access
 )
 
 
@@ -365,14 +366,12 @@ def get_communications(
     )
 ):
 
-    communications = db.query(
-        Communication
-    ).order_by(
-        Communication.created_at.desc()
-    ).all()
-
-
-    return communications
+    query = db.query(Communication)
+    if current_user.role == VENDOR:
+        if not current_user.vendor_id:
+            return []
+        query = query.filter(Communication.vendor_id == current_user.vendor_id)
+    return query.order_by(Communication.created_at.desc()).all()
 
 
 # ==========================================
@@ -410,6 +409,7 @@ def get_vendor_communications(
             detail="Vendor not found"
         )
 
+    ensure_vendor_access(current_user, vendor_id)
 
     communications = db.query(
         Communication
@@ -492,7 +492,7 @@ def get_communication(
             detail="Communication not found"
         )
 
-
+    ensure_vendor_access(current_user, communication.vendor_id)
     return communication
 
 

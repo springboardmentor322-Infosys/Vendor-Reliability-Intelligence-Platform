@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 interface AuditTrail {
-  id: string;
+  id: number;
+  log_id: string;
   timestamp: string;
   user: string;
   role: string;
@@ -20,127 +22,144 @@ interface AuditTrail {
   templateUrl: './audit-trails.html',
   styleUrl: './audit-trails.css'
 })
-export class AuditTrails {
+export class AuditTrails implements OnInit {
+
+  private apiUrl = 'http://127.0.0.1:8000';
 
   searchTerm = '';
   selectedModule = 'All Modules';
   selectedStatus = 'All Status';
 
-  auditTrails: AuditTrail[] = [
-    {
-      id: 'LOG-2026-001',
-      timestamp: '01 Sep 2026, 10:42 AM',
-      user: 'Sai Subham',
-      role: 'Auditor',
-      action: 'Viewed Audit Plan',
-      module: 'Audit Plan',
-      description: 'Reviewed scheduled vendor audit AUD-2026-001',
-      status: 'Success'
-    },
-    {
-      id: 'LOG-2026-002',
-      timestamp: '01 Sep 2026, 10:35 AM',
-      user: 'Auditor',
-      role: 'Auditor',
-      action: 'Updated Finding',
-      module: 'Audit Findings',
-      description: 'Updated status of finding FND-2026-002',
-      status: 'Success'
-    },
-    {
-      id: 'LOG-2026-003',
-      timestamp: '01 Sep 2026, 09:58 AM',
-      user: 'Procurement Manager',
-      role: 'Procurement Manager',
-      action: 'Approved Purchase Order',
-      module: 'Purchase Orders',
-      description: 'Approved purchase order #65753',
-      status: 'Success'
-    },
-    {
-      id: 'LOG-2026-004',
-      timestamp: '01 Sep 2026, 09:41 AM',
-      user: 'Auditor',
-      role: 'Auditor',
-      action: 'Viewed Vendor',
-      module: 'Vendors',
-      description: 'Viewed vendor profile for National Supplies',
-      status: 'Success'
-    },
-    {
-      id: 'LOG-2026-005',
-      timestamp: '01 Sep 2026, 09:25 AM',
-      user: 'Auditor',
-      role: 'Auditor',
-      action: 'Created Finding',
-      module: 'Audit Findings',
-      description: 'Created finding FND-2026-003',
-      status: 'Success'
-    },
-    {
-      id: 'LOG-2026-006',
-      timestamp: '31 Aug 2026, 05:16 PM',
-      user: 'Procurement Manager',
-      role: 'Procurement Manager',
-      action: 'Rejected Request',
-      module: 'Procurement',
-      description: 'Rejected procurement request #3',
-      status: 'Warning'
-    },
-    {
-      id: 'LOG-2026-007',
-      timestamp: '31 Aug 2026, 04:48 PM',
-      user: 'Auditor',
-      role: 'Auditor',
-      action: 'Viewed Contract',
-      module: 'Contracts',
-      description: 'Reviewed contract CNT-2026-0006',
-      status: 'Success'
-    },
-    {
-      id: 'LOG-2026-008',
-      timestamp: '31 Aug 2026, 03:22 PM',
-      user: 'System',
-      role: 'System',
-      action: 'Renewal Reminder',
-      module: 'Contracts',
-      description: 'Contract renewal reminder generated',
-      status: 'Warning'
-    },
-    {
-      id: 'LOG-2026-009',
-      timestamp: '31 Aug 2026, 02:54 PM',
-      user: 'Auditor',
-      role: 'Auditor',
-      action: 'Completed Audit',
-      module: 'Audit Plan',
-      description: 'Completed audit AUD-2026-005',
-      status: 'Success'
-    },
-    {
-      id: 'LOG-2026-010',
-      timestamp: '31 Aug 2026, 01:36 PM',
-      user: 'Administrator',
-      role: 'Administrator',
-      action: 'Updated User',
-      module: 'User Management',
-      description: 'Updated user access permissions',
-      status: 'Success'
+  auditTrails: AuditTrail[] = [];
+
+  loading = false;
+
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.loadAuditTrails();
+  }
+
+  // ==========================================
+  // LOAD AUDIT TRAILS
+  // ==========================================
+
+  loadAuditTrails(): void {
+
+    this.loading = true;
+
+    this.http.get<any[]>(
+      `${this.apiUrl}/audit-trails/`
+    ).subscribe({
+
+      next: (data) => {
+
+        this.auditTrails = (data || []).map(
+          item => ({
+            id: item.id,
+            log_id: item.log_id,
+            timestamp: this.formatTimestamp(
+              item.created_at
+            ),
+            user: item.user || 'Unknown',
+            role: item.role || 'System',
+            action: item.action || '',
+            module: item.module || '',
+            description: item.description || '',
+            status: item.status || 'Success'
+          })
+        );
+
+        this.loading = false;
+
+        this.cdr.detectChanges();
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Failed to load audit trails:',
+          error
+        );
+
+        this.auditTrails = [];
+
+        this.loading = false;
+
+        this.cdr.detectChanges();
+      }
+
+    });
+  }
+
+
+  // ==========================================
+  // FORMAT DATE / TIME
+  // ==========================================
+
+  formatTimestamp(value: string | null): string {
+
+    if (!value) {
+      return '—';
     }
-  ];
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleString(
+      'en-IN',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }
+    );
+  }
+
+
+  // ==========================================
+  // FILTERED AUDIT TRAILS
+  // ==========================================
 
   get filteredTrails(): AuditTrail[] {
+
     return this.auditTrails.filter(log => {
 
-      const search = this.searchTerm.toLowerCase();
+      const search =
+        this.searchTerm
+          .trim()
+          .toLowerCase();
 
       const matchesSearch =
         !search ||
-        log.id.toLowerCase().includes(search) ||
-        log.user.toLowerCase().includes(search) ||
-        log.action.toLowerCase().includes(search) ||
-        log.module.toLowerCase().includes(search) ||
-        log.description.toLowerCase().includes(search);
+        log.log_id
+          .toLowerCase()
+          .includes(search) ||
+
+        log.user
+          .toLowerCase()
+          .includes(search) ||
+
+        log.action
+          .toLowerCase()
+          .includes(search) ||
+
+        log.module
+          .toLowerCase()
+          .includes(search) ||
+
+        log.description
+          .toLowerCase()
+          .includes(search);
 
       const matchesModule =
         this.selectedModule === 'All Modules' ||
@@ -150,29 +169,62 @@ export class AuditTrails {
         this.selectedStatus === 'All Status' ||
         log.status === this.selectedStatus;
 
-      return matchesSearch && matchesModule && matchesStatus;
+      return (
+        matchesSearch &&
+        matchesModule &&
+        matchesStatus
+      );
     });
   }
 
+
+  // ==========================================
+  // SUMMARY CARDS
+  // ==========================================
+
   get totalActivities(): number {
+
     return this.auditTrails.length;
   }
 
+
   get successfulActivities(): number {
-    return this.auditTrails.filter(x => x.status === 'Success').length;
+
+    return this.auditTrails.filter(
+      x => x.status === 'Success'
+    ).length;
   }
+
 
   get warningActivities(): number {
-    return this.auditTrails.filter(x => x.status === 'Warning').length;
+
+    return this.auditTrails.filter(
+      x => x.status === 'Warning'
+    ).length;
   }
+
 
   get failedActivities(): number {
-    return this.auditTrails.filter(x => x.status === 'Failed').length;
+
+    return this.auditTrails.filter(
+      x => x.status === 'Failed'
+    ).length;
   }
 
+
+  // ==========================================
+  // CLEAR FILTERS
+  // ==========================================
+
   clearFilters(): void {
+
     this.searchTerm = '';
-    this.selectedModule = 'All Modules';
-    this.selectedStatus = 'All Status';
+
+    this.selectedModule =
+      'All Modules';
+
+    this.selectedStatus =
+      'All Status';
   }
+
 }

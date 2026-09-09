@@ -14,7 +14,8 @@ from app.utils.permissions import (
     SUPPLY_CHAIN_MANAGER,
     VENDOR,
     FINANCE_OFFICER,
-    AUDITOR
+    AUDITOR,
+    ensure_vendor_access
 )
 
 
@@ -132,12 +133,12 @@ def get_invoices(
     )
 ):
 
-    invoices = db.query(
-        Invoice
-    ).all()
-
-
-    return invoices
+    query = db.query(Invoice)
+    if current_user.role == VENDOR:
+        if not current_user.vendor_id:
+            return []
+        query = query.filter(Invoice.vendor_id == current_user.vendor_id)
+    return query.all()
 
 
 # ==========================================
@@ -175,7 +176,7 @@ def get_invoice(
             detail="Invoice not found"
         )
 
-
+    ensure_vendor_access(current_user, invoice.vendor_id)
     return invoice
 
 

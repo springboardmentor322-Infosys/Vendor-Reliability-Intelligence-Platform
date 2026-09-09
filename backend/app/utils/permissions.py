@@ -74,3 +74,8 @@ def require_roles(*allowed_roles):
         return current_user
 
     return role_checker
+
+def ensure_vendor_access(current_user, vendor_id):
+    if current_user.role == VENDOR:
+        if not current_user.vendor_id or int(vendor_id) != int(current_user.vendor_id):
+            raise HTTPException(status_code=403, detail="Vendors may access only their own company data")

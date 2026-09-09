@@ -18,7 +18,8 @@ from app.utils.permissions import (
     SUPPLY_CHAIN_MANAGER,
     FINANCE_OFFICER,
     AUDITOR,
-    VENDOR
+    VENDOR,
+    ensure_vendor_access
 )
 
 
@@ -199,6 +200,10 @@ def get_orders(
     offset = max(0, offset)
 
     query = db.query(Order)
+    if current_user.role == VENDOR:
+        if not current_user.vendor_id:
+            return []
+        query = query.filter(Order.vendor_id == current_user.vendor_id)
 
     if status and status != "All":
         query = query.filter(Order.status == status)
@@ -243,6 +248,10 @@ def get_order_count(
 ):
 
     query = db.query(Order)
+    if current_user.role == VENDOR:
+        if not current_user.vendor_id:
+            return {"count": 0}
+        query = query.filter(Order.vendor_id == current_user.vendor_id)
 
     if status and status != "All":
         query = query.filter(Order.status == status)
@@ -592,7 +601,9 @@ def create_order_from_procurement(
 
         amount=request.estimated_amount,
 
-        status="Ordered"
+        status="Ordered",
+
+        expected_delivery_date=request.expected_delivery_date
 
     )
 

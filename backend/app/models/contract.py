@@ -112,3 +112,8 @@ class Contract(Base):
         String,
         nullable=True
     )
+
+    evidence_url = Column(
+        String,
+        nullable=True
+    )

@@ -23,28 +23,26 @@ export class Delivery {
 
   getDeliveries(
     page: number = 1,
-    limit: number = 50
+    limit: number = 50,
+    search: string = ''
   ): Observable<any> {
 
-    const params =
-      new HttpParams()
-        .set(
-          'page',
-          page
-        )
-        .set(
-          'limit',
-          limit
-        );
+    let params = new HttpParams()
+      .set('page', page)
+      .set('limit', limit);
 
+    if (search.trim()) {
+      params = params.set(
+        'search',
+        search.trim()
+      );
+    }
 
     return this.http.get<any>(
       `${this.apiUrl}/deliveries/`,
       { params }
     );
-
   }
-
 
   // ==========================================
   // GET DELIVERY BY ID
@@ -121,16 +119,12 @@ export class Delivery {
   // CREATE DELIVERY
   // ==========================================
 
-  createDelivery(
-    data: any
-  ): Observable<any> {
-
-    return this.http.post<any>(
-      `${this.apiUrl}/deliveries/`,
-      data
-    );
-
-  }
+    createDelivery(data: any): Observable<any> {
+      return this.http.post<any>(
+          `${this.apiUrl}/deliveries/`,
+          data
+      );
+    }
 
 
   // ==========================================

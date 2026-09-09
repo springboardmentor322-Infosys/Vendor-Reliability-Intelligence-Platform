@@ -11,7 +11,7 @@ class DeliveryCreate(BaseModel):
 
     order_id: int
 
-    vendor_id: int
+    vendor_id: Optional[int] = None
 
     expected_delivery_date: date
 

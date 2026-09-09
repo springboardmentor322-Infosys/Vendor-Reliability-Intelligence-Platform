@@ -1,10 +1,10 @@
 import {
   Component,
-  OnInit
+  OnInit,
+  ChangeDetectorRef
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-
 import { FormsModule } from '@angular/forms';
 
 import { Delivery } from '../../services/delivery';
@@ -12,7 +12,6 @@ import { Delivery } from '../../services/delivery';
 
 @Component({
   selector: 'app-deliveries',
-
   standalone: true,
 
   imports: [
@@ -20,23 +19,24 @@ import { Delivery } from '../../services/delivery';
     FormsModule
   ],
 
-  templateUrl:
-    './deliveries.html',
+  templateUrl: './deliveries.html',
 
-  styleUrl:
-    './deliveries.css'
+  styleUrl: './deliveries.css'
 })
 
 
-export class Deliveries
-  implements OnInit {
+export class Deliveries implements OnInit {
 
   Math = Math;
+
+
   // ==========================================
   // DELIVERY DATA
   // ==========================================
 
   deliveries: any[] = [];
+
+  allDeliveries: any[] = [];
 
   delayedDeliveries: any[] = [];
 
@@ -70,6 +70,15 @@ export class Deliveries
 
 
   // ==========================================
+  // SEARCH
+  // ==========================================
+
+  searchTerm = '';
+
+  isSearching = false;
+
+
+  // ==========================================
   // LOADING
   // ==========================================
 
@@ -98,7 +107,6 @@ export class Deliveries
 
     order_id: null,
 
-    vendor_id: null,
 
     expected_delivery_date: '',
 
@@ -118,7 +126,8 @@ export class Deliveries
   // ==========================================
 
   constructor(
-    private deliveryService: Delivery
+    private deliveryService: Delivery,
+    private cdr: ChangeDetectorRef
   ) {}
 
 
@@ -127,6 +136,9 @@ export class Deliveries
   // ==========================================
 
   ngOnInit(): void {
+
+    // Load everything automatically
+    // when the page opens.
 
     this.loadDeliveries();
 
@@ -153,22 +165,81 @@ export class Deliveries
       )
       .subscribe({
 
-        next: (response) => {
+        next: (response: any) => {
 
-          this.deliveries =
-            response?.items || [];
+          console.log(
+            'Deliveries response:',
+            response
+          );
 
-          this.totalRecords =
-            response?.total || 0;
 
-          this.totalPages =
-            response?.total_pages || 1;
+          /*
+           * Support both:
+           *
+           * {
+           *   items: [],
+           *   total: 367,
+           *   page: 1,
+           *   total_pages: 8
+           * }
+           *
+           * and a direct array.
+           */
 
-          this.currentPage =
-            response?.page ||
-            this.currentPage;
+          if (Array.isArray(response)) {
+
+            this.allDeliveries = response;
+
+            this.totalRecords =
+              response.length;
+
+            this.totalPages =
+              Math.max(
+                1,
+                Math.ceil(
+                  response.length /
+                  this.pageSize
+                )
+              );
+
+          } else {
+
+            this.allDeliveries =
+              response?.items || [];
+
+            this.totalRecords =
+              response?.total ??
+              this.allDeliveries.length;
+
+            this.totalPages =
+              response?.total_pages ??
+              Math.max(
+                1,
+                Math.ceil(
+                  this.totalRecords /
+                  this.pageSize
+                )
+              );
+
+            this.currentPage =
+              response?.page ??
+              this.currentPage;
+
+          }
+
+
+          // Apply search after data arrives.
+
+          this.applySearch();
+
+
+          // Stop loading.
 
           this.loading = false;
+
+          // Force Angular to update the UI.
+
+          this.cdr.detectChanges();
 
         },
 
@@ -180,17 +251,141 @@ export class Deliveries
             error
           );
 
+
           this.errorMessage =
             error?.error?.detail ||
             'Unable to load deliveries.';
 
+
+          this.allDeliveries = [];
+
           this.deliveries = [];
 
+          this.totalRecords = 0;
+
+          this.totalPages = 1;
+
+
+          // Stop loading even when request fails.
+
           this.loading = false;
+
+          // Force Angular to update the UI.
+
+          this.cdr.detectChanges();
 
         }
 
       });
+
+  }
+
+
+  // ==========================================
+  // APPLY SEARCH
+  // ==========================================
+
+  applySearch(): void {
+
+    const term =
+      this.searchTerm
+        .trim()
+        .toLowerCase();
+
+
+    if (!term) {
+
+      this.deliveries =
+        [...this.allDeliveries];
+
+      return;
+
+    }
+
+
+    this.deliveries =
+      this.allDeliveries.filter(
+        (delivery: any) => {
+
+          const order =
+            String(
+              delivery.order_id ?? ''
+            ).toLowerCase();
+
+
+          const vendor =
+            String(
+              delivery.vendor_id ?? ''
+            ).toLowerCase();
+
+
+          const tracking =
+            String(
+              delivery.tracking_number ?? ''
+            ).toLowerCase();
+
+
+          const status =
+            String(
+              delivery.status ?? ''
+            ).toLowerCase();
+
+
+          const id =
+            String(
+              delivery.id ?? ''
+            ).toLowerCase();
+
+
+          return (
+
+            order.includes(term) ||
+
+            vendor.includes(term) ||
+
+            tracking.includes(term) ||
+
+            status.includes(term) ||
+
+            id.includes(term)
+
+          );
+
+        }
+
+      );
+
+  }
+
+
+  // ==========================================
+  // SEARCH
+  // ==========================================
+
+  onSearch(): void {
+
+    this.currentPage = 1;
+
+    this.isSearching = true;
+
+    this.applySearch();
+
+    this.isSearching = false;
+
+  }
+
+
+  // ==========================================
+  // CLEAR SEARCH
+  // ==========================================
+
+  clearSearch(): void {
+
+    this.searchTerm = '';
+
+    this.currentPage = 1;
+
+    this.applySearch();
 
   }
 
@@ -208,24 +403,33 @@ export class Deliveries
       .getDeliverySummary()
       .subscribe({
 
-        next: (summary) => {
+        next: (summary: any) => {
 
           this.totalDeliveries =
             summary?.total_deliveries || 0;
 
+
           this.pendingDeliveries =
             summary?.pending_deliveries || 0;
+
 
           this.inTransitDeliveries =
             summary?.in_transit_deliveries || 0;
 
+
           this.delayedCount =
             summary?.delayed_deliveries || 0;
+
 
           this.deliveredDeliveries =
             summary?.delivered_deliveries || 0;
 
+
           this.summaryLoading = false;
+
+          // Force Angular to update summary cards.
+
+          this.cdr.detectChanges();
 
         },
 
@@ -237,7 +441,12 @@ export class Deliveries
             error
           );
 
+
           this.summaryLoading = false;
+
+          // Force Angular to update summary cards.
+
+          this.cdr.detectChanges();
 
         }
 
@@ -331,15 +540,19 @@ export class Deliveries
 
     const pages: number[] = [];
 
-    const start = Math.max(
-      1,
-      this.currentPage - 2
-    );
 
-    const end = Math.min(
-      this.totalPages,
-      this.currentPage + 2
-    );
+    const start =
+      Math.max(
+        1,
+        this.currentPage - 2
+      );
+
+
+    const end =
+      Math.min(
+        this.totalPages,
+        this.currentPage + 2
+      );
 
 
     for (
@@ -370,6 +583,8 @@ export class Deliveries
 
     this.errorMessage = '';
 
+    this.cdr.detectChanges();
+
   }
 
 
@@ -396,8 +611,7 @@ export class Deliveries
 
       order_id: null,
 
-      vendor_id: null,
-
+  
       expected_delivery_date: '',
 
       actual_delivery_date: null,
@@ -426,12 +640,11 @@ export class Deliveries
 
     if (
       !this.newDelivery.order_id ||
-      !this.newDelivery.vendor_id ||
       !this.newDelivery.expected_delivery_date
     ) {
 
       this.errorMessage =
-        'Order ID, Vendor ID and Expected Delivery Date are required.';
+        'Order ID and Expected Delivery Date are required.';
 
       return;
 
@@ -449,11 +662,15 @@ export class Deliveries
           this.successMessage =
             'Delivery created successfully.';
 
+
           this.showForm = false;
 
           this.resetForm();
 
           this.currentPage = 1;
+
+
+          // Reload automatically.
 
           this.loadDeliveries();
 
@@ -468,6 +685,7 @@ export class Deliveries
             'Error creating delivery:',
             error
           );
+
 
           this.errorMessage =
             error?.error?.detail ||
@@ -517,6 +735,16 @@ export class Deliveries
           this.successMessage =
             'Delivery marked as delivered.';
 
+
+          // Update immediately on screen.
+
+          delivery.status =
+            'Delivered';
+
+          delivery.actual_delivery_date =
+            today;
+
+
           this.loadDeliveries();
 
           this.loadSummary();
@@ -530,6 +758,7 @@ export class Deliveries
             'Error updating delivery:',
             error
           );
+
 
           this.errorMessage =
             error?.error?.detail ||
@@ -599,6 +828,7 @@ export class Deliveries
             error
           );
 
+
           this.errorMessage =
             error?.error?.detail ||
             'Unable to delete delivery.';
@@ -621,6 +851,7 @@ export class Deliveries
     switch (status) {
 
       case 'Delivered':
+
       case 'Completed':
 
         return 'status-success';
@@ -689,6 +920,7 @@ export class Deliveries
       0,
       0
     );
+
 
     today.setHours(
       0,

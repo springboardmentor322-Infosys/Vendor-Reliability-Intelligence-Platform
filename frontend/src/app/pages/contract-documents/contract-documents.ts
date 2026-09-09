@@ -9,7 +9,6 @@ import { FormsModule } from '@angular/forms';
 
 import { ContractDocumentService } from '../../services/contract-document.service';
 
-
 @Component({
   selector: 'app-contract-documents',
   standalone: true,
@@ -22,10 +21,7 @@ import { ContractDocumentService } from '../../services/contract-document.servic
   templateUrl: './contract-documents.html',
   styleUrl: './contract-documents.css'
 })
-
-
 export class ContractDocuments implements OnInit {
-
 
   // ==========================================
   // DATA
@@ -33,28 +29,32 @@ export class ContractDocuments implements OnInit {
 
   documents = signal<any[]>([]);
 
+  // ==========================================
+  // CONTRACT
+  // ==========================================
+
+  // Contract ID is TEXT because the UI uses:
+  // CNT-2026-0001
+  contractId = '';
+
+  // Actual numeric database Contract.id
+  selectedContractDbId: number | null = null;
 
   // ==========================================
-  // SELECTED CONTRACT
+  // USER / ROLE
   // ==========================================
 
-  contractId: number | null = null;
-
+  isAuditor = false;
 
   // ==========================================
   // FORM
   // ==========================================
 
   certificationName = '';
-
   certificationNumber = '';
-
   issueDate = '';
-
   expiryDate = '';
-
   status = 'Active';
-
 
   // ==========================================
   // FILE
@@ -62,36 +62,28 @@ export class ContractDocuments implements OnInit {
 
   selectedFile: File | null = null;
 
-
   // ==========================================
   // LOADING
   // ==========================================
 
   loading = signal(false);
-
   uploading = signal(false);
-
 
   // ==========================================
   // FORM VISIBILITY
   // ==========================================
 
   showForm = signal(false);
-
   editMode = signal(false);
 
-
   selectedDocumentId: number | null = null;
-
 
   // ==========================================
   // MESSAGES
   // ==========================================
 
   successMessage = '';
-
   errorMessage = '';
-
 
   // ==========================================
   // CONSTRUCTOR
@@ -101,18 +93,73 @@ export class ContractDocuments implements OnInit {
     private documentService: ContractDocumentService
   ) {}
 
-
   // ==========================================
   // INITIALIZE
   // ==========================================
 
   ngOnInit(): void {
-
-    // Documents are loaded after
-    // entering a Contract ID.
-
+    this.detectUserRole();
   }
 
+  // ==========================================
+  // DETECT USER ROLE
+  // ==========================================
+
+  detectUserRole(): void {
+
+    this.isAuditor = false;
+
+    const storageKeys = [
+      'role',
+      'userRole',
+      'currentUser',
+      'user',
+      'loggedInUser',
+      'authUser'
+    ];
+
+    const storages = [
+      window.localStorage,
+      window.sessionStorage
+    ];
+
+    for (const storage of storages) {
+
+      for (const key of storageKeys) {
+
+        const rawValue = storage.getItem(key);
+
+        if (!rawValue) {
+          continue;
+        }
+
+        let roleValue = rawValue;
+
+        try {
+          const parsed = JSON.parse(rawValue);
+
+          if (typeof parsed === 'string') {
+            roleValue = parsed;
+          } else if (parsed?.role) {
+            roleValue = parsed.role;
+          } else if (parsed?.user?.role) {
+            roleValue = parsed.user.role;
+          }
+        } catch {
+          // Value was plain text, so use it directly.
+        }
+
+        if (
+          String(roleValue)
+            .trim()
+            .toLowerCase() === 'auditor'
+        ) {
+          this.isAuditor = true;
+          return;
+        }
+      }
+    }
+  }
 
   // ==========================================
   // LOAD DOCUMENTS
@@ -120,33 +167,72 @@ export class ContractDocuments implements OnInit {
 
   loadDocuments(): void {
 
-    if (!this.contractId) {
+    const enteredId = this.contractId.trim();
+
+    if (!enteredId) {
+
+      this.errorMessage =
+        'Please enter a Contract ID.';
+
+      this.documents.set([]);
+
+      return;
+    }
+
+    this.loading.set(true);
+
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    /*
+     * UI Contract ID:
+     *
+     * CNT-2026-0001
+     *
+     * Backend expects numeric:
+     *
+     * 1
+     */
+
+    const match = enteredId.match(/-(\d+)$/);
+
+    if (!match) {
+
+      this.loading.set(false);
+
+      this.documents.set([]);
+
+      this.errorMessage =
+        'Please enter a valid Contract ID, for example CNT-2026-0001.';
+
+      return;
+    }
+
+    const numericId = Number(match[1]);
+
+    if (!numericId || numericId < 1) {
+
+      this.loading.set(false);
+
+      this.documents.set([]);
 
       this.errorMessage =
         'Please enter a valid Contract ID.';
 
       return;
-
     }
 
-
-    this.loading.set(true);
-
-    this.errorMessage = '';
-
-    this.successMessage = '';
-
+    this.selectedContractDbId = numericId;
 
     this.documentService
-      .getContractDocuments(this.contractId)
+      .getContractDocuments(numericId)
       .subscribe({
 
         next: (response: any[]) => {
 
-          this.documents.set(response);
+          this.documents.set(response || []);
 
           this.loading.set(false);
-
         },
 
         error: (error: any) => {
@@ -161,21 +247,60 @@ export class ContractDocuments implements OnInit {
           this.loading.set(false);
 
           this.errorMessage =
-            error?.error?.detail ||
-            'Unable to load contract documents.';
-
+            this.getErrorMessage(
+              error,
+              'Unable to load contract documents.'
+            );
         }
 
       });
-
   }
 
+  // ==========================================
+  // ERROR MESSAGE
+  // ==========================================
+
+  getErrorMessage(
+    error: any,
+    fallback: string
+  ): string {
+
+    if (typeof error?.error === 'string') {
+      return error.error;
+    }
+
+    if (typeof error?.error?.detail === 'string') {
+      return error.error.detail;
+    }
+
+    if (typeof error?.message === 'string') {
+      return error.message;
+    }
+
+    return fallback;
+  }
 
   // ==========================================
   // OPEN ADD FORM
   // ==========================================
 
   openAddForm(): void {
+
+    if (this.isAuditor) {
+
+      this.errorMessage =
+        'Auditors have read-only access to contract documentation.';
+
+      return;
+    }
+
+    if (!this.selectedContractDbId) {
+
+      this.errorMessage =
+        'Please load a valid Contract ID first.';
+
+      return;
+    }
 
     this.editMode.set(false);
 
@@ -184,9 +309,7 @@ export class ContractDocuments implements OnInit {
     this.resetForm();
 
     this.showForm.set(true);
-
   }
-
 
   // ==========================================
   // OPEN EDIT FORM
@@ -195,6 +318,14 @@ export class ContractDocuments implements OnInit {
   openEditForm(
     selectedDocument: any
   ): void {
+
+    if (this.isAuditor) {
+
+      this.errorMessage =
+        'Auditors have read-only access to contract documentation.';
+
+      return;
+    }
 
     this.editMode.set(true);
 
@@ -219,9 +350,7 @@ export class ContractDocuments implements OnInit {
     this.selectedFile = null;
 
     this.showForm.set(true);
-
   }
-
 
   // ==========================================
   // CLOSE FORM
@@ -232,9 +361,7 @@ export class ContractDocuments implements OnInit {
     this.showForm.set(false);
 
     this.resetForm();
-
   }
-
 
   // ==========================================
   // RESET FORM
@@ -243,21 +370,14 @@ export class ContractDocuments implements OnInit {
   resetForm(): void {
 
     this.certificationName = '';
-
     this.certificationNumber = '';
-
     this.issueDate = '';
-
     this.expiryDate = '';
-
     this.status = 'Active';
 
     this.selectedFile = null;
-
     this.selectedDocumentId = null;
-
   }
-
 
   // ==========================================
   // FILE SELECT
@@ -267,9 +387,12 @@ export class ContractDocuments implements OnInit {
     event: Event
   ): void {
 
+    if (this.isAuditor) {
+      return;
+    }
+
     const input =
       event.target as HTMLInputElement;
-
 
     if (
       input.files &&
@@ -280,11 +403,8 @@ export class ContractDocuments implements OnInit {
         input.files[0];
 
       this.errorMessage = '';
-
     }
-
   }
-
 
   // ==========================================
   // SAVE DOCUMENT
@@ -292,28 +412,32 @@ export class ContractDocuments implements OnInit {
 
   saveDocument(): void {
 
-    this.successMessage = '';
-
-    this.errorMessage = '';
-
-
-    // ------------------------------------------
-    // VALIDATE CONTRACT
-    // ------------------------------------------
-
-    if (!this.contractId) {
+    if (this.isAuditor) {
 
       this.errorMessage =
-        'Please enter a Contract ID.';
+        'Auditors have read-only access to contract documentation.';
 
       return;
-
     }
 
+    this.successMessage = '';
+    this.errorMessage = '';
 
-    // ------------------------------------------
+    // ==========================================
+    // VALIDATE CONTRACT
+    // ==========================================
+
+    if (!this.selectedContractDbId) {
+
+      this.errorMessage =
+        'Please load a valid Contract ID first.';
+
+      return;
+    }
+
+    // ==========================================
     // VALIDATE CERTIFICATION
-    // ------------------------------------------
+    // ==========================================
 
     if (!this.certificationName.trim()) {
 
@@ -321,13 +445,11 @@ export class ContractDocuments implements OnInit {
         'Certification name is required.';
 
       return;
-
     }
 
-
-    // ------------------------------------------
+    // ==========================================
     // VALIDATE DATES
-    // ------------------------------------------
+    // ==========================================
 
     if (
       this.issueDate &&
@@ -339,27 +461,19 @@ export class ContractDocuments implements OnInit {
         'Expiry date cannot be before issue date.';
 
       return;
-
     }
-
-
-    // ------------------------------------------
-    // IMPORTANT:
-    // KEEP THE FILE BEFORE RESETTING FORM
-    // ------------------------------------------
 
     const fileToUpload =
       this.selectedFile;
 
-
-    // ------------------------------------------
+    // ==========================================
     // REQUEST DATA
-    // ------------------------------------------
+    // ==========================================
 
     const data = {
 
       contract_id:
-        this.contractId,
+        this.selectedContractDbId,
 
       certification_name:
         this.certificationName.trim(),
@@ -368,19 +482,17 @@ export class ContractDocuments implements OnInit {
         this.certificationNumber.trim(),
 
       issue_date:
-        this.issueDate,
+        this.issueDate || null,
 
       expiry_date:
-        this.expiryDate,
+        this.expiryDate || null,
 
       status:
         this.status
-
     };
 
-
     // ==========================================
-    // UPDATE EXISTING DOCUMENT
+    // UPDATE
     // ==========================================
 
     if (
@@ -390,7 +502,6 @@ export class ContractDocuments implements OnInit {
 
       const documentId =
         this.selectedDocumentId;
-
 
       this.documentService
         .updateContractDocument(
@@ -404,27 +515,19 @@ export class ContractDocuments implements OnInit {
             this.successMessage =
               'Document information updated successfully.';
 
-
-            // ----------------------------------
-            // UPLOAD NEW FILE IF SELECTED
-            // ----------------------------------
-
             if (fileToUpload) {
 
               this.uploadFile(
                 documentId,
                 fileToUpload
               );
-
             }
-
 
             this.showForm.set(false);
 
             this.resetForm();
 
             this.loadDocuments();
-
           },
 
           error: (error: any) => {
@@ -435,21 +538,19 @@ export class ContractDocuments implements OnInit {
             );
 
             this.errorMessage =
-              error?.error?.detail ||
-              'Unable to update document.';
-
+              this.getErrorMessage(
+                error,
+                'Unable to update document.'
+              );
           }
 
         });
 
-
       return;
-
     }
 
-
     // ==========================================
-    // CREATE NEW DOCUMENT
+    // CREATE
     // ==========================================
 
     this.documentService
@@ -463,14 +564,8 @@ export class ContractDocuments implements OnInit {
             response
           );
 
-
           const documentId =
             response?.id;
-
-
-          // ----------------------------------
-          // CHECK DOCUMENT ID
-          // ----------------------------------
 
           if (!documentId) {
 
@@ -478,22 +573,11 @@ export class ContractDocuments implements OnInit {
               'Document was created, but no document ID was returned.';
 
             return;
-
           }
-
-
-          // ----------------------------------
-          // CLOSE FORM
-          // ----------------------------------
 
           this.showForm.set(false);
 
           this.resetForm();
-
-
-          // ----------------------------------
-          // UPLOAD FILE
-          // ----------------------------------
 
           if (fileToUpload) {
 
@@ -508,9 +592,7 @@ export class ContractDocuments implements OnInit {
               'Document record created successfully.';
 
             this.loadDocuments();
-
           }
-
         },
 
         error: (error: any) => {
@@ -521,15 +603,14 @@ export class ContractDocuments implements OnInit {
           );
 
           this.errorMessage =
-            error?.error?.detail ||
-            'Unable to create document.';
-
+            this.getErrorMessage(
+              error,
+              'Unable to create document.'
+            );
         }
 
       });
-
   }
-
 
   // ==========================================
   // UPLOAD FILE
@@ -540,10 +621,13 @@ export class ContractDocuments implements OnInit {
     file: File
   ): void {
 
+    if (this.isAuditor) {
+      return;
+    }
+
     this.uploading.set(true);
 
     this.errorMessage = '';
-
 
     this.documentService
       .uploadDocument(
@@ -565,7 +649,6 @@ export class ContractDocuments implements OnInit {
             'Document uploaded successfully.';
 
           this.loadDocuments();
-
         },
 
         error: (error: any) => {
@@ -578,15 +661,14 @@ export class ContractDocuments implements OnInit {
           this.uploading.set(false);
 
           this.errorMessage =
-            error?.error?.detail ||
-            'Unable to upload document.';
-
+            this.getErrorMessage(
+              error,
+              'Unable to upload document.'
+            );
         }
 
       });
-
   }
-
 
   // ==========================================
   // DELETE DOCUMENT
@@ -596,18 +678,22 @@ export class ContractDocuments implements OnInit {
     documentId: number
   ): void {
 
+    if (this.isAuditor) {
+
+      this.errorMessage =
+        'Auditors have read-only access to contract documentation.';
+
+      return;
+    }
+
     const confirmed =
       confirm(
         'Are you sure you want to delete this document?'
       );
 
-
     if (!confirmed) {
-
       return;
-
     }
-
 
     this.documentService
       .deleteContractDocument(documentId)
@@ -619,7 +705,6 @@ export class ContractDocuments implements OnInit {
             'Document deleted successfully.';
 
           this.loadDocuments();
-
         },
 
         error: (error: any) => {
@@ -630,15 +715,14 @@ export class ContractDocuments implements OnInit {
           );
 
           this.errorMessage =
-            error?.error?.detail ||
-            'Unable to delete document.';
-
+            this.getErrorMessage(
+              error,
+              'Unable to delete document.'
+            );
         }
 
       });
-
   }
-
 
   // ==========================================
   // DOWNLOAD DOCUMENT
@@ -654,9 +738,7 @@ export class ContractDocuments implements OnInit {
         'Invalid document.';
 
       return;
-
     }
-
 
     this.documentService
       .downloadDocument(
@@ -671,37 +753,26 @@ export class ContractDocuments implements OnInit {
               blob
             );
 
-
-          // Use window.document so there
-          // is no naming conflict.
-
           const anchor =
             window.document.createElement('a');
 
-
           anchor.href = url;
-
 
           anchor.download =
             selectedDocument.document_name ||
             'contract-document';
 
-
           window.document.body.appendChild(
             anchor
           );
 
-
           anchor.click();
 
-
           anchor.remove();
-
 
           window.URL.revokeObjectURL(
             url
           );
-
         },
 
         error: (error: any) => {
@@ -712,15 +783,14 @@ export class ContractDocuments implements OnInit {
           );
 
           this.errorMessage =
-            error?.error?.detail ||
-            'Unable to download document.';
-
+            this.getErrorMessage(
+              error,
+              'Unable to download document.'
+            );
         }
 
       });
-
   }
-
 
   // ==========================================
   // EXPIRY STATUS
@@ -731,21 +801,14 @@ export class ContractDocuments implements OnInit {
   ): string {
 
     if (!expiryDate) {
-
       return 'No Expiry';
-
     }
-
 
     const today =
       new Date();
 
     const expiry =
       new Date(expiryDate);
-
-
-    // Remove time portion so that
-    // date comparison is more reliable.
 
     today.setHours(
       0,
@@ -761,26 +824,13 @@ export class ContractDocuments implements OnInit {
       0
     );
 
-
-    // ------------------------------------------
-    // EXPIRED
-    // ------------------------------------------
-
     if (expiry < today) {
-
       return 'Expired';
-
     }
-
-
-    // ------------------------------------------
-    // DAYS REMAINING
-    // ------------------------------------------
 
     const difference =
       expiry.getTime() -
       today.getTime();
-
 
     const days =
       Math.ceil(
@@ -788,24 +838,10 @@ export class ContractDocuments implements OnInit {
         (1000 * 60 * 60 * 24)
       );
 
-
-    // ------------------------------------------
-    // EXPIRING SOON
-    // ------------------------------------------
-
     if (days <= 30) {
-
       return 'Expiring Soon';
-
     }
 
-
-    // ------------------------------------------
-    // ACTIVE
-    // ------------------------------------------
-
     return 'Active';
-
   }
-
 }
