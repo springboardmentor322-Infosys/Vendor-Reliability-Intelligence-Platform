@@ -20,6 +20,10 @@ export default function ProtectedRoute() {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />
   }
 
+  if (location.pathname === '/my-vendor-profile') {
+    return <Navigate to="/profile" replace />
+  }
+
   const allowedRoutes = getAllowedRoutesForRole(user?.role)
   if (!allowedRoutes.includes(location.pathname)) {
     return <Navigate to={getDashboardRouteForRole(user?.role)} replace />

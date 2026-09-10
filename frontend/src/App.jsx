@@ -11,7 +11,6 @@ import Register from './pages/Register'
 import ResetPassword from './pages/ResetPassword'
 import VendorDashboard from './pages/VendorDashboard'
 import VendorManagement from './pages/VendorManagement'
-import VendorProfile from './pages/VendorProfile'
 import ProcurementDashboard from './pages/ProcurementDashboard'
 import PurchaseOrders from './pages/PurchaseOrders'
 import VendorPerformance from './pages/VendorPerformance'
@@ -57,7 +56,7 @@ export default function App() {
               <Route path="/system-settings" element={<SystemSettings />} />
               <Route path="/system-health" element={<SystemHealth />} />
               <Route path="/po-approval-trails" element={<PurchaseOrderApprovalTrails />} />
-              <Route path="/my-vendor-profile" element={<VendorProfile />} />
+              <Route path="/my-vendor-profile" element={<Navigate to="/profile" replace />} />
               <Route path="/procurement" element={<ProcurementDashboard />} />
               <Route path="/purchase-orders" element={<PurchaseOrders />} />
               <Route path="/invoices" element={<Invoices />} />

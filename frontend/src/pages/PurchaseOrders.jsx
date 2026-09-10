@@ -721,7 +721,9 @@ export default function PurchaseOrders() {
               ? 'Track your assigned purchase orders and upload delivery documents.'
               : isPM
                 ? 'Create purchase orders, manage statuses, and open a row to view PO details.'
-                : 'View and track purchase orders across the organisation. Open a row to see PO details.'}
+                : role === 'Auditor'
+                  ? 'Read-only operational purchase orders. Status-change history is on PO Approval Trails.'
+                  : 'View and track purchase orders across the organisation. Open a row to see PO details.'}
           </p>
         </div>
         {isPM && (

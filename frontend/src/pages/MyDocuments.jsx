@@ -171,7 +171,7 @@ export default function MyDocuments() {
 
       {!vendor?.id && !loading ? (
         <div className="page-alert page-alert--error">
-          No vendor profile is linked to this account yet. Complete My Vendor Profile first.
+          No vendor profile is linked to this account yet. Complete your supplier details under Profile, then return here to upload documents.
         </div>
       ) : null}
 

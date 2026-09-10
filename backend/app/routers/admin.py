@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.core.config import get_settings
 from app.core.security import get_current_user_with_role
-from app.db.session import engine, get_db
+from app.db.session import get_db
 from app.models.app_setting import AppSetting
 from app.models.communication import AuditLog
 from app.models.user import INTERNAL_ASSIGNABLE_ROLES, Role, User
@@ -223,21 +223,24 @@ def update_settings(
 
 @router.get("/health", response_model=SystemHealthResponse)
 def get_system_health(
+    db: Session = Depends(get_db),
     _: User = Depends(_admin_user),
 ) -> SystemHealthResponse:
     try:
-        with engine.connect() as connection:
-            connection.execute(text("SELECT 1"))
+        db.execute(text("SELECT 1"))
         database = HealthCheckItem(ok=True, detail="Database connection OK")
     except Exception as exc:  # noqa: BLE001 — health check must not crash
         database = HealthCheckItem(ok=False, detail=f"Database connection failed: {exc}")
 
-    settings = get_settings()
-    smtp_ready = bool(settings.SMTP_HOST and settings.SMTP_USER)
-    smtp = HealthCheckItem(
-        ok=smtp_ready,
-        detail="SMTP configured" if smtp_ready else "SMTP not configured",
-    )
+    try:
+        settings = get_settings()
+        smtp_ready = bool(settings.SMTP_HOST and settings.SMTP_USER)
+        smtp = HealthCheckItem(
+            ok=smtp_ready,
+            detail="SMTP configured" if smtp_ready else "SMTP host/user not configured",
+        )
+    except Exception as exc:  # noqa: BLE001
+        smtp = HealthCheckItem(ok=False, detail=f"SMTP settings unavailable: {exc}")
 
     now = datetime.now(timezone.utc)
     uptime = max(0, int((now - STARTED_AT).total_seconds()))
@@ -256,19 +259,15 @@ def list_po_approval_trails(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user_with_role([Role.ADMINISTRATOR, Role.AUDITOR])),
 ) -> list[PurchaseOrderTrail]:
-    purchase_orders = list(
-        db.scalars(
-            select(PurchaseOrder)
-            .options(selectinload(PurchaseOrder.vendor))
-            .order_by(PurchaseOrder.id.desc())
-        )
-    )
     logs = list(
         db.scalars(
             select(AuditLog)
             .options(selectinload(AuditLog.actor))
-            .where(AuditLog.entity_type == "purchase_order")
-            .order_by(AuditLog.timestamp.asc())
+            .where(
+                AuditLog.entity_type == "purchase_order",
+                AuditLog.action_description.ilike("%status changed%"),
+            )
+            .order_by(AuditLog.timestamp.desc())
         )
     )
     events_by_po: dict[int, list[PurchaseOrderTrailEvent]] = defaultdict(list)
@@ -283,15 +282,35 @@ def list_po_approval_trails(
             )
         )
 
-    return [
-        PurchaseOrderTrail(
-            purchase_order_id=po.id,
-            po_number=po.po_number,
-            vendor_id=po.vendor_id,
-            vendor_name=po.vendor.name if po.vendor else None,
-            status=po.status.value if hasattr(po.status, "value") else str(po.status),
-            created_at=po.created_at,
-            events=events_by_po.get(po.id, []),
+    po_ids = list(events_by_po.keys())
+    if not po_ids:
+        return []
+
+    purchase_orders = list(
+        db.scalars(
+            select(PurchaseOrder)
+            .options(selectinload(PurchaseOrder.vendor))
+            .where(PurchaseOrder.id.in_(po_ids))
         )
-        for po in purchase_orders
-    ]
+    )
+    po_by_id = {po.id: po for po in purchase_orders}
+
+    trails: list[PurchaseOrderTrail] = []
+    for po_id in po_ids:
+        po = po_by_id.get(po_id)
+        if po is None:
+            continue
+        events = sorted(events_by_po[po_id], key=lambda item: item.timestamp, reverse=True)
+        trails.append(
+            PurchaseOrderTrail(
+                purchase_order_id=po.id,
+                po_number=po.po_number,
+                vendor_id=po.vendor_id,
+                vendor_name=po.vendor.name if po.vendor else None,
+                status=po.status.value if hasattr(po.status, "value") else str(po.status),
+                created_at=po.created_at,
+                events=events,
+            )
+        )
+    trails.sort(key=lambda trail: trail.events[0].timestamp if trail.events else trail.created_at, reverse=True)
+    return trails

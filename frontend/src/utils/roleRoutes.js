@@ -32,7 +32,6 @@ export const ROLE_ALLOWED_ROUTES = {
   ],
   Vendor: [
     '/vendor-dashboard',
-    '/my-vendor-profile',
     '/vendor-performance',
     '/purchase-orders',
     '/deliveries',
@@ -79,7 +78,6 @@ export const ROLE_ALLOWED_ROUTES = {
   'Supply Chain Manager': [
     '/supply-chain',
     '/procurement-requests',
-    '/procurement',
     '/purchase-orders',
     '/deliveries',
     '/quality-inspections',
@@ -130,8 +128,6 @@ export const ROLE_NAV_CONFIG = {
   ],
   Vendor: [
     { to: '/vendor-dashboard', label: 'Vendor Dashboard' },
-    { to: '/my-vendor-profile', label: 'My Vendor Profile' },
-    { to: '/profile', label: 'Account Profile' },
     { to: '/vendor-performance', label: 'My Performance' },
     { to: '/purchase-orders', label: 'My Purchase Orders' },
     { to: '/deliveries', label: 'My Delivery Tracking' },
@@ -168,7 +164,6 @@ export const ROLE_NAV_CONFIG = {
   'Supply Chain Manager': [
     { to: '/supply-chain', label: 'Supply Chain Dashboard' },
     { to: '/procurement-requests', label: 'Procurement Requests' },
-    { to: '/procurement', label: 'Procurement Overview' },
     { to: '/purchase-orders', label: 'Purchase Orders' },
     { to: '/deliveries', label: 'Delivery Tracking' },
     { to: '/quality-inspections', label: 'Quality Inspection' },
@@ -186,7 +181,7 @@ export const ROLE_NAV_CONFIG = {
     { to: '/quality-inspections', label: 'Quality Inspection' },
     { to: '/contracts', label: 'Contracts & Compliance' },
     { to: '/analytics', label: 'Compliance Overview' },
-    { to: '/po-approval-trails', label: 'PO Approval Trails' },
+    { to: '/po-approval-trails', label: 'PO Status-Change History' },
     { to: '/reports', label: 'Reports' },
     { to: '/notifications', label: 'Notifications' },
   ],
@@ -239,7 +234,6 @@ export const ROLE_SIDEBAR_CONFIG = {
       items: [
         { to: '/supply-chain', label: 'Supply Chain Dashboard' },
         { to: '/procurement-requests', label: 'Procurement Requests' },
-        { to: '/procurement', label: 'Procurement Overview' },
         { to: '/vendor-management', label: 'Vendor Management' },
         { to: '/purchase-orders', label: 'Purchase Orders' },
         { to: '/deliveries', label: 'Delivery Tracking' },
@@ -256,8 +250,6 @@ export const ROLE_SIDEBAR_CONFIG = {
       title: 'Supplier',
       items: [
         { to: '/vendor-dashboard', label: 'Vendor Dashboard' },
-        { to: '/my-vendor-profile', label: 'My Vendor Profile' },
-        { to: '/profile', label: 'Account Profile' },
         { to: '/vendor-performance', label: 'My Performance' },
         { to: '/purchase-orders', label: 'My Purchase Orders' },
         { to: '/deliveries', label: 'My Delivery Tracking' },
@@ -293,7 +285,7 @@ export const ROLE_SIDEBAR_CONFIG = {
         { to: '/quality-inspections', label: 'Quality Inspection' },
         { to: '/contracts', label: 'Contracts & Compliance' },
         { to: '/analytics', label: 'Compliance Overview' },
-        { to: '/po-approval-trails', label: 'Purchase Order Approval Trails' },
+        { to: '/po-approval-trails', label: 'PO Status-Change History' },
         { to: '/reports', label: 'Reports' },
       ],
     },

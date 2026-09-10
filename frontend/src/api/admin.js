@@ -22,7 +22,13 @@ export async function updateSystemSettings(payload) {
 
 export async function fetchSystemHealth() {
   const { data } = await api.get('/admin/health')
-  return data
+  return {
+    database: data?.database ?? { ok: false, detail: 'Database check missing from response' },
+    backend: data?.backend ?? { ok: false, detail: 'Backend check missing from response' },
+    smtp: data?.smtp ?? { ok: false, detail: 'SMTP check missing from response' },
+    uptime_seconds: data?.uptime_seconds ?? 0,
+    started_at: data?.started_at ?? null,
+  }
 }
 
 export async function fetchPoApprovalTrails() {

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { fetchPoApprovalTrails } from '../api/admin'
-import { statusPillClass } from '../components/DashboardWidgets'
 import { getErrorMessage } from '../utils/auth'
 import { formatDateTime } from '../utils/vendorStatus'
 import '../dashboard-admin.css'
@@ -11,7 +10,6 @@ export default function PurchaseOrderApprovalTrails() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
-  const [expandedId, setExpandedId] = useState(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -29,22 +27,38 @@ export default function PurchaseOrderApprovalTrails() {
     load()
   }, [load])
 
+  const events = useMemo(() => {
+    const rows = trails.flatMap((trail) =>
+      (trail.events || []).map((event) => ({
+        ...event,
+        purchase_order_id: trail.purchase_order_id,
+        po_number: trail.po_number,
+        vendor_name: trail.vendor_name,
+      })),
+    )
+    rows.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    return rows
+  }, [trails])
+
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase()
-    if (!query) return trails
-    return trails.filter((trail) =>
-      [trail.po_number, trail.vendor_name, trail.status]
+    if (!query) return events
+    return events.filter((event) =>
+      [event.po_number, event.vendor_name, event.performer_name, event.action_description]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(query)),
     )
-  }, [trails, search])
+  }, [events, search])
 
   return (
     <section className="dashboard-admin-main page-enter">
       <header className="dashboard-admin-header">
         <div>
-          <h1>Purchase Order Approval Trails</h1>
-          <p>Read-only status-change history for purchase orders, including who changed what and when.</p>
+          <h1>PO Status-Change History</h1>
+          <p>
+            Read-only audit trail of purchase-order status changes (who changed what and when).
+            Operational PO management lives on Purchase Orders.
+          </p>
         </div>
         <div className="dashboard-admin-header__actions">
           <button type="button" className="dashboard-admin-btn dashboard-admin-btn--ghost" onClick={load} disabled={loading}>
@@ -61,7 +75,7 @@ export default function PurchaseOrderApprovalTrails() {
           <input
             type="text"
             className="filter-search"
-            placeholder="Search PO, vendor, or status…"
+            placeholder="Search actor, PO, vendor, or action…"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
@@ -70,80 +84,41 @@ export default function PurchaseOrderApprovalTrails() {
 
       <section className="table-card">
         <div className="table-card__header">
-          <h3>Purchase orders</h3>
+          <h3>Audit events</h3>
           <span className="table-card__meta">
-            {loading ? 'Loading…' : `${filtered.length} PO${filtered.length === 1 ? '' : 's'}`}
+            {loading ? 'Loading…' : `${filtered.length} status change${filtered.length === 1 ? '' : 's'}`}
           </span>
         </div>
         {loading ? (
-          <p className="loading-state">Loading approval trails…</p>
+          <p className="loading-state">Loading status-change history…</p>
         ) : (
           <table>
             <thead>
               <tr>
+                <th>When</th>
+                <th>Changed by</th>
                 <th>PO</th>
                 <th>Vendor</th>
-                <th>Current status</th>
-                <th>Created</th>
-                <th>History</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="table-empty">
-                    No purchase order trails found.
+                    No PO status-change audit events recorded yet.
                   </td>
                 </tr>
               ) : (
-                filtered.flatMap((trail) => {
-                  const rows = [
-                    <tr key={trail.purchase_order_id}>
-                      <td style={{ fontWeight: 600 }}>{trail.po_number}</td>
-                      <td>{trail.vendor_name || '—'}</td>
-                      <td>
-                        <span className={`status-pill ${statusPillClass(trail.status)}`}>{trail.status}</span>
-                      </td>
-                      <td>{formatDateTime(trail.created_at)}</td>
-                      <td>
-                        <button
-                          type="button"
-                          className="dashboard-admin-btn dashboard-admin-btn--ghost"
-                          onClick={() =>
-                            setExpandedId(expandedId === trail.purchase_order_id ? null : trail.purchase_order_id)
-                          }
-                        >
-                          {expandedId === trail.purchase_order_id
-                            ? 'Hide'
-                            : `${trail.events.length} change${trail.events.length === 1 ? '' : 's'}`}
-                        </button>
-                      </td>
-                    </tr>,
-                  ]
-                  if (expandedId === trail.purchase_order_id) {
-                    rows.push(
-                      <tr key={`${trail.purchase_order_id}-history`}>
-                        <td colSpan={5} style={{ background: '#f8fafc' }}>
-                          {trail.events.length === 0 ? (
-                            <p className="table-empty">No status-change audit events recorded for this PO.</p>
-                          ) : (
-                            <ul style={{ margin: 0, paddingLeft: '1.1rem' }}>
-                              {trail.events.map((event) => (
-                                <li key={event.id} style={{ marginBottom: '0.4rem' }}>
-                                  <strong>{event.performer_name || `User #${event.performed_by}`}</strong>
-                                  {' · '}
-                                  {formatDateTime(event.timestamp)}
-                                  <div>{event.action_description}</div>
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </td>
-                      </tr>,
-                    )
-                  }
-                  return rows
-                })
+                filtered.map((event) => (
+                  <tr key={event.id}>
+                    <td>{formatDateTime(event.timestamp)}</td>
+                    <td>{event.performer_name || `User #${event.performed_by}`}</td>
+                    <td style={{ fontWeight: 600 }}>{event.po_number}</td>
+                    <td>{event.vendor_name || '—'}</td>
+                    <td>{event.action_description}</td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
