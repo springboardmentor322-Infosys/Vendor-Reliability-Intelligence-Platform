@@ -266,9 +266,8 @@ async function fetchAllVendorData(forcedVendorName = null) {
 
       if (currentVendorObj) {
         if (currentVendorObj.id) sessionStorage.setItem("vendor_id_pk", currentVendorObj.id);
-        const rawScore = currentVendorObj.reliability_score ?? currentVendorObj.risk_level ?? 94;
-        const numericMatch = rawScore.toString().match(/\d+/);
-        let score = numericMatch ? parseInt(numericMatch[0], 10) : 94;
+        
+        const score = Number(currentVendorObj.reliability_score ?? 100);
 
         const metricReliability = document.getElementById("metric-reliability");
         if (metricReliability) metricReliability.textContent = `${score}%`;
@@ -278,18 +277,28 @@ async function fetchAllVendorData(forcedVendorName = null) {
         if (breakdownRating) breakdownRating.textContent = `${score} / 100`;
         applyRiskColor("breakdown-rating", score, { high: 90, medium: 75 });
 
-        const vendorOnTime = currentVendorObj.on_time_rate ?? currentVendorObj.on_time_delivery;
+        const vendorOnTime = currentVendorObj.on_time_rate ?? currentVendorObj.on_time_delivery ?? score;
         if (vendorOnTime !== undefined && vendorOnTime !== null) {
           syncOnTimeDeliveryMetrics(vendorOnTime);
         }
       }
     }
 
+    let allOrders = [];
     let poRes = await fetchWithRetry(`${API_BASE}/api/v1/purchase-orders`);
     if (poRes.ok) {
-      const allOrders = await poRes.json();
-      cachedOrders = allOrders.filter(o => isVendorMatch(o.vendor_name, vendorName));
+      allOrders = await poRes.json();
     }
+
+    const localPOs = JSON.parse(localStorage.getItem('supply_custom_replacement_pos') || '[]');
+    const existingIds = new Set(allOrders.map(o => o.invoice_no));
+    localPOs.forEach(lpo => {
+      if (!existingIds.has(lpo.invoice_no)) {
+        allOrders.push(lpo);
+      }
+    });
+
+    cachedOrders = allOrders.filter(o => isVendorMatch(o.vendor_name, vendorName));
 
     let invRes = await fetchWithRetry(`${API_BASE}/api/v1/invoices`);
     if (invRes.ok) {
@@ -346,47 +355,7 @@ function renderDashboardData() {
     );
   });
 
-  let totalScorePoints = 0;
-  let evaluatedOrdersCount = 0;
-
-  const targetOrders = cachedOrders.filter(po => {
-    const status = (po.order_status || "").toLowerCase();
-    const prodStatus = (po.production_status || "").toLowerCase();
-    return !status.includes("rejected") && !status.includes("returned") && !prodStatus.includes("rejected") && !prodStatus.includes("returned");
-  });
-
-  if (targetOrders.length > 0) {
-    targetOrders.forEach(po => {
-      if (!po.expiry_date) {
-        totalScorePoints += 100;
-        evaluatedOrdersCount++;
-        return;
-      }
-
-      const expiry = new Date(po.expiry_date.split('T')[0]);
-      const checkDate = po.actual_delivery_date 
-        ? new Date(po.actual_delivery_date.split('T')[0]) 
-        : new Date();
-
-      expiry.setHours(0, 0, 0, 0);
-      checkDate.setHours(0, 0, 0, 0);
-
-      const diffDays = Math.round((expiry - checkDate) / (1000 * 60 * 60 * 24));
-
-      if (diffDays > 7) {
-        totalScorePoints += 100;
-      } else if (diffDays >= 0 && diffDays <= 7) {
-        totalScorePoints += 70;
-      } else {
-        totalScorePoints += 30;
-      }
-      evaluatedOrdersCount++;
-    });
-  }
-
-  const onTimePercentage = evaluatedOrdersCount > 0 
-    ? Math.round(totalScorePoints / evaluatedOrdersCount) 
-    : 0;
+  const onTimePercentage = cachedOnTimeRate !== null ? cachedOnTimeRate : 92;
 
   const pendingTxns = cachedInvoices.filter(inv => {
     const isRejected = (inv.status && (inv.status.toLowerCase().includes("rejected") || inv.status.toLowerCase().includes("returned"))) ||
@@ -431,8 +400,8 @@ function renderDashboardData() {
       <td>$${Number(po.total_value || 0).toFixed(2)}</td>
       <td>
         <div class="action-btn-group">
-          <button class="btn-accept" onclick="handleVendorAcceptance(${po.id}, 'Accepted by Vendor')">Accept</button>
-          <button class="btn-reject" onclick="handleVendorAcceptance(${po.id}, 'Rejected by Vendor')">Reject</button>
+          <button class="btn-accept" onclick="handleVendorAcceptance(${po.id || 1}, 'Accepted by Vendor')">Accept</button>
+          <button class="btn-reject" onclick="handleVendorAcceptance(${po.id || 1}, 'Rejected by Vendor')">Reject</button>
         </div>
       </td>
     `;
@@ -594,27 +563,11 @@ function renderPurchaseOrders() {
     const orderStatus = (po.order_status || "").toLowerCase().trim();
     const prodStatus = (po.production_status || "").toLowerCase().trim();
 
-    if (
-      orderStatus === "pending" ||
-      orderStatus.includes("pending") ||
-      orderStatus.includes("awaiting") ||
-      orderStatus.includes("accepted by f.o") ||
-      orderStatus.includes("accepted by fo")
-    ) {
-      return false;
-    }
-
     if (orderStatus.includes("rejected") || orderStatus.includes("returned") || prodStatus.includes("rejected") || prodStatus.includes("returned")) {
       return false;
     }
 
-    return (
-      orderStatus.includes("accepted by vendor") ||
-      orderStatus.includes("in production") ||
-      orderStatus.includes("in transit") ||
-      orderStatus.includes("delivered") ||
-      prodStatus.length > 0
-    );
+    return true;
   });
 
   if (activeOrders.length === 0) {
@@ -639,7 +592,7 @@ function renderPurchaseOrders() {
       <td>$${Number(po.total_value || 0).toFixed(2)}</td>
       <td><span class="status ${statusClass}">${currentStatus}</span></td>
       <td>
-        <button class="btn-action" onclick="openEditModal(${po.id})"><i class="fa-solid fa-pen-to-square"></i> Edit Progress</button>
+        <button class="btn-action" onclick="openEditModal(${po.id || 1})"><i class="fa-solid fa-pen-to-square"></i> Edit Progress</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -651,41 +604,20 @@ function exportPurchaseOrders() {
     const orderStatus = (po.order_status || "").toLowerCase().trim();
     const prodStatus = (po.production_status || "").toLowerCase().trim();
 
-    if (
-      orderStatus === "pending" ||
-      orderStatus.includes("pending") ||
-      orderStatus.includes("awaiting") ||
-      orderStatus.includes("accepted by f.o") ||
-      orderStatus.includes("accepted by fo") ||
-      orderStatus.includes("rejected") || 
-      orderStatus.includes("returned") ||
-      prodStatus.includes("rejected") ||
-      prodStatus.includes("returned")
-    ) {
+    if (orderStatus.includes("rejected") || orderStatus.includes("returned") || prodStatus.includes("rejected") || prodStatus.includes("returned")) {
       return false;
     }
 
-    return (
-      orderStatus.includes("accepted by vendor") ||
-      orderStatus.includes("in production") ||
-      orderStatus.includes("in transit") ||
-      orderStatus.includes("delivered") ||
-      prodStatus.length > 0
-    );
+    return true;
   });
 
-  const ordersToExport = activeOrders.length > 0 ? activeOrders : cachedOrders.filter(po => {
-    const orderStatus = (po.order_status || "").toLowerCase().trim();
-    return !orderStatus.includes("rejected") && !orderStatus.includes("returned");
-  });
-
-  if (ordersToExport.length === 0) {
+  if (activeOrders.length === 0) {
     alert("No purchase orders available to export.");
     return;
   }
 
   const headers = ["PO Ref", "Vendor", "Dept", "Product", "Creation", "Expiry", "Units Completed", "Total Value", "Status"];
-  const rows = ordersToExport.map(po => {
+  const rows = activeOrders.map(po => {
     const completedUnits = po.completed_units !== undefined && po.completed_units !== null ? po.completed_units : 0;
     const status = po.production_status || po.order_status || "In Production";
     
@@ -918,7 +850,7 @@ function renderContractsData() {
           <td>
             <div style="display: flex; gap: 6px;">
               <button class="btn-action" onclick="showContractDetails('${o.invoice_no}')">Details</button>
-              ${isReturned ? `<button class="btn-accept" style="padding: 6px 12px; font-size: 11px;" onclick="reinitiateProduction(${o.id}, '${o.invoice_no}')">Re-initiate</button>` : ''}
+              ${isReturned ? `<button class="btn-accept" style="padding: 6px 12px; font-size: 11px;" onclick="reinitiateProduction(${o.id || 1}, '${o.invoice_no}')">Re-initiate</button>` : ''}
             </div>
           </td>
         </tr>`;
@@ -1073,7 +1005,6 @@ function selectVendorChatRole(roleName) {
   activeVendorChatRole = roleName;
   
   const vendorName = sessionStorage.getItem("vendor_name") || "Vendor";
-  // Explicitly clear unread count in localStorage and update tracking baseline
   localStorage.setItem(`vendor_unread_${vendorName}_${roleName}`, "0");
   const storageKey = `vendor_chat_${vendorName}_${roleName}`;
   const messages = JSON.parse(localStorage.getItem(storageKey) || "[]");
@@ -1322,6 +1253,37 @@ function updateDynamicAnalytics() {
 
   if (responseEl) {
     responseEl.textContent = `${avgHours} hours avg.`;
+  }
+
+  const currentMetricText = document.getElementById("metric-reliability")?.textContent || "94%";
+  const activeScore = parseInt(currentMetricText.replace(/\D/g, ''), 10) || 94;
+
+  const benchOnTimeEl = document.getElementById("dyn-benchmark-ontime");
+  const benchRelEl = document.getElementById("dyn-benchmark-reliability");
+  const benchBadgeEl = document.getElementById("benchmark-status-badge");
+
+  if (benchOnTimeEl) {
+    benchOnTimeEl.textContent = `${slaRate}%`;
+    benchOnTimeEl.style.color = slaRate >= 82 ? '#10b981' : '#ef4444';
+  }
+
+  if (benchRelEl) {
+    benchRelEl.textContent = `${activeScore}%`;
+    benchRelEl.style.color = activeScore >= 88 ? '#10b981' : '#ef4444';
+  }
+
+  if (benchBadgeEl) {
+    if (slaRate >= 82 && activeScore >= 88) {
+      benchBadgeEl.textContent = "Performing Above Category Average";
+      benchBadgeEl.style.background = "rgba(16, 185, 129, 0.15)";
+      benchBadgeEl.style.color = "#10b981";
+      benchBadgeEl.style.borderColor = "rgba(16, 185, 129, 0.3)";
+    } else {
+      benchBadgeEl.textContent = "Meeting Category Benchmarks";
+      benchBadgeEl.style.background = "rgba(59, 130, 246, 0.15)";
+      benchBadgeEl.style.color = "#3b82f6";
+      benchBadgeEl.style.borderColor = "rgba(59, 130, 246, 0.3)";
+    }
   }
 }
 
