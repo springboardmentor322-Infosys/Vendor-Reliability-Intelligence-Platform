@@ -144,6 +144,35 @@
             </div>
           </div>
 
+          <!-- Dashboard Charts Layout Grid (Risk Tier Breakdown + On-Time Delivery Rate + High-Risk Vendors) -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px; margin-bottom: 40px;">
+            <div class="content-card" style="margin-bottom: 0;">
+              <h3 class="card-title mb-2">Risk Tier Breakdown</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; font-weight: 700;">Vendor distribution across risk categories</p>
+              <div style="position: relative; height: 280px; width: 100%;">
+                <canvas id="generalRiskChart"></canvas>
+              </div>
+            </div>
+
+            <div class="metric-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center;">
+              <div class="metric-top">
+                <span class="metric-label">On-Time Delivery Rate</span>
+                <i class="fa-solid fa-truck-fast metric-icon text-green" style="font-size: 22px;"></i>
+              </div>
+              <div class="metric-value" id="dash-ontime-rate">94%</div>
+              <div class="metric-footer text-green-sub">Target: &gt;90%</div>
+            </div>
+
+            <div class="metric-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center;">
+              <div class="metric-top">
+                <span class="metric-label">High-Risk Vendors</span>
+                <i class="fa-solid fa-skull-crossbones metric-icon text-red" style="font-size: 22px;"></i>
+              </div>
+              <div class="metric-value" id="dash-high-risk-count">39</div>
+              <div class="metric-footer text-red-sub">Action required</div>
+            </div>
+          </div>
+
           <!-- Returned Items Section -->
           <div class="content-card">
             <h2 class="card-title mb-4">Returned Items</h2>
@@ -277,7 +306,7 @@
                 <span class="metric-label">Avg Resolution Time</span>
                 <i class="fa-solid fa-stopwatch metric-icon text-blue"></i>
               </div>
-              <div class="metric-value" id="rel-resolution-time">1.4 Days</div>
+              <div class="metric-value" id="rel-resolution-time">0.5 Days</div>
               <div class="metric-footer text-blue-sub">Communication efficiency</div>
             </div>
 
@@ -286,7 +315,7 @@
                 <span class="metric-label">Delayed Shipments</span>
                 <i class="fa-solid fa-triangle-exclamation metric-icon text-orange"></i>
               </div>
-              <div class="metric-value" id="rel-delayed-count">3</div>
+              <div class="metric-value" id="rel-delayed-count">0</div>
               <div class="metric-footer text-orange-sub">Requires monitoring</div>
             </div>
 
@@ -295,7 +324,7 @@
                 <span class="metric-label">High-Risk Vendors</span>
                 <i class="fa-solid fa-skull-crossbones metric-icon text-red"></i>
               </div>
-              <div class="metric-value" id="rel-high-risk-count">1</div>
+              <div class="metric-value" id="rel-high-risk-count">39</div>
               <div class="metric-footer text-red-sub">Action required</div>
             </div>
           </div>
@@ -334,7 +363,6 @@
             <p class="page-subtitle">Review overarching supply chain performance, departmental spending, and order distributions.</p>
           </div>
           
-          <!-- 5 General Analytics Charts Grid -->
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px;">
             <div class="content-card" style="margin-bottom: 0;">
               <h3 class="card-title mb-2">Spend by Department</h3>
@@ -357,14 +385,6 @@
               <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; font-weight: 700;">Total suppliers categorized by industry type</p>
               <div style="position: relative; height: 280px; width: 100%;">
                 <canvas id="generalProductChart"></canvas>
-              </div>
-            </div>
-
-            <div class="content-card" style="margin-bottom: 0;">
-              <h3 class="card-title mb-2">Risk Tier Breakdown</h3>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; font-weight: 700;">Vendor distribution across risk categories</p>
-              <div style="position: relative; height: 280px; width: 100%;">
-                <canvas id="generalRiskChart"></canvas>
               </div>
             </div>
 
@@ -441,6 +461,37 @@
         </div>
 
       </main>
+    </div>
+  </div>
+
+  <!-- Return Order Modal -->
+  <div id="returnModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3, 7, 18, 0.65); backdrop-filter: blur(30px); z-index: 200; align-items: center; justify-content: center;">
+    <div class="modal-card" style="background: var(--card-bg); backdrop-filter: blur(50px); padding: 40px; border-radius: 24px; width: 480px; max-width: 90%; border: 1px solid var(--border); box-shadow: 0 50px 100px rgba(0, 0, 0, 0.4); color: var(--text-dark);">
+      <div class="modal-header" style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">Process Order Return & Defect Log</div>
+      <input type="hidden" id="return-modal-invoice-id">
+      
+      <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
+        <p><strong>Invoice Ref:</strong> <span id="return-modal-invNo"></span></p>
+        <p><strong>Vendor Name:</strong> <span id="return-modal-vendor"></span></p>
+        <p><strong>Product Name:</strong> <span id="return-modal-product"></span></p>
+        <p><strong>Total Quantity:</strong> <span id="return-modal-total-qty"></span></p>
+        <p><strong>Department:</strong> <span id="return-modal-dept"></span></p>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label for="return-modal-defects" style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 700; color: var(--text-muted);">Number of Defect Items</label>
+        <input type="number" id="return-modal-defects" class="form-control" min="1" value="1" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; outline: none; background: var(--card-bg); color: var(--text-dark); font-size: 14px;">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label for="return-modal-reason" style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 700; color: var(--text-muted);">Return Reason / Notes</label>
+        <textarea id="return-modal-reason" class="form-control" rows="3" placeholder="Specify defect details..." style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; outline: none; background: var(--card-bg); color: var(--text-dark); font-size: 14px; resize: none;"></textarea>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="btn btn-secondary" onclick="closeReturnModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitReturnOrder()">Confirm & Re-issue PO</button>
+      </div>
     </div>
   </div>
 
