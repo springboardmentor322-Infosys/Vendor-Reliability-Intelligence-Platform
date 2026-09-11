@@ -1,3 +1,4 @@
+# main.py
 import random
 from typing import Optional, List
 from fastapi import FastAPI, Depends, HTTPException, status, APIRouter
@@ -227,7 +228,7 @@ def get_admin_metrics(db: Session = Depends(get_db)):
         "total_users": len(all_approved),
         "pending_approvals": len(all_pending),
         "pm_count": len([u for u in all_approved if str(u.role).strip().lower().replace(" ", "_") == "procurement_manager"]),
-        "fo_count": len([u for u in all_approved if str(u.role).strip().lower().replace(" ", "_") in ["finance_officer", "finance officer"]]),
+        "fo_count": len([u for u in all_approved if str(u.role).strip().lower().replace(" ", "_") in ["finance_officer", "auditor", "finance officer"]]),
         "scm_count": len([u for u in all_approved if str(u.role).strip().lower().replace(" ", "_") == "supply_chain_manager"]),
         "auditor_count": len([u for u in all_approved if str(u.role).strip().lower().replace(" ", "_") == "auditor"]),
         "vendor_count": len([u for u in all_approved if str(u.role).strip().lower().replace(" ", "_") == "vendor"])
@@ -373,13 +374,6 @@ def create_purchase_order(po: schemas.POCreate, db: Session = Depends(get_db)):
     db.add(db_invoice)
     db.commit()
     
-    vendor = db.query(models.Vendor).filter(models.Vendor.vendor_name == po.vendor_name).first()
-    if vendor:
-        score, tier = compute_vendor_dynamic_score(po.vendor_name, db)
-        vendor.reliability_score = score
-        vendor.risk_tier = tier
-        db.commit()
-
     db.refresh(db_po)
     return db_po
 
@@ -435,12 +429,6 @@ def update_po_status(po_id: int, status: str, db: Session = Depends(get_db)):
         if hasattr(invoice, 'order_status'):
             invoice.order_status = status
 
-    vendor = db.query(models.Vendor).filter(models.Vendor.vendor_name == po.vendor_name).first()
-    if vendor:
-        score, tier = compute_vendor_dynamic_score(po.vendor_name, db)
-        vendor.reliability_score = score
-        vendor.risk_tier = tier
-
     db.commit()
     return {"message": f"PO and Invoice status updated to {status}"}
 
@@ -461,14 +449,8 @@ def update_po_progress(po_id: int, progress: schemas.POProgressUpdate, db: Sessi
         if hasattr(invoice, 'delivery_status'):
             invoice.delivery_status = progress.production_status
 
-    vendor = db.query(models.Vendor).filter(models.Vendor.vendor_name == po.vendor_name).first()
-    if vendor:
-        score, tier = compute_vendor_dynamic_score(po.vendor_name, db)
-        vendor.reliability_score = score
-        vendor.risk_tier = tier
-
     db.commit()
-    return {"message": "Order progress and dynamic score updated successfully"}
+    return {"message": "Order progress updated successfully"}
 
 
 # --- Invoices & Payment Routes ---
@@ -595,14 +577,8 @@ def create_vendor(vendor: schemas.VendorCreate, db: Session = Depends(get_db)):
 
 @app.get("/api/v1/vendors", response_model=List[schemas.VendorResponse])
 def get_all_vendors(db: Session = Depends(get_db)):
+    # Return database vendors directly without dynamic score overwriting
     vendors = db.query(models.Vendor).order_by(models.Vendor.id.desc()).all()
-    
-    for vendor in vendors:
-        score, tier = compute_vendor_dynamic_score(vendor.vendor_name, db)
-        vendor.reliability_score = score
-        vendor.risk_tier = tier
-        
-    db.commit()
     return vendors
 
 
@@ -611,12 +587,6 @@ def get_vendor_by_id(vendor_id: int, db: Session = Depends(get_db)):
     vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
     if not vendor:
         raise HTTPException(status_code=404, detail="Vendor not found.")
-        
-    score, tier = compute_vendor_dynamic_score(vendor.vendor_name, db)
-    vendor.reliability_score = score
-    vendor.risk_tier = tier
-    db.commit()
-    
     return vendor
 
 
@@ -681,14 +651,12 @@ def log_vendor_performance(payload: schemas.VendorPerformanceCreate, db: Session
 
 @app.get("/api/vendor-performance/{vendor_id}/summary")
 def get_vendor_score_summary(vendor_id: int, db: Session = Depends(get_db)):
-    # Check if vendor exists first
     vendor = db.query(models.Vendor).filter(models.Vendor.id == vendor_id).first()
     if not vendor:
         raise HTTPException(status_code=404, detail="Vendor not found")
 
     logs = db.query(models.VendorPerformanceLog).filter(models.VendorPerformanceLog.vendor_id == vendor_id).all()
 
-    # If no specific performance logs exist, return a safe default summary based on vendor record
     if not logs:
         return {
             "vendor_id": vendor_id,
@@ -718,6 +686,7 @@ def get_vendor_score_summary(vendor_id: int, db: Session = Depends(get_db)):
         "composite_score": round(composite_score, 2),
         "risk_tier": risk_tier
     }
+
 
 @app.get("/api/v1/analytics/processing-time")
 def get_average_processing_time(db: Session = Depends(get_db)):
