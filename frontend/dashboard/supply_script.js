@@ -4,6 +4,7 @@ const API_BASE = "http://127.0.0.1:8000";
 let chartInstances = {};
 let activeChatVendor = null;
 let lastKnownSupplyMessageCounts = {};
+let globalInspectionInvoicesCache = [];
 
 function switchTab(tabId, element) {
   const tabs = document.querySelectorAll('.tab-content');
@@ -56,24 +57,21 @@ async function loadPurchaseOrdersFromDB() {
       if (orders.length === 0) {
         tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding: 2rem;">No purchase orders found.</td></tr>';
       } else {
-        const currentRowsCount = tableBody.querySelectorAll('tr').length;
-        if (currentRowsCount <= 1 || currentRowsCount !== orders.length) {
-          tableBody.innerHTML = '';
-          orders.forEach(po => {
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-              <td>#${po.invoice_no || po.id}</td>
-              <td>${po.vendor_name || po.vendor}</td>
-              <td>${po.product_name}</td>
-              <td>${po.quantity}</td>
-              <td>${po.department}</td>
-              <td>${po.creation_date || 'N/A'}</td>
-              <td>${po.expiry_date || 'N/A'}</td>
-              <td>$${Number(po.total_value || 0).toFixed(2)}</td>
-            `;
-            tableBody.appendChild(newRow);
-          });
-        }
+        tableBody.innerHTML = '';
+        orders.forEach(po => {
+          const newRow = document.createElement('tr');
+          newRow.innerHTML = `
+            <td>#${po.invoice_no || po.id}</td>
+            <td>${po.vendor_name || po.vendor}</td>
+            <td>${po.product_name}</td>
+            <td>${po.quantity}</td>
+            <td>${po.department}</td>
+            <td>${po.creation_date || 'N/A'}</td>
+            <td>${po.expiry_date || 'N/A'}</td>
+            <td>$${Number(po.total_value || 0).toFixed(2)}</td>
+          `;
+          tableBody.appendChild(newRow);
+        });
       }
     }
 
@@ -160,6 +158,7 @@ async function loadInspectionOrders(isBackground = false) {
 
     const invoices = await invRes.json();
     const purchaseOrders = await poRes.json();
+    globalInspectionInvoicesCache = invoices;
 
     const tbody = document.getElementById('inspection-tbody');
     const returnedTbody = document.getElementById('returned-items-tbody');
@@ -257,7 +256,7 @@ async function loadInspectionOrders(isBackground = false) {
             <td>
               <button class="btn btn-accept" onclick="updateInspectionStatus(${inv.id}, 'Checked')"><i class="fa-solid fa-check"></i> Pass</button>
               <button class="btn btn-reject" onclick="updateInspectionStatus(${inv.id}, 'Fault')"><i class="fa-solid fa-xmark"></i> Fail</button>
-              <button class="btn" style="background: #ef4444; color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-left: 4px;" onclick="processReturnOrder(${inv.id}, '${inv.invoice_no}')"><i class="fa-solid fa-rotate-left"></i> Return</button>
+              <button class="btn" style="background: #ef4444; color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-left: 4px;" onclick="openReturnModal(${inv.id}, '${inv.invoice_no}')"><i class="fa-solid fa-rotate-left"></i> Return</button>
             </td>
           `;
           tbody.appendChild(row);
@@ -271,13 +270,48 @@ async function loadInspectionOrders(isBackground = false) {
   }
 }
 
-async function processReturnOrder(invoiceId, invoiceNo) {
-  if (!confirm(`Are you sure you want to process a return for invoice #${invoiceNo}?`)) {
+function openReturnModal(invoiceId, invoiceNo) {
+  const inv = globalInspectionInvoicesCache.find(i => i.id == invoiceId || i.invoice_no === invoiceNo);
+  if (!inv) {
+    alert("Invoice details not found.");
+    return;
+  }
+
+  document.getElementById("return-modal-invoice-id").value = inv.id;
+  document.getElementById("return-modal-invNo").textContent = `#${inv.invoice_no}`;
+  document.getElementById("return-modal-vendor").textContent = inv.vendor_name;
+  document.getElementById("return-modal-product").textContent = inv.product_name;
+  document.getElementById("return-modal-total-qty").textContent = inv.quantity;
+  document.getElementById("return-modal-dept").textContent = inv.department;
+  document.getElementById("return-modal-defects").value = 1;
+  document.getElementById("return-modal-reason").value = "";
+
+  const modal = document.getElementById("returnModal");
+  if (modal) modal.style.display = "flex";
+}
+
+function closeReturnModal() {
+  const modal = document.getElementById("returnModal");
+  if (modal) modal.style.display = "none";
+}
+
+async function submitReturnOrder() {
+  const invoiceId = document.getElementById("return-modal-invoice-id").value;
+  const defectCount = parseInt(document.getElementById("return-modal-defects").value, 10) || 0;
+  
+  const inv = globalInspectionInvoicesCache.find(i => i.id == invoiceId);
+  if (!inv) {
+    alert("Target invoice reference not found.");
+    return;
+  }
+
+  if (defectCount <= 0) {
+    alert("Please enter a valid number of defect items.");
     return;
   }
 
   try {
-    const res = await fetchWithRetry(`${API_BASE}/api/v1/invoices/${invoiceId}/status`, {
+    await fetchWithRetry(`${API_BASE}/api/v1/invoices/${invoiceId}/status`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -287,132 +321,108 @@ async function processReturnOrder(invoiceId, invoiceNo) {
       })
     });
 
+    const newInvoiceNo = `${inv.invoice_no}-R${Math.floor(100 + Math.random() * 900)}`;
+    const unitPrice = Number(inv.amount || 0) / Number(inv.quantity || 1);
+    const replacementAmount = Number((unitPrice * defectCount).toFixed(2));
+
+    const newPoPayload = {
+      invoice_no: newInvoiceNo,
+      vendor_name: inv.vendor_name,
+      product_name: `${inv.product_name} (Replacement)`,
+      quantity: defectCount,
+      department: inv.department,
+      total_value: replacementAmount,
+      order_status: 'Pending',
+      inspection_status: 'In Progress',
+      creation_date: new Date().toISOString().split('T')[0],
+      expiry_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    };
+
+    const res = await fetchWithRetry(`${API_BASE}/api/v1/purchase-orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newPoPayload)
+    });
+
     if (res.ok) {
-      alert(`Invoice #${invoiceNo} has been marked as Returned.`);
+      alert(`Return processed. Replacement PO #${newInvoiceNo} has been successfully created and sent to ${inv.vendor_name} for normal acceptance.`);
+      closeReturnModal();
       await loadInspectionOrders(false);
       await loadPurchaseOrdersFromDB();
     } else {
-      alert("Failed to process return.");
+      alert("Failed to create replacement purchase order on server.");
     }
   } catch (err) {
-    console.error("Error processing return:", err);
-    alert("Server error while processing return.");
+    console.error("Error submitting return order:", err);
+    alert("Network error while processing return.");
   }
 }
 
 async function loadReliabilityRiskData(isBackground = false) {
   try {
-    const [vendorRes, poRes, invRes] = await Promise.all([
+    const [vendorRes, poRes] = await Promise.all([
       fetchWithRetry(`${API_BASE}/api/v1/vendors`),
-      fetchWithRetry(`${API_BASE}/api/v1/purchase-orders`),
-      fetchWithRetry(`${API_BASE}/api/v1/invoices`)
+      fetchWithRetry(`${API_BASE}/api/v1/purchase-orders`)
     ]);
 
-    if (!vendorRes.ok || !poRes.ok || !invRes.ok) return;
+    if (!vendorRes.ok || !poRes.ok) return;
     const vendors = await vendorRes.json();
     const orders = await poRes.json();
-    const invoices = await invRes.json();
 
     const reliabilityTbody = document.getElementById('reliability-tbody');
     if (!reliabilityTbody) return;
 
-    const activeVendorNames = new Set();
-    orders.forEach(po => {
-      if (po.vendor_name) activeVendorNames.add(po.vendor_name.trim().toLowerCase());
-      if (po.vendor) activeVendorNames.add(po.vendor.trim().toLowerCase());
-    });
-    invoices.forEach(inv => {
-      if (inv.vendor_name) activeVendorNames.add(inv.vendor_name.trim().toLowerCase());
-    });
-
-    const activeVendors = vendors.filter(v => 
-      activeVendorNames.has(v.vendor_name.trim().toLowerCase())
-    );
-
     let totalScoreSum = 0;
-    let delayedCount = 0;
     let highRiskCount = 0;
-    let totalResponseHours = 0;
-    let performanceRecordsCount = 0;
 
-    for (const v of activeVendors) {
-      const score = Number(v.reliability_score || 85);
+    vendors.forEach(v => {
+      const score = Number(v.reliability_score ?? 85);
       totalScoreSum += score;
-
-      if (score < 75) {
-        highRiskCount++;
-      }
-
-      try {
-        const perfRes = await fetch(`${API_BASE}/api/vendor-performance/${v.id}/summary`);
-        if (perfRes.ok) {
-          const perfData = await perfRes.json();
-          if (perfData.average_response_hours) {
-            totalResponseHours += perfData.average_response_hours;
-            performanceRecordsCount++;
-          }
-        }
-      } catch (e) {}
-    }
-
-    const avgScore = activeVendors.length > 0 ? Math.round(totalScoreSum / activeVendors.length) : 0;
-    
-    orders.forEach(po => {
-      const status = (po.production_status || po.order_status || "").toLowerCase();
-      if (status.includes("delay") || status.includes("late")) {
-        delayedCount++;
-      }
+      if (score < 75) highRiskCount++;
     });
 
-    let avgResolutionDays = 1.2;
-    if (performanceRecordsCount > 0) {
-      avgResolutionDays = Number(((totalResponseHours / performanceRecordsCount) / 24.0).toFixed(1));
-    } else {
-      avgResolutionDays = Number((Math.max(0.5, (101 - avgScore) * 0.05)).toFixed(1));
-    }
+    const avgScore = vendors.length > 0 ? Math.round(totalScoreSum / vendors.length) : 85;
 
     const onTimeElem = document.getElementById('rel-ontime-rate');
     const resolutionElem = document.getElementById('rel-resolution-time');
     const delayedElem = document.getElementById('rel-delayed-count');
     const highRiskElem = document.getElementById('rel-high-risk-count');
+    const dashOnTimeElem = document.getElementById('dash-ontime-rate');
+    const dashHighRiskElem = document.getElementById('dash-high-risk-count');
 
     if (onTimeElem) onTimeElem.innerText = `${avgScore}%`;
-    if (resolutionElem) resolutionElem.innerText = `${avgResolutionDays} Days`;
-    if (delayedElem) delayedElem.innerText = delayedCount;
+    if (resolutionElem) resolutionElem.innerText = `1.2 Days`;
+    if (delayedElem) delayedElem.innerText = orders.filter(po => (po.production_status || po.order_status || "").toLowerCase().includes("delay")).length;
     if (highRiskElem) highRiskElem.innerText = highRiskCount;
+    if (dashOnTimeElem) dashOnTimeElem.innerText = `${avgScore}%`;
+    if (dashHighRiskElem) dashHighRiskElem.innerText = highRiskCount;
 
     if (!isBackground || reliabilityTbody.querySelectorAll('tr').length <= 1) {
-      if (activeVendors.length === 0) {
-        reliabilityTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 2rem;">No vendors with active purchase orders found in database.</td></tr>';
+      if (vendors.length === 0) {
+        reliabilityTbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 2rem;">No vendors found in database.</td></tr>';
       } else {
         reliabilityTbody.innerHTML = '';
-        activeVendors.forEach(v => {
-          const score = Number(v.reliability_score || 85);
-          let riskTier = "Low Risk";
-          let riskColor = "#059669";
-          if (score < 75) {
-            riskTier = "High Risk";
-            riskColor = "#dc2626";
-          } else if (score < 90) {
-            riskTier = "Medium Risk";
-            riskColor = "#d97706";
-          }
+        vendors.forEach(v => {
+          // Render exact database scores and risk tiers directly for all registered vendors
+          const score = Number(v.reliability_score ?? 85);
+          const qualityText = score >= 90 ? 'Excellent' : (score >= 75 ? 'Good' : 'Poor');
+          const riskTier = v.risk_tier || (score < 75 ? "High Risk" : (score < 90 ? "Medium Risk" : "Low Risk"));
+          const riskColor = score < 75 ? "#dc2626" : (score < 90 ? "#d97706" : "#059669");
 
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${v.vendor_name}</td>
             <td>${v.category || 'General'}</td>
-            <td>${score >= 80 ? '98%' : '85%'}</td>
-            <td>${score >= 90 ? 'Excellent' : (score >= 75 ? 'Good' : 'Poor')}</td>
+            <td>${score >= 75 ? '98%' : '82%'}</td>
+            <td>${qualityText}</td>
             <td>${score}%</td>
-            <td>${score}%</td>
+            <td><span style="color: ${riskColor}; font-weight: 700;">${score}%</span></td>
             <td><span style="color: ${riskColor}; font-weight: 800;">${riskTier}</span></td>
           `;
           reliabilityTbody.appendChild(row);
         });
       }
     }
-
   } catch (err) {
     console.error("Error loading reliability & risk data:", err);
   }
@@ -481,13 +491,11 @@ async function loadAnalyticsCharts() {
     const purchaseOrders = await poRes.json();
     const vendors = await vendorRes.json();
 
-    // Destroy existing chart instances if any
     Object.keys(chartInstances).forEach(id => {
       if (chartInstances[id]) chartInstances[id].destroy();
     });
     chartInstances = {};
 
-    // 1. Chart 1: Spend by Department (Bar Chart)
     const deptSpend = {};
     purchaseOrders.forEach(po => {
       const dept = po.department || 'General';
@@ -519,7 +527,6 @@ async function loadAnalyticsCharts() {
       });
     }
 
-    // 2. Chart 2: Order Status Distribution (Doughnut Chart)
     const statusCount = {};
     purchaseOrders.forEach(po => {
       const status = po.order_status || po.production_status || 'Pending';
@@ -547,7 +554,6 @@ async function loadAnalyticsCharts() {
       });
     }
 
-    // 3. Chart 3: Vendor Category Breakdown (Pie Chart)
     const categoryCount = {};
     vendors.forEach(v => {
       const cat = v.category || 'General';
@@ -575,14 +581,15 @@ async function loadAnalyticsCharts() {
       });
     }
 
-    // 4. Chart 4: Risk Tier Breakdown (Doughnut Chart)
     const riskCount = { "Low Risk": 0, "Medium Risk": 0, "High Risk": 0 };
     vendors.forEach(v => {
-      const tier = v.risk_tier || "Low Risk";
+      const score = Number(v.reliability_score || 85);
+      let tier = "Low Risk";
+      if (score < 75) tier = "High Risk";
+      else if (score < 90) tier = "Medium Risk";
+      
       if (riskCount[tier] !== undefined) {
         riskCount[tier]++;
-      } else {
-        riskCount["Low Risk"]++;
       }
     });
 
@@ -607,7 +614,6 @@ async function loadAnalyticsCharts() {
       });
     }
 
-    // 5. Chart 5: Top 5 Vendors by Total Spend (Horizontal Bar Chart)
     const vendorSpend = {};
     purchaseOrders.forEach(po => {
       const vendor = po.vendor_name || po.vendor || 'Unknown';
@@ -902,6 +908,7 @@ window.addEventListener('DOMContentLoaded', () => {
   loadPurchaseOrdersFromDB();
   loadInspectionOrders(false);
   loadReliabilityRiskData(false);
+  loadAnalyticsCharts();
 
   setInterval(() => {
     loadInspectionOrders(true);
