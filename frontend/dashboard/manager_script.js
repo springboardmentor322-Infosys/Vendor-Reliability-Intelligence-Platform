@@ -594,9 +594,22 @@ async function syncContractsAndRisk() {
   if (!contractsBody) return;
 
   try {
-    const res = await fetchWithRetry(`${API_BASE}/api/v1/purchase-orders`);
-    if (!res.ok) return;
-    const orders = await res.json();
+    const [poRes, vendorRes] = await Promise.all([
+      fetchWithRetry(`${API_BASE}/api/v1/purchase-orders`),
+      fetchWithRetry(`${API_BASE}/api/v1/vendors`)
+    ]);
+
+    if (!poRes.ok || !vendorRes.ok) return;
+    const orders = await poRes.json();
+    const vendors = await vendorRes.json();
+
+    const vendorMap = {};
+    vendors.forEach(v => {
+      vendorMap[(v.vendor_name || "").trim().toLowerCase()] = {
+        score: Number(v.reliability_score ?? 85),
+        riskTier: v.risk_tier || "Low Risk"
+      };
+    });
 
     const displayedOrders = orders.filter(po => {
       const status = (po.order_status || "").toLowerCase();
@@ -618,7 +631,11 @@ async function syncContractsAndRisk() {
       const badgeClass = getOrderStatusBadgeClass(currentOrderStatus);
       const contractStatusObj = determineContractStatus(po.expiry_date, currentOrderStatus);
 
-      const { finalScore, riskTier, riskColor } = calculateOrderRiskScoreAndTier(po);
+      const vKey = (po.vendor_name || "").trim().toLowerCase();
+      const vendorData = vendorMap[vKey] || { score: 85, riskTier: "Low Risk" };
+      const finalScore = vendorData.score;
+      const riskTier = vendorData.riskTier;
+      const riskColor = riskTier.toLowerCase().includes("high") ? "#e53e3e" : (riskTier.toLowerCase().includes("medium") ? "#d69e2e" : "#2f855a");
 
       const newRow = document.createElement('tr');
       newRow.innerHTML = `
@@ -638,60 +655,25 @@ async function syncContractsAndRisk() {
     console.error("Failed to sync contracts and risk from database:", err);
   }
 }
-
 async function loadVendorsFromDB() {
   try {
-    const [vendorRes, poRes] = await Promise.all([
-      fetchWithRetry(`${API_BASE}/api/v1/vendors`),
-      fetchWithRetry(`${API_BASE}/api/v1/purchase-orders`)
-    ]);
-
-    if (!vendorRes.ok || !poRes.ok) return;
-    const vendors = await vendorRes.json();
-    const orders = await poRes.json();
-
-    const vendorRiskMap = {};
-    orders.forEach(po => {
-      const status = (po.order_status || "").toLowerCase();
-      const isRejected = status.includes("rejected");
-
-      if (!isRejected) {
-        const { finalScore } = calculateOrderRiskScoreAndTier(po);
-        const vName = (po.vendor_name || "").trim().toLowerCase();
-        if (!vendorRiskMap[vName]) {
-          vendorRiskMap[vName] = [];
-        }
-        vendorRiskMap[vName].push(finalScore);
-      }
-    });
+    const res = await fetchWithRetry(`${API_BASE}/api/v1/vendors`);
+    if (!res.ok) return;
+    const vendors = await res.json();
 
     const tbody = document.getElementById('vendor-tbody');
     if (!tbody) return;
 
     if (vendors.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #718096; padding: 2rem;">No vendors registered in database.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: #718096; padding: 2rem;">No vendors registered in database.</td></tr>';
       return;
     }
 
     tbody.innerHTML = '';
     vendors.forEach(v => {
-      const vKey = (v.vendor_name || "").trim().toLowerCase();
-      let avgScore = v.reliability_score || 100;
-
-      if (vendorRiskMap[vKey] && vendorRiskMap[vKey].length > 0) {
-        const sum = vendorRiskMap[vKey].reduce((acc, score) => acc + score, 0);
-        avgScore = Math.round(sum / vendorRiskMap[vKey].length);
-      }
-
-      let calculatedRiskTier = "Low Risk";
-      let riskColor = "#2f855a";
-      if (avgScore < 75) {
-        calculatedRiskTier = "High Risk";
-        riskColor = "#e53e3e";
-      } else if (avgScore < 90) {
-        calculatedRiskTier = "Medium Risk";
-        riskColor = "#d69e2e";
-      }
+      const score = Number(v.reliability_score ?? 85);
+      const riskTier = v.risk_tier || (score < 75 ? "High Risk" : (score < 90 ? "Medium Risk" : "Low Risk"));
+      const riskColor = score < 75 ? "#e53e3e" : (score < 90 ? "#d69e2e" : "#2f855a");
 
       const statusBadgeClass = v.status === 'Accepting Orders' ? 'status-approved' : 'status-rejected';
 
@@ -699,12 +681,12 @@ async function loadVendorsFromDB() {
       row.innerHTML = `
         <td>${v.vendor_name}</td>
         <td>${v.category || 'N/A'}</td>
-        <td>${v.contact_person}</td>
-        <td>${v.email}</td>
-        <td><span style="color: ${riskColor}; font-weight: 600;">${calculatedRiskTier} (${avgScore}%)</span></td>
-        <td><span class="status-badge ${statusBadgeClass}">${v.status}</span></td>
+        <td>${v.contact_person || 'N/A'}</td>
+        <td>${v.email || 'N/A'}</td>
+        <td><span style="color: ${riskColor}; font-weight: 600;">${riskTier} (${score}%)</span></td>
+        <td><span class="status-badge ${statusBadgeClass}">${v.status || 'Accepting Orders'}</span></td>
         <td>
-          <button class="btn btn-secondary" onclick="showVendorDetails('${v.vendor_name}', '${v.category || 'N/A'}', '${v.contact_person}', '${v.email}', '${calculatedRiskTier} (${avgScore}%)', '${v.last_ordered_date || 'N/A'}', '${v.contract_ended_date || 'N/A'}')">Show</button>
+          <button class="btn btn-secondary" onclick="showVendorDetails('${v.vendor_name}', '${v.category || 'N/A'}', '${v.contact_person || 'N/A'}', '${v.email || 'N/A'}', '${riskTier} (${score}%)', '${v.last_ordered_date || 'N/A'}', '${v.contract_ended_date || 'N/A'}')">Show</button>
         </td>
       `;
       tbody.appendChild(row);
