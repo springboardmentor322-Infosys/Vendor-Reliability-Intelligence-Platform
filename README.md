@@ -906,6 +906,8 @@ Possible future improvements include:
 
 **Vendor Reliability Intelligence Platform – Project Demo**
 
+🎥 [▶️ Watch the Complete Project Demo](https://drive.google.com/file/d/1fdhtNMnlMN92iyZkLNYD3YpdihS36mF0/view?usp=drive_link)
+
 The project demonstration covers the major functionalities of the platform, including:
 
 * User Registration and Login
@@ -928,7 +930,6 @@ The project demonstration covers the major functionalities of the platform, incl
 * Reports and Analytics
 * Auditor Review
 * Role-specific Dashboards
-
 ---
 
 ## 21. License
