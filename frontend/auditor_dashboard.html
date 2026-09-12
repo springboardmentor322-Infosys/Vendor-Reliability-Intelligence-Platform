@@ -6,21 +6,205 @@
     <title>Auditor Dashboard - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Auditor-Specific Visual Enhancements */
+        .read-only-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #eef2ff;
+            color: #4338ca;
+            border: 1px solid #c7d2fe;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Timeline Styling for Transaction Trace */
+        .timeline-container {
+            position: relative;
+            padding: 20px 0 20px 24px;
+            margin-top: 16px;
+        }
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            bottom: 12px;
+            left: 31px;
+            width: 2px;
+            background: #cbd5e1;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding-left: 32px;
+        }
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 0;
+            top: 2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 0 0 3px #eef2ff;
+            z-index: 2;
+        }
+        .timeline-dot.success { border-color: var(--success-color); box-shadow: 0 0 0 3px #ecfdf5; }
+        .timeline-dot.warning { border-color: var(--warning-color); box-shadow: 0 0 0 3px #fffbeb; }
+        .timeline-dot.danger { border-color: var(--danger-color); box-shadow: 0 0 0 3px #fef2f2; }
+        
+        .timeline-content-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px 18px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .timeline-content-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .timeline-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .timeline-time {
+            font-size: 11.5px;
+            color: var(--text-secondary);
+        }
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            background: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        /* Filter Tab Pills */
+        .filter-tab-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .filter-tab-btn {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-tab-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        .filter-tab-btn.active {
+            background: var(--primary-color);
+            color: #ffffff;
+            border-color: var(--primary-color);
+        }
+
+        /* Modal dialog for Findings Review */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .modal-card {
+            background: #ffffff;
+            border-radius: 12px;
+            max-width: 540px;
+            width: 100%;
+            padding: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .empty-state-box {
+            padding: 36px 16px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            background: #f8fafc;
+            border: 1px dashed var(--border-color);
+            border-radius: 10px;
+            margin: 12px 0;
+        }
+        .report-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 12px;
+        }
+        .report-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+    </style>
 </head>
 <body>
-    <div class="dashboard-header">
-        <div>
-            <h1>Audit & Compliance Governance</h1>
-            <p>Monitor vendor risk ratings, review quality control standards, verify legal compliance, and inspect audit trails.</p>
+    <!-- Auditor Welcome Banner -->
+    <div class="role-welcome-banner">
+        <div class="welcome-text-content">
+            <h1 id="auditWelcomeTitle">Audit & Governance Center 👋</h1>
+            <p>Independent review, transaction history reconstruction, approval verification, and SLA compliance auditing.</p>
         </div>
-        <div class="header-badge">
-            <span class="status-dot"></span> Audit Mode: Real-time Compliance Monitoring
+        <div class="quick-actions-bar">
+            <a href="#audit-trace" class="quick-action-btn primary">🔍 Trace Transaction</a>
+            <a href="#approval-verification" class="quick-action-btn">✅ Approval Verification</a>
+            <a href="#audit-findings" class="quick-action-btn">🚨 Audit Findings</a>
+            <a href="#audit-evidence" class="quick-action-btn">📁 Evidence & Certifications</a>
+            <a href="#audit-reports" class="quick-action-btn">📊 Compliance Reports</a>
+            <a href="audit_logs.html" class="quick-action-btn">📜 System Audit Logs</a>
         </div>
     </div>
 
-    <!-- Top KPI Summary Cards -->
+    <!-- Top KPI Summary Cards (Real System Records) -->
     <div class="kpi-grid-4">
-        <div class="kpi-card">
+        <div class="kpi-card clickable-card" data-href="audit_logs.html" title="Click to view full system audit trail">
             <div class="kpi-header">
                 <span class="kpi-label">Total Audit Events</span>
                 <span class="kpi-icon">📝</span>
@@ -29,16 +213,16 @@
             <div class="kpi-sub">Total database operations tracked</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card clickable-card" data-href="#compliance-overview" title="Click to view compliance overview">
             <div class="kpi-header">
                 <span class="kpi-label">Compliance Pass Rate</span>
                 <span class="kpi-icon">🛡️</span>
             </div>
             <div class="kpi-value" id="complianceRateVal" style="color: var(--success-color);">0.0%</div>
-            <div class="kpi-sub">Suppliers meeting reliability SLA</div>
+            <div class="kpi-sub">Suppliers meeting reliability SLA (≥70%)</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card clickable-card" data-href="#audit-findings" title="Click to jump to high-risk audit findings">
             <div class="kpi-header">
                 <span class="kpi-label">High-Risk Findings</span>
                 <span class="kpi-icon">⚠️</span>
@@ -47,13 +231,39 @@
             <div class="kpi-sub">Requiring remediation review</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card clickable-card" data-href="#checklist-progress" title="Click to jump to control assessment">
             <div class="kpi-header">
                 <span class="kpi-label">Controls Assessed</span>
                 <span class="kpi-icon">🎯</span>
             </div>
             <div class="kpi-value" id="controlsAssessedVal">5/5</div>
             <div class="kpi-sub" id="avgQualityScoreSub">Quality Avg: 0.0%</div>
+        </div>
+    </div>
+ 
+    <!-- Attention Required (Governance & Compliance Risks) -->
+    <div class="risk-highlight-card" id="auditorRiskSection">
+        <div class="risk-highlight-header">
+            <h3>⚠️ Governance & Compliance Risk Attention</h3>
+            <span class="badge badge-warning" id="auditAttentionBadge">Active Governance Review</span>
+        </div>
+        <div class="risk-highlight-grid">
+            <div class="risk-highlight-item clickable-card" data-href="#audit-findings" title="Click to inspect high-risk audit findings">
+                <span class="title">🚨 High-Risk Findings</span>
+                <span class="value" id="auditFocusHighRisk" style="color: var(--danger-color);">0 Findings</span>
+            </div>
+            <div class="risk-highlight-item clickable-card" data-href="#compliance-overview" title="Click to view compliance overview">
+                <span class="title">🛡️ Compliance SLA Pass</span>
+                <span class="value" id="auditFocusCompliance" style="color: var(--success-color);">0.0%</span>
+            </div>
+            <div class="risk-highlight-item clickable-card" data-href="audit_logs.html" title="Click to view full audit logs">
+                <span class="title">📋 Tracked System Logs</span>
+                <span class="value" id="auditFocusTotalLogs" style="color: var(--primary-color);">0 Events</span>
+            </div>
+            <div class="risk-highlight-item clickable-card" data-href="#checklist-progress" title="Click to view checklist controls">
+                <span class="title">🎯 Controls Assessed</span>
+                <span class="value" id="auditFocusControls" style="color: var(--text-color);">5 / 5 Assessed</span>
+            </div>
         </div>
     </div>
 
@@ -74,54 +284,265 @@
             </div>
         </div>
 
-        <!-- Audit Checklist Progress & Controls -->
+        <!-- Audit Checklist Progress & 5 Controls (Transparently Calculated) -->
         <div class="stat-overview-box" id="checklist-progress">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3>
-                    <span>🎯 Audit Checklist & Control Status</span>
-                </h3>
-                <span class="kpi-trend positive" id="checklistProgressBadge">94% Verified</span>
+                <div>
+                    <h3><span>🎯 Audit Checklist & Control Status</span></h3>
+                    <p style="font-size: 11.5px; color: var(--text-secondary); margin-top: 2px;">Calculated mathematically from genuine database records.</p>
+                </div>
+                <span class="kpi-trend positive" id="checklistProgressBadge">0.0% Verified</span>
             </div>
 
             <div id="controlsListContainer" style="display: flex; flex-direction: column; gap: 14px;">
-                <!-- Populated dynamically -->
+                <!-- Populated dynamically with full transparent metrics -->
             </div>
         </div>
     </div>
 
     <!-- Audit Insights & Alerts -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 28px;" id="audit-insights">
-        <div class="insight-card danger">
+        <div class="insight-card danger clickable-card" data-href="#audit-findings" title="Click to review audit findings">
             <div class="insight-icon">🚨</div>
             <div class="insight-content">
-                <h4>High Risk Compliance Findings</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4>High-Risk Compliance Findings</h4>
+                    <span class="badge badge-poor" style="font-size: 10px;">Calculated Metric</span>
+                </div>
                 <p id="findingsInsight">Scanning audit findings for critical anomalies...</p>
             </div>
         </div>
-        <div class="insight-card info">
+        <div class="insight-card info clickable-card" data-href="#audit-reports" title="Click to view compliance reports">
             <div class="insight-icon">📋</div>
             <div class="insight-content">
-                <h4>Material Inspection Quality Index</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4>Material Inspection Quality Index</h4>
+                    <span class="badge badge-info" style="font-size: 10px;">Quality Inspection</span>
+                </div>
                 <p id="qualityInsight">Checking ISO material quality pass rates...</p>
             </div>
         </div>
-        <div class="insight-card warning">
+        <div class="insight-card warning clickable-card" data-href="contract-monitoring.html" title="Click to view contract monitoring & document review">
             <div class="insight-icon">📑</div>
             <div class="insight-content">
-                <h4>Contract Expirations & Renewals</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4>Contract Expirations & Renewals</h4>
+                    <span class="badge badge-warning" style="font-size: 10px;">Legal Governance</span>
+                </div>
                 <p id="contractAuditInsight">Inspecting legal agreements...</p>
             </div>
         </div>
     </div>
 
-    <!-- Recent Audit Findings Table -->
+    <!-- ==================================================
+         FEATURE 1: END-TO-END TRANSACTION TRACEABILITY
+         ================================================== -->
+    <div class="table-card" id="audit-trace" style="margin-bottom: 28px;">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <h3>🔍 End-to-End Transaction Traceability</h3>
+                    <span class="read-only-badge">Read-Only Governance</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                    Reconstruct complete chronological lifecycle from requisition to payment. Operational records cannot be modified.
+                </p>
+            </div>
+        </div>
+
+        <div style="padding: 16px; background: #f8fafc; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">Entity Type</label>
+                    <select id="traceEntityType" class="filter-select" style="min-width: 170px;" onchange="onTraceTypeChanged()">
+                        <option value="purchase_order">Purchase Order (PO)</option>
+                        <option value="purchase_request">Purchase Request (PR)</option>
+                        <option value="invoice">Invoice</option>
+                        <option value="payment">Payment</option>
+                        <option value="contract">Contract</option>
+                        <option value="vendor">Vendor / Supplier</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">Select Recent Record</label>
+                    <select id="traceQuickSelect" class="filter-select" style="min-width: 240px; max-width: 340px;" onchange="onTraceQuickSelected()">
+                        <option value="">-- Choose from Database --</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1;">
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">Or Enter ID / Reference Code</label>
+                    <input type="text" id="traceEntityIdInput" placeholder="e.g. 180521, PO-2026-180521, INV-000001, etc." class="filter-select" style="width: 100%;">
+                </div>
+
+                <button class="btn btn-primary" onclick="executeTrace()" style="padding: 8px 18px; font-weight: 600; height: 38px;">
+                    ⚡ Trace History
+                </button>
+            </div>
+        </div>
+
+        <!-- Trace Results Area -->
+        <div id="traceResultsWrapper" style="padding: 20px; display: none;">
+            <!-- Entity Summary Box -->
+            <div id="traceSummaryBox" style="background: #f1f5f9; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;">
+                <!-- Dynamically populated -->
+            </div>
+
+            <!-- Visual Timeline -->
+            <h4 style="font-size: 13.5px; font-weight: 700; color: var(--text-color); margin-bottom: 6px;">
+                📜 Complete Transaction Timeline
+            </h4>
+            <div class="timeline-container" id="traceTimeline">
+                <!-- Dynamically rendered timeline items -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================
+         FEATURE 2: APPROVAL VERIFICATION
+         ================================================== -->
+    <div class="table-card" id="approval-verification" style="margin-bottom: 28px;">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <h3>✅ Approval Verification</h3>
+                    <span class="read-only-badge">Independent Audit</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                    Exposes genuine approval evidence from recorded audit ledgers. Unrecorded authorizations are flagged.
+                </p>
+            </div>
+            <div class="table-header-actions">
+                <select id="approvalEntityFilter" class="filter-select" onchange="loadApprovalVerification()">
+                    <option value="all">All Controlled Entities</option>
+                    <option value="purchase_request">Purchase Requests</option>
+                    <option value="purchase_order">Purchase Orders</option>
+                    <option value="invoice">Invoices</option>
+                    <option value="user">User Access Accounts</option>
+                </select>
+                <button class="btn btn-secondary" onclick="loadApprovalVerification()" style="padding: 6px 12px; font-size: 12px;">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="approvalTable">
+                <thead>
+                    <tr>
+                        <th>Entity & Ref</th>
+                        <th>Created By</th>
+                        <th>Created Date</th>
+                        <th>Approval Status</th>
+                        <th>Approved / Rejected By</th>
+                        <th>Approval Date</th>
+                        <th>Approver Role</th>
+                        <th>Previous Status</th>
+                        <th>Final Status</th>
+                        <th>Audit Evidence Status</th>
+                    </tr>
+                </thead>
+                <tbody id="approvalTableBody">
+                    <tr>
+                        <td colspan="10" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading approval verification ledger...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==================================================
+         FEATURE 3 & 4: AUDIT EVIDENCE & CERTIFICATIONS
+         ================================================== -->
+    <div class="table-card" id="audit-evidence" style="margin-bottom: 28px;">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <h3>📁 Audit Evidence & Certification Verification</h3>
+                    <span class="read-only-badge">Evidence Repository</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                    READ-ONLY verification of vendor certifications, contracts, PO proofs, and invoices.
+                </p>
+            </div>
+            <div class="table-header-actions">
+                <div class="filter-tab-bar" style="margin-bottom: 0;">
+                    <button class="filter-tab-btn active" id="tabBtnCerts" onclick="switchEvidenceTab('certs')">Vendor Certifications</button>
+                    <button class="filter-tab-btn" id="tabBtnDocs" onclick="switchEvidenceTab('docs')">Supporting Documents</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-View A: Vendor Certifications -->
+        <div id="certsViewWrapper" style="padding: 16px;">
+            <div class="table-container">
+                <table id="certsTable">
+                    <thead>
+                        <tr>
+                            <th>Document / Cert Name</th>
+                            <th>Certificate Type</th>
+                            <th>Related Partner</th>
+                            <th>Upload Date</th>
+                            <th>Expiry Date</th>
+                            <th>Validity Status</th>
+                            <th>Verification Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="certsTableBody">
+                        <!-- Rendered dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sub-View B: Supporting Evidence Documents -->
+        <div id="docsViewWrapper" style="padding: 16px; display: none;">
+            <div class="table-container">
+                <table id="docsTable">
+                    <thead>
+                        <tr>
+                            <th>Document Name</th>
+                            <th>Document Type</th>
+                            <th>Related Entity</th>
+                            <th>Upload Date</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                            <th>Verification Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="docsTableBody">
+                        <!-- Rendered dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================
+         FEATURE 5: UNRESOLVED AUDIT FINDINGS LIFECYCLE
+         ================================================== -->
     <div class="table-card" id="audit-findings" style="margin-bottom: 28px;">
         <div class="table-header-bar">
             <div class="table-header-title">
-                <h3>Recent Audit Findings & Risk Flags</h3>
-                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Identified anomalies across vendor SLAs, inspection defects, and contract terms.</p>
+                <h3>🚨 Audit Findings & Risk Flags</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                    Identified anomalies across vendor SLAs, inspection defects, and contract terms with governance lifecycle.
+                </p>
             </div>
         </div>
+
+        <div style="padding: 12px 16px 0 16px;">
+            <div class="filter-tab-bar" id="findingsTabBar">
+                <button class="filter-tab-btn active" onclick="filterFindings('all')">All Findings (<span id="countAllFindings">0</span>)</button>
+                <button class="filter-tab-btn" onclick="filterFindings('open')">Open (<span id="countOpenFindings">0</span>)</button>
+                <button class="filter-tab-btn" onclick="filterFindings('unresolved')">Unresolved (<span id="countUnresolvedFindings">0</span>)</button>
+                <button class="filter-tab-btn" onclick="filterFindings('high_risk')">High-Risk (<span id="countHighRiskFindings">0</span>)</button>
+                <button class="filter-tab-btn" onclick="filterFindings('resolved')">Resolved (<span id="countResolvedFindings">0</span>)</button>
+            </div>
+        </div>
+
         <div class="table-container">
             <table id="findingsTable">
                 <thead>
@@ -130,13 +551,15 @@
                         <th>Audit Area</th>
                         <th>Vendor Partner</th>
                         <th>Risk Level</th>
-                        <th>Audit Status</th>
                         <th>Identified Date</th>
+                        <th>Audit Status</th>
+                        <th>Resolution Status</th>
+                        <th>Governance Action</th>
                     </tr>
                 </thead>
                 <tbody id="findingsTableBody">
                     <tr>
-                        <td colspan="6" class="loading-spinner-wrapper">
+                        <td colspan="8" class="loading-spinner-wrapper">
                             <div class="spinner"></div>
                             <p>Loading audit findings...</p>
                         </td>
@@ -146,8 +569,10 @@
         </div>
     </div>
 
-    <!-- Real Audit Trail Activity Table -->
-    <div class="table-card" id="audit-trail">
+    <!-- ==================================================
+         REAL AUDIT TRAIL ACTIVITY TABLE
+         ================================================== -->
+    <div class="table-card" id="audit-trail" style="margin-bottom: 28px;">
         <div class="table-header-bar">
             <div class="table-header-title">
                 <h3>Recent Audit Trail & Log Activity</h3>
@@ -161,7 +586,7 @@
                     <tr>
                         <th>Log ID</th>
                         <th>User Email</th>
-                        <th>Role</th>
+                        <th>User Role</th>
                         <th>Action</th>
                         <th>Entity</th>
                         <th>Details</th>
@@ -177,6 +602,147 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- ==================================================
+         AUDITOR REPORTING CENTER (All 5 Reports)
+         ================================================== -->
+    <div class="table-card" id="audit-reports" style="margin-bottom: 32px;">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>📊 Compliance & Governance Reports Center</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                    Generate and export official governance ledgers compiled from actual database records.
+                </p>
+            </div>
+        </div>
+
+        <div style="padding: 16px;">
+            <div class="report-card-grid">
+                <!-- 1. Compliance Report -->
+                <div class="report-card">
+                    <div>
+                        <div style="font-size: 24px; margin-bottom: 6px;">📋</div>
+                        <h4 style="font-size: 14px; font-weight: 700;">1. Compliance Report</h4>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                            ISO 9001 material quality inspections, defect ratios, and pass rates.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="http://127.0.0.1:8000/reports/compliance/excel" class="btn btn-secondary" style="font-size: 11.5px; padding: 6px 10px; width: 100%; text-align: center;">📥 Excel</a>
+                        <a href="reports.html" class="btn btn-primary" style="font-size: 11.5px; padding: 6px 10px; width: 100%; text-align: center;">View</a>
+                    </div>
+                </div>
+
+                <!-- 2. Contract Compliance Report -->
+                <div class="report-card">
+                    <div>
+                        <div style="font-size: 24px; margin-bottom: 6px;">📑</div>
+                        <h4 style="font-size: 14px; font-weight: 700;">2. Contract Compliance Report</h4>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                            Active legal agreements, expiry safeguards, and compliance terms.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="http://127.0.0.1:8000/reports/contracts/excel" class="btn btn-secondary" style="font-size: 11.5px; padding: 6px 10px; width: 100%; text-align: center;">📥 Excel</a>
+                        <a href="contract-monitoring.html" class="btn btn-primary" style="font-size: 11.5px; padding: 6px 10px; width: 100%; text-align: center;">View</a>
+                    </div>
+                </div>
+
+                <!-- 3. Vendor Compliance Report -->
+                <div class="report-card">
+                    <div>
+                        <div style="font-size: 24px; margin-bottom: 6px;">🏢</div>
+                        <h4 style="font-size: 14px; font-weight: 700;">3. Vendor Compliance Report</h4>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                            Supplier SLA scores, on-time delivery rates, and risk categorizations.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="http://127.0.0.1:8000/reports/vendor-reliability/excel" class="btn btn-secondary" style="font-size: 11.5px; padding: 6px 10px; width: 100%; text-align: center;">📥 Excel</a>
+                        <a href="reports.html" class="btn btn-primary" style="font-size: 11.5px; padding: 6px 10px; width: 100%; text-align: center;">View</a>
+                    </div>
+                </div>
+
+                <!-- 4. Audit Findings Report -->
+                <div class="report-card">
+                    <div>
+                        <div style="font-size: 24px; margin-bottom: 6px;">🚨</div>
+                        <h4 style="font-size: 14px; font-weight: 700;">4. Audit Findings Report</h4>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                            Full ledger of open, high-risk, and unresolved compliance anomalies.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="http://127.0.0.1:8000/reports/audit-findings/excel" class="btn btn-secondary" style="font-size: 11.5px; padding: 6px 10px; width: 100%; text-align: center;">📥 Excel</a>
+                        <a href="#audit-findings" class="btn btn-primary" style="font-size: 11.5px; padding: 6px 10px; width: 100%; text-align: center;">View</a>
+                    </div>
+                </div>
+
+                <!-- 5. Audit Trail Report -->
+                <div class="report-card">
+                    <div>
+                        <div style="font-size: 24px; margin-bottom: 6px;">📜</div>
+                        <h4 style="font-size: 14px; font-weight: 700;">5. Audit Trail Report</h4>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                            Complete chronological ledger of user logins, approvals, and changes.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="http://127.0.0.1:8000/reports/audit/excel" class="btn btn-secondary" style="font-size: 11.5px; padding: 6px 10px; width: 100%; text-align: center;">📥 Excel</a>
+                        <a href="audit_logs.html" class="btn btn-primary" style="font-size: 11.5px; padding: 6px 10px; width: 100%; text-align: center;">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Governance Modal: Update Audit Finding Status -->
+    <div class="modal-overlay" id="findingModal">
+        <div class="modal-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700;" id="modalFindingTitle">Review Audit Finding</h3>
+                <button onclick="closeFindingModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-secondary);">&times;</button>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">Finding Description</div>
+                <div id="modalFindingDesc" style="font-size: 13px; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);"></div>
+            </div>
+
+            <form id="findingStatusForm" onsubmit="submitFindingUpdate(event)">
+                <input type="hidden" id="modalFindingId">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Audit Lifecycle Status</label>
+                    <select id="modalAuditStatus" class="filter-select" style="width: 100%;">
+                        <option value="Open">Open</option>
+                        <option value="Under Review">Under Review</option>
+                        <option value="Action Required">Action Required</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Resolution Status</label>
+                    <select id="modalResolutionStatus" class="filter-select" style="width: 100%;">
+                        <option value="Unresolved">Unresolved</option>
+                        <option value="In Remediation">In Remediation</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Auditor Governance Notes</label>
+                    <textarea id="modalFindingNotes" class="filter-select" style="width: 100%; height: 70px; resize: vertical;" placeholder="Record remedial verification notes..."></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeFindingModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Review</button>
+                </div>
+            </form>
         </div>
     </div>
 

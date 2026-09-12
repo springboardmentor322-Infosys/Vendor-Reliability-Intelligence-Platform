@@ -24,7 +24,10 @@ function showMessage(text, type = "info") {
 
 async function loadUserProfile() {
     try {
-        const response = await fetch(`${API_BASE_URL}/users/me`);
+        const token = typeof getToken === "function" ? getToken() : localStorage.getItem("access_token");
+        const response = await fetch(`${API_BASE_URL}/users/me`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
         
         if (!response.ok) {
             throw new Error(`Profile load failed: ${response.status}`);
@@ -55,6 +58,7 @@ async function updateUserProfile(event) {
     showMessage("Updating profile...", "info");
     
     try {
+        const token = typeof getToken === "function" ? getToken() : localStorage.getItem("access_token");
         const formData = new FormData();
         formData.append("name", name);
         formData.append("first_name", first_name);
@@ -63,6 +67,7 @@ async function updateUserProfile(event) {
         
         const response = await fetch(`${API_BASE_URL}/users/me`, {
             method: "PUT",
+            headers: token ? { "Authorization": `Bearer ${token}` } : {},
             body: formData
         });
         

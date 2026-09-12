@@ -3,7 +3,10 @@ let allVendors = [];
 
 async function loadVendors() {
     try {
-        const response = await fetch(`${API_BASE_URL}/vendors`);
+        const token = typeof getToken === "function" ? getToken() : localStorage.getItem("access_token");
+        const response = await fetch(`${API_BASE_URL}/vendors`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
@@ -15,6 +18,28 @@ async function loadVendors() {
 
         // Build dynamic category dropdown options
         populateCategoryFilter();
+
+        // Check if URL has ?risk= or ?status= filter
+        const urlParams = new URLSearchParams(window.location.search);
+        const riskParam = urlParams.get("risk");
+        if (riskParam) {
+            const searchInput = document.getElementById("searchVendors");
+            if (searchInput) {
+                searchInput.placeholder = `Filtered by: ${riskParam} (Type to search...)`;
+            }
+        }
+        const statusParam = urlParams.get("status");
+        if (statusParam) {
+            const statusSelect = document.getElementById("filterStatus");
+            if (statusSelect) {
+                for (let opt of statusSelect.options) {
+                    if (opt.value.toLowerCase() === statusParam.toLowerCase()) {
+                        statusSelect.value = opt.value;
+                        break;
+                    }
+                }
+            }
+        }
 
         // Render table
         filterAndRenderTable();
@@ -60,12 +85,28 @@ function filterAndRenderTable() {
     const catFilter = document.getElementById("filterCategory").value;
     const statusFilter = document.getElementById("filterStatus").value;
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const riskParam = urlParams.get("risk");
+
     const filtered = allVendors.filter(v => {
         const nameMatch = (v.vendor_name || "").toLowerCase().includes(searchVal) || 
                           (v.company || "").toLowerCase().includes(searchVal);
         const catMatch = catFilter === "" || v.category === catFilter;
         const statusMatch = statusFilter === "" || (v.status || "").toLowerCase() === statusFilter.toLowerCase();
-        return nameMatch && catMatch && statusMatch;
+
+        let riskMatch = true;
+        if (riskParam && !searchVal) {
+            const rLower = riskParam.toLowerCase();
+            if (rLower.includes("high")) {
+                riskMatch = (v.risk_level && v.risk_level.toLowerCase().includes("high")) || (v.reliability_score !== null && Number(v.reliability_score) < 60);
+            } else if (rLower.includes("med")) {
+                riskMatch = (v.risk_level && v.risk_level.toLowerCase().includes("medium")) || (v.reliability_score !== null && Number(v.reliability_score) >= 60 && Number(v.reliability_score) < 80);
+            } else if (rLower.includes("low")) {
+                riskMatch = (v.risk_level && v.risk_level.toLowerCase().includes("low")) || (v.reliability_score !== null && Number(v.reliability_score) >= 80);
+            }
+        }
+
+        return nameMatch && catMatch && statusMatch && riskMatch;
     });
 
     const tbody = document.querySelector("#vendorTable tbody");

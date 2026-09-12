@@ -3,13 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contract Management - VendorIQ</title>
+    <title>Contracts & Compliance - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+        .badge-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .badge-poor {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .badge-pending {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+        .badge-neutral {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+    </style>
 </head>
 <body>
     <div style="margin-bottom: 24px;">
-        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Contract Directory</h1>
-        <p style="color: var(--text-secondary);">Manage procurement agreements, active SLAs, legal start/end dates, and status categories.</p>
+        <h1 id="contractsPageTitle" style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Contract Directory</h1>
+        <p id="contractsPageSubtitle" style="color: var(--text-secondary);">Manage procurement agreements, active SLAs, legal start/end dates, and status categories.</p>
     </div>
 
     <!-- KPI Summary Grid -->
@@ -20,7 +42,7 @@
                 <span class="kpi-icon">📄</span>
             </div>
             <div class="kpi-value" id="kpiTotalContracts">0</div>
-            <div class="kpi-sub">Total contract records</div>
+            <div class="kpi-sub" id="kpiTotalSub">Total contract records</div>
         </div>
 
         <div class="kpi-card">
@@ -29,7 +51,7 @@
                 <span class="kpi-icon">✅</span>
             </div>
             <div class="kpi-value" id="kpiActiveContracts" style="color: var(--success-color);">0</div>
-            <div class="kpi-sub">Contracts in active operations</div>
+            <div class="kpi-sub">Agreements in active operations</div>
         </div>
 
         <div class="kpi-card">
@@ -51,7 +73,7 @@
         </div>
     </div>
 
-    <!-- Create Contract Form (Visible to Admin & PM) -->
+    <!-- Create Contract Form (Visible to Admin & PM only) -->
     <div id="addContractContainer" class="form-container" style="display: none; max-width: 100%;">
         <div class="form-title">Register New Contract</div>
         <form id="contractForm">
@@ -94,24 +116,25 @@
     <div class="table-card" style="margin-top: 24px;">
         <div class="table-header-bar">
             <div class="table-header-title">
-                <h3>SLA Contracts Ledger</h3>
+                <h3 id="tableTitleHeader">SLA Contracts Ledger</h3>
             </div>
             <div class="table-header-actions">
                 <div class="search-input-wrapper">
-                    <input type="text" id="searchContracts" placeholder="Search contract or vendor name...">
+                    <input type="text" id="searchContracts" placeholder="Search contract or vendor...">
                 </div>
                 <select id="filterContractStatus" class="filter-select">
                     <option value="">All Statuses</option>
                     <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                    <option value="Pending">Pending</option>
+                    <option value="Expiring Soon">Expiring Soon</option>
                     <option value="Expired">Expired</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Inactive">Inactive</option>
                 </select>
             </div>
         </div>
         <div class="table-container">
             <table id="contractTable">
-                <thead>
+                <thead id="contractTableHead">
                     <tr>
                         <th>ID</th>
                         <th>Vendor ID</th>
@@ -123,7 +146,7 @@
                         <th>Management Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="contractTableBody">
                     <tr>
                         <td colspan="8" class="loading-spinner-wrapper">
                             <div class="spinner"></div>

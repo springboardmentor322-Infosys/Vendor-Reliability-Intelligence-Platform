@@ -6,23 +6,10 @@ from auth import get_current_user, check_role
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
 
-# =========================================================
-# DATABASE CONNECTION
-# =========================================================
+from db import conn as shared_conn
 
 def get_connection():
-    DB_HOST = os.getenv("DB_HOST", "localhost")
-    DB_NAME = os.getenv("DB_NAME", "vendor_platform")
-    DB_USER = os.getenv("DB_USER", "postgres")
-    DB_PASSWORD = os.getenv("DB_PASSWORD", "Amruta@9279")
-    DB_PORT = os.getenv("DB_PORT", "5432")
-    return psycopg2.connect(
-        host=DB_HOST,
-        database=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        port=DB_PORT
-    )
+    return shared_conn
 
 
 # =========================================================

@@ -19,6 +19,24 @@ async function loadVendorReliability() {
         // Render charts
         renderCharts();
 
+        // Check URL parameters for risk filter
+        const urlParams = new URLSearchParams(window.location.search);
+        const riskParam = urlParams.get("risk");
+        if (riskParam) {
+            const riskSelect = document.getElementById("filterRisk");
+            if (riskSelect) {
+                const rLower = riskParam.toLowerCase();
+                for (let opt of riskSelect.options) {
+                    if (opt.value && (opt.value.toLowerCase().includes(rLower) || rLower.includes(opt.value.toLowerCase()))) {
+                        riskSelect.value = opt.value;
+                        break;
+                    }
+                }
+            }
+        }
+
+        wireReliabilityKpiClicks();
+
         // Render table
         filterAndRenderTable();
         
@@ -229,6 +247,25 @@ function filterAndRenderTable() {
             </tr>
         `;
     });
+}
+
+function wireReliabilityKpiClicks() {
+    const cardTotal = document.getElementById("kpiTotalVendors")?.closest(".kpi-card");
+    if (cardTotal) {
+        cardTotal.classList.add("clickable-card");
+        cardTotal.title = "Click to view suppliers directory";
+        cardTotal.onclick = () => { window.location.href = "vendors.html"; };
+    }
+    const cardHighRisk = document.getElementById("kpiHighRiskVendors")?.closest(".kpi-card");
+    if (cardHighRisk) {
+        cardHighRisk.classList.add("clickable-card");
+        cardHighRisk.title = "Click to filter high risk partners";
+        cardHighRisk.onclick = () => {
+            const sel = document.getElementById("filterRisk");
+            if (sel) sel.value = "High Risk";
+            filterAndRenderTable();
+        };
+    }
 }
 
 // Load on DOM ready

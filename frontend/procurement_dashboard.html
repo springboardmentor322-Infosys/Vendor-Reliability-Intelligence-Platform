@@ -6,65 +6,281 @@
     <title>Procurement Dashboard - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .pipeline-grid-7 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .pipeline-card {
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .pipeline-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .pipeline-stage-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary, #64748b);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .pipeline-stage-val {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-color, #1e293b);
+        }
+        .pipeline-stage-sub {
+            font-size: 10.5px;
+            color: var(--text-muted, #94a3b8);
+            margin-top: 4px;
+        }
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content-box {
+            background: #ffffff;
+            border-radius: 12px;
+            max-width: 780px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color, #e2e8f0);
+        }
+        .modal-header-bar {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-color, #e2e8f0);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+        .modal-body-content {
+            padding: 24px;
+        }
+        .modal-footer-bar {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color, #e2e8f0);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background: #f8fafc;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+    </style>
 </head>
 <body>
-    <div class="dashboard-header">
-        <div>
-            <h1>Procurement Management & Supplier Intelligence</h1>
-            <p>Monitor procurement order pipelines, evaluate vendor scorecards, manage budget allocations, and track fulfillments.</p>
+    <!-- Procurement Welcome Banner -->
+    <div class="role-welcome-banner">
+        <div class="welcome-text-content">
+            <h1 id="procWelcomeTitle">Procurement Operations Center 👋</h1>
+            <p>Sourcing pipeline, purchase requisition workflows, supplier scorecards, delivery tracking, and cost management.</p>
         </div>
-        <div class="header-badge">
-            <span class="status-dot"></span> Pipeline Active: Auto-Syncing Orders
+        <div class="quick-actions-bar">
+            <a href="purchase-request.html" class="quick-action-btn primary">📝 New Requisition</a>
+            <a href="purchase-orders.html" class="quick-action-btn">🛍️ Purchase Orders</a>
+            <a href="vendors.html" class="quick-action-btn">🏢 Suppliers Directory</a>
+            <a href="vendor-performance.html" class="quick-action-btn">📈 Vendor Performance</a>
+            <a href="invoices.html" class="quick-action-btn">💳 Invoices & Payments</a>
+            <a href="#delivery-status" class="quick-action-btn">🚚 Delivery Status</a>
+            <a href="contracts.html" class="quick-action-btn">📄 Contracts & SLAs</a>
+            <a href="reports.html" class="quick-action-btn">📊 Reports</a>
         </div>
     </div>
 
     <!-- Top KPI Summary Cards -->
     <div class="kpi-grid-4">
-        <div class="kpi-card">
+        <div class="kpi-card clickable-card" data-href="purchase-orders.html?source=all" title="Click to view full purchase orders ledger">
             <div class="kpi-header">
-                <span class="kpi-label">Total Orders</span>
+                <span class="kpi-label">Historical Procurement Transactions</span>
                 <span class="kpi-icon">🛍️</span>
             </div>
             <div class="kpi-value" id="totalOrders">0</div>
-            <div class="kpi-sub" id="totalVendorsSub">0 Active Suppliers</div>
+            <div class="kpi-sub" id="totalVendorsSub">DataCo Line Items (65,761 Unique POs)</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card clickable-card" data-href="purchase-orders.html?source=application" title="Click to view active purchase orders">
             <div class="kpi-header">
-                <span class="kpi-label">Active Orders</span>
+                <span class="kpi-label">Active Purchase Orders</span>
                 <span class="kpi-icon">🚚</span>
             </div>
             <div class="kpi-value" id="activeOrdersVal">0</div>
-            <div class="kpi-sub">In-Transit & Processing</div>
+            <div class="kpi-sub" id="activeOrdersSub">Approved, Ordered & In-Transit</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card clickable-card" data-href="purchase-request.html?status=Pending" title="Click to review pending requisitions">
             <div class="kpi-header">
                 <span class="kpi-label">Pending Requisitions</span>
                 <span class="kpi-icon">📝</span>
             </div>
             <div class="kpi-value" id="pendingOrdersVal" style="color: var(--warning-color);">0</div>
-            <div class="kpi-sub">Awaiting Procurement Approval</div>
+            <div class="kpi-sub" id="pendingRequisitionsSub">Awaiting Procurement Review</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card clickable-card" data-href="#delivery-status" title="Click to jump to delivery status telemetry">
             <div class="kpi-header">
-                <span class="kpi-label">On-Time Delivery Rate</span>
+                <span class="kpi-label">On-Time Fulfillment Rate</span>
                 <span class="kpi-icon">⏱️</span>
             </div>
             <div class="kpi-value" id="onTimeRate" style="color: var(--success-color);">0.0%</div>
-            <div class="kpi-sub" id="avgReliabilitySub">Avg Reliability: 0.0</div>
+            <div class="kpi-sub" id="avgReliabilitySub">Avg Supplier Score: 0.0</div>
         </div>
     </div>
 
-    <!-- Order Overview & Budget vs Spend Analysis Grid -->
-    <div class="section-grid-2" id="budget-spend">
+    <!-- SECTION 1: PURCHASE ORDER STATUS OVERVIEW (7 CANONICAL LIFECYCLE STAGES) -->
+    <div class="table-card" style="margin-bottom: 24px;">
+        <div class="table-header-bar" style="flex-wrap: wrap; gap: 8px;">
+            <div>
+                <h3 style="margin: 0;">1. Purchase Order Status Overview (Lifecycle Pipeline)</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                    Real database-driven counts for all 7 canonical procurement statuses across active workflows and historical records.
+                </p>
+            </div>
+            <span class="badge badge-active" style="font-size: 11px;">PostgreSQL Reconciled</span>
+        </div>
+        <div style="padding: 16px 20px 8px 20px;">
+            <div class="pipeline-grid-7" id="canonicalStatusGrid">
+                <div class="pipeline-card clickable-card" data-href="purchase-orders.html?status=Pending&source=all" title="View Pending Approval orders" style="border-left: 3px solid #f59e0b;">
+                    <span class="pipeline-stage-label">Pending Approval</span>
+                    <div class="pipeline-stage-val" id="stPendingApproval">0</div>
+                    <span class="pipeline-stage-sub" id="stSubPendingApproval">0 app / 0 ledger</span>
+                </div>
+                <div class="pipeline-card clickable-card" data-href="purchase-orders.html?status=Approved&source=all" title="View Approved orders" style="border-left: 3px solid #3b82f6;">
+                    <span class="pipeline-stage-label">Approved</span>
+                    <div class="pipeline-stage-val" id="stApproved">0</div>
+                    <span class="pipeline-stage-sub" id="stSubApproved">0 app / 0 ledger</span>
+                </div>
+                <div class="pipeline-card clickable-card" data-href="purchase-orders.html?status=Ordered&source=all" title="View Ordered orders" style="border-left: 3px solid #6366f1;">
+                    <span class="pipeline-stage-label">Ordered</span>
+                    <div class="pipeline-stage-val" id="stOrdered">0</div>
+                    <span class="pipeline-stage-sub" id="stSubOrdered">0 app / 0 ledger</span>
+                </div>
+                <div class="pipeline-card clickable-card" data-href="purchase-orders.html?status=In-Transit&source=all" title="View In-Transit orders" style="border-left: 3px solid #0284c7;">
+                    <span class="pipeline-stage-label">In-Transit</span>
+                    <div class="pipeline-stage-val" id="stInTransit">0</div>
+                    <span class="pipeline-stage-sub" id="stSubInTransit">0 app / 0 ledger</span>
+                </div>
+                <div class="pipeline-card clickable-card" data-href="purchase-orders.html?status=Delivered&source=all" title="View Delivered orders" style="border-left: 3px solid #10b981;">
+                    <span class="pipeline-stage-label">Delivered</span>
+                    <div class="pipeline-stage-val" id="stDelivered">0</div>
+                    <span class="pipeline-stage-sub" id="stSubDelivered">0 app / 0 ledger</span>
+                </div>
+                <div class="pipeline-card clickable-card" data-href="purchase-orders.html?status=Completed&source=all" title="View Completed orders" style="border-left: 3px solid #059669;">
+                    <span class="pipeline-stage-label">Completed</span>
+                    <div class="pipeline-stage-val" id="stCompleted">0</div>
+                    <span class="pipeline-stage-sub" id="stSubCompleted">0 app / 0 ledger</span>
+                </div>
+                <div class="pipeline-card clickable-card" data-href="purchase-orders.html?status=Cancelled&source=all" title="View Cancelled orders" style="border-left: 3px solid #ef4444;">
+                    <span class="pipeline-stage-label">Cancelled</span>
+                    <div class="pipeline-stage-val" id="stCancelled">0</div>
+                    <span class="pipeline-stage-sub" id="stSubCancelled">0 app / 0 ledger</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 2: ACTIVE PURCHASE ORDER MONITORING -->
+    <div class="risk-highlight-card" id="procurementRiskSection" style="margin-bottom: 24px;">
+        <div class="risk-highlight-header">
+            <h3>🚚 2. Active Purchase Order Monitoring</h3>
+            <span class="badge badge-warning" id="procAttentionBadge">Live Operational Surveillance</span>
+        </div>
+        <div class="risk-highlight-grid">
+            <div class="risk-highlight-item clickable-card" data-href="purchase-orders.html?source=application" title="Click to view active purchase orders">
+                <span class="title">📦 Total Active Orders</span>
+                <span class="value" id="actTotalActive" style="color: var(--primary-color);">0 Orders</span>
+            </div>
+            <div class="risk-highlight-item clickable-card" data-href="purchase-orders.html?status=In-Transit&source=all" title="Click to view orders currently in transit">
+                <span class="title">🚚 Ordered or In-Transit</span>
+                <span class="value" id="actOrderedInTransit" style="color: #3b82f6;">0 Active</span>
+            </div>
+            <div class="risk-highlight-item clickable-card" data-href="purchase-orders.html?status=delayed&source=all" title="Click to view delayed deliveries">
+                <span class="title">⚠️ Delayed Deliveries</span>
+                <span class="value" id="actDelayed" style="color: var(--danger-color);">0 Delayed</span>
+            </div>
+            <div class="risk-highlight-item clickable-card" data-href="purchase-orders.html?status=Approved&source=all" title="Click to view upcoming scheduled deliveries">
+                <span class="title">📅 Upcoming Deliveries</span>
+                <span class="value" id="actUpcoming" style="color: var(--success-color);">0 Scheduled</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 3: PENDING PROCUREMENT REQUISITIONS & ACTION PANEL -->
+    <div class="table-card" style="margin-bottom: 24px;" id="pending-requests-section">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>📋 3. Pending Procurement Requests & Clearance Pipeline</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                    Department requisitions awaiting approval, vendor allocation, and purchase order issuance.
+                </p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <a href="purchase-request.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">+ Open Requisition Center</a>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="pendingRequestsTable">
+                <thead>
+                    <tr>
+                        <th>Req #</th>
+                        <th>Product Specification</th>
+                        <th>Assigned Supplier</th>
+                        <th>Supplier Reliability</th>
+                        <th>Qty</th>
+                        <th>Request Date</th>
+                        <th>Requested By</th>
+                        <th>Workflow Action</th>
+                    </tr>
+                </thead>
+                <tbody id="pendingRequestsBody">
+                    <tr>
+                        <td colspan="8" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading pending procurement requests...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECTION 4: PROCUREMENT COST ANALYSIS & ORDERS BREAKDOWN -->
+    <div class="section-grid-2" id="budget-spend" style="margin-bottom: 24px;">
         <!-- Purchase Orders Overview Donut Chart -->
         <div class="chart-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <div>
                     <h3>Procurement Orders Breakdown</h3>
-                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Fulfillment status of all recorded purchase requisitions.</p>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Fulfillment status across all recorded purchase orders.</p>
                 </div>
                 <span class="kpi-trend positive" id="completedRateBadge">0% Completed</span>
             </div>
@@ -74,31 +290,39 @@
             </div>
         </div>
 
-        <!-- Budget vs Actual Spend Analysis -->
+        <!-- Comprehensive Procurement Cost Analysis Box -->
         <div class="stat-overview-box">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <h3>
-                    <span>💰 Budget vs. Actual Spend</span>
+                    <span>💰 4. Procurement Cost Analysis</span>
                 </h3>
                 <span class="kpi-trend neutral" id="budgetUtilBadge">0% Utilized</span>
             </div>
 
-            <div class="overview-stat-row">
-                <span class="overview-stat-label">💵 Allocated Fiscal Budget</span>
+            <div class="overview-stat-row clickable-stat-row" data-href="reports.html" title="Click to view fiscal budget report">
+                <span class="overview-stat-label">💵 Fiscal Budget Allocation</span>
                 <span class="overview-stat-value" id="allocatedBudgetVal">₹0.00</span>
             </div>
-            <div class="overview-stat-row">
-                <span class="overview-stat-label">💳 Actual Procurement Spend</span>
+            <div class="overview-stat-row clickable-stat-row" data-href="invoices.html" title="Click to view committed spend in invoices">
+                <span class="overview-stat-label">💳 Budget Consumed (Committed)</span>
                 <span class="overview-stat-value" id="actualSpendVal">₹0.00</span>
             </div>
-            <div class="overview-stat-row">
+            <div class="overview-stat-row clickable-stat-row" data-href="reports.html" title="Click to view available fiscal budget in reports">
                 <span class="overview-stat-label">📉 Remaining Available Budget</span>
                 <span class="overview-stat-value" id="remainingBudgetVal" style="color: var(--success-color);">₹0.00</span>
             </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="invoices.html" title="Click to view enterprise spend across all invoices" style="border-top: 1px dashed var(--border-color); padding-top: 8px; margin-top: 8px;">
+                <span class="overview-stat-label">🏢 Total Enterprise Spend (DataCo Ledger)</span>
+                <span class="overview-stat-value" id="totalEnterpriseSpendVal" style="color: var(--primary-color);">₹0.00</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="purchase-orders.html?source=application" title="Click to view application active purchase orders">
+                <span class="overview-stat-label">🛍️ Application Active PO Spend</span>
+                <span class="overview-stat-value" id="appProcSpendVal" style="font-weight: 600;">₹0.00</span>
+            </div>
 
-            <div style="margin-top: 18px;">
+            <div style="margin-top: 14px;">
                 <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">
-                    <span>Budget Consumption</span>
+                    <span>Fiscal Budget Consumption</span>
                     <span id="budgetProgressPct" style="font-weight: 600; color: var(--text-color);">0%</span>
                 </div>
                 <div class="progress-meter">
@@ -110,37 +334,99 @@
 
     <!-- Procurement Insights & Alerts -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 28px;">
-        <div class="insight-card info">
+        <div class="insight-card info clickable-card" data-href="vendor-performance.html" title="Click to inspect supplier performance scorecards">
             <div class="insight-icon">💡</div>
             <div class="insight-content">
-                <h4>Supplier Fulfillment Velocity</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4>Supplier Fulfillment Velocity</h4>
+                    <span class="badge badge-info" style="font-size: 10px;">Calculated Metric</span>
+                </div>
                 <p id="velocityInsight">Evaluating supplier order cycle duration...</p>
             </div>
         </div>
-        <div class="insight-card warning">
+        <div class="insight-card warning clickable-card" data-href="purchase-request.html?status=Pending" title="Click to open pending purchase requisitions">
             <div class="insight-icon">⚠️</div>
             <div class="insight-content">
-                <h4>Requisition Pipeline Alerts</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4>Requisition Pipeline Alerts</h4>
+                    <span class="badge badge-warning" style="font-size: 10px;">Operational Action</span>
+                </div>
                 <p id="pendingRequisitionsInsight">Checking open purchase requests...</p>
             </div>
         </div>
-        <div class="insight-card success">
+        <div class="insight-card success clickable-card" data-href="vendor-performance.html" title="Click to view top performing supplier partner scorecards">
             <div class="insight-icon">🌟</div>
             <div class="insight-content">
-                <h4>Top Performing Supplier Partner</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4>Top Performing Supplier Partner</h4>
+                    <span class="badge badge-active" style="font-size: 10px;">Historical Analytics</span>
+                </div>
                 <p id="topSupplierInsight">Identifying top-rated vendor scorecards...</p>
             </div>
         </div>
     </div>
 
+    <!-- SECTION 5: DELIVERY STATUS INTEGRATION (NEW REQUIRED SECTION) -->
+    <div class="table-card" style="margin-bottom: 24px;" id="delivery-status">
+        <div class="table-header-bar" style="flex-wrap: wrap; gap: 8px;">
+            <div class="table-header-title">
+                <h3>🚚 5. Fulfillment & Delivery Status</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                    End-to-end delivery monitoring, on-time delivery ratios, logistics delays, and historical trends.
+                </p>
+            </div>
+            <span class="badge badge-active">Logistics Telemetry</span>
+        </div>
+
+        <div style="padding: 16px 20px;">
+            <!-- Delivery KPI subgrid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px;">
+                <div class="clickable-card" data-href="purchase-orders.html?status=In-Transit&source=all" title="Click to view in-transit orders in ledger" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">🚚 In-Transit Orders</div>
+                    <div id="delivInTransitVal" style="font-size: 22px; font-weight: 700; color: #3b82f6; margin-top: 4px;">0</div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Currently en route to destination</div>
+                </div>
+                <div class="clickable-card" data-href="purchase-orders.html?status=Delivered&source=all" title="Click to view delivered orders in ledger" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">⏱️ On-Time Deliveries</div>
+                    <div id="delivOnTimeVal" style="font-size: 22px; font-weight: 700; color: var(--success-color); margin-top: 4px;">0</div>
+                    <div id="delivOnTimeRateSub" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">0.0% fulfillment rate</div>
+                </div>
+                <div class="clickable-card" data-href="purchase-orders.html?status=delayed&source=all" title="Click to view delayed deliveries in ledger" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">⚠️ Delayed Deliveries</div>
+                    <div id="delivDelayedVal" style="font-size: 22px; font-weight: 700; color: var(--danger-color); margin-top: 4px;">0</div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Deliveries exceeding scheduled window</div>
+                </div>
+                <div class="clickable-card" data-href="purchase-orders.html?status=Approved&source=all" title="Click to view approved upcoming scheduled deliveries" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">📅 Upcoming Scheduled Deliveries</div>
+                    <div id="delivUpcomingVal" style="font-size: 22px; font-weight: 700; color: var(--primary-color); margin-top: 4px;">0</div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Expected arrivals on schedule</div>
+                </div>
+            </div>
+
+            <!-- Delivery Performance Trend Chart -->
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 10px; padding: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h4 style="font-size: 13px; font-weight: 600; margin: 0;">📈 Monthly Delivery Performance Trend (On-Time %)</h4>
+                    <span style="font-size: 11px; color: var(--text-muted);">Source: PostgreSQL deliveries table</span>
+                </div>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="deliveryTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Supplier Performance Scorecard -->
-    <div class="table-card" style="margin-bottom: 28px;" id="vendor-scorecard">
+    <div class="table-card" style="margin-bottom: 24px;" id="vendor-scorecard">
         <div class="table-header-bar">
             <div class="table-header-title">
-                <h3>Supplier Performance Scorecard</h3>
+                <h3>🏢 Supplier Performance Scorecard</h3>
                 <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Multi-dimensional performance evaluation from real delivery transactions.</p>
             </div>
-            <a href="vendors.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">Full Vendor Directory</a>
+            <div style="display: flex; gap: 8px;">
+                <a href="vendor-performance.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">📈 Deep Performance Analytics</a>
+                <a href="vendors.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">Full Vendor Directory</a>
+            </div>
         </div>
         <div class="table-container">
             <table id="vendorPerformanceTable">
@@ -154,11 +440,12 @@
                         <th>Quality Index</th>
                         <th>Reliability Rating</th>
                         <th>Risk Tier</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="vendorPerformanceBody">
                     <tr>
-                        <td colspan="8" class="loading-spinner-wrapper">
+                        <td colspan="9" class="loading-spinner-wrapper">
                             <div class="spinner"></div>
                             <p>Loading supplier performance scorecard...</p>
                         </td>
@@ -168,36 +455,69 @@
         </div>
     </div>
 
-    <!-- Recent Purchase Orders Log -->
-    <div class="table-card" id="recent-orders">
-        <div class="table-header-bar">
+    <!-- Purchase Orders Ledger Card -->
+    <div class="table-card" id="recent-orders" style="margin-bottom: 32px;">
+        <div class="table-header-bar" style="flex-wrap: wrap; gap: 12px;">
             <div class="table-header-title">
-                <h3>Recent Purchase Orders Pipeline</h3>
-                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Latest purchase order requisitions and fulfillment statuses.</p>
+                <h3>🛍️ Purchase Orders Ledger</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;" id="recentOrdersSubheading">
+                    Application purchase orders created through procurement workflows. Click any row or Inspect to review and manage.
+                </p>
             </div>
-            <a href="purchase-orders.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">All Purchase Orders</a>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <!-- Source Toggle -->
+                <div class="btn-group" id="dashSourceToggleGroup" style="display: inline-flex; background: var(--border-color); padding: 3px; border-radius: 6px; gap: 3px;">
+                    <button type="button" class="btn btn-sm btn-primary active" id="btnDashSourceApp" onclick="setDashboardPoSource('application')" style="padding: 4px 10px; font-size: 11px;">Application Purchase Orders</button>
+                    <button type="button" class="btn btn-sm btn-secondary" id="btnDashSourceHist" onclick="setDashboardPoSource('historical')" style="padding: 4px 10px; font-size: 11px;">Historical DataCo Records</button>
+                    <button type="button" class="btn btn-sm btn-secondary" id="btnDashSourceAll" onclick="setDashboardPoSource('all')" style="padding: 4px 10px; font-size: 11px;">All Records</button>
+                </div>
+                <a href="purchase-orders.html?source=application" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">Full Ledger</a>
+            </div>
         </div>
         <div class="table-container">
             <table id="purchaseOrdersTable">
                 <thead>
                     <tr>
                         <th>PO #</th>
+                        <th>Source</th>
                         <th>Supplier Name</th>
                         <th>Product Item</th>
                         <th>Total Value</th>
                         <th>Order Date</th>
+                        <th>Expected Delivery</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="purchaseOrdersBody">
                     <tr>
-                        <td colspan="6" class="loading-spinner-wrapper">
+                        <td colspan="9" class="loading-spinner-wrapper">
                             <div class="spinner"></div>
                             <p>Loading purchase orders...</p>
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- PURCHASE ORDER DETAIL & ACTION MODAL -->
+    <div class="modal-overlay" id="poDetailModal">
+        <div class="modal-content-box">
+            <div class="modal-header-bar">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <h3 id="modalPoTitle" style="margin: 0; font-size: 16px;">Purchase Order Inspection</h3>
+                    <span class="badge" id="modalPoStatusBadge">Status</span>
+                    <span class="badge badge-neutral" id="modalDataSourceBadge">Application Workflow</span>
+                </div>
+                <button type="button" class="btn-close" onclick="closePoModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <div class="modal-body-content" id="modalPoBody">
+                <div class="spinner" style="margin: 40px auto;"></div>
+            </div>
+            <div class="modal-footer-bar" id="modalPoFooter">
+                <button type="button" class="btn btn-secondary" onclick="closePoModal()">Close</button>
+            </div>
         </div>
     </div>
 

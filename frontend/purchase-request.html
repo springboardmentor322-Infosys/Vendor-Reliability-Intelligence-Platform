@@ -19,20 +19,31 @@
             <div class="form-title">Create Requisition Request</div>
             <form id="requestForm">
                 <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="vendor_id">Supplier Partner</label>
-                    <select id="vendor_id" required>
-                        <option value="">Select Vendor</option>
+                    <label for="vendor_id">Supplier Partner <small style="font-weight: normal; color: var(--text-secondary);">(Optional - Can be assigned during review)</small></label>
+                    <select id="vendor_id">
+                        <option value="">-- Optional: Assign During Review --</option>
                     </select>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="product_name">Product Name</label>
+                    <label for="product_name">Product Specification</label>
                     <input type="text" id="product_name" required placeholder="e.g. Server Hardware SLA">
                 </div>
 
                 <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="quantity">Quantity</label>
+                    <label for="quantity">Quantity <span style="color: var(--danger-color);">*</span></label>
                     <input type="number" id="quantity" required min="1" value="1">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="unit_price">Unit Price (₹) <span style="color: var(--danger-color);">*</span></label>
+                    <input type="number" id="unit_price" required min="0.01" step="0.01" placeholder="e.g. 150.00">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="total_amount">Estimated Total Amount (₹)</label>
+                    <input type="number" id="total_amount" readonly step="0.01" style="background: var(--bg-surface); color: var(--text-color); font-weight: 600;" placeholder="0.00">
+                    <small style="color: var(--text-secondary); font-size: 11px;">Automatically calculated as Quantity &times; Unit Price.</small>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 16px;">
@@ -41,21 +52,18 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="requested_by">Requested By (Name)</label>
-                    <input type="text" id="requested_by" placeholder="e.g. Jane Doe" required>
+                    <label for="requested_by">Requested By <small style="font-weight: normal; color: var(--text-secondary);">(Authenticated User)</small></label>
+                    <input type="text" id="requested_by" readonly style="background: var(--bg-surface); color: var(--text-color); font-weight: 500;">
                 </div>
 
                 <div class="form-group" style="margin-bottom: 20px;">
-                    <label for="status">Initial Status</label>
-                    <select id="status" required>
-                        <option value="Pending" selected>Pending</option>
-                        <option value="Approved">Approved</option>
-                        <option value="Rejected">Rejected</option>
-                    </select>
+                    <label for="status_display">Initial Status</label>
+                    <input type="text" id="status_display" value="Pending" disabled style="background: var(--bg-surface); color: var(--warning-color); font-weight: 600;">
+                    <small style="color: var(--text-secondary); font-size: 11px;">All new requisitions automatically start in Pending status awaiting review.</small>
                 </div>
 
                 <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                    <button type="submit" class="btn btn-primary">Save Request</button>
+                    <button type="submit" class="btn btn-primary">Submit Requisition</button>
                 </div>
             </form>
         </div>
@@ -98,20 +106,22 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Vendor Name</th>
+                        <th>Supplier Partner</th>
                         <th>Product Specification</th>
                         <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Estimated Total</th>
                         <th>Request Date</th>
                         <th>Requested By</th>
                         <th>Status</th>
-                        <th>Approve Action</th>
-                        <th>Edit Action</th>
-                        <th>Delete Action</th>
+                        <th>Workflow Action</th>
+                        <th>Manage</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="10" class="loading-spinner-wrapper">
+                        <td colspan="12" class="loading-spinner-wrapper">
                             <div class="spinner"></div>
                             <p>Loading requisitions...</p>
                         </td>

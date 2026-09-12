@@ -3,27 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - VendorIQ</title>
+    <title>Login - VendorIQ Procurement Intelligence</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="auth-body">
+    <!-- Ambient glowing gradients -->
+    <div class="auth-ambient-glow top-left"></div>
+    <div class="auth-ambient-glow bottom-right"></div>
+
+    <!-- Interactive AI data network canvas -->
+    <canvas id="networkCanvas" class="auth-network-canvas"></canvas>
+
     <div class="auth-wrapper">
         <div class="auth-card">
-            <h2>VendorIQ</h2>
-            <p class="subtitle">Vendor Reliability Intelligence Platform</p>
+            <div class="auth-badge-header">
+                <span class="auth-ai-pill">
+                    <span class="pill-dot"></span> AI Telemetry Active
+                </span>
+                <span style="font-size: 11px; font-weight: 600; color: #64748b; letter-spacing: 0.05em; text-transform: uppercase;">
+                    v2.4 Enterprise
+                </span>
+            </div>
+
+            <div class="auth-brand">
+                <div class="auth-brand-icon">⚡</div>
+                <h2>VendorIQ</h2>
+            </div>
+            <p class="subtitle">Vendor Reliability Intelligence & Risk Platform</p>
             
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" placeholder="Enter email" required>
+                    <label for="email">
+                        <span>Email Address</span>
+                        <span style="font-size: 11px; color: #64748b; font-weight: normal;">Corporate Account</span>
+                    </label>
+                    <input type="email" id="email" placeholder="e.g. procurement@vendoriq.com" required autocomplete="email">
                 </div>
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter password" required>
+                    <label for="password">
+                        <span>Password</span>
+                    </label>
+                    <input type="password" id="password" placeholder="Enter secure password" required autocomplete="current-password">
                 </div>
-                <button type="submit" style="margin-top: 10px;">Login</button>
+                <button type="submit" id="btnLoginSubmit">
+                    <span>Sign In to Intelligence Portal</span>
+                    <span style="font-size: 16px;">→</span>
+                </button>
             </form>
             
+            <div class="auth-trust-badges">
+                <div class="auth-trust-item">
+                    <span>🔒</span>
+                    <span>256-Bit TLS</span>
+                </div>
+                <span>•</span>
+                <div class="auth-trust-item">
+                    <span>🛡️</span>
+                    <span>Role-Based RBAC</span>
+                </div>
+                <span>•</span>
+                <div class="auth-trust-item">
+                    <span>⚡</span>
+                    <span>FastAPI Async</span>
+                </div>
+            </div>
+
             <div class="auth-footer">
                 <p>Don't have an account? <a href="register.html">Register</a></p>
                 <p style="margin-top: 8px;"><a href="forgot-password.html">Forgot Password?</a></p>
@@ -31,6 +76,87 @@
         </div>
     </div>
     
+    <!-- Background telemetry animation script -->
+    <script>
+        (function() {
+            const canvas = document.getElementById('networkCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+            const particleCount = 45;
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.45,
+                    vy: (Math.random() - 0.5) * 0.45,
+                    radius: Math.random() * 2 + 1,
+                    alpha: Math.random() * 0.5 + 0.3
+                });
+            }
+
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                // Draw connections
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < 130) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(59, 130, 246, ${0.18 * (1 - dist / 130)})`;
+                            ctx.lineWidth = 0.8;
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                // Draw particles
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(96, 165, 250, ${p.alpha})`;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = 'rgba(59, 130, 246, 0.5)';
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    if (!prefersReducedMotion) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+
+                        if (p.x < 0) p.x = width;
+                        else if (p.x > width) p.x = 0;
+                        if (p.y < 0) p.y = height;
+                        else if (p.y > height) p.y = 0;
+                    }
+                }
+
+                if (!prefersReducedMotion) {
+                    requestAnimationFrame(animate);
+                }
+            }
+            animate();
+        })();
+    </script>
+
     <script src="js/auth.js"></script>
     <script src="js/login.js"></script>
 </body>

@@ -4,7 +4,10 @@ let charts = {};
 
 async function loadContractMonitoring() {
     try {
-        const response = await fetch(`${API_BASE_URL}/contract-monitoring`);
+        const token = typeof getToken === "function" ? getToken() : localStorage.getItem("access_token");
+        const response = await fetch(`${API_BASE_URL}/contract-monitoring`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
         const contracts = await response.json();
 
         if (!Array.isArray(contracts)) {
@@ -18,6 +21,21 @@ async function loadContractMonitoring() {
 
         // Render charts
         renderCharts();
+
+        // Check URL parameters for status filter
+        const urlParams = new URLSearchParams(window.location.search);
+        const statusParam = urlParams.get("status");
+        if (statusParam) {
+            const filterSelect = document.getElementById("filterMonitoringStatus");
+            if (filterSelect) {
+                for (let opt of filterSelect.options) {
+                    if (opt.value && (opt.value.toLowerCase().includes(statusParam.toLowerCase()) || statusParam.toLowerCase().includes(opt.value.toLowerCase()))) {
+                        filterSelect.value = opt.value;
+                        break;
+                    }
+                }
+            }
+        }
 
         // Render table
         filterAndRenderTable();
@@ -43,16 +61,15 @@ function calculateKPIs() {
     let expired = 0;
 
     allContracts.forEach(c => {
-        const dbStatus = (c.status || "").toLowerCase();
-        const mStatus = c.monitoring_status;
+        const mStatus = c.monitoring_status || c.status || "";
+        const sLower = mStatus.toLowerCase();
 
-        if (dbStatus === "expired" || mStatus === "Expired") {
+        if (sLower === "expired") {
             expired++;
-        } else if (dbStatus === "active") {
+        } else if (sLower === "expiring soon" || sLower === "renewal due soon") {
+            expiring++;
+        } else if (sLower === "active") {
             active++;
-            if (mStatus === "Expiring Soon" || mStatus === "Renewal Due Soon") {
-                expiring++;
-            }
         }
     });
 

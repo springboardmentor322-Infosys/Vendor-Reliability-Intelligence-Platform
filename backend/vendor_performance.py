@@ -51,18 +51,18 @@ def calculate_vendor_reliability(vendor_id):
                 completion_rate = (completed / total) * 100.0
                 reliability_score = (quality_score * 0.5) + (delivery_rate * 0.3) + (completion_rate * 0.2)
                 
-                # Centralized Thresholds
+                # Centralized Thresholds (Consistent across entire platform)
+                # 80–100 = Low Risk
+                # 60–79 = Medium Risk
+                # Below 60 = High Risk
                 if reliability_score >= 80:
                     risk_level = "Low Risk"
                     reliability_status = "Excellent"
-                elif reliability_score >= 70:
+                elif reliability_score >= 60:
                     risk_level = "Medium Risk"
                     reliability_status = "Good"
-                elif reliability_score >= 60:
-                    risk_level = "High Risk"
-                    reliability_status = "Average"
                 else:
-                    risk_level = "Critical Risk"
+                    risk_level = "High Risk"
                     reliability_status = "Poor"
 
             final_score = round(reliability_score, 2)
@@ -129,13 +129,13 @@ def _performance_level(reliability_score):
 
 
 def _risk_level(reliability_score, delivery_rate=None):
+    if reliability_score is None:
+        return "Medium Risk"
     if reliability_score >= 80:
         return "Low Risk"
-    if reliability_score >= 70:
-        return "Medium Risk"
     if reliability_score >= 60:
-        return "High Risk"
-    return "Critical Risk"
+        return "Medium Risk"
+    return "High Risk"
 
 
 def _recommendation(risk):
@@ -224,20 +224,24 @@ def get_vendor_performance(current_user: dict = Depends(get_current_user)):
                         COUNT(po.id) AS total_orders,
 
                         COUNT(po.id) FILTER (
-                            WHERE LOWER(po.status) IN ('completed', 'delivered')
+                            WHERE LOWER(po.status) = 'completed'
                         ) AS completed_orders,
 
                         COUNT(po.id) FILTER (
-                            WHERE LOWER(po.status) = 'pending'
+                            WHERE LOWER(po.status) IN ('pending', 'pending approval')
                         ) AS pending_orders,
 
                         COUNT(po.id) FILTER (
-                            WHERE LOWER(po.status) = 'ordered'
+                            WHERE LOWER(po.status) IN ('ordered', 'approved', 'in-transit', 'in transit')
                         ) AS ordered_orders,
 
                         COUNT(po.id) FILTER (
                             WHERE LOWER(po.status) = 'delivered'
                         ) AS delivered_orders,
+
+                        COUNT(po.id) FILTER (
+                            WHERE LOWER(po.status) IN ('canceled', 'cancelled', 'fraud')
+                        ) AS cancelled_orders,
 
                         COALESCE(v.quality_score, 0) AS quality_score,
                         COALESCE(v.delivery_rate, 0) AS delivery_rate,
@@ -269,20 +273,24 @@ def get_vendor_performance(current_user: dict = Depends(get_current_user)):
                         COUNT(po.id) AS total_orders,
 
                         COUNT(po.id) FILTER (
-                            WHERE LOWER(po.status) IN ('completed', 'delivered')
+                            WHERE LOWER(po.status) = 'completed'
                         ) AS completed_orders,
 
                         COUNT(po.id) FILTER (
-                            WHERE LOWER(po.status) = 'pending'
+                            WHERE LOWER(po.status) IN ('pending', 'pending approval')
                         ) AS pending_orders,
 
                         COUNT(po.id) FILTER (
-                            WHERE LOWER(po.status) = 'ordered'
+                            WHERE LOWER(po.status) IN ('ordered', 'approved', 'in-transit', 'in transit')
                         ) AS ordered_orders,
 
                         COUNT(po.id) FILTER (
                             WHERE LOWER(po.status) = 'delivered'
                         ) AS delivered_orders,
+
+                        COUNT(po.id) FILTER (
+                            WHERE LOWER(po.status) IN ('canceled', 'cancelled', 'fraud')
+                        ) AS cancelled_orders,
 
                         COALESCE(v.quality_score, 0) AS quality_score,
                         COALESCE(v.delivery_rate, 0) AS delivery_rate,
@@ -320,6 +328,7 @@ def get_vendor_performance(current_user: dict = Depends(get_current_user)):
                 pending_orders,
                 ordered_orders,
                 delivered_orders,
+                cancelled_orders,
                 quality_score,
                 delivery_rate,
                 reliability_score,
@@ -330,6 +339,8 @@ def get_vendor_performance(current_user: dict = Depends(get_current_user)):
             pending_orders = int(pending_orders or 0)
             ordered_orders = int(ordered_orders or 0)
             delivered_orders = int(delivered_orders or 0)
+            cancelled_orders = int(cancelled_orders or 0)
+            fulfilled_orders = completed_orders + delivered_orders
 
             quality_score = float(quality_score or 0)
             delivery_rate = float(delivery_rate or 0)
@@ -353,6 +364,8 @@ def get_vendor_performance(current_user: dict = Depends(get_current_user)):
                     "pending_orders": pending_orders,
                     "ordered_orders": ordered_orders,
                     "delivered_orders": delivered_orders,
+                    "cancelled_orders": cancelled_orders,
+                    "fulfilled_orders": fulfilled_orders,
                     "quality_score": round(quality_score, 2),
                     "delivery_rate": round(delivery_rate, 2),
                     "reliability_score": round(reliability_score, 2),

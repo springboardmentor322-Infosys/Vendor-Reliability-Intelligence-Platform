@@ -12,7 +12,7 @@ async function initQuality() {
 
 function setupFormVisibility() {
     const role = getUserRole();
-    const authorizedRoles = ["Admin", "Procurement Manager", "Supply Chain Manager"];
+    const authorizedRoles = ["Admin", "Administrator", "Procurement Manager", "Supply Chain Manager"];
     const container = document.getElementById("addInspectionContainer");
     
     if (container) {

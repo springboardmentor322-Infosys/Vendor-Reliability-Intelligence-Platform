@@ -25,6 +25,7 @@ import notifications
 import audit_logs
 import invoices
 import quality
+import predictions
 
 # Create FastAPI app
 app = FastAPI()
@@ -72,8 +73,10 @@ app.include_router(delivery_router)
 app.include_router(analytics.router)
 app.include_router(notifications.router)
 app.include_router(audit_logs.router)
+app.include_router(audit_logs.audit_router)
 app.include_router(invoices.router)
 app.include_router(quality.router)
+app.include_router(predictions.router)
 
 
 # ==========================

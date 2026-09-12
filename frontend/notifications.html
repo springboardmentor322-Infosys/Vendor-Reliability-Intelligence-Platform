@@ -8,64 +8,93 @@
 </head>
 <body>
     <div style="margin-bottom: 24px;">
-        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">System Notifications</h1>
-        <p style="color: var(--text-secondary);">Manage and clear system warnings, late deliveries, compliance notifications, and audit risk alerts.</p>
+        <h1 id="notifPageTitle" style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Supplier Alerts & Notifications 🔔</h1>
+        <p id="notifPageSubtitle" style="color: var(--text-secondary);">Direct operational alerts regarding delayed orders, overdue invoices, quality concerns, and contract timelines.</p>
     </div>
 
-    <!-- Alert Count Card -->
-    <div class="kpi-grid" style="grid-template-columns: 1fr;">
-        <div class="kpi-card" style="border-left: 4px solid var(--primary-color); background-color: var(--primary-light);">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div>
-                    <h3 style="font-size: 14px; font-weight: 600; color: var(--text-color); text-transform: uppercase;">Active Alerts</h3>
-                    <p style="font-size: 28px; font-weight: 700; color: var(--primary-color); margin-top: 4px;" id="unreadCount">0</p>
-                </div>
-                <div class="kpi-icon" style="background-color: #ffffff;">🔔</div>
+    <!-- Top KPI Grid -->
+    <div class="kpi-grid-4" style="margin-bottom: 24px;">
+        <div class="kpi-card" style="border-left: 4px solid var(--primary-color);">
+            <div class="kpi-header">
+                <span class="kpi-label">Active Alerts</span>
+                <span class="kpi-icon">🔔</span>
             </div>
+            <div class="kpi-value" id="unreadCount" style="color: var(--primary-color);">0</div>
+            <div class="kpi-sub" id="unreadCountSub">Unread alerts requiring review</div>
+        </div>
+
+        <div class="kpi-card" style="border-left: 4px solid #8b5cf6;">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Notifications</span>
+                <span class="kpi-icon">📋</span>
+            </div>
+            <div class="kpi-value" id="totalNotifCount" style="color: #8b5cf6;">0</div>
+            <div class="kpi-sub" id="totalNotifSub">Historical notification log</div>
+        </div>
+
+        <div class="kpi-card" style="border-left: 4px solid var(--danger-color, #ef4444);">
+            <div class="kpi-header">
+                <span class="kpi-label">Critical / Urgent</span>
+                <span class="kpi-icon">⚠️</span>
+            </div>
+            <div class="kpi-value" id="urgentAlertsCount" style="color: var(--danger-color, #ef4444);">0</div>
+            <div class="kpi-sub" id="urgentAlertsSub">Delays & Overdue settlements</div>
+        </div>
+
+        <div class="kpi-card" style="border-left: 4px solid var(--success-color, #10b981);">
+            <div class="kpi-header">
+                <span class="kpi-label">Acknowledged</span>
+                <span class="kpi-icon">✅</span>
+            </div>
+            <div class="kpi-value" id="readNotifCount" style="color: var(--success-color, #10b981);">0</div>
+            <div class="kpi-sub" id="readNotifSub">Cleared alert records</div>
         </div>
     </div>
 
-    <!-- Table Card -->
-    <div class="table-card">
-        <div class="table-header-bar">
+    <!-- Notifications Table Card -->
+    <div class="table-card" style="margin-bottom: 28px;">
+        <div class="table-header-bar" style="flex-wrap: wrap; gap: 12px;">
             <div class="table-header-title">
-                <h3>Notifications Ledger</h3>
+                <h3>Notifications & Alert Ledger</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Chronological operational events and system notices.</p>
             </div>
-            <div class="table-header-actions">
-                <select id="statusFilter" class="filter-select" onchange="filterNotifications()">
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <select id="statusFilter" class="filter-select" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color);">
                     <option value="all">All Statuses</option>
                     <option value="Unread">Unread</option>
                     <option value="Read">Read</option>
                 </select>
-                <select id="typeFilter" class="filter-select" onchange="filterNotifications()">
+                <select id="typeFilter" class="filter-select" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color);">
                     <option value="all">All Types</option>
-                    <option value="Delivery Delay">Delivery Delay</option>
-                    <option value="Vendor Approval">Vendor Approval</option>
-                    <option value="Contract Expiry">Contract Expiry</option>
-                    <option value="Quality Issue">Quality Issue</option>
-                    <option value="Procurement Alert">Procurement Alert</option>
-                    <option value="Payment/Invoice">Payment/Invoice</option>
-                    <option value="Compliance">Compliance</option>
+                    <option value="Delivery Delay">🚚 Delivery Delay</option>
+                    <option value="Payment/Invoice">💳 Payment/Invoice</option>
+                    <option value="Quality Issue">⚠️ Quality Issue</option>
+                    <option value="Contract Expiry">📄 Contract Expiry</option>
+                    <option value="Vendor Risk">⚡ Vendor Risk</option>
+                    <option value="Vendor Approval">👤 Vendor Approval</option>
                 </select>
+                <button type="button" id="btnMarkAllRead" class="btn btn-secondary" style="padding: 6px 14px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                    <span>✓✓</span> Mark All Read
+                </button>
             </div>
         </div>
         <div class="table-container">
             <table id="notificationsTable">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Type</th>
-                        <th>Message</th>
-                        <th>Date Created</th>
-                        <th>Status</th>
-                        <th>Management Action</th>
+                        <th style="width: 80px;">ID</th>
+                        <th style="width: 160px;">Alert Type</th>
+                        <th>Notification Message</th>
+                        <th style="width: 170px;">Date & Time</th>
+                        <th style="width: 110px;">Status</th>
+                        <th style="width: 130px; text-align: center;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="6" class="loading-spinner-wrapper">
+                        <td colspan="6" class="loading-spinner-wrapper" style="text-align: center; padding: 24px;">
                             <div class="spinner"></div>
-                            <p>Loading system notifications...</p>
+                            <p>Loading notifications ledger...</p>
                         </td>
                     </tr>
                 </tbody>

@@ -20,16 +20,16 @@
                 <span class="kpi-icon">📦</span>
             </div>
             <div class="kpi-value" id="kpiTotalPOs">0</div>
-            <div class="kpi-sub">Total logged records</div>
+            <div class="kpi-sub" id="kpiTotalSub">Total logged records</div>
         </div>
 
         <div class="kpi-card">
             <div class="kpi-header">
-                <span class="kpi-label">Pending Payouts</span>
+                <span class="kpi-label">Pending Orders</span>
                 <span class="kpi-icon">⏱️</span>
             </div>
             <div class="kpi-value" id="kpiPendingPOs" style="color: var(--warning-color);">0</div>
-            <div class="kpi-sub">Awaiting delivery verification</div>
+            <div class="kpi-sub">Awaiting delivery / fulfillment</div>
         </div>
 
         <div class="kpi-card">
@@ -119,22 +119,37 @@
 
     <!-- Data Table -->
     <div class="table-card">
-        <div class="table-header-bar">
+        <div class="table-header-bar" style="flex-wrap: wrap; gap: 12px;">
             <div class="table-header-title">
                 <h3>Procurement Ledger Log</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;" id="tableSubheading">
+                    Showing Application Purchase Orders first for active procurement workflows.
+                </p>
             </div>
-            <div class="table-header-actions">
+            <div class="table-header-actions" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <!-- Source Toggle / Filter -->
+                <div class="btn-group" id="sourceToggleGroup" style="display: inline-flex; background: var(--border-color); padding: 3px; border-radius: 6px; gap: 3px;">
+                    <button type="button" class="btn btn-sm btn-primary active" id="btnSourceApp" style="padding: 5px 12px; font-size: 12px;">Application Purchase Orders</button>
+                    <button type="button" class="btn btn-sm btn-secondary" id="btnSourceHist" style="padding: 5px 12px; font-size: 12px;">Historical DataCo Records</button>
+                    <button type="button" class="btn btn-sm btn-secondary" id="btnSourceAll" style="padding: 5px 12px; font-size: 12px;">All Records</button>
+                </div>
+                <select id="filterPOSource" class="filter-select" style="min-width: 195px;" title="Filter by Order Source">
+                    <option value="application" selected>Application Purchase Orders</option>
+                    <option value="historical">Historical DataCo Records</option>
+                    <option value="all">All Records</option>
+                </select>
                 <div class="search-input-wrapper">
                     <input type="text" id="searchPOs" placeholder="Search product name...">
                 </div>
                 <select id="filterPOStatus" class="filter-select">
                     <option value="">All Statuses</option>
-                    <option value="Pending">Pending</option>
+                    <option value="Pending">Pending Approval</option>
                     <option value="Approved">Approved</option>
-                    <option value="Processing">Processing</option>
-                    <option value="Completed">Completed</option>
+                    <option value="Ordered">Ordered</option>
+                    <option value="In-Transit">In-Transit</option>
                     <option value="Delivered">Delivered</option>
-                    <option value="Fraud">Fraud</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Delayed">Delayed / Overdue</option>
                 </select>
             </div>
         </div>
@@ -142,27 +157,159 @@
             <table id="purchaseTable">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Vendor Name</th>
-                        <th>Product</th>
-                        <th>Qty</th>
+                        <th>PO Number</th>
+                        <th>Order Source</th>
+                        <th>Supplier Partner</th>
+                        <th>Product Specification</th>
+                        <th>Quantity</th>
                         <th>Unit Price</th>
                         <th>Total Amount</th>
                         <th>Order Date</th>
-                        <th>Expected Delivery</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>Delivery Date</th>
+                        <th>Workflow Status</th>
+                        <th>Workflow Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="10" class="loading-spinner-wrapper">
+                        <td colspan="11" class="loading-spinner-wrapper">
                             <div class="spinner"></div>
                             <p>Loading purchase orders...</p>
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- ADVANCE PAYMENT MODAL -->
+    <div class="modal-backdrop" id="advancePaymentModal" style="display: none;">
+        <div class="modal-dialog" style="max-width: 520px; width: 95%;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">💳</span>
+                    <h3 style="margin: 0; font-size: 16px;">Record Advance Payment</h3>
+                </div>
+                <button type="button" class="modal-close-btn" onclick="closeAdvancePaymentModal()">&times;</button>
+            </div>
+            <form id="advancePaymentForm" onsubmit="submitAdvancePayment(event)">
+                <input type="hidden" id="advPoId">
+                <div class="modal-body" style="padding: 20px;">
+                    <div style="background: #f8fafc; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; border: 1px solid var(--border-color);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; color: var(--text-secondary);">PO Reference:</span>
+                            <span style="font-weight: 600;" id="advPoNumberDisplay">PO-2026-00000</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; color: var(--text-secondary);">Supplier Partner:</span>
+                            <span style="font-weight: 600;" id="advVendorNameDisplay">Vendor</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="font-size: 13px; color: var(--text-secondary);">Total Order Amount:</span>
+                            <span style="font-weight: 700; color: var(--primary-color);" id="advTotalAmountDisplay">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label for="advPercentageInput" style="font-size: 13px; font-weight: 500; display: block; margin-bottom: 4px;">Advance Percentage (%)</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="number" id="advPercentageInput" min="1" max="100" step="1" value="25" required style="width: 100px;" oninput="updateAdvanceCalculation()">
+                            <span style="font-size: 13px; color: var(--text-secondary);">(Default: 25%)</span>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div style="background: #ecfdf5; padding: 10px; border-radius: 6px; border: 1px solid #a7f3d0;">
+                            <div style="font-size: 11.5px; color: #065f46; font-weight: 600;">Advance to Pay Now</div>
+                            <div style="font-size: 16px; font-weight: 700; color: #059669; margin-top: 2px;" id="advAmountDisplay">₹0.00</div>
+                        </div>
+                        <div style="background: #eff6ff; padding: 10px; border-radius: 6px; border: 1px solid #bfdbfe;">
+                            <div style="font-size: 11.5px; color: #1e40af; font-weight: 600;">Remaining Balance</div>
+                            <div style="font-size: 16px; font-weight: 700; color: #2563eb; margin-top: 2px;" id="advRemainingDisplay">₹0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label for="advPaymentMethod" style="font-size: 13px; font-weight: 500; display: block; margin-bottom: 4px;">Payment Disbursement Method</label>
+                        <select id="advPaymentMethod" style="width: 100%;">
+                            <option value="Electronic Funds Transfer" selected>Electronic Funds Transfer (NEFT/RTGS)</option>
+                            <option value="Direct Bank Wire">Direct Bank Wire</option>
+                            <option value="Corporate Card">Corporate Card</option>
+                            <option value="Letter of Credit">Letter of Credit</option>
+                        </select>
+                    </div>
+
+                    <div style="font-size: 11.5px; color: var(--text-secondary); background: #fffbeb; padding: 8px 12px; border-radius: 6px; border: 1px solid #fde68a;">
+                        ℹ️ Once advance payment is recorded, PO payment status will reflect <strong>Partially Paid</strong>. Final settlement will unlock after order status becomes Completed.
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 12px 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeAdvancePaymentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmitAdvance" style="background: #059669; border-color: #059669;">Confirm Advance Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FINAL PAYMENT MODAL -->
+    <div class="modal-backdrop" id="finalPaymentModal" style="display: none;">
+        <div class="modal-dialog" style="max-width: 520px; width: 95%;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">💰</span>
+                    <h3 style="margin: 0; font-size: 16px;">Record Final Settlement Payment</h3>
+                </div>
+                <button type="button" class="modal-close-btn" onclick="closeFinalPaymentModal()">&times;</button>
+            </div>
+            <form id="finalPaymentForm" onsubmit="submitFinalPayment(event)">
+                <input type="hidden" id="finalPoId">
+                <div class="modal-body" style="padding: 20px;">
+                    <div style="background: #f8fafc; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; border: 1px solid var(--border-color);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; color: var(--text-secondary);">PO Reference:</span>
+                            <span style="font-weight: 600;" id="finalPoNumberDisplay">PO-2026-00000</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; color: var(--text-secondary);">Supplier Partner:</span>
+                            <span style="font-weight: 600;" id="finalVendorNameDisplay">Vendor</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; color: var(--text-secondary);">Operational Status:</span>
+                            <span class="badge badge-active" id="finalPoStatusDisplay">Completed</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; color: var(--text-secondary);">Total Order Amount:</span>
+                            <span style="font-weight: 600;" id="finalTotalAmountDisplay">₹0.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; color: var(--text-secondary);">Advance Already Paid:</span>
+                            <span style="font-weight: 600; color: #059669;" id="finalAdvancePaidDisplay">₹0.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding-top: 6px; border-top: 1px dashed var(--border-color);">
+                            <span style="font-size: 13px; font-weight: 600;">Final Settlement Due:</span>
+                            <span style="font-size: 16px; font-weight: 700; color: var(--primary-color);" id="finalRemainingDueDisplay">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label for="finalPaymentMethod" style="font-size: 13px; font-weight: 500; display: block; margin-bottom: 4px;">Payment Disbursement Method</label>
+                        <select id="finalPaymentMethod" style="width: 100%;">
+                            <option value="Electronic Funds Transfer" selected>Electronic Funds Transfer (NEFT/RTGS)</option>
+                            <option value="Direct Bank Wire">Direct Bank Wire</option>
+                            <option value="Corporate Card">Corporate Card</option>
+                            <option value="Letter of Credit">Letter of Credit</option>
+                        </select>
+                    </div>
+
+                    <div style="font-size: 11.5px; color: var(--text-secondary); background: #ecfdf5; padding: 8px 12px; border-radius: 6px; border: 1px solid #a7f3d0;">
+                        ✓ This action will disburse the remaining balance and mark the Purchase Order as <strong>Fully Paid</strong>.
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 12px 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeFinalPaymentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmitFinal" style="background: #2563eb; border-color: #2563eb;">Disburse Final Payment</button>
+                </div>
+            </form>
         </div>
     </div>
 

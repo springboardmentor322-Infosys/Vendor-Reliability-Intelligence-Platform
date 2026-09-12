@@ -62,24 +62,18 @@ def get_vendor_reliability(current_user: dict = Depends(get_current_user)):
 
         for row in rows:
 
+            score_val = float(row[8] or 0)
             reliability_status = row[9] or ""
-            status_key = str(reliability_status).strip().lower()
 
-            if status_key == "poor":
-                risk_level = "Critical Risk Vendor"
-                recommendation = "Vendor performance review required"
-            elif status_key == "average":
-                risk_level = "High Risk Vendor"
-                recommendation = "Review vendor performance"
-            elif status_key == "good":
-                risk_level = "Medium Risk Vendor"
-                recommendation = "Monitor vendor performance"
-            elif status_key == "excellent":
+            if score_val >= 80:
                 risk_level = "Low Risk Vendor"
                 recommendation = "Preferred Vendor"
+            elif score_val >= 60:
+                risk_level = "Medium Risk Vendor"
+                recommendation = "Monitor vendor performance"
             else:
-                risk_level = "Unknown"
-                recommendation = "Review vendor performance"
+                risk_level = "High Risk Vendor"
+                recommendation = "Vendor performance review required"
 
             vendors.append({
                 "vendor_name": row[0],

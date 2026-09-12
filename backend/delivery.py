@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from db import conn
-from auth import get_current_user, check_role
+from auth import get_current_user, check_role, normalize_role
 
 router = APIRouter(prefix="/deliveries", tags=["Deliveries"])
 
 @router.get("/summary")
 def get_deliveries_summary(current_user: dict = Depends(get_current_user)):
-    user_role = current_user.get("role")
+    user_role = normalize_role(current_user.get("role"))
     user_vendor_id = current_user.get("vendor_id")
 
-    if user_role not in ["Admin", "Supply Chain Manager", "Vendor", "Auditor"]:
+    if user_role not in ["Administrator", "Supply Chain Manager", "Procurement Manager", "Vendor", "Auditor"]:
         raise HTTPException(status_code=403, detail="Permission Denied")
 
     try:
@@ -47,7 +47,7 @@ def get_deliveries_summary(current_user: dict = Depends(get_current_user)):
                 cursor.execute("""
                     SELECT 
                         COALESCE(reliability_score, 0),
-                        CASE WHEN reliability_score < 70 THEN 1 ELSE 0 END
+                        CASE WHEN reliability_score < 60 THEN 1 ELSE 0 END
                     FROM vendors
                     WHERE id = %s
                 """, (user_vendor_id,))
@@ -75,7 +75,7 @@ def get_deliveries_summary(current_user: dict = Depends(get_current_user)):
                 cursor.execute("""
                     SELECT 
                         COALESCE(AVG(reliability_score), 0),
-                        COUNT(CASE WHEN reliability_score < 70 THEN 1 END)
+                        COUNT(CASE WHEN reliability_score < 60 THEN 1 END)
                     FROM vendors
                 """)
                 avg_reliability, at_risk_vendors = cursor.fetchone()
@@ -102,10 +102,10 @@ def get_deliveries_summary(current_user: dict = Depends(get_current_user)):
 
 @router.get("/recent")
 def get_recent_deliveries(current_user: dict = Depends(get_current_user)):
-    user_role = current_user.get("role")
+    user_role = normalize_role(current_user.get("role"))
     user_vendor_id = current_user.get("vendor_id")
 
-    if user_role not in ["Admin", "Supply Chain Manager", "Vendor", "Auditor"]:
+    if user_role not in ["Administrator", "Supply Chain Manager", "Procurement Manager", "Vendor", "Auditor"]:
         raise HTTPException(status_code=403, detail="Permission Denied")
 
     try:
@@ -174,10 +174,10 @@ def get_recent_deliveries(current_user: dict = Depends(get_current_user)):
 
 @router.get("/alerts")
 def get_delivery_alerts(current_user: dict = Depends(get_current_user)):
-    user_role = current_user.get("role")
+    user_role = normalize_role(current_user.get("role"))
     user_vendor_id = current_user.get("vendor_id")
 
-    if user_role not in ["Admin", "Supply Chain Manager", "Vendor", "Auditor"]:
+    if user_role not in ["Administrator", "Supply Chain Manager", "Procurement Manager", "Vendor", "Auditor"]:
         raise HTTPException(status_code=403, detail="Permission Denied")
 
     try:
@@ -241,10 +241,10 @@ def get_delivery_alerts(current_user: dict = Depends(get_current_user)):
 
 @router.get("/trend")
 def get_delivery_trend(current_user: dict = Depends(get_current_user)):
-    user_role = current_user.get("role")
+    user_role = normalize_role(current_user.get("role"))
     user_vendor_id = current_user.get("vendor_id")
 
-    if user_role not in ["Admin", "Supply Chain Manager", "Vendor", "Auditor"]:
+    if user_role not in ["Administrator", "Supply Chain Manager", "Procurement Manager", "Vendor", "Auditor"]:
         raise HTTPException(status_code=403, detail="Permission Denied")
 
     try:

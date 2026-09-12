@@ -3,98 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - VendorIQ</title>
+    <title>Administrator Control Center - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="dashboard-header">
-        <div>
-            <h1>Platform Administration & Intelligence</h1>
-            <p>Complete enterprise-level visibility, user governance, platform metrics, and system activity logs.</p>
+    <!-- Executive Welcome Banner -->
+    <div class="role-welcome-banner">
+        <div class="welcome-text-content">
+            <h1 id="adminWelcomeTitle">Executive Control Center 👋</h1>
+            <p>Enterprise system governance, supplier reliability intelligence, procurement transaction velocity, and security telemetry.</p>
+            <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+                <span class="status-dot online"></span> Live PostgreSQL Data · <span id="adminLastSync">Synchronized just now</span>
+            </div>
         </div>
-        <div class="header-badge">
-            <span class="status-dot"></span> System Live: PostgreSQL 16
+        <div class="quick-actions-bar">
+            <a href="vendors.html" class="quick-action-btn">🏢 Vendors Directory</a>
+            <a href="purchase-orders.html" class="quick-action-btn">🛍️ Purchase Orders</a>
+            <a href="invoices.html" class="quick-action-btn">💳 Invoices & Payments</a>
+            <a href="reports.html" class="quick-action-btn">📊 Reports Center</a>
+            <a href="audit_logs.html" class="quick-action-btn">📋 Audit Trail</a>
+            <a href="#user-management" class="quick-action-btn primary" id="quickActionUsersBtn">👥 User Management</a>
         </div>
     </div>
 
-    <!-- Top KPI Cards Grid -->
-    <div class="kpi-grid-5">
-        <div class="kpi-card">
+    <!-- Top KPI Cards Grid (6 Live Metric Cards, All Clickable) -->
+    <div class="kpi-grid-6">
+        <!-- 1. User Statistics -->
+        <div class="kpi-card clickable-card" id="kpiCardUsers" title="Click to open User Management">
             <div class="kpi-header">
-                <span class="kpi-label">Total Users</span>
+                <span class="kpi-label">Platform Users</span>
                 <span class="kpi-icon">👥</span>
             </div>
             <div class="kpi-value" id="totalUsersCount">0</div>
-            <div class="kpi-sub" id="approvedUsersSub">0 Approved Accounts</div>
+            <div class="kpi-sub" id="usersSubtext">0 Active · 0 Pending</div>
         </div>
 
-        <div class="kpi-card">
+        <!-- 2. Vendor Statistics -->
+        <div class="kpi-card clickable-card" id="kpiCardVendors" title="Click to view Vendors Directory">
             <div class="kpi-header">
                 <span class="kpi-label">Registered Vendors</span>
                 <span class="kpi-icon">🏢</span>
             </div>
             <div class="kpi-value" id="totalVendorsCount">0</div>
-            <div class="kpi-sub">Active platform suppliers</div>
+            <div class="kpi-sub" id="vendorsSubtext">0 Active · 0 High Risk</div>
         </div>
 
-        <div class="kpi-card">
+        <!-- 3. Procurement Statistics (Clearly Distinguishing Orders) -->
+        <div class="kpi-card clickable-card" id="kpiCardOrders" title="Click to view Purchase Orders">
             <div class="kpi-header">
-                <span class="kpi-label">Active Purchase Orders</span>
+                <span class="kpi-label">Purchase Orders</span>
                 <span class="kpi-icon">🛍️</span>
             </div>
-            <div class="kpi-value" id="activePOsCount">0</div>
-            <div class="kpi-sub" id="totalPOsSub">0 Total Tracked</div>
+            <div class="kpi-value" id="totalPOsCount">0</div>
+            <div class="kpi-sub" id="posSubtext">Unique Orders (180,528 Items)</div>
         </div>
 
-        <div class="kpi-card">
+        <!-- 4. Financial Overview -->
+        <div class="kpi-card clickable-card" id="kpiCardFinance" title="Click to view Invoices & Financials">
             <div class="kpi-header">
-                <span class="kpi-label">Platform Growth</span>
+                <span class="kpi-label">Procurement Volume</span>
                 <span class="kpi-icon">📈</span>
             </div>
             <div class="kpi-value" id="platformValuation">₹0.00</div>
-            <div class="kpi-sub">Total PO Transaction Volume</div>
+            <div class="kpi-sub" id="financeSubtext">Total Transaction Volume</div>
         </div>
 
-        <div class="kpi-card">
+        <!-- 5. Contracts & Compliance -->
+        <div class="kpi-card clickable-card" id="kpiCardContracts" title="Click to view Contracts & Compliance">
+            <div class="kpi-header">
+                <span class="kpi-label">Contracts Tracked</span>
+                <span class="kpi-icon">📄</span>
+            </div>
+            <div class="kpi-value" id="totalContractsCount">1</div>
+            <div class="kpi-sub" id="contractsSubtext">0 Active · 1 Expired</div>
+        </div>
+
+        <!-- 6. Ecosystem Reliability -->
+        <div class="kpi-card clickable-card" id="kpiCardReliability" title="Click to view Vendor Reliability Intelligence">
             <div class="kpi-header">
                 <span class="kpi-label">Platform Reliability</span>
                 <span class="kpi-icon">🛡️</span>
             </div>
             <div class="kpi-value" id="platformReliability" style="color: var(--primary-color);">0.0%</div>
-            <div class="kpi-sub">Vendor Reliability Index</div>
+            <div class="kpi-sub" id="reliabilitySubtext">Standardized Ecosystem Avg</div>
         </div>
     </div>
 
-    <!-- Platform Overview & Analytics Section -->
-    <div class="section-grid-2" id="platform-overview">
-        <!-- Platform Overview Stat Card & Trend Chart -->
+    <!-- Platform Governance & Real Attention Alerts (Clickable KPI Cards) -->
+    <div class="table-card" id="platform-governance" style="margin-bottom: 24px;">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>⚠️ Platform Attention & System Governance</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Real-time automated alerts derived from live PostgreSQL tables. Click any alert to inspect filtered records.</p>
+            </div>
+            <span class="badge badge-warning" id="governanceStatusBadge">Live Telemetry</span>
+        </div>
+        
+        <div class="governance-alert-grid" id="governanceAlertsContainer">
+            <!-- Rendered dynamically by JavaScript -->
+            <div class="loading-spinner-wrapper" style="grid-column: 1 / -1; padding: 24px;">
+                <div class="spinner"></div>
+                <p>Scanning platform governance telemetry...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Operational Breakdowns (Procurement, Financials, Contracts) -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+        <!-- Procurement Breakdown -->
+        <div class="stat-overview-box" style="margin-bottom: 0;">
+            <h3 style="display: flex; justify-content: space-between; align-items: center;">
+                <span>📦 Procurement Operations</span>
+                <a href="purchase-orders.html" style="font-size: 11.5px; color: var(--primary-color); text-decoration: none; font-weight: 600;">View Orders →</a>
+            </h3>
+            <div class="overview-stat-row clickable-stat-row" data-href="purchase-orders.html?source=all" title="Click to view all unique purchase orders">
+                <span class="overview-stat-label">Unique Purchase Orders</span>
+                <span class="overview-stat-value" id="procUniqueOrders">0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="purchase-orders.html?source=historical" title="Click to view historical dataset rows">
+                <span class="overview-stat-label">Dataset Transaction Rows</span>
+                <span class="overview-stat-value" id="procDatasetRows">0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="purchase-orders.html?source=application" title="Click to view application purchase orders">
+                <span class="overview-stat-label">Application POs Created</span>
+                <span class="overview-stat-value" id="procAppOrders">0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="purchase-orders.html?status=Pending&source=all" title="Click to view pending & active orders">
+                <span class="overview-stat-label">Pending & Active (Unique)</span>
+                <span class="overview-stat-value" id="procActiveOrders" style="color: var(--primary-color);">0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="purchase-orders.html?status=Completed&source=all" title="Click to view completed & delivered orders">
+                <span class="overview-stat-label">Completed & Delivered (Unique)</span>
+                <span class="overview-stat-value" id="procCompletedOrders" style="color: var(--success-color);">0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="purchase-orders.html?status=delayed&source=all" title="Click to view delayed and at-risk orders">
+                <span class="overview-stat-label" title="Operational risk metric: orders past scheduled delivery date, overlapping with pending or active order lifecycle status">Delayed / At-Risk Orders (Operational Risk) ℹ️</span>
+                <span class="overview-stat-value" id="procDelayedOrders" style="color: var(--danger-color);">0</span>
+            </div>
+        </div>
+
+        <!-- Financial Overview Breakdown -->
+        <div class="stat-overview-box" style="margin-bottom: 0;">
+            <h3 style="display: flex; justify-content: space-between; align-items: center;">
+                <span>💳 Financial Overview</span>
+                <a href="invoices.html" style="font-size: 11.5px; color: var(--primary-color); text-decoration: none; font-weight: 600;">View Invoices →</a>
+            </h3>
+            <div class="overview-stat-row clickable-stat-row" data-href="invoices.html" title="Click to view invoices financial ledger">
+                <span class="overview-stat-label">Total Procurement Spending</span>
+                <span class="overview-stat-value" id="finTotalSpend">₹0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="invoices.html" title="Click to view all invoice commitments">
+                <span class="overview-stat-label">Total Invoice Amount</span>
+                <span class="overview-stat-value" id="finTotalInvoiced">₹0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="invoices.html?status=Paid" title="Click to view paid invoices">
+                <span class="overview-stat-label">Total Paid Amount</span>
+                <span class="overview-stat-value" id="finPaidAmount" style="color: var(--success-color);">₹0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="invoices.html?status=Pending" title="Click to view pending payment invoices">
+                <span class="overview-stat-label">Pending Payment Amount</span>
+                <span class="overview-stat-value" id="finPendingAmount" style="color: var(--warning-color);">₹0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="invoices.html?status=Overdue" title="Click to view overdue invoices">
+                <span class="overview-stat-label">Overdue Invoices Amount</span>
+                <span class="overview-stat-value" id="finOverdueAmount" style="color: var(--danger-color);">₹0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="invoices.html?status=Overdue" title="Click to view overdue invoices">
+                <span class="overview-stat-label">Overdue Invoices Count</span>
+                <span class="overview-stat-value" id="finOverdueCount" style="color: var(--danger-color);">0 Invoices</span>
+            </div>
+        </div>
+
+        <!-- Contracts & Compliance Breakdown -->
+        <div class="stat-overview-box" style="margin-bottom: 0;">
+            <h3 style="display: flex; justify-content: space-between; align-items: center;">
+                <span>📄 Contracts & Legal SLA</span>
+                <a href="contracts.html" style="font-size: 11.5px; color: var(--primary-color); text-decoration: none; font-weight: 600;">View Contracts →</a>
+            </h3>
+            <div class="overview-stat-row clickable-stat-row" data-href="contracts.html" title="Click to view all contracts">
+                <span class="overview-stat-label">Total Registered Contracts</span>
+                <span class="overview-stat-value" id="contTotal">0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="contracts.html?status=Active" title="Click to view active contracts">
+                <span class="overview-stat-label">Active Contracts</span>
+                <span class="overview-stat-value" id="contActive" style="color: var(--success-color);">0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="contracts.html?status=Expiring%20Soon" title="Click to view expiring contracts">
+                <span class="overview-stat-label">Expiring Soon (Within 30 Days)</span>
+                <span class="overview-stat-value" id="contExpiring" style="color: var(--warning-color);">0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="contracts.html?status=Expired" title="Click to view expired contracts">
+                <span class="overview-stat-label">Expired Contracts</span>
+                <span class="overview-stat-value" id="contExpired" style="color: var(--danger-color);">0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="contracts.html?status=Inactive" title="Click to view compliance gaps">
+                <span class="overview-stat-label">Compliance Gaps / Issues</span>
+                <span class="overview-stat-value" id="contIssues" style="color: var(--danger-color);">0</span>
+            </div>
+            <div class="overview-stat-row clickable-stat-row" data-href="contracts.html?status=Pending" title="Click to view pending contract reviews">
+                <span class="overview-stat-label">Pending Compliance Review</span>
+                <span class="overview-stat-value" id="contPendingDocs">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section 1: Spending Trend & Users Distribution -->
+    <div class="section-grid-2" style="margin-bottom: 24px;">
+        <!-- Monthly Procurement Activity & Spending Trend -->
         <div class="chart-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3>Platform Operations Overview</h3>
-                <span class="kpi-trend positive">✓ Live Aggregation</span>
+                <div>
+                    <h3>Monthly Procurement Activity & Spending Trend</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary);">Dual-axis chronological aggregation of purchase orders and valuation.</p>
+                </div>
+                <span class="kpi-trend positive">✓ Live PostgreSQL</span>
             </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
-                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
-                    <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Departments</div>
-                    <div style="font-size: 18px; font-weight: 700; color: var(--text-color); margin-top: 4px;" id="deptCount">0</div>
-                </div>
-                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
-                    <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Locations</div>
-                    <div style="font-size: 18px; font-weight: 700; color: var(--text-color); margin-top: 4px;" id="locationCount">0</div>
-                </div>
-                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
-                    <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Categories</div>
-                    <div style="font-size: 18px; font-weight: 700; color: var(--text-color); margin-top: 4px;" id="catCount">0</div>
-                </div>
-                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
-                    <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Workflows</div>
-                    <div style="font-size: 18px; font-weight: 700; color: var(--text-color); margin-top: 4px;" id="workflowCount">8</div>
-                </div>
-            </div>
-
-            <div class="chart-container" style="height: 240px; position: relative;">
+            <div class="chart-container" style="height: 270px; position: relative;">
                 <canvas id="platformTrendChart"></canvas>
             </div>
         </div>
@@ -102,42 +227,254 @@
         <!-- Users by Role Donut Chart -->
         <div class="chart-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3>Users by Role Distribution</h3>
+                <div>
+                    <h3>Users by Role Distribution</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary);">Enterprise access segmentation across the 6 canonical roles.</p>
+                </div>
                 <span class="kpi-trend neutral" id="totalUsersBadge">0 Accounts</span>
             </div>
-            <div class="chart-container" style="height: 280px; position: relative; display: flex; justify-content: center; align-items: center;">
+            <div class="chart-container" style="height: 270px; position: relative; display: flex; justify-content: center; align-items: center;">
                 <canvas id="usersRoleChart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- System Health & Platform Insights Section -->
-    <div class="section-grid-2" id="system-health">
-        <!-- System Health & Usage -->
+    <!-- Charts Section 2: Vendor Risk Distribution & PO Status Distribution -->
+    <div class="section-grid-2" style="margin-bottom: 24px;">
+        <!-- Vendor Risk Distribution (80/60 Rule) -->
+        <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div>
+                    <h3>Vendor Risk Distribution</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary);">Standardized thresholds: Low (&ge;80), Medium (60-79), High (&lt;60).</p>
+                </div>
+                <span class="badge badge-neutral" id="vendorRiskTotalBadge">118 Suppliers</span>
+            </div>
+            <div class="chart-container" style="height: 250px; position: relative;">
+                <canvas id="vendorRiskChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Purchase Order Status Distribution -->
+        <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div>
+                    <h3>Purchase Order Status Distribution</h3>
+                    <p style="font-size: 12px; color: var(--text-secondary);">Mutually exclusive order lifecycle stages (Pending, Approved, Processing, Delivered, Completed, Cancelled).</p>
+                </div>
+                <span class="badge badge-active">Live Lifecycle</span>
+            </div>
+            <div class="chart-container" style="height: 250px; position: relative; display: flex; justify-content: center; align-items: center;">
+                <canvas id="poStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Platform Intelligence & Governance Insights -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 28px;">
+        <div class="insight-card info">
+            <div class="insight-icon">📊</div>
+            <div class="insight-content">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4>Top Merchandise Category</h4>
+                    <span class="badge badge-info" style="font-size: 10px;">Historical Analytics</span>
+                </div>
+                <p id="topCategoryInsight">Aggregating platform transaction logs...</p>
+            </div>
+        </div>
+        <div class="insight-card danger">
+            <div class="insight-icon">🚨</div>
+            <div class="insight-content">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4>Supplier Risk Mitigation</h4>
+                    <span class="badge badge-poor" style="font-size: 10px;">Calculated Metric</span>
+                </div>
+                <p id="highRiskVendorsInsight">Evaluating supplier reliability thresholds...</p>
+            </div>
+        </div>
+        <div class="insight-card success">
+            <div class="insight-icon">📑</div>
+            <div class="insight-content">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4>Contract SLA Governance</h4>
+                    <span class="badge badge-active" style="font-size: 10px;">Legal Governance</span>
+                </div>
+                <p id="contractsInsight">Auditing active corporate agreements...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management Section (Complete Enterprise System) -->
+    <div class="table-card" id="user-management" style="margin-bottom: 28px;">
+        <div class="table-header-bar" style="margin-bottom: 16px;">
+            <div class="table-header-title">
+                <h3>👥 Platform User Management & Access Control</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                    Manage registration approvals, assign canonical enterprise roles, map vendor companies, and supervise account status.
+                </p>
+            </div>
+        </div>
+
+        <!-- Tabs Header -->
+        <div class="tab-nav-container">
+            <button class="tab-btn active" id="tabBtnPending" onclick="switchUserTab('pending')">
+                ⏳ Pending Approval Queue <span class="tab-badge" id="pendingTabBadge">0</span>
+            </button>
+            <button class="tab-btn" id="tabBtnAllUsers" onclick="switchUserTab('all')">
+                📋 All Platform Users Directory <span class="tab-badge" id="allUsersTabBadge">0</span>
+            </button>
+        </div>
+
+        <!-- TAB 1: Pending Approvals Queue -->
+        <div id="tabContentPending">
+            <div class="table-container">
+                <table id="pendingTable">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Full Name</th>
+                            <th>Email Address</th>
+                            <th>Assign Platform Role & Vendor Company</th>
+                            <th>Approval Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingTableBody">
+                        <tr>
+                            <td colspan="5" class="loading-spinner-wrapper">
+                                <div class="spinner"></div>
+                                <p>Loading pending accounts queue...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 2: All Users Directory (Full Search & Filter System) -->
+        <div id="tabContentAllUsers" style="display: none;">
+            <!-- Filter Bar -->
+            <div class="filter-bar-container">
+                <input type="text" id="userSearchInput" class="filter-input-search" placeholder="🔍 Search users by name or email address..." oninput="debounceUserSearch()">
+                
+                <select id="userRoleFilter" class="filter-select" onchange="loadAdminUsersDirectory()" style="padding: 8px 12px; font-size: 13px;">
+                    <option value="All">All Roles</option>
+                    <option value="Administrator">Administrator</option>
+                    <option value="Procurement Manager">Procurement Manager</option>
+                    <option value="Supply Chain Manager">Supply Chain Manager</option>
+                    <option value="Vendor">Vendor</option>
+                    <option value="Finance Officer">Finance Officer</option>
+                    <option value="Auditor">Auditor</option>
+                </select>
+
+                <select id="userStatusFilter" class="filter-select" onchange="loadAdminUsersDirectory()" style="padding: 8px 12px; font-size: 13px;">
+                    <option value="All">All Statuses</option>
+                    <option value="Approved">Approved / Active</option>
+                    <option value="Pending">Pending Approval</option>
+                    <option value="Deactivated">Deactivated / Inactive</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+
+                <button class="btn btn-secondary" onclick="resetUserFilters()" style="padding: 8px 14px; font-size: 12px;">Reset Filters</button>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-container">
+                <table id="allUsersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User Name</th>
+                            <th>Email</th>
+                            <th>Assigned Role</th>
+                            <th>Status</th>
+                            <th>Linked Vendor Company</th>
+                            <th>Created At</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allUsersTableBody">
+                        <tr>
+                            <td colspan="9" class="loading-spinner-wrapper">
+                                <div class="spinner"></div>
+                                <p>Loading platform user directory...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Role & Permission Management Section -->
+    <div class="table-card" id="roles-permissions" style="margin-bottom: 28px;">
+        <div class="table-header-bar">
+            <div class="table-header-title">
+                <h3>🔐 Platform Role & Permissions Matrix</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                    Strict role-based access control (RBAC) enforced by FastAPI dependencies across all core business modules.
+                </p>
+            </div>
+            <span class="badge badge-active">Enforced via FastAPI</span>
+        </div>
+        <div class="table-container">
+            <table class="matrix-table" id="permissionsMatrixTable">
+                <thead>
+                    <tr>
+                        <th style="min-width: 150px;">Role</th>
+                        <th style="min-width: 220px;">Operational Scope</th>
+                        <th>Dashboard</th>
+                        <th>User Mgmt</th>
+                        <th>Vendors</th>
+                        <th>Procurement</th>
+                        <th>Contracts</th>
+                        <th>Invoices</th>
+                        <th>Audit Logs</th>
+                    </tr>
+                </thead>
+                <tbody id="permissionsMatrixBody">
+                    <tr>
+                        <td colspan="9" class="loading-spinner-wrapper">
+                            <div class="spinner"></div>
+                            <p>Loading enterprise permissions matrix...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- System Health & Platform Infrastructure Telemetry -->
+    <div class="section-grid-2" id="system-health" style="margin-bottom: 28px;">
+        <!-- Live System Health Metrics -->
         <div class="stat-overview-box">
             <h3>
-                <span>⚡ System Health & Infrastructure</span>
-                <span class="kpi-trend positive">Operational</span>
+                <span>⚡ System Health & Infrastructure Telemetry</span>
+                <span class="kpi-trend positive" id="systemHealthOverallBadge">Healthy</span>
             </h3>
             <div class="overview-stat-row">
                 <span class="overview-stat-label">📡 API Response Latency</span>
-                <span class="overview-stat-value" id="apiLatencyVal">12.4 ms</span>
+                <span class="overview-stat-value" id="apiLatencyVal">Measuring...</span>
             </div>
             <div class="overview-stat-row">
-                <span class="overview-stat-label">💾 Database Record Index</span>
-                <span class="overview-stat-value" id="dbRecordsVal">180,500+ Rows</span>
+                <span class="overview-stat-label">🗄️ PostgreSQL Connection Status</span>
+                <span class="overview-stat-value" id="dbConnectionVal" style="color: var(--success-color);">Connected</span>
             </div>
             <div class="overview-stat-row">
-                <span class="overview-stat-label">🔒 Authentication & Token Security</span>
-                <span class="overview-stat-value" style="color: var(--success-color);">HS256 Bearer JWT Active</span>
+                <span class="overview-stat-label">💾 Indexed Platform Records</span>
+                <span class="overview-stat-value" id="dbRecordsVal">360,000+ Rows</span>
             </div>
             <div class="overview-stat-row">
-                <span class="overview-stat-label">⚙️ System Engine</span>
-                <span class="overview-stat-value">PostgreSQL 16 & FastAPI Async</span>
+                <span class="overview-stat-label">🔒 JWT Authentication & Token Security</span>
+                <span class="overview-stat-value" id="jwtSecurityVal" style="color: var(--success-color);">HS256 Bearer Token Active</span>
             </div>
             <div class="overview-stat-row">
-                <span class="overview-stat-label">⏱️ Server Status</span>
-                <span class="overview-stat-value" style="color: var(--success-color);">100% Uptime Operational</span>
+                <span class="overview-stat-label">⚙️ Backend Engine Architecture</span>
+                <span class="overview-stat-value" id="backendEngineVal">PostgreSQL & FastAPI</span>
+            </div>
+            <div class="overview-stat-row">
+                <span class="overview-stat-label">⏱️ Server API Status</span>
+                <span class="overview-stat-value" id="serverStatusVal" style="color: var(--success-color);">Operational</span>
             </div>
         </div>
 
@@ -153,7 +490,7 @@
             <div class="insight-card warning">
                 <div class="insight-icon">⚠️</div>
                 <div class="insight-content">
-                    <h4>Critical & High Risk Vendors</h4>
+                    <h4>High Risk Suppliers Standard</h4>
                     <p id="highRiskVendorsInsight">Scanning supplier reliability index scores...</p>
                 </div>
             </div>
@@ -167,46 +504,14 @@
         </div>
     </div>
 
-    <!-- Admin User Approval Queue (Preserved & Enhanced) -->
-    <div class="table-card" id="user-management" style="margin-bottom: 28px;">
-        <div class="table-header-bar">
-            <div class="table-header-title">
-                <h3>Pending Account Approval Queue</h3>
-                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Review user registrations, assign enterprise roles, and map vendor companies.</p>
-            </div>
-            <span class="badge badge-pending" id="pendingQueueCountBadge">0 Pending</span>
-        </div>
-        <div class="table-container">
-            <table id="pendingTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>User Name</th>
-                        <th>Email Address</th>
-                        <th>Assign Platform Role & Vendor Link</th>
-                        <th>Approval Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="5" class="loading-spinner-wrapper">
-                            <div class="spinner"></div>
-                            <p>Loading pending accounts queue...</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
     <!-- Recent System Activities Audit Trail -->
-    <div class="table-card" id="recent-activities">
+    <div class="table-card" id="recent-activities" style="margin-bottom: 30px;">
         <div class="table-header-bar">
             <div class="table-header-title">
-                <h3>Recent System Activities & Audit Trail</h3>
-                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Real platform-level audit logs captured in PostgreSQL.</p>
+                <h3>📋 Recent System Activities & Audit Trail</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Real platform-level audit logs captured dynamically in PostgreSQL.</p>
             </div>
-            <a href="audit_logs.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">View All Logs</a>
+            <a href="audit_logs.html" class="btn btn-secondary" style="padding: 6px 14px; font-size: 12px;">View All Logs →</a>
         </div>
         <div class="table-container">
             <table id="systemActivitiesTable">
@@ -229,6 +534,65 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Modal: Edit User Role & Vendor Company Mapping -->
+    <div class="modal-backdrop" id="editRoleModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3>Assign Platform Role & Vendor Link</h3>
+                <button class="modal-close-btn" onclick="closeEditRoleModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editUserId">
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Editing permissions for user: <strong id="editUserNameDisplay" style="color: var(--text-color);"></strong>
+                </p>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-color);">Platform Role</label>
+                    <select id="modalRoleSelect" class="filter-select" style="width: 100%; padding: 8px 12px; font-size: 13px;" onchange="handleModalRoleChange()">
+                        <option value="Administrator">Administrator</option>
+                        <option value="Procurement Manager">Procurement Manager</option>
+                        <option value="Supply Chain Manager">Supply Chain Manager</option>
+                        <option value="Vendor">Vendor</option>
+                        <option value="Finance Officer">Finance Officer</option>
+                        <option value="Auditor">Auditor</option>
+                    </select>
+                </div>
+
+                <div id="modalVendorGroup" style="margin-bottom: 16px; display: none;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-color);">Linked Vendor Company</label>
+                    <select id="modalVendorSelect" class="filter-select" style="width: 100%; padding: 8px 12px; font-size: 13px;">
+                        <!-- Options populated dynamically -->
+                    </select>
+                    <p style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">Vendor users are strictly scoped to their linked company records.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeEditRoleModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitEditUserRole()">Save Role & Link</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: View User Details -->
+    <div class="modal-backdrop" id="userDetailsModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3>User Profile Details</h3>
+                <button class="modal-close-btn" onclick="closeUserDetailsModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="userDetailsModalBody">
+                <div class="loading-spinner-wrapper">
+                    <div class="spinner"></div>
+                    <p>Loading profile details...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUserDetailsModal()">Close</button>
+            </div>
         </div>
     </div>
 

@@ -101,8 +101,8 @@ function getUserRole() {
 
     // Exact role mappings
 
-    if (cleanRole === "admin") {
-        return "Admin";
+    if (cleanRole === "admin" || cleanRole === "administrator") {
+        return "Administrator";
     }
 
     if (
@@ -142,7 +142,7 @@ function getUserRole() {
     // Partial role mappings
 
     if (cleanRole.includes("admin")) {
-        return "Admin";
+        return "Administrator";
     }
 
     if (cleanRole.includes("procurement")) {
@@ -210,7 +210,16 @@ function isAuthenticated() {
 // LOGOUT
 // ==================================================
 
-function logout() {
+async function logout() {
+    try {
+        const token = getToken();
+        if (token) {
+            await fetch(`${API_BASE_URL}/logout`, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${token}` }
+            }).catch(() => {});
+        }
+    } catch (_) {}
 
     localStorage.removeItem(AUTH_KEYS.TOKEN);
     localStorage.removeItem(AUTH_KEYS.ROLE);
@@ -218,11 +227,9 @@ function logout() {
     localStorage.removeItem("vendor_id");
 
     // Clear session storage as well
-
     sessionStorage.clear();
 
     // Always return to login page
-
     window.location.replace("login.html");
 }
 
@@ -240,6 +247,7 @@ function redirectToDashboard(role) {
     switch (normalizedRole) {
 
         case "admin":
+        case "administrator":
 
             window.location.replace(
                 "admin_dashboard.html"
@@ -406,7 +414,8 @@ function checkPageProtection() {
 
     if (
         pageName === "admin_dashboard.html" &&
-        role !== "Admin"
+        role !== "Admin" &&
+        role !== "Administrator"
     ) {
 
         alert(
@@ -445,7 +454,8 @@ function checkPageProtection() {
     if (
         pageName === "supplychain_dashboard.html" &&
         role !== "Supply Chain Manager" &&
-        role !== "Admin"
+        role !== "Admin" &&
+        role !== "Administrator"
     ) {
 
         alert(
@@ -522,6 +532,7 @@ function checkPageProtection() {
     if (
         pageName === "audit_logs.html" &&
         role !== "Admin" &&
+        role !== "Administrator" &&
         role !== "Auditor"
     ) {
 

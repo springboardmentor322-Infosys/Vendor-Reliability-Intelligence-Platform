@@ -63,9 +63,17 @@
                 </div>
                 <select id="statusFilter" class="filter-select" onchange="filterInvoices()">
                     <option value="all">All Invoices</option>
+                    <option value="Pending Review">Pending Review</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Partially Paid">Partially Paid</option>
                     <option value="Paid">Paid</option>
-                    <option value="Pending">Pending</option>
+                    <option value="Pending">Pending Payment</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="Overdue">Overdue Invoices</option>
                 </select>
+                <button id="btnCreateInvoiceFromPo" class="btn btn-primary" onclick="openGenerateInvoiceModal()" style="display: none; padding: 6px 14px; font-size: 13px; white-space: nowrap;">
+                    + Create Invoice from PO
+                </button>
             </div>
         </div>
         <div class="table-container">
@@ -73,25 +81,96 @@
                 <thead>
                     <tr>
                         <th>Invoice Number</th>
-                        <th>Vendor</th>
-                        <th>Purchase Order ID</th>
-                        <th>Invoice Date</th>
+                        <th>Vendor Name</th>
+                        <th>PO Reference</th>
+                        <th>Product Description</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total PO Amount</th>
+                        <th>Invoice Amount</th>
                         <th>Due Date</th>
-                        <th>Amount</th>
+                        <th>Invoice Status</th>
                         <th>Payment Status</th>
-                        <th>Payment Date</th>
-                        <th>Management Action</th>
+                        <th>Finance Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="9" class="loading-spinner-wrapper">
+                        <td colspan="12" class="loading-spinner-wrapper">
                             <div class="spinner"></div>
                             <p>Loading invoices...</p>
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- GENERATE INVOICE FROM PO MODAL (Finance Officer Exclusive) -->
+    <div class="modal-backdrop" id="generateInvoiceModal">
+        <div class="modal-dialog" style="max-width: 900px; width: 95%; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <h3 style="margin: 0; font-size: 16px;">Create Invoice from Delivered Purchase Order</h3>
+                    <span class="badge badge-primary">Finance Workflow</span>
+                </div>
+                <button type="button" class="modal-close-btn" onclick="closeGenerateInvoiceModal()" title="Close dialog">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px 24px; overflow-y: auto;">
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Select an eligible delivered purchase order to verify pricing and generate a formal invoice under Finance Officer authorization.
+                </p>
+                <div class="table-container" style="max-height: 420px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>PO #</th>
+                                <th>Vendor</th>
+                                <th>Product / Service</th>
+                                <th>Qty</th>
+                                <th>Unit Price</th>
+                                <th>Total PO Amount</th>
+                                <th>Delivery Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eligiblePoTableBody">
+                            <tr>
+                                <td colspan="8" class="loading-spinner-wrapper">
+                                    <div class="spinner"></div>
+                                    <p>Loading eligible purchase orders...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeGenerateInvoiceModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INVOICE REVIEW & DETAILS MODAL -->
+    <div class="modal-backdrop" id="invoiceReviewModal">
+        <div class="modal-dialog" style="max-width: 820px; width: 95%; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <h3 id="modalInvoiceTitle" style="margin: 0; font-size: 16px;">Invoice Review</h3>
+                    <span class="badge" id="modalInvoiceStatusBadge">Pending Review</span>
+                    <span class="badge" id="modalPaymentStatusBadge">Pending</span>
+                </div>
+                <button type="button" class="modal-close-btn" onclick="closeInvoiceReviewModal()" title="Close dialog">&times;</button>
+            </div>
+            <div class="modal-body" id="invoiceReviewModalBody" style="overflow-y: auto; max-height: calc(90vh - 130px); padding: 20px 24px;">
+                <div class="loading-spinner-wrapper" style="padding: 30px;">
+                    <div class="spinner"></div>
+                    <p>Loading invoice, purchase order, and vendor review details...</p>
+                </div>
+            </div>
+            <div class="modal-footer" id="invoiceReviewModalFooter">
+                <button type="button" class="btn btn-secondary" onclick="closeInvoiceReviewModal()">Close</button>
+            </div>
         </div>
     </div>
 

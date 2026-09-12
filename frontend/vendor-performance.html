@@ -85,6 +85,53 @@
             margin-bottom: 20px;
         }
 
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .badge-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-toggle {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-toggle:hover {
+            background: #2563eb;
+        }
+
+        .empty-state-box {
+            text-align: center;
+            padding: 30px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
         a {
             color: #3b82f6;
             text-decoration: none;
@@ -96,19 +143,19 @@
     <h1>Vendor Performance Dashboard</h1>
 
     <div class="cards">
-        <div class="card">
+        <div class="card clickable-card" data-href="vendors.html" title="Click to view suppliers directory">
             <h3>Total Vendors</h3>
             <p id="totalVendors">0</p>
         </div>
-        <div class="card">
+        <div class="card clickable-card" data-href="purchase-orders.html" title="Click to view purchase orders">
             <h3>Total Orders</h3>
             <p id="totalOrders">0</p>
         </div>
-        <div class="card">
+        <div class="card clickable-card" data-href="purchase-orders.html?status=Completed&source=all" title="Click to view completed purchase orders">
             <h3>Completed Orders</h3>
             <p id="completedOrders">0</p>
         </div>
-        <div class="card">
+        <div class="card clickable-card" data-href="#reliabilityChart" title="Click to view reliability comparison chart">
             <h3>Average Reliability</h3>
             <p id="averageReliability">0</p>
         </div>
@@ -131,14 +178,19 @@
     </select>
 
     <div class="chart-card">
-        <canvas id="historyChart"></canvas>
+        <div id="historyEmptyNotice" class="empty-state-box" style="display: none;">
+            No historical performance data is currently available for this vendor.
+        </div>
+        <div id="historyChartContainer">
+            <canvas id="historyChart"></canvas>
+        </div>
     </div>
 
     <h3>Performance History Data</h3>
     <table>
         <thead>
             <tr>
-                <th>Month</th>
+                <th>Date / Period</th>
                 <th>Quality Score</th>
                 <th>Delivery Rate</th>
                 <th>Reliability Score</th>
@@ -158,6 +210,7 @@
                 <th>Pending</th>
                 <th>Ordered</th>
                 <th>Delivered</th>
+                <th>Cancelled</th>
                 <th>Quality Score</th>
                 <th>Delivery Rate</th>
                 <th>Reliability Score</th>
@@ -189,11 +242,12 @@
     <div id="riskAlerts"></div>
 
     <h2>Top Performing Vendor</h2>
-    <div class="card">
+    <div class="card" id="topVendorCard">
         <h3 id="topVendorName">-</h3>
         <p><strong>Reliability Score:</strong> <span id="topVendorReliability">0</span></p>
         <p><strong>Performance:</strong> <span id="topVendorPerformance">-</span></p>
         <p><strong>Risk:</strong> <span id="topVendorRisk">-</span></p>
+        <p><strong>Recommendation:</strong> <span id="topVendorRecommendation">-</span></p>
     </div>
 
     <a href="dashboard.html">← Back To Dashboard</a>

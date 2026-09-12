@@ -37,22 +37,40 @@ async function loginUser(event) {
             console.log("Logged in role:", result.role);
         }
 
-        if (result.message === "Waiting for Admin Approval") {
+        if (result.error) {
+            showToast(result.error, "error");
+            return;
+        }
+
+        if (result.message === "Waiting for Admin Approval" || (result.status && result.status.toLowerCase() === "pending")) {
             showToast("Your account is pending Admin Approval.", "warning");
             return;
         }
 
-        if (result.message === "Your Account has been Rejected") {
+        if (result.message === "Your Account has been Rejected" || (result.status && result.status.toLowerCase() === "rejected")) {
             showToast("Your account registration has been Rejected by an administrator.", "error");
             return;
         }
 
-        if (result.message === "Invalid Email or Password") {
-            showToast("Invalid email address or password.", "error");
+        if (
+            result.message === "Your account has been deactivated. Please contact an Administrator." ||
+            (result.status && (result.status.toLowerCase() === "deactivated" || result.status.toLowerCase() === "inactive"))
+        ) {
+            showToast("Your account has been deactivated. Please contact an Administrator.", "error");
             return;
         }
 
-        if (result.message === "Login Successful") {
+        if (
+            result.message === "Invalid Email or Password" ||
+            result.message === "Invalid password" ||
+            (result.message && result.message.toLowerCase().includes("invalid")) ||
+            result.success === false
+        ) {
+            showToast(result.message || "Invalid email address or password.", "error");
+            return;
+        }
+
+        if (result.message === "Login Successful" || result.success === true) {
             const token = result.access_token;
             const role = result.role;
             const name = result.name;

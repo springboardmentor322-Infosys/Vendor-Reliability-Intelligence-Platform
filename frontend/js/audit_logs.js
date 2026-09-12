@@ -1,10 +1,11 @@
+const API_BASE_URL = "http://127.0.0.1:8000";
 document.addEventListener("DOMContentLoaded", initAuditLogs);
 
 let allLogs = [];
 
 async function initAuditLogs() {
     const role = getUserRole();
-    if (role !== "Admin" && role !== "Auditor") {
+    if (role !== "Admin" && role !== "Administrator" && role !== "Auditor") {
         console.warn("Unauthorized role accessed audit_logs page:", role);
         return;
     }
@@ -13,16 +14,51 @@ async function initAuditLogs() {
 
 async function loadAuditLogs() {
     try {
-        const response = await fetch("/audit-logs");
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/audit-logs`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
         if (!response.ok) {
             throw new Error(`Audit Logs API Error: ${response.status}`);
         }
         allLogs = await response.json();
-        renderAuditLogs(allLogs);
+
+        // Check URL parameters for action or entity filters
+        const urlParams = new URLSearchParams(window.location.search);
+        const actionParam = urlParams.get("action");
+        if (actionParam) {
+            const actionSelect = document.getElementById("filterAction");
+            if (actionSelect) {
+                for (let opt of actionSelect.options) {
+                    if (opt.value.toLowerCase() === actionParam.toLowerCase()) {
+                        actionSelect.value = opt.value;
+                        break;
+                    }
+                }
+            }
+        }
+        const entityParam = urlParams.get("entity");
+        if (entityParam) {
+            const entitySelect = document.getElementById("filterEntity");
+            if (entitySelect) {
+                for (let opt of entitySelect.options) {
+                    if (opt.value.toLowerCase() === entityParam.toLowerCase()) {
+                        entitySelect.value = opt.value;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (actionParam || entityParam) {
+            filterLogs();
+        } else {
+            renderAuditLogs(allLogs);
+        }
     } catch (error) {
         console.error("Error fetching audit logs:", error);
         const tbody = document.querySelector("#auditTable tbody");
-        tbody.innerHTML = `<tr><td colspan="9" style="color: #dc3545; font-weight: bold;">Error loading system logs. Please check your connection.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" style="color: #dc3545; font-weight: bold;">Error loading system logs. Please check your connection.</td></tr>`;
     }
 }
 
@@ -31,7 +67,7 @@ function renderAuditLogs(logsList) {
     tbody.innerHTML = "";
 
     if (logsList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="color: #666; font-style: italic;">No matching audit logs found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" style="color: #666; font-style: italic;">No matching audit logs found.</td></tr>`;
         return;
     }
 
@@ -53,6 +89,7 @@ function renderAuditLogs(logsList) {
             <td>${log.id}</td>
             <td style="font-weight: 500;">${escapeHTML(log.user_name) || "System"}</td>
             <td>${escapeHTML(log.user_email) || "-"}</td>
+            <td><span class="badge badge-info" style="font-size: 11px;">${escapeHTML(log.user_role) || "System"}</span></td>
             <td><span class="badge ${actionClass}">${escapeHTML(log.action)}</span></td>
             <td style="font-weight: 600;">${escapeHTML(log.entity_type)}</td>
             <td>${escapeHTML(log.entity_id) || "-"}</td>

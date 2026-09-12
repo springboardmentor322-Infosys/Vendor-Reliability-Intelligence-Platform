@@ -1,203 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Communication</title>
-
+    <title>Vendor Communications - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .badge-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+        .badge-poor {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .badge-pending {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+        .comm-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .comm-modal-content {
+            background: #ffffff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 650px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border-color);
+        }
+        .comm-modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .comm-modal-body {
+            padding: 20px;
+        }
+        .comm-modal-footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--border-color);
+            background: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
 </head>
-
 <body>
-
-    <div class="container">
-
-        <h1>Vendor Reliability Platform</h1>
-
-        <h2>Communication</h2>
-
-        <p>
-            Communicate with vendors regarding purchase orders and contracts.
-        </p>
-
-
-        <!-- ==========================================
-             SEND MESSAGE
-        =========================================== -->
-
-        <section>
-
-            <h2>Send Message</h2>
-
-            <form id="communicationForm">
-
-                <label>User ID</label>
-                <input
-                    type="number"
-                    id="userId"
-                    placeholder="Enter User ID"
-                    required
-                >
-
-                <br><br>
-
-
-                <label>Vendor ID</label>
-                <input
-                    type="number"
-                    id="vendorId"
-                    placeholder="Enter Vendor ID"
-                >
-
-                <br><br>
-
-
-                <label>Purchase Order ID</label>
-                <input
-                    type="number"
-                    id="purchaseOrderId"
-                    placeholder="Enter PO ID"
-                >
-
-                <br><br>
-
-
-                <label>Contract ID</label>
-                <input
-                    type="number"
-                    id="contractId"
-                    placeholder="Enter Contract ID"
-                >
-
-                <br><br>
-
-
-                <label>Message</label>
-
-                <br>
-
-                <textarea
-                    id="message"
-                    rows="5"
-                    cols="50"
-                    placeholder="Enter your message..."
-                    required
-                ></textarea>
-
-                <br><br>
-
-
-                <button type="submit">
-                    Send Message
-                </button>
-
-            </form>
-
-            <p id="messageResult"></p>
-
-        </section>
-
-
-        <hr>
-
-
-        <!-- ==========================================
-             COMMUNICATION HISTORY
-        =========================================== -->
-
-        <section>
-
-            <h2>Communication History</h2>
-
-            <table border="1" width="100%">
-
-                <thead>
-
-                    <tr>
-
-                        <th>ID</th>
-
-                        <th>Vendor</th>
-
-                        <th>Purchase Order</th>
-
-                        <th>Contract</th>
-
-                        <th>Message</th>
-
-                        <th>Date</th>
-
-                        <th>Action</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody id="communicationBody">
-
-                    <tr>
-
-                        <td colspan="7">
-                            Loading communications...
-                        </td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </section>
-
-
-        <br>
-
-
-        <!-- ==========================================
-             NAVIGATION
-        =========================================== -->
-
-        <div>
-
-            <a href="dashboard.html">
-                ← Back To Dashboard
-            </a>
-
-            &nbsp; | &nbsp;
-
-            <a href="vendors.html">
-                Vendors
-            </a>
-
-            &nbsp; | &nbsp;
-
-            <a href="purchase-orders.html">
-                Purchase Orders
-            </a>
-
-            &nbsp; | &nbsp;
-
-            <a href="contracts.html">
-                Contracts
-            </a>
-
-            &nbsp; | &nbsp;
-
-            <a href="reports.html">
-                Reports
-            </a>
-
-        </div>
-
+    <!-- Header Banner -->
+    <div style="margin-bottom: 24px;">
+        <h1 id="commPageTitle" style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Vendor Communications Desk 💬</h1>
+        <p id="commPageSubtitle" style="color: var(--text-secondary);">Direct operational inquiries, order clarifications, and message threads between suppliers and procurement personnel.</p>
     </div>
 
+    <!-- Top KPI Performance Summary Grid -->
+    <div class="kpi-grid-4" style="margin-bottom: 24px;">
+        <div class="kpi-card" style="border-left: 4px solid var(--primary-color);">
+            <div class="kpi-header">
+                <span class="kpi-label">Total Messages</span>
+                <span class="kpi-icon">💬</span>
+            </div>
+            <div class="kpi-value" id="kpiTotalMessages" style="color: var(--primary-color);">0</div>
+            <div class="kpi-sub" id="kpiTotalMessagesSub">Total message history</div>
+        </div>
 
-<script src="js/auth.js"></script>
-<script src="js/communication.js"></script>
+        <div class="kpi-card" style="border-left: 4px solid #8b5cf6;">
+            <div class="kpi-header">
+                <span class="kpi-label">Communication Activity</span>
+                <span class="kpi-icon">⚡</span>
+            </div>
+            <div class="kpi-value" id="kpiActivityScore" style="color: #8b5cf6;">N/A</div>
+            <div class="kpi-sub" id="kpiActivitySub">Response activity index</div>
+        </div>
 
+        <div class="kpi-card" style="border-left: 4px solid var(--warning-color);">
+            <div class="kpi-header">
+                <span class="kpi-label">Open Inquiries</span>
+                <span class="kpi-icon">⏳</span>
+            </div>
+            <div class="kpi-value" id="kpiOpenThreads" style="color: var(--warning-color);">0</div>
+            <div class="kpi-sub" id="kpiOpenThreadsSub">Awaiting reply or resolution</div>
+        </div>
 
+        <div class="kpi-card" style="border-left: 4px solid var(--success-color);">
+            <div class="kpi-header">
+                <span class="kpi-label">Last Interaction</span>
+                <span class="kpi-icon">🕒</span>
+            </div>
+            <div class="kpi-value" id="kpiLastDate" style="font-size: 18px; color: var(--text-color); margin-top: 4px;">None</div>
+            <div class="kpi-sub" id="kpiLastDateSub">Latest logged dispatch</div>
+        </div>
+    </div>
+
+    <!-- Communication Threads Table Card -->
+    <div class="table-card" style="margin-bottom: 28px;">
+        <div class="table-header-bar" style="flex-wrap: wrap; gap: 12px;">
+            <div class="table-header-title">
+                <h3>Message Threads & Inquiry Log</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Direct procurement correspondence records.</p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="commSearchInput" placeholder="Search subject or messages..." style="padding: 6px 12px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+                <select id="commStatusFilter" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <option value="all">All Statuses</option>
+                    <option value="open">Open</option>
+                    <option value="resolved">Resolved</option>
+                </select>
+                <button type="button" id="btnToggleComposer" class="btn btn-primary" style="padding: 6px 14px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                    <span>✉️</span> New Message
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Thread Ref</th>
+                        <th>Subject / Topic</th>
+                        <th>Sender</th>
+                        <th>Linked Context</th>
+                        <th>Message Preview</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="communicationBody">
+                    <tr>
+                        <td colspan="8" class="loading-spinner-wrapper" style="text-align: center; padding: 24px;">
+                            <div class="spinner"></div>
+                            <p>Loading communication threads...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Message Composer Card -->
+    <div class="table-card" id="composerCard" style="margin-bottom: 28px; display: none;">
+        <div class="table-header-bar">
+            <div>
+                <h3>✉️ Compose Inquiry or Message</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Send an inquiry directly to the Procurement Desk or assigned supplier.</p>
+            </div>
+            <button type="button" id="btnCloseComposer" class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;">Close</button>
+        </div>
+        <div style="padding: 20px 24px;">
+            <form id="commComposerForm">
+                <!-- Target Vendor Selection (Only shown for Admin & Procurement Manager) -->
+                <div id="targetVendorGroup" style="margin-bottom: 16px; display: none;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">Target Supplier Partner</label>
+                    <select id="targetVendorSelect" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px;">
+                        <option value="">Select Vendor Partner...</option>
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">Subject / Topic *</label>
+                        <input type="text" id="commSubjectInput" required placeholder="e.g. Shipment Schedule Clarification" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">Linked Purchase Order ID (Optional)</label>
+                        <input type="number" id="commPoInput" placeholder="e.g. 177483" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">Message Content *</label>
+                    <textarea id="commMessageInput" required rows="4" placeholder="Type your inquiry, transit update, or clarification..." style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px; font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; align-items: center;">
+                    <span id="composerFeedback" style="font-size: 12px; display: none;"></span>
+                    <button type="submit" id="btnSubmitMessage" class="btn btn-primary" style="padding: 10px 20px; font-size: 13px;">
+                        <span>✉️</span> Dispatch Message
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Thread Detail & Reply Modal -->
+    <div id="threadModal" class="comm-modal-overlay">
+        <div class="comm-modal-content">
+            <div class="comm-modal-header">
+                <div>
+                    <h3 id="modalThreadTitle" style="font-size: 16px; margin: 0;">Thread Details</h3>
+                    <p id="modalThreadMeta" style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Reference details</p>
+                </div>
+                <button type="button" id="btnCloseModal" style="background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <div class="comm-modal-body">
+                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span id="modalSender" style="font-weight: 600; color: var(--primary-color);">Sender</span>
+                        <span id="modalDate" style="font-size: 11px; color: var(--text-muted);">Timestamp</span>
+                    </div>
+                    <div id="modalMessageBody" style="font-size: 13px; line-height: 1.5; color: var(--text-color); white-space: pre-wrap;">Message body...</div>
+                </div>
+
+                <!-- Quick Reply Box -->
+                <form id="modalReplyForm">
+                    <input type="hidden" id="modalTargetVendorId">
+                    <input type="hidden" id="modalTargetPoId">
+                    <input type="hidden" id="modalTargetContractId">
+                    <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">Post Reply to Thread</label>
+                    <textarea id="modalReplyText" required rows="3" placeholder="Type response to Procurement Desk..." style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px; font-family: inherit; margin-bottom: 10px;"></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span id="modalReplyFeedback" style="font-size: 12px; display: none;"></span>
+                        <button type="submit" id="btnModalReply" class="btn btn-primary" style="padding: 8px 16px; font-size: 12px;">Send Reply</button>
+                    </div>
+                </form>
+            </div>
+            <div class="comm-modal-footer">
+                <button type="button" id="btnDismissModal" class="btn btn-secondary" style="padding: 6px 14px; font-size: 12px;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Application Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/communication.js"></script>
 </body>
-
-</html>
+</html>

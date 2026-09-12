@@ -1,0 +1,239 @@
+{
+    "model_version": "1.0.0",
+    "trained_at": "2026-09-05T13:06:14.544083",
+    "model_type": "HistGradientBoosting",
+    "framework": "scikit-learn",
+    "dataset": {
+        "name": "DataCo Supply Chain Historical Dataset",
+        "total_records": 180519,
+        "train_records": 144415,
+        "test_records": 36104,
+        "split_strategy": "Chronological Split (80% Train, 20% Test)",
+        "target_variable": "late_delivery_risk",
+        "target_classes": {
+            "0": "On-Time Delivery",
+            "1": "Late Delivery"
+        }
+    },
+    "features": {
+        "all_features": [
+            "shipping_mode",
+            "category_name",
+            "order_region",
+            "order_country",
+            "days_for_shipment_scheduled",
+            "order_item_quantity",
+            "order_item_product_price",
+            "order_item_total",
+            "order_month",
+            "order_day_of_week",
+            "order_hour",
+            "vendor_reliability",
+            "vendor_on_time_rate",
+            "vendor_total_orders"
+        ],
+        "categorical_features": [
+            "shipping_mode",
+            "category_name",
+            "order_region",
+            "order_country"
+        ],
+        "numerical_features": [
+            "days_for_shipment_scheduled",
+            "order_item_quantity",
+            "order_item_product_price",
+            "order_item_total",
+            "order_month",
+            "order_day_of_week",
+            "order_hour",
+            "vendor_reliability",
+            "vendor_on_time_rate",
+            "vendor_total_orders"
+        ],
+        "excluded_leakage_features": [
+            "days_for_shipping_real",
+            "delivery_status",
+            "shipping_date",
+            "order_status"
+        ]
+    },
+    "performance_metrics": {
+        "model_name": "HistGradientBoosting",
+        "accuracy": 0.716,
+        "precision": 0.8399,
+        "recall": 0.5935,
+        "f1_score": 0.6955,
+        "roc_auc": 0.7598,
+        "confusion_matrix": [
+            [
+                14138,
+                2233
+            ],
+            [
+                8021,
+                11712
+            ]
+        ]
+    },
+    "candidate_comparisons": [
+        {
+            "model_name": "LogisticRegression",
+            "accuracy": 0.6945,
+            "precision": 0.8378,
+            "recall": 0.547,
+            "f1_score": 0.6619,
+            "roc_auc": 0.7337,
+            "confusion_matrix": [
+                [
+                    14282,
+                    2089
+                ],
+                [
+                    8939,
+                    10794
+                ]
+            ]
+        },
+        {
+            "model_name": "DecisionTree",
+            "accuracy": 0.7129,
+            "precision": 0.8275,
+            "recall": 0.5999,
+            "f1_score": 0.6955,
+            "roc_auc": 0.7556,
+            "confusion_matrix": [
+                [
+                    13903,
+                    2468
+                ],
+                [
+                    7896,
+                    11837
+                ]
+            ]
+        },
+        {
+            "model_name": "HistGradientBoosting",
+            "accuracy": 0.716,
+            "precision": 0.8399,
+            "recall": 0.5935,
+            "f1_score": 0.6955,
+            "roc_auc": 0.7598,
+            "confusion_matrix": [
+                [
+                    14138,
+                    2233
+                ],
+                [
+                    8021,
+                    11712
+                ]
+            ]
+        }
+    ],
+    "risk_thresholds": {
+        "low_risk": "probability < 0.33",
+        "medium_risk": "0.33 <= probability < 0.67",
+        "high_risk": "probability >= 0.67"
+    },
+    "global_feature_importance": [
+        {
+            "feature": "days_for_shipment_scheduled",
+            "importance_score": 0.07363,
+            "importance_std": 0.0034,
+            "description": "Agreed contractual delivery duration window",
+            "rank": 1
+        },
+        {
+            "feature": "order_hour",
+            "importance_score": 0.02935,
+            "importance_std": 0.00181,
+            "description": "Time-of-day carrier cutoff and sorting depot schedules",
+            "rank": 2
+        },
+        {
+            "feature": "order_country",
+            "importance_score": 0.00136,
+            "importance_std": 0.00108,
+            "description": "Destination customs clearance jurisdiction",
+            "rank": 3
+        },
+        {
+            "feature": "order_day_of_week",
+            "importance_score": 0.00129,
+            "importance_std": 0.00038,
+            "description": "Day-of-week dispatch cadence and weekend terminal operations",
+            "rank": 4
+        },
+        {
+            "feature": "order_month",
+            "importance_score": 0.00079,
+            "importance_std": 0.00036,
+            "description": "Seasonal logistics capacity variance and peak carrier demand",
+            "rank": 5
+        },
+        {
+            "feature": "order_region",
+            "importance_score": 0.00047,
+            "importance_std": 0.00019,
+            "description": "Geographic transit corridor and regional logistics infrastructure",
+            "rank": 6
+        },
+        {
+            "feature": "vendor_on_time_rate",
+            "importance_score": 0.00039,
+            "importance_std": 0.00033,
+            "description": "Historical supplier on-time fulfillment adherence",
+            "rank": 7
+        },
+        {
+            "feature": "order_item_total",
+            "importance_score": 0.00034,
+            "importance_std": 0.00038,
+            "description": "Total invoice transit exposure and financial priority",
+            "rank": 8
+        },
+        {
+            "feature": "category_name",
+            "importance_score": 0.00011,
+            "importance_std": 0.00011,
+            "description": "Commodity group and merchandise physical handling profile",
+            "rank": 9
+        },
+        {
+            "feature": "order_item_quantity",
+            "importance_score": 0.00011,
+            "importance_std": 7e-05,
+            "description": "Shipment package volume and freight consolidation burden",
+            "rank": 10
+        },
+        {
+            "feature": "vendor_reliability",
+            "importance_score": 0.00011,
+            "importance_std": 0.00014,
+            "description": "Historical vendor composite reliability score",
+            "rank": 11
+        },
+        {
+            "feature": "vendor_total_orders",
+            "importance_score": 0.0001,
+            "importance_std": 0.00012,
+            "description": "Supplier operational volume and dispatch consistency",
+            "rank": 12
+        },
+        {
+            "feature": "shipping_mode",
+            "importance_score": 0.0,
+            "importance_std": 0.00307,
+            "description": "Carrier transit service class (Standard, Second, First, Same Day)",
+            "rank": 13
+        },
+        {
+            "feature": "order_item_product_price",
+            "importance_score": 0.0,
+            "importance_std": 7e-05,
+            "description": "Product valuation and high-value cargo handling security",
+            "rank": 14
+        }
+    ]
+}

@@ -58,7 +58,7 @@ def add_vendor(
 
         # Log Vendor Creation
         from audit_logs import log_action
-        log_action(user_id=current_user.get('id'), user_name=current_user.get('name'), user_email=current_user.get('email'), action="CREATE", entity_type="VENDOR", entity_id=str(new_vendor_id), details=f"Added vendor: {vendor_name}")
+        log_action(user_id=current_user.get('id'), user_name=current_user.get('name'), user_email=current_user.get('email'), action="VENDOR_CREATED", entity_type="VENDOR", entity_id=str(new_vendor_id), details=f"Added vendor: {vendor_name}")
 
         return {
             "message": "Vendor Added Successfully"
@@ -278,7 +278,7 @@ def update_vendor(
                 cursor.execute("SELECT status FROM vendors WHERE id = %s", (id,))
                 current_status_row = cursor.fetchone()
                 status = current_status_row[0] if current_status_row else "Pending"
-        elif user_role not in ["Admin", "Procurement Manager"]:
+        elif user_role not in ["Admin", "Administrator", "Procurement Manager"]:
             raise HTTPException(status_code=403, detail="Permission Denied: Unauthorized role")
 
         conn.rollback()
@@ -313,21 +313,19 @@ def update_vendor(
 
         # Log Vendor Update
         from audit_logs import log_action
-        log_action(user_id=current_user.get('id'), user_name=current_user.get('name'), user_email=current_user.get('email'), action="UPDATE", entity_type="VENDOR", entity_id=str(id), details=f"Updated vendor details for: {vendor_name}")
+        log_action(user_id=current_user.get('id'), user_name=current_user.get('name'), user_email=current_user.get('email'), action="VENDOR_UPDATED", entity_type="VENDOR", entity_id=str(id), details=f"Updated vendor details for: {vendor_name}")
 
         return {
             "message": "Vendor Updated Successfully"
         }
 
+    except HTTPException:
+        raise
+
     except Exception as e:
-
         conn.rollback()
-
         print("UPDATE VENDOR ERROR:", e)
-
-        return {
-            "error": str(e)
-        }
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ==================================================
@@ -335,7 +333,7 @@ def update_vendor(
 # ==================================================
 
 @router.delete("/vendors/{id}")
-def delete_vendor(id: int, current_user: dict = Depends(check_role(["Admin"]))):
+def delete_vendor(id: int, current_user: dict = Depends(check_role(["Admin", "Administrator"]))):
 
     try:
         conn.rollback()
@@ -357,7 +355,7 @@ def delete_vendor(id: int, current_user: dict = Depends(check_role(["Admin"]))):
 
         # Log Vendor Deletion
         from audit_logs import log_action
-        log_action(user_id=current_user.get('id'), user_name=current_user.get('name'), user_email=current_user.get('email'), action="DELETE", entity_type="VENDOR", entity_id=str(id), details=f"Deleted vendor: {vendor_name} (ID: {id})")
+        log_action(user_id=current_user.get('id'), user_name=current_user.get('name'), user_email=current_user.get('email'), action="VENDOR_DELETED", entity_type="VENDOR", entity_id=str(id), details=f"Deleted vendor: {vendor_name} (ID: {id})")
 
         return {
             "message": "Vendor Deleted Successfully"

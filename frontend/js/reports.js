@@ -14,8 +14,12 @@ async function loadVendorReport() {
 
     try {
 
+        const token = getToken();
         const response = await fetch(
-            `${API_BASE_URL}/reports/vendor-reliability`
+            `${API_BASE_URL}/reports/vendor-reliability`,
+            {
+                headers: token ? { "Authorization": `Bearer ${token}` } : {}
+            }
         );
 
         console.log(
@@ -378,8 +382,12 @@ async function loadPurchaseOrderReport() {
 
     try {
 
+        const token = getToken();
         const response = await fetch(
-            `${API_BASE_URL}/reports/purchase-orders`
+            `${API_BASE_URL}/reports/purchase-orders`,
+            {
+                headers: token ? { "Authorization": `Bearer ${token}` } : {}
+            }
         );
 
 

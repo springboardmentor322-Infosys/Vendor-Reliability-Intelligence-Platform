@@ -323,31 +323,43 @@ topButton.onclick = () => {
 // DYNAMIC PLATFORM STATISTICS
 // ================================
 
+const HOME_API_BASE = window.API_BASE_URL || (window.location.port === "8000" ? "" : "http://127.0.0.1:8000");
+
 async function loadPlatformStats() {
     try {
-        const res = await fetch(`/api/public/platform-stats`);
-        if (!res.ok) throw new Error("Stats fetch failed");
+        const res = await fetch(`${HOME_API_BASE}/api/public/platform-stats`);
+        if (!res.ok) throw new Error(`Stats fetch failed with status ${res.status}`);
         const data = await res.json();
 
         // Update data-target attributes in HTML
         const counters = document.querySelectorAll(".counter");
         counters.forEach(counter => {
-            const text = counter.nextElementSibling.innerText.trim().toLowerCase();
+            const labelEl = counter.nextElementSibling;
+            if (!labelEl) return;
+            const text = labelEl.innerText.trim().toLowerCase();
+            let targetVal = 0;
             if (text.includes("vendors")) {
-                counter.dataset.target = data.total_vendors || 0;
+                targetVal = data.total_vendors || 0;
             } else if (text.includes("purchase orders") || text.includes("orders")) {
-                counter.dataset.target = data.total_purchase_orders || 0;
+                targetVal = data.total_purchase_orders || 0;
             } else if (text.includes("contracts")) {
-                counter.dataset.target = data.total_contracts || 0;
+                targetVal = data.total_contracts || 0;
             } else if (text.includes("reliability")) {
-                counter.dataset.target = Math.round(data.average_reliability || 0);
+                targetVal = Math.round(data.average_reliability || 0);
+            }
+            counter.dataset.target = targetVal;
+            if (counterStarted) {
+                counter.innerText = Number(targetVal).toLocaleString();
             }
         });
+        if (!counterStarted) {
+            startCounter();
+            counterStarted = true;
+        }
     } catch (err) {
         console.error("Failed to load platform stats:", err);
-        // Show fallback message if database or API is down
         const statsSection = document.querySelector(".stats");
-        if (statsSection) {
+        if (statsSection && !statsSection.querySelector(".stats-unavailable-note")) {
             const note = document.createElement("p");
             note.className = "stats-unavailable-note";
             note.style.textAlign = "center";
@@ -376,7 +388,8 @@ function updateAuthUI() {
     if (token && role) {
         let dashboardPage = "login.html";
         switch (role) {
-            case "Admin": dashboardPage = "admin_dashboard.html"; break;
+            case "Admin":
+            case "Administrator": dashboardPage = "admin_dashboard.html"; break;
             case "Procurement Manager": dashboardPage = "procurement_dashboard.html"; break;
             case "Supply Chain Manager": dashboardPage = "supplychain_dashboard.html"; break;
             case "Vendor": dashboardPage = "vendor_dashboard.html"; break;

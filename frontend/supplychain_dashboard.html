@@ -8,19 +8,23 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="dashboard-header">
-        <div>
-            <h1>Supply Chain Logistics & Fulfillment Intelligence</h1>
-            <p>Monitor multi-modal shipping pipelines, assess delivery schedule delays, track inventory flows, and evaluate supplier logistics risk.</p>
+    <!-- Supply Chain Welcome Banner -->
+    <div class="role-welcome-banner">
+        <div class="welcome-text-content">
+            <h1 id="scWelcomeTitle">Supply Chain Intelligence 👋</h1>
+            <p>Multi-modal shipping telemetry, transit cycle analytics, and supplier logistics disruption monitoring.</p>
         </div>
-        <div class="header-badge">
-            <span class="status-dot"></span> Multi-Modal Network: Active Telemetry
+        <div class="quick-actions-bar">
+            <a href="purchase-orders.html" class="quick-action-btn primary">🚚 Track Shipments</a>
+            <a href="#disruption-monitor" class="quick-action-btn">⚠️ Disruption Monitor</a>
+            <a href="vendor-reliability.html" class="quick-action-btn">🛡️ Supplier Reliability</a>
+            <a href="reports.html" class="quick-action-btn">📊 Logistics Reports</a>
         </div>
     </div>
 
     <!-- Top KPI Summary Cards -->
     <div class="kpi-grid-4">
-        <div class="kpi-card">
+        <div class="kpi-card clickable-card" data-href="vendors.html" title="Click to view active suppliers directory">
             <div class="kpi-header">
                 <span class="kpi-label">Active Suppliers</span>
                 <span class="kpi-icon">🏢</span>
@@ -29,7 +33,7 @@
             <div class="kpi-sub" id="atRiskSub">0 At-Risk Suppliers</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card clickable-card" data-href="purchase-orders.html" title="Click to track shipments & purchase orders">
             <div class="kpi-header">
                 <span class="kpi-label">Active Purchase Orders</span>
                 <span class="kpi-icon">🛍️</span>
@@ -38,7 +42,7 @@
             <div class="kpi-sub">Shipments in fulfillment pipeline</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card clickable-card" data-href="purchase-orders.html?status=delayed&source=all" title="Click to view delayed shipments in ledger">
             <div class="kpi-header">
                 <span class="kpi-label">Delayed Shipments</span>
                 <span class="kpi-icon">⚠️</span>
@@ -47,7 +51,7 @@
             <div class="kpi-sub" id="avgDelaySub">Avg Delay: 0.0 Days</div>
         </div>
 
-        <div class="kpi-card">
+        <div class="kpi-card clickable-card" data-href="vendor-reliability.html" title="Click to view supplier reliability intelligence">
             <div class="kpi-header">
                 <span class="kpi-label">On-Time Delivery Rate</span>
                 <span class="kpi-icon">⏱️</span>
@@ -56,8 +60,32 @@
             <div class="kpi-sub">Fulfillment SLA Target > 85%</div>
         </div>
     </div>
-
-    <!-- Supplier Performance Distribution & Shipping Modes Section -->
+ 
+    <!-- Attention Required (Logistics & Transit Disruption) -->
+    <div class="risk-highlight-card" id="supplychainRiskSection">
+        <div class="risk-highlight-header">
+            <h3>⚠️ Logistics & Transit Disruption Attention</h3>
+            <span class="badge badge-poor" id="scAttentionBadge">Active Telemetry</span>
+        </div>
+        <div class="risk-highlight-grid">
+            <div class="risk-highlight-item clickable-card" data-href="purchase-orders.html?status=delayed&source=all" title="Click to inspect delayed shipments">
+                <span class="title">⚠️ Delayed Shipments</span>
+                <span class="value" id="scFocusDelayed" style="color: var(--danger-color);">0 Delayed</span>
+            </div>
+            <div class="risk-highlight-item clickable-card" data-href="vendor-reliability.html" title="Click to view on-time delivery analytics">
+                <span class="title">⏱️ On-Time Delivery Rate</span>
+                <span class="value" id="scFocusOnTime" style="color: var(--success-color);">0.0%</span>
+            </div>
+            <div class="risk-highlight-item clickable-card" data-href="vendors.html" title="Click to view active suppliers directory">
+                <span class="title">🏢 Active Suppliers</span>
+                <span class="value" id="scFocusSuppliers" style="color: var(--primary-color);">0 Partners</span>
+            </div>
+            <div class="risk-highlight-item clickable-card" data-href="purchase-orders.html?status=In-Transit&source=all" title="Click to view shipments currently in transit">
+                <span class="title">🛍️ Shipments in Transit</span>
+                <span class="value" id="scFocusActivePOs" style="color: #3b82f6;">0 Active</span>
+            </div>
+        </div>
+    </div>
     <div class="section-grid-2" id="visibility-section">
         <!-- Supplier Performance Distribution Donut Chart -->
         <div class="chart-card">
@@ -94,24 +122,33 @@
     <div class="section-grid-2" id="disruption-monitor">
         <!-- AI Supply Chain Insights -->
         <div style="display: flex; flex-direction: column; gap: 12px;">
-            <div class="insight-card info">
+            <div class="insight-card info clickable-card" data-href="purchase-orders.html" title="Click to view multi-modal freight logistics">
                 <div class="insight-icon">🚚</div>
                 <div class="insight-content">
-                    <h4>Primary Freight Routing Mode</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Primary Freight Routing Mode</h4>
+                        <span class="badge badge-neutral" style="font-size: 10px;">Historical Analytics</span>
+                    </div>
                     <p id="topShippingModeInsight">Analyzing multi-modal freight data...</p>
                 </div>
             </div>
-            <div class="insight-card warning">
+            <div class="insight-card warning clickable-card" data-href="purchase-orders.html?status=delayed&source=all" title="Click to view latency variance on delayed shipments">
                 <div class="insight-icon">⚠️</div>
                 <div class="insight-content">
-                    <h4>Late Delivery Impact Assessment</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Late Delivery Impact Assessment</h4>
+                        <span class="badge badge-warning" style="font-size: 10px;">Calculated Metric</span>
+                    </div>
                     <p id="delayImpactInsight">Evaluating order cycle latency variance...</p>
                 </div>
             </div>
-            <div class="insight-card danger">
+            <div class="insight-card danger clickable-card" data-href="vendor-reliability.html?risk=High" title="Click to view high risk suppliers and bottlenecks">
                 <div class="insight-icon">🚨</div>
                 <div class="insight-content">
-                    <h4>Critical Supplier Disruption Alert</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Critical Supplier Disruption Alert</h4>
+                        <span class="badge badge-poor" style="font-size: 10px;">AI Risk Insight</span>
+                    </div>
                     <p id="atRiskSuppliersInsight">Scanning supplier scorecards for bottlenecks...</p>
                 </div>
             </div>
@@ -125,6 +162,193 @@
             </div>
             <div id="alertsContainer" style="overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
                 <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Delivery Delay & Vendor Risk Prediction Simulator -->
+    <div class="table-card" id="ml-prediction-section" style="margin-bottom: 24px; border-left: 4px solid var(--primary-color);">
+        <div class="table-header-bar" style="flex-wrap: wrap; gap: 10px;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <h3>🤖 Predictive Machine Learning Delivery Risk Engine</h3>
+                    <span class="badge badge-active" id="mlModelBadge">HistGradientBoosting v1.0.0</span>
+                    <span class="badge" style="background: #f1f5f9; color: #475569;" id="mlModelStatsBadge">71.6% Acc | 69.6% F1</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                    Real-time scikit-learn inference pipeline trained on 180,519 historical records. Predicts transit delay probability using pre-fulfillment parameters without data leakage.
+                </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge badge-active" id="mlHealthBadge">System: Optimal</span>
+                <button type="button" id="btnToggleFeatImp" class="btn btn-secondary" style="padding: 5px 12px; font-size: 11px; cursor: pointer;">📊 Global Features</button>
+            </div>
+        </div>
+
+        <!-- Collapsible Global Feature Importance Drawer -->
+        <div id="featImportanceDrawer" style="display: none; background: #f8fafc; border-bottom: 1px solid var(--border-color); padding: 16px 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color);">Global Model Feature Importance (Permutation F1-Score Impact)</h4>
+                <span style="font-size: 11px; color: var(--text-muted);">Trained on 180,519 records | Evaluated on 10,000 Holdout Records</span>
+            </div>
+            <div id="featImportanceList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px;">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+
+        <div style="padding: 20px 24px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px;">
+            <!-- Prediction Parameter Controls -->
+            <div>
+                <h4 style="margin-bottom: 14px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">
+                    Fulfillment Parameters
+                </h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div style="grid-column: span 2;">
+                        <label style="display: block; font-size: 12px; font-weight: 500; margin-bottom: 4px; color: var(--text-color);">Select Supplier</label>
+                        <select id="predVendorSelect" class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px;">
+                            <option value="">Loading suppliers...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 500; margin-bottom: 4px; color: var(--text-color);">Shipping Mode</label>
+                        <select id="predShippingMode" class="form-control" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px;">
+                            <option value="Standard Class">Standard Class (4-6 Days)</option>
+                            <option value="Second Class">Second Class (2-3 Days)</option>
+                            <option value="First Class">First Class (1-2 Days)</option>
+                            <option value="Same Day">Same Day (0-1 Day)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 500; margin-bottom: 4px; color: var(--text-color);">Scheduled Transit (Days)</label>
+                        <input type="number" id="predScheduledDays" value="4" min="1" max="15" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 500; margin-bottom: 4px; color: var(--text-color);">Commodity Category</label>
+                        <select id="predCategory" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px;">
+                            <option value="Cleats">Cleats & Footwear</option>
+                            <option value="Sporting Goods">Sporting Goods & Equipment</option>
+                            <option value="Apparel">Industrial & Safety Apparel</option>
+                            <option value="Electronics">Electronics & Hardware</option>
+                            <option value="Cardio Equipment">Heavy Machinery & Cardio</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 500; margin-bottom: 4px; color: var(--text-color);">Destination Region</label>
+                        <select id="predRegion" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px;">
+                            <option value="South Asia">South Asia</option>
+                            <option value="Southeast Asia">Southeast Asia</option>
+                            <option value="Central America">Central America</option>
+                            <option value="South America">South America</option>
+                            <option value="Western Europe">Western Europe</option>
+                            <option value="US of America">United States</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 500; margin-bottom: 4px; color: var(--text-color);">Order Quantity</label>
+                        <input type="number" id="predQuantity" value="2" min="1" max="1000" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 500; margin-bottom: 4px; color: var(--text-color);">Order Amount (₹)</label>
+                        <input type="number" id="predAmount" value="2500" min="50" max="500000" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px;">
+                    </div>
+                </div>
+                <div style="margin-top: 18px; display: flex; gap: 12px; align-items: center;">
+                    <button type="button" id="btnRunPrediction" class="btn btn-primary" style="padding: 10px 20px; font-weight: 600; cursor: pointer;">
+                        ⚡ Calculate Predictive Delay Risk
+                    </button>
+                    <span id="predLoadingSpinner" style="display: none; font-size: 12px; color: var(--text-secondary);">
+                        <span class="spinner" style="display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: middle;"></span> Analyzing ML features...
+                    </span>
+                </div>
+            </div>
+
+            <!-- Prediction Results Output Card -->
+            <div id="predResultCard" style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <!-- Data Drift Warning Banner -->
+                    <div id="predDriftBanner" style="display: none; background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid var(--warning-color); padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 11.5px; color: var(--warning-text);">
+                        <strong>⚠️ Out-of-Distribution Warning:</strong> <span id="predDriftText">One or more features deviate significantly from the training baseline.</span>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div>
+                            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600;">AI Forecast Result</span>
+                            <h3 id="predResultTitle" style="font-size: 18px; margin-top: 2px;">Awaiting Input</h3>
+                        </div>
+                        <span class="badge" id="predRiskBadge" style="background: #e2e8f0; color: #475569; font-size: 12px;">Pending</span>
+                    </div>
+
+                    <!-- Delay Probability Metric -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+                            <span style="color: var(--text-secondary);">Predicted Delay Probability</span>
+                            <strong id="predProbValue">0.0%</strong>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                            <div id="predProbBar" style="width: 0%; height: 100%; background: var(--primary-color); transition: width 0.4s ease;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Comparison: Historical vs Future Risk -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; background: #ffffff; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 14px;">
+                        <div>
+                            <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase;">Historical Reliability</div>
+                            <div id="predVendorHistRel" style="font-size: 15px; font-weight: 700; color: var(--primary-color);">--</div>
+                            <div style="font-size: 10px; color: var(--text-muted);">Past Contractual Score</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase;">Prospective Delay Risk</div>
+                            <div id="predFutureRiskTier" style="font-size: 15px; font-weight: 700; color: var(--text-color);">--</div>
+                            <div style="font-size: 10px; color: var(--text-muted);">ML Pipeline Prediction</div>
+                        </div>
+                    </div>
+
+                    <!-- Why This Prediction? (Real Explainability) -->
+                    <div style="margin-bottom: 14px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">🔍 Why This Prediction? (Top Contributing Factors)</span>
+                        </div>
+                        <div id="predTopFactorsList" style="display: flex; flex-direction: column; gap: 6px;">
+                            <span style="font-size: 11.5px; color: var(--text-muted);">Select parameters and run prediction to inspect feature contributions.</span>
+                        </div>
+                    </div>
+
+                    <!-- Technical Model Explanation -->
+                    <div style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 10px 12px; margin-bottom: 10px;">
+                        <span style="font-size: 10.5px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; display: block; margin-bottom: 3px;">Technical Inference Rationale:</span>
+                        <p id="predModelExplanation" style="font-size: 11.5px; color: var(--text-color); margin: 0; line-height: 1.5;">Evaluates calibrated probability relative to decision boundary.</p>
+                    </div>
+
+                    <!-- Business Operational Guidance -->
+                    <div style="background: rgba(79, 70, 229, 0.05); border-left: 3px solid var(--primary-color); padding: 10px 12px; border-radius: 6px; margin-bottom: 12px;">
+                        <span style="font-size: 10.5px; font-weight: 700; color: var(--primary-color); text-transform: uppercase; display: block; margin-bottom: 3px;">Business Operational Guidance:</span>
+                        <p id="predBusinessGuidance" style="font-size: 11.5px; color: var(--text-color); margin: 0; line-height: 1.5;">Actionable recommendations will appear here.</p>
+                    </div>
+
+                    <!-- Prediction Feedback Action Button & Inline Form -->
+                    <div id="feedbackSection" style="margin-top: 10px;">
+                        <button type="button" id="btnToggleFeedbackForm" class="btn btn-secondary" style="width: 100%; padding: 6px 12px; font-size: 11.5px; display: none; cursor: pointer;">
+                            📝 Record Observed Delivery Outcome (Feedback)
+                        </button>
+                        <div id="feedbackFormContainer" style="display: none; background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-top: 8px;">
+                            <span style="font-size: 11px; font-weight: 700; color: var(--text-color); display: block; margin-bottom: 6px;">Ground Truth Delivery Feedback</span>
+                            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                <select id="fbOutcomeSelect" style="flex: 1; padding: 6px; font-size: 12px; border: 1px solid var(--border-color); border-radius: 6px;">
+                                    <option value="Delayed">Actual Outcome: Delayed (Late)</option>
+                                    <option value="On Time">Actual Outcome: On Time</option>
+                                </select>
+                                <button type="button" id="btnSubmitFeedback" class="btn btn-primary" style="padding: 6px 14px; font-size: 12px; cursor: pointer;">Submit</button>
+                            </div>
+                            <input type="text" id="fbNotesInput" placeholder="Optional notes (e.g. carrier delay, port congestion)..." style="width: 100%; padding: 6px 8px; font-size: 11.5px; border: 1px solid var(--border-color); border-radius: 6px;">
+                            <div id="fbResultMsg" style="font-size: 11px; margin-top: 6px; display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 14px; padding-top: 8px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; color: var(--text-muted);">
+                    <span id="predAuditStamp">Audit Log: Unrecorded</span>
+                    <span id="predConfidenceStamp">Confidence: --</span>
+                </div>
             </div>
         </div>
     </div>
