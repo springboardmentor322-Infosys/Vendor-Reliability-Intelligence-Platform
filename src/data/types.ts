@@ -57,7 +57,14 @@ export interface ProcurementRequest {
 	date: string;
 }
 
-export type POStatus = 'Draft' | 'Ordered' | 'Delivered' | 'Cancelled';
+export type POStatus =
+  | 'Draft'
+  | 'Pending Approval'
+  | 'Approved'
+  | 'Ordered'
+  | 'Delivered'
+  | 'Completed'
+  | 'Cancelled';
 
 export interface POItem {
 	name: string;
@@ -140,4 +147,3 @@ export interface RoleInfo {
 	label: string;
 	dashboard: string;
 }
-x
