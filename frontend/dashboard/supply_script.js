@@ -154,40 +154,41 @@ async function loadInspectionOrders(isBackground = false) {
       fetchWithRetry(`${API_BASE}/api/v1/purchase-orders`)
     ]);
 
-    if (!invRes.ok || !poRes.ok) return;
+    if (!poRes.ok) return;
 
-    const invoices = await invRes.json();
+    const invoices = invRes.ok ? await invRes.json() : [];
     const purchaseOrders = await poRes.json();
     globalInspectionInvoicesCache = invoices;
 
+    const invoiceMap = {};
+    invoices.forEach(inv => {
+      invoiceMap[inv.invoice_no] = inv;
+    });
+
     const tbody = document.getElementById('inspection-tbody');
     const returnedTbody = document.getElementById('returned-items-tbody');
-    
-    const poStatusMap = {};
-    const poMap = {};
-    purchaseOrders.forEach(po => {
-      poStatusMap[po.invoice_no] = po.production_status || po.order_status;
-      poMap[po.invoice_no] = po;
+
+    const validOrders = purchaseOrders.filter(po => {
+      const s = (po.order_status || "").toLowerCase();
+      const ps = (po.production_status || "").toLowerCase();
+      return !s.includes("reject") && !s.includes("returned") && !ps.includes("reject") && !ps.includes("returned");
     });
 
-    const validInvoices = invoices.filter(inv => {
-      const s = (inv.status || "").toLowerCase();
-      const orderStatus = (inv.order_status || "").toLowerCase();
-      return !s.includes("reject") && !orderStatus.includes("reject") && !orderStatus.includes("returned");
-    });
-
-    const returnedInvoices = invoices.filter(inv => {
-      const s = (inv.status || "").toLowerCase();
-      const orderStatus = (inv.order_status || "").toLowerCase();
-      return s.includes("reject") || orderStatus.includes("reject") || orderStatus.includes("returned") || inv.inspection_status === 'Fault';
+    const returnedOrders = purchaseOrders.filter(po => {
+      const s = (po.order_status || "").toLowerCase();
+      const ps = (po.production_status || "").toLowerCase();
+      const invObj = invoiceMap[po.invoice_no] || {};
+      const invInsp = (invObj.inspection_status || invObj.quality_status || "").toLowerCase();
+      return s.includes("reject") || s.includes("returned") || ps.includes("reject") || ps.includes("returned") || invInsp.includes("fault") || invInsp.includes("fail");
     });
 
     let pendingCount = 0;
     let passedCount = 0;
     let failedCount = 0;
 
-    validInvoices.forEach(inv => {
-      const inspectionStatus = inv.inspection_status || inv.quality_status || 'In Progress';
+    validOrders.forEach(po => {
+      const invObj = invoiceMap[po.invoice_no] || {};
+      const inspectionStatus = invObj.inspection_status || invObj.quality_status || po.inspection_status || 'In Progress';
       if (inspectionStatus === 'Checked' || inspectionStatus === 'Passed') {
         passedCount++;
       } else if (inspectionStatus === 'Fault' || inspectionStatus === 'Failed') {
@@ -207,19 +208,18 @@ async function loadInspectionOrders(isBackground = false) {
 
     if (returnedTbody) {
       returnedTbody.innerHTML = '';
-      if (returnedInvoices.length === 0) {
+      if (returnedOrders.length === 0) {
         returnedTbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">No returned orders found.</td></tr>';
       } else {
-        returnedInvoices.forEach(inv => {
-          const poObj = poMap[inv.invoice_no] || {};
+        returnedOrders.forEach(po => {
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>#${inv.invoice_no}</td>
-            <td>${inv.vendor_name}</td>
-            <td>${inv.product_name}</td>
-            <td>${inv.quantity}</td>
-            <td>${inv.department}</td>
-            <td>${poObj.expiry_date || 'N/A'}</td>
+            <td>#${po.invoice_no}</td>
+            <td>${po.vendor_name}</td>
+            <td>${po.product_name}</td>
+            <td>${po.quantity}</td>
+            <td>${po.department}</td>
+            <td>${po.expiry_date || 'N/A'}</td>
             <td><span class="status-badge status-rejected">High Risk / Returned</span></td>
           `;
           returnedTbody.appendChild(row);
@@ -229,13 +229,15 @@ async function loadInspectionOrders(isBackground = false) {
 
     if (tbody && (!isBackground || tbody.querySelectorAll('tr').length <= 1)) {
       tbody.innerHTML = '';
-      if (validInvoices.length === 0) {
+      if (validOrders.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 2rem;">No orders available for inspection.</td></tr>';
       } else {
-        validInvoices.forEach(inv => {
-          const inspectionStatus = inv.inspection_status || inv.quality_status || 'In Progress';
-          const currentOrderStatus = poStatusMap[inv.invoice_no] || inv.order_status || inv.delivery_status || 'In Transit';
+        validOrders.forEach(po => {
+          const invObj = invoiceMap[po.invoice_no] || {};
+          const inspectionStatus = invObj.inspection_status || invObj.quality_status || po.inspection_status || 'In Progress';
+          const currentOrderStatus = po.production_status || po.order_status || 'In Transit';
           const badgeClass = getOrderStatusBadgeClass(currentOrderStatus);
+          const targetId = invObj.id || po.id;
 
           let inspectionBadge = '';
           if (inspectionStatus === 'Checked' || inspectionStatus === 'Passed') {
@@ -248,15 +250,15 @@ async function loadInspectionOrders(isBackground = false) {
 
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>#${inv.invoice_no}</td>
-            <td>${inv.vendor_name}</td>
-            <td>${inv.product_name}</td>
+            <td>#${po.invoice_no}</td>
+            <td>${po.vendor_name}</td>
+            <td>${po.product_name}</td>
             <td><span class="status-badge ${badgeClass}">${currentOrderStatus}</span></td>
             <td>${inspectionBadge}</td>
             <td>
-              <button class="btn btn-accept" onclick="updateInspectionStatus(${inv.id}, 'Checked')"><i class="fa-solid fa-check"></i> Pass</button>
-              <button class="btn btn-reject" onclick="updateInspectionStatus(${inv.id}, 'Fault')"><i class="fa-solid fa-xmark"></i> Fail</button>
-              <button class="btn" style="background: #ef4444; color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-left: 4px;" onclick="openReturnModal(${inv.id}, '${inv.invoice_no}')"><i class="fa-solid fa-rotate-left"></i> Return</button>
+              <button class="btn btn-accept" onclick="updateInspectionStatus(${targetId}, 'Checked')"><i class="fa-solid fa-check"></i> Pass</button>
+              <button class="btn btn-reject" onclick="updateInspectionStatus(${targetId}, 'Fault')"><i class="fa-solid fa-xmark"></i> Fail</button>
+              <button class="btn" style="background: #ef4444; color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-left: 4px;" onclick="openReturnModal(${targetId}, '${po.invoice_no}')"><i class="fa-solid fa-rotate-left"></i> Return</button>
             </td>
           `;
           tbody.appendChild(row);
