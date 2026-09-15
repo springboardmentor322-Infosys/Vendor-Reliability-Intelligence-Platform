@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SCM - Create Shipment</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/CreateShipment.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+        </div>
+
+        <nav>
+
+            <a href="/supplychaindashboard">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="/demand-planning">
+                <i class="fa-solid fa-chart-line"></i>
+                Demand Planning
+            </a>
+
+            <a href="/supplychainprocurement">
+                <i class="fa-solid fa-cart-shopping"></i>
+                Procurement
+            </a>
+
+            <a href="/suppliers">
+                <i class="fa-solid fa-users"></i>
+                Suppliers
+            </a>
+
+            <a href="/inventory">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                Inventory
+            </a>
+
+            <a href="/ordersshipments">
+                <i class="fa-solid fa-truck"></i>
+                Orders & Shipments
+            </a>
+
+            <a href="/warehouses">
+                <i class="fa-solid fa-warehouse"></i>
+                Warehouses
+            </a>
+
+            <a href="/transportation">
+                <i class="fa-solid fa-truck-fast"></i>
+                Transportation
+            </a>
+
+            <a href="/analyticsreports">
+                <i class="fa-solid fa-chart-column"></i>
+                Analytics & Reports
+            </a>
+
+            <a href="/alertsnotifications">
+                <i class="fa-solid fa-bell"></i>
+                Alerts & Notifications
+            </a>
+
+            <a href="/documents">
+                <i class="fa-solid fa-file"></i>
+                Documents
+            </a>
+
+            <a href="/supplychainsettings">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <!-- QUICK ACTIONS -->
+
+        <div class="quick-actions">
+
+            <h4>Quick Actions</h4>
+
+            <button onclick="window.location.href='/CreatePurchaseOrder'">
+                <i class="fa-solid fa-cart-plus"></i>
+                Create Purchase Order
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/AddSupplier'">
+                <i class="fa-solid fa-user-plus"></i>
+                Add New Supplier
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/CreateShipment'">
+                <i class="fa-solid fa-ship"></i>
+                Create Shipment
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/UploadDocument'">
+                <i class="fa-solid fa-upload"></i>
+                Upload Document
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+
+        <div class="user-card" onclick="openSupplyChainProfile()">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <strong>Arjun Kumar</strong>
+
+            <span>Supply Chain Manager</span>
+
+            <small>
+                <i class="fa-solid fa-circle"></i>
+                Online
+            </small>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <h1>Supply Chain Dashboard</h1>
+
+            <div class="top-actions">
+
+                <input
+                    type="search"
+                    placeholder="Search..."
+                >
+
+                <i class="fa-regular fa-bell"></i>
+
+                <i class="fa-regular fa-calendar"></i>
+
+                <div>
+                    <strong>May 23, 2025</strong>
+                    <small>10:30 AM</small>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= CONTENT ================= -->
+
+        <section class="content">
+
+            <!-- STEPPER -->
+
+            <div class="stepper">
+
+                <div class="step active">
+                    <span>1</span>
+                    Shipment Details
+                </div>
+
+                <div class="line"></div>
+
+                <div class="step">
+                    <span>2</span>
+                    Items & Packages
+                </div>
+
+                <div class="line"></div>
+
+                <div class="step">
+                    <span>3</span>
+                    Transportation
+                </div>
+
+                <div class="line"></div>
+
+                <div class="step">
+                    <span>4</span>
+                    Review & Confirm
+                </div>
+
+            </div>
+
+
+            <div class="layout">
+
+                <!-- ================= FORM ================= -->
+
+                <div class="form-area">
+
+                    <form id="shipmentForm">
+
+                        <!-- SHIPMENT DETAILS -->
+
+                        <section class="card">
+
+                            <h2>Shipment Details</h2>
+
+                            <div class="grid-4">
+
+                                <div class="field">
+
+                                    <label>
+                                        Shipment Number
+                                    </label>
+
+                                    <input
+                                        id="shipmentNumber"
+                                        type="text"
+                                        value="Auto generate"
+                                        readonly
+                                    >
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Shipment Date
+                                        <span>*</span>
+                                    </label>
+
+                                    <input
+                                        id="shipmentDate"
+                                        type="date"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Shipment Type
+                                        <span>*</span>
+                                    </label>
+
+                                    <select
+                                        id="shipmentType"
+                                        required
+                                    >
+
+                                        <option value="Outbound">
+                                            Outbound
+                                        </option>
+
+                                        <option value="Inbound">
+                                            Inbound
+                                        </option>
+
+                                        <option value="Transfer">
+                                            Transfer
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Priority
+                                    </label>
+
+                                    <select id="priority">
+
+                                        <option value="Normal">
+                                            Normal
+                                        </option>
+
+                                        <option value="High">
+                                            High
+                                        </option>
+
+                                        <option value="Urgent">
+                                            Urgent
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Purchase Order
+                                        <span>*</span>
+                                    </label>
+
+                                    <select
+                                        id="poId"
+                                        required
+                                    >
+
+                                        <option value="">
+                                            Select purchase order
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Reference Number
+                                    </label>
+
+                                    <input
+                                        id="referenceNumber"
+                                        type="text"
+                                        placeholder="Enter reference number"
+                                    >
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Related Document
+                                    </label>
+
+                                    <input
+                                        id="relatedDocument"
+                                        type="text"
+                                        placeholder="Document number"
+                                    >
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Incoterms
+                                        <span>*</span>
+                                    </label>
+
+                                    <select id="incoterms">
+
+                                        <option value="FOB">
+                                            FOB - Free on Board
+                                        </option>
+
+                                        <option value="CIF">
+                                            CIF
+                                        </option>
+
+                                        <option value="EXW">
+                                            EXW
+                                        </option>
+
+                                        <option value="DDP">
+                                            DDP
+                                        </option>
+
+                                        <option value="DAP">
+                                            DAP
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Payment Terms
+                                    </label>
+
+                                    <select id="paymentTerms">
+
+                                        <option value="Net 30 Days">
+                                            Net 30 Days
+                                        </option>
+
+                                        <option value="Net 15 Days">
+                                            Net 15 Days
+                                        </option>
+
+                                        <option value="Net 45 Days">
+                                            Net 45 Days
+                                        </option>
+
+                                        <option value="Advance">
+                                            Advance
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+                        <!-- ORIGIN DESTINATION -->
+
+                        <section class="card">
+
+                            <h2>Origin & Destination</h2>
+
+                            <div class="origin-destination">
+
+                                <!-- ORIGIN -->
+
+                                <div class="location-box">
+
+                                    <h3>From (Origin)</h3>
+
+                                    <div class="grid-2">
+
+                                        <div class="field">
+
+                                            <label>
+                                                Warehouse / Location
+                                                <span>*</span>
+                                            </label>
+
+                                            <input
+                                                id="origin"
+                                                type="text"
+                                                placeholder="Enter warehouse / location"
+                                                required
+                                            >
+
+                                        </div>
+
+
+                                        <div class="field">
+
+                                            <label>Address</label>
+
+                                            <textarea
+                                                id="originAddress"
+                                                placeholder="Origin address"
+                                            ></textarea>
+
+                                        </div>
+
+
+                                        <div class="field">
+
+                                            <label>
+                                                Contact Person
+                                            </label>
+
+                                            <input
+                                                id="originContact"
+                                                type="text"
+                                            >
+
+                                        </div>
+
+
+                                        <div class="field">
+
+                                            <label>Phone</label>
+
+                                            <input
+                                                id="originPhone"
+                                                type="tel"
+                                            >
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="arrow">
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </div>
+
+
+                                <!-- DESTINATION -->
+
+                                <div class="location-box">
+
+                                    <h3>To (Destination)</h3>
+
+                                    <div class="grid-2">
+
+                                        <div class="field">
+
+                                            <label>
+                                                Customer / Location
+                                                <span>*</span>
+                                            </label>
+
+                                            <input
+                                                id="destination"
+                                                type="text"
+                                                placeholder="Enter customer / location"
+                                                required
+                                            >
+
+                                        </div>
+
+
+                                        <div class="field">
+
+                                            <label>Address</label>
+
+                                            <textarea
+                                                id="destinationAddress"
+                                                placeholder="Destination address"
+                                            ></textarea>
+
+                                        </div>
+
+
+                                        <div class="field">
+
+                                            <label>
+                                                Contact Person
+                                            </label>
+
+                                            <input
+                                                id="destinationContact"
+                                                type="text"
+                                            >
+
+                                        </div>
+
+
+                                        <div class="field">
+
+                                            <label>Phone</label>
+
+                                            <input
+                                                id="destinationPhone"
+                                                type="tel"
+                                            >
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+                        <!-- SCHEDULE -->
+
+                        <section class="card">
+
+                            <h2>Schedule & Delivery</h2>
+
+                            <div class="grid-4">
+
+                                <div class="field">
+
+                                    <label>
+                                        Requested Delivery Date
+                                    </label>
+
+                                    <input
+                                        id="requestedDelivery"
+                                        type="date"
+                                    >
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Promised Delivery Date
+                                    </label>
+
+                                    <input
+                                        id="promisedDelivery"
+                                        type="date"
+                                    >
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Earliest Pickup Date
+                                    </label>
+
+                                    <input
+                                        id="earliestPickup"
+                                        type="date"
+                                    >
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Latest Delivery Date
+                                    </label>
+
+                                    <input
+                                        id="latestDelivery"
+                                        type="date"
+                                    >
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Pickup Time Window
+                                    </label>
+
+                                    <select id="pickupTimeWindow">
+
+                                        <option value="09:00 AM - 12:00 PM">
+                                            09:00 AM - 12:00 PM
+                                        </option>
+
+                                        <option value="12:00 PM - 03:00 PM">
+                                            12:00 PM - 03:00 PM
+                                        </option>
+
+                                        <option value="03:00 PM - 06:00 PM">
+                                            03:00 PM - 06:00 PM
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Delivery Time Window
+                                    </label>
+
+                                    <select id="deliveryTimeWindow">
+
+                                        <option value="02:00 PM - 06:00 PM">
+                                            02:00 PM - 06:00 PM
+                                        </option>
+
+                                        <option value="09:00 AM - 12:00 PM">
+                                            09:00 AM - 12:00 PM
+                                        </option>
+
+                                        <option value="12:00 PM - 03:00 PM">
+                                            12:00 PM - 03:00 PM
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>Timezone</label>
+
+                                    <select id="timezone">
+
+                                        <option value="Asia/Kolkata">
+                                            (UTC+05:30) Asia/Kolkata
+                                        </option>
+
+                                        <option value="UTC">
+                                            UTC
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="text-grid">
+
+                                <div class="field">
+
+                                    <label>
+                                        Special Instructions
+                                    </label>
+
+                                    <textarea
+                                        id="specialInstructions"
+                                        placeholder="Enter special instructions for this shipment..."
+                                    ></textarea>
+
+                                </div>
+
+
+                                <div class="field">
+
+                                    <label>
+                                        Notes (Internal)
+                                    </label>
+
+                                    <textarea
+                                        id="internalNotes"
+                                        placeholder="Enter internal notes..."
+                                    ></textarea>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+                        <!-- ITEMS -->
+
+                        <section class="card">
+
+                            <div class="section-header">
+
+                                <h2>Items Summary</h2>
+
+                                <button
+                                    type="button"
+                                    class="add-btn"
+                                    id="addItemBtn"
+                                >
+                                    <i class="fa-solid fa-plus"></i>
+                                    Add Item
+                                </button>
+
+                            </div>
+
+
+                            <div class="table-wrapper">
+
+                                <table>
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>#</th>
+                                            <th>Item / Description</th>
+                                            <th>SKU / Item Code</th>
+                                            <th>Quantity</th>
+                                            <th>UOM</th>
+                                            <th>Total Weight</th>
+                                            <th>Total Volume</th>
+                                            <th>Actions</th>
+
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody id="itemsBody"></tbody>
+
+                                </table>
+
+                            </div>
+
+                            <div class="items-total">
+
+                                <span>
+                                    Total Items:
+                                    <strong id="totalItems">0</strong>
+                                </span>
+
+                                <span>
+                                    Total Weight:
+                                    <strong id="totalWeight">0.00 kg</strong>
+                                </span>
+
+                                <span>
+                                    Total Volume:
+                                    <strong id="totalVolume">0.00 m³</strong>
+                                </span>
+
+                            </div>
+
+                        </section>
+
+
+                        <div class="form-actions">
+
+                            <button
+                                type="button"
+                                class="cancel-btn"
+                                id="cancelBtn"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="save-btn"
+                            >
+                                Save & Continue
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+
+                <!-- ================= SIDEBAR ================= -->
+
+                <aside class="right-panel">
+
+                    <div class="card">
+
+                        <h2>
+                            <i class="fa-regular fa-file-lines"></i>
+                            Shipment Summary
+                        </h2>
+
+                        <div class="summary-row">
+                            <span>Shipment Number</span>
+                            <strong id="summaryNumber">
+                                — (Auto Generate)
+                            </strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Shipment Type</span>
+                            <strong id="summaryType">
+                                Outbound
+                            </strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>From</span>
+                            <strong id="summaryFrom">—</strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>To</span>
+                            <strong id="summaryTo">—</strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Requested Delivery</span>
+                            <strong id="summaryDelivery">
+                                —
+                            </strong>
+                        </div>
+
+                        <div class="summary-stats">
+
+                            <div>
+                                <strong id="summaryItems">0</strong>
+                                <span>Total Items</span>
+                            </div>
+
+                            <div>
+                                <strong id="summaryWeight">0.00</strong>
+                                <span>kg</span>
+                            </div>
+
+                            <div>
+                                <strong id="summaryVolume">0.00</strong>
+                                <span>m³</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="card checklist">
+
+                        <h2>Checklist</h2>
+
+                        <div class="check pending">
+                            <i class="fa-regular fa-circle"></i>
+                            Shipment details
+                        </div>
+
+                        <div class="check pending">
+                            <i class="fa-regular fa-circle"></i>
+                            Origin & destination
+                        </div>
+
+                        <div class="check pending">
+                            <i class="fa-regular fa-circle"></i>
+                            Items added
+                        </div>
+
+                        <div class="check pending">
+                            <i class="fa-regular fa-circle"></i>
+                            Transportation selected
+                        </div>
+
+                        <div class="check pending">
+                            <i class="fa-regular fa-circle"></i>
+                            Review & confirm
+                        </div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <h2>Quick Actions</h2>
+
+                        <button
+                            class="quick-btn"
+                            id="quickAddItem"
+                        >
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            Add Items
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                        <button
+                            class="quick-btn"
+                            id="draftBtn"
+                        >
+                            <i class="fa-regular fa-file"></i>
+                            Save as Draft
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </div>
+
+
+                    <div class="card help">
+
+                        <h2>
+                            <i class="fa-solid fa-headset"></i>
+                            Need Help?
+                        </h2>
+
+                        <p>
+                            Learn more about creating shipments.
+                        </p>
+
+                        <a href="#">
+                            View User Guide
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="/static/CreateShipment.js"></script>
+
+</body>
+
+</html>

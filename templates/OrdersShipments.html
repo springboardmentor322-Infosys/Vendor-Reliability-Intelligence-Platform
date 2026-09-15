@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SCM - Orders & Shipments</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/OrdersShipments.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
+
+<aside class="sidebar">
+
+    <div class="brand">
+
+        <div class="brand-logo">
+            <i class="fa-solid fa-truck-fast"></i>
+        </div>
+
+        <div>
+
+            <h2>VendorIQ</h2>
+
+            <span>
+                Vendor Reliability Platform
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <nav class="sidebar-nav">
+
+        <a href="/supplychaindashboard">
+            <i class="fa-solid fa-house"></i>
+            Dashboard
+        </a>
+
+        <a href="demand-planning">
+            <i class="fa-solid fa-chart-line"></i>
+            Demand Planning
+        </a>
+
+        <a href="/supplychainprocurement">
+            <i class="fa-solid fa-cart-shopping"></i>
+            Procurement
+        </a>
+
+        <a href="/suppliers">
+            <i class="fa-solid fa-users"></i>
+            Suppliers
+        </a>
+
+        <a href="/inventory">
+            <i class="fa-solid fa-box"></i>
+            Inventory
+        </a>
+
+        <a
+            href="/ordersshipments"
+            class="active"
+        >
+            <i class="fa-solid fa-truck-fast"></i>
+            Orders & Shipments
+        </a>
+
+        <a href="/warehouses">
+            <i class="fa-solid fa-warehouse"></i>
+            Warehouses
+        </a>
+
+        <a href="/transportation">
+            <i class="fa-solid fa-truck"></i>
+            Transportation
+        </a>
+
+        <a href="/analyticsreports">
+            <i class="fa-solid fa-chart-pie"></i>
+            Analytics & Reports
+        </a>
+
+        <a href="/alertsnotifications">
+            <i class="fa-regular fa-bell"></i>
+            Alerts & Notifications
+        </a>
+
+        <a href="/documents">
+            <i class="fa-regular fa-file-lines"></i>
+            Documents
+        </a>
+
+        <a href="/supplychainsettings">
+            <i class="fa-solid fa-gear"></i>
+            Settings
+        </a>
+
+        <a href="/login">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+
+    </nav>
+
+
+    <div class="quick-actions">
+
+        <h4>Quick Actions</h4>
+
+        <button onclick="window.location.href='/CreatePurchaseOrder'">
+            <i class="fa-solid fa-cart-plus"></i>
+            Create Purchase Order
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <button onclick="window.location.href='/AddSupplier'">
+            <i class="fa-solid fa-user-plus"></i>
+            Add New Supplier
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <button onclick="window.location.href='/CreateShipment'">
+            <i class="fa-solid fa-ship"></i>
+            Create Shipment
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <button onclick="window.location.href='/UploadDocument'">
+            <i class="fa-solid fa-upload"></i>
+            Upload Document
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+
+
+    <div class="profile-card" onclick="openSupplyChainProfile()">
+
+        <div class="avatar">
+            <i class="fa-solid fa-user-tie"></i>
+        </div>
+
+        <strong id="userName">
+            Supply Chain Manager
+        </strong>
+
+        <span>
+            Supply Chain Manager
+        </span>
+
+        <small>
+            <i class="fa-solid fa-circle"></i>
+            Online
+        </small>
+
+    </div>
+
+
+</aside>
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main class="main">
+
+
+<header class="topbar">
+
+    <div class="topbar-left">
+
+        <h1>
+            Supply Chain Manager Dashboard
+        </h1>
+
+    </div>
+
+
+    <div class="topbar-right">
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="globalSearch"
+                placeholder="Search..."
+            >
+
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+        </div>
+
+
+        <button class="top-icon notification-button">
+
+            <i class="fa-regular fa-bell"></i>
+
+            <span
+                id="notificationCount"
+                class="notification-count"
+            >
+                0
+            </span>
+
+        </button>
+
+
+        <div class="date-time">
+
+            <i class="fa-regular fa-calendar"></i>
+
+            <div>
+
+                <strong id="currentDate">
+                    --
+                </strong>
+
+                <span id="currentTime">
+                    --
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<section class="content">
+
+
+<div class="page-heading">
+
+    <div>
+
+        <h2>
+            Orders & Shipments Overview
+        </h2>
+
+        <p>
+            Real-time view of all customer orders and shipment activities.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     KPI CARDS
+========================================================= -->
+
+<section class="kpi-grid">
+
+
+<div class="kpi-card">
+
+    <div class="kpi-icon blue">
+        <i class="fa-solid fa-cart-shopping"></i>
+    </div>
+
+    <div>
+
+        <span>Total Orders</span>
+
+        <strong id="totalOrders">
+            0
+        </strong>
+
+        <small class="positive">
+            ↑ Live database
+        </small>
+
+    </div>
+
+</div>
+
+
+<div class="kpi-card">
+
+    <div class="kpi-icon green">
+        <i class="fa-solid fa-circle-check"></i>
+    </div>
+
+    <div>
+
+        <span>Delivered Orders</span>
+
+        <strong id="deliveredOrders">
+            0
+        </strong>
+
+        <small class="positive">
+            ↑ Current
+        </small>
+
+    </div>
+
+</div>
+
+
+<div class="kpi-card">
+
+    <div class="kpi-icon purple">
+        <i class="fa-solid fa-truck"></i>
+    </div>
+
+    <div>
+
+        <span>In Transit Shipments</span>
+
+        <strong id="inTransitShipments">
+            0
+        </strong>
+
+        <small class="positive">
+            ↑ Current
+        </small>
+
+    </div>
+
+</div>
+
+
+<div class="kpi-card">
+
+    <div class="kpi-icon orange">
+        <i class="fa-regular fa-clock"></i>
+    </div>
+
+    <div>
+
+        <span>Pending Orders</span>
+
+        <strong id="pendingOrders">
+            0
+        </strong>
+
+        <small>
+            Live status
+        </small>
+
+    </div>
+
+</div>
+
+
+<div class="kpi-card">
+
+    <div class="kpi-icon yellow">
+        <i class="fa-solid fa-xmark"></i>
+    </div>
+
+    <div>
+
+        <span>Cancelled Orders</span>
+
+        <strong id="cancelledOrders">
+            0
+        </strong>
+
+        <small>
+            Live status
+        </small>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+     CHARTS
+========================================================= -->
+
+<section class="charts-grid">
+
+
+<div class="panel trend-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h3>
+                Orders Trend
+            </h3>
+
+        </div>
+
+        <select id="trendPeriod">
+
+            <option value="30">
+                Last 30 Days
+            </option>
+
+            <option value="7">
+                Last 7 Days
+            </option>
+
+        </select>
+
+    </div>
+
+    <div class="chart-container">
+
+        <canvas id="ordersTrendChart"></canvas>
+
+    </div>
+
+</div>
+
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <h3>
+            Orders by Status
+        </h3>
+
+    </div>
+
+    <div class="donut-wrapper">
+
+        <canvas id="ordersStatusChart"></canvas>
+
+        <div
+            id="ordersStatusCenter"
+            class="donut-center"
+        >
+            <strong>0</strong>
+            <span>Total Orders</span>
+        </div>
+
+    </div>
+
+    <div
+        id="ordersStatusLegend"
+        class="chart-legend"
+    ></div>
+
+</div>
+
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <h3>
+            Shipments by Status
+        </h3>
+
+    </div>
+
+    <div class="donut-wrapper">
+
+        <canvas id="shipmentsStatusChart"></canvas>
+
+        <div
+            id="shipmentsStatusCenter"
+            class="donut-center"
+        >
+            <strong>0</strong>
+            <span>Total Shipments</span>
+        </div>
+
+    </div>
+
+    <div
+        id="shipmentsStatusLegend"
+        class="chart-legend"
+    ></div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+     RECENT TABLES
+========================================================= -->
+
+<section class="tables-grid">
+
+
+<div class="panel table-panel">
+
+    <div class="panel-header">
+
+        <h3>
+            Recent Orders
+        </h3>
+
+        <button>
+            View All Orders
+        </button>
+
+    </div>
+
+
+    <div class="table-scroll">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Order Date</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                    <th>ETA</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="recentOrdersBody">
+
+                <tr>
+
+                    <td colspan="6">
+                        Loading...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<div class="panel table-panel">
+
+    <div class="panel-header">
+
+        <h3>
+            Recent Shipments
+        </h3>
+
+        <button>
+            View All Shipments
+        </button>
+
+    </div>
+
+
+    <div class="table-scroll">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Shipment ID</th>
+                    <th>Order ID</th>
+                    <th>Carrier</th>
+                    <th>Status</th>
+                    <th>Location</th>
+                    <th>ETA</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="recentShipmentsBody">
+
+                <tr>
+
+                    <td colspan="6">
+                        Loading...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- =========================================================
+     TRANSIT + MAP
+========================================================= -->
+
+<section class="bottom-grid">
+
+
+<div class="panel table-panel">
+
+    <div class="panel-header">
+
+        <h3>
+            Shipments in Transit
+        </h3>
+
+        <button>
+            View All
+        </button>
+
+    </div>
+
+
+    <div class="table-scroll">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Shipment ID</th>
+                    <th>Order ID</th>
+                    <th>Origin</th>
+                    <th>Destination</th>
+                    <th>Carrier</th>
+                    <th>Status</th>
+                    <th>ETA</th>
+                    <th>Tracking</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="transitBody">
+
+                <tr>
+
+                    <td colspan="8">
+                        Loading...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<div class="panel map-panel">
+
+    <div class="panel-header">
+
+        <h3>
+            Shipment Tracking Map
+        </h3>
+
+        <button>
+            View All Shipments
+        </button>
+
+    </div>
+
+
+    <div id="shipmentMap"></div>
+
+</div>
+
+</section>
+
+
+</section>
+
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+<script src="/static/OrdersShipments.js"></script>
+
+</body>
+
+</html>

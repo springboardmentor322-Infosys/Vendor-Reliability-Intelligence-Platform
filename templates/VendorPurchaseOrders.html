@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+ 
+    <title>
+        VendorIQ - Purchase Orders
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/VendorPurchaseOrders.css"
+    >
+
+    <!-- Font Awesome Professional Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <!-- Chart.js -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- BRAND -->
+
+        <div class="brand">
+
+            <div class="brand-logo">
+
+                <div class="logo-shield">
+                    <i class="fa-solid fa-cube"></i>
+                </div>
+
+            </div>
+
+            <div class="brand-text">
+
+                <h2>
+                    VendorIQ
+                </h2>
+
+                <span>
+                    Vendor Reliability Platform
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- MAIN MENU -->
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+
+        <nav class="navigation">
+
+
+            <a href="/VendorDashboard">
+
+                <i class="fa-solid fa-house"></i>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a href="/VendorProfile">
+
+                <i class="fa-solid fa-user"></i>
+
+                <span>
+                    Vendor Profile
+                </span>
+
+            </a>
+
+
+            <a href="/PerformanceOverview">
+
+                <i class="fa-solid fa-chart-column"></i>
+
+                <span>
+                    Performance Overview
+                </span>
+
+            </a>
+
+
+            <a
+                href="/PurchaseOrders"
+                class="active"
+            >
+
+                <i class="fa-solid fa-clipboard-list"></i>
+
+                <span>
+                    Purchase Orders
+                </span>
+
+            </a>
+
+
+            <a href="/VendorContract">
+
+                <i class="fa-regular fa-file-lines"></i>
+
+                <span>
+                    Contracts & Compliance
+                </span>
+
+            </a>
+
+
+            <a href="/VendorInvoices">
+
+                <i class="fa-regular fa-credit-card"></i>
+
+                <span>
+                    Invoices & Payments
+                </span>
+
+            </a>
+
+
+            <a href="/VendorCommunication">
+
+                <i class="fa-regular fa-comment"></i>
+
+                <span>
+                    Communication
+                </span>
+
+                <b class="notification-badge">
+                    3
+                </b>
+
+            </a>
+
+
+            <a href="/VendorDocument">
+
+                <i class="fa-regular fa-folder"></i>
+
+                <span>
+                    Documents
+                </span>
+
+            </a>
+
+
+            <a href="/VendorNotifications">
+
+                <i class="fa-regular fa-bell"></i>
+
+                <span>
+                    Notifications
+                </span>
+
+                <b class="notification-badge">
+                    5
+                </b>
+
+            </a>
+
+
+            <!-- REPORTS -->
+
+            <div class="menu-title reports-title">
+                REPORTS
+            </div>
+
+
+            <a href="/PerformanceReports">
+
+                <i class="fa-solid fa-chart-line"></i>
+
+                <span>
+                    Performance Reports
+                </span>
+
+            </a>
+
+
+            <a href="/OrderReports">
+
+                <i class="fa-regular fa-file"></i>
+
+                <span>
+                    Order Reports
+                </span>
+
+            </a>
+
+
+            <a href="/ComplianceReports">
+
+                <i class="fa-solid fa-shield"></i>
+
+                <span>
+                    Compliance Reports
+                </span>
+
+            </a>
+
+
+            <a href="/ExportReports">
+
+                <i class="fa-solid fa-download"></i>
+
+                <span>
+                    Export Reports
+                </span>
+
+            </a>
+
+
+            <!-- ACCOUNT -->
+
+            <div class="menu-title reports-title">
+                ACCOUNT
+            </div>
+
+
+            <a href="/VendorSettings">
+
+                <i class="fa-solid fa-gear"></i>
+
+                <span>
+                    Settings
+                </span>
+
+            </a>
+
+
+            <a href="/VendorHelpSupport">
+
+                <i class="fa-regular fa-circle-question"></i>
+
+                <span>
+                    Help & Support
+                </span>
+
+            </a>
+
+
+            <a
+                href="/login"
+                id="logoutBtn"
+            >
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <span>
+                    Logout
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        <!-- =================================================
+             VENDOR CARD
+        ================================================== -->
+
+        <div class="vendor-card">
+
+
+            <div class="vendor-avatar">
+
+                <i class="fa-solid fa-user"></i>
+
+            </div>
+
+
+            <div class="vendor-card-info">
+
+                <strong id="sidebarVendorName">
+                    Loading...
+                </strong>
+
+                <span>
+                    Vendor ID:<span id="sidebarVendorId"> - </span>
+                </span>
+
+                <small>
+
+                    <i class="fa-solid fa-circle"></i>
+
+                    Verified Vendor
+
+                </small>
+
+            </div>
+
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+
+            <div class="page-heading">
+
+                <h1>
+                    Purchase Orders
+                </h1>
+
+                <div class="breadcrumb">
+
+                    <span>
+                        Home
+                    </span>
+
+                    <span>/</span>
+
+                    <span>
+                        Purchase Orders
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="header-actions">
+
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        id="globalSearch"
+                        placeholder="Search PO number, status..."
+                    >
+
+                </div>
+
+
+                <button
+                    class="header-icon"
+                    title="Notifications"
+                    onclick="window.location.href='/VendorNotifications'"
+                >
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <b>
+                        3
+                    </b>
+
+                </button>
+
+
+                <button
+                    class="header-icon"
+                    title="Messages"
+                    onclick="window.location.href='/VendorCommunication'"
+                >
+
+                    <i class="fa-regular fa-envelope"></i>
+
+                    <b>
+                        5
+                    </b>
+
+                </button>
+
+
+                <div class="profile">
+
+
+                    <div class="profile-avatar">
+
+                        <i class="fa-solid fa-user"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong id="headerVendorName">
+                            Loading...
+                        </strong>
+
+                        <span>
+                            Vendor
+                        </span>
+
+                    </div>
+
+
+                    <i class="fa-solid fa-chevron-down profile-arrow"></i>
+
+
+                </div>
+
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- =====================================================
+             CONTENT
+        ====================================================== -->
+
+        <section class="content">
+
+
+            <!-- =================================================
+                 KPI CARDS
+            ================================================== -->
+
+            <div class="stats-grid">
+
+
+                <!-- TOTAL -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon blue">
+
+                        <i class="fa-solid fa-file-lines"></i>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Total Orders
+                        </span>
+
+                        <strong id="totalOrders">
+                            0
+                        </strong>
+
+                        <small>
+                            This Year
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DELIVERED -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon green">
+
+                        <i class="fa-solid fa-truck-fast"></i>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Orders Delivered
+                        </span>
+
+                        <strong id="deliveredOrders">
+                            0
+                        </strong>
+
+                        <small id="deliveredPercent">
+                            0%
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TRANSIT -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon orange">
+
+                        <i class="fa-solid fa-truck"></i>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            In Transit
+                        </span>
+
+                        <strong id="transitOrders">
+                            0
+                        </strong>
+
+                        <small id="transitPercent">
+                            0%
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PENDING -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon purple">
+
+                        <i class="fa-solid fa-clock"></i>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Pending
+                        </span>
+
+                        <strong id="pendingOrders">
+                            0
+                        </strong>
+
+                        <small id="pendingPercent">
+                            0%
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CANCELLED -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon red">
+
+                        <i class="fa-solid fa-circle-xmark"></i>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Cancelled
+                        </span>
+
+                        <strong id="cancelledOrders">
+                            0
+                        </strong>
+
+                        <small id="cancelledPercent">
+                            0%
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- VALUE -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon gold">
+
+                        <i class="fa-solid fa-dollar-sign"></i>
+
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Total Order Value
+                        </span>
+
+                        <strong id="totalOrderValue">
+                            $0
+                        </strong>
+
+                        <small>
+                            This Year
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 LOWER LAYOUT
+            ================================================== -->
+
+            <div class="orders-layout">
+
+
+                <!-- =================================================
+                     LEFT
+                ================================================== -->
+
+                <div class="orders-section">
+
+
+                    <!-- FILTER CARD -->
+
+                    <div class="filter-card">
+
+
+                        <div class="filter-item">
+
+                            <label>
+                                Search PO
+                            </label>
+
+                            <div class="input-with-icon">
+
+                                <input
+                                    type="text"
+                                    id="searchInput"
+                                    placeholder="Search PO number..."
+                                >
+
+                                <i class="fa-solid fa-magnifying-glass"></i>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="filter-item">
+
+                            <label>
+                                Status
+                            </label>
+
+                            <select id="statusFilter">
+
+                                <option value="All">
+                                    All Status
+                                </option>
+
+                                <option value="Pending">
+                                    Pending
+                                </option>
+
+                                <option value="Approved">
+                                    Approved
+                                </option>
+
+                                <option value="Ordered">
+                                    Ordered
+                                </option>
+
+                                <option value="In Transit">
+                                    In Transit
+                                </option>
+
+                                <option value="Delivered">
+                                    Delivered
+                                </option>
+
+                                <option value="Completed">
+                                    Completed
+                                </option>
+
+                                <option value="Cancelled">
+                                    Cancelled
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="filter-item">
+
+                            <label>
+                                Order Date
+                            </label>
+
+                            <div class="date-range">
+
+                                <input
+                                    type="date"
+                                    id="startDate"
+                                >
+
+                                <span>
+                                    to
+                                </span>
+
+                                <input
+                                    type="date"
+                                    id="endDate"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="filter-actions">
+
+                            <button
+                                class="reset-btn"
+                                id="resetBtn"
+                            >
+
+                                <i class="fa-solid fa-rotate-left"></i>
+
+                                Reset
+
+                            </button>
+
+
+                            <button
+                                class="export-btn"
+                                id="exportBtn"
+                            >
+
+                                <i class="fa-solid fa-file-export"></i>
+
+                                Export
+
+                            </button>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- TABLE -->
+
+                    <div class="table-card">
+
+
+                        <div class="table-header">
+
+                            <div>
+
+                                <h3>
+                                    Purchase Orders
+                                </h3>
+
+                                <span>
+                                    Manage and monitor your purchase orders
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="table-wrapper">
+
+                            <table>
+
+                                <thead>
+                                    <tr>
+
+                                        <th>
+                                            Purchase Order ID
+                                        </th>
+
+                                        <th>
+                                            Ordered By
+                                        </th>
+
+                                        <th>
+                                            Order Date
+                                        </th>
+
+                                        <th>
+                                            Expected Delivery
+                                        </th>
+
+                                        <th>
+                                            Status
+                                        </th>
+
+                                        <th>
+                                            Amount
+                                        </th>
+
+                                        <th>
+                                            Actions
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="ordersTableBody">
+
+                                    <tr>
+
+                                        <td
+                                            colspan="7"
+                                            class="loading"
+                                        >
+
+                                            <i class="fa-solid fa-spinner fa-spin"></i>
+
+                                            Loading purchase orders...
+
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+
+
+                        <!-- PAGINATION -->
+
+                        <div class="pagination-container">
+
+
+                            <span id="paginationInfo">
+                                Showing 0 entries
+                            </span>
+
+
+                            <div class="pagination">
+
+
+                                <select id="pageLimit">
+
+                                    <option value="10">
+                                        10 per page
+                                    </option>
+
+                                    <option value="20">
+                                        20 per page
+                                    </option>
+
+                                    <option value="50">
+                                        50 per page
+                                    </option>
+
+                                </select>
+
+
+                                <button id="previousPage">
+
+                                    <i class="fa-solid fa-chevron-left"></i>
+
+                                </button>
+
+
+                                <div id="pageNumbers"></div>
+
+
+                                <button id="nextPage">
+
+                                    <i class="fa-solid fa-chevron-right"></i>
+
+                                </button>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     RIGHT COLUMN
+                ================================================== -->
+
+                <aside class="right-column">
+
+
+                    <!-- ORDER SUMMARY -->
+
+                    <div class="side-card">
+
+                        <div class="side-card-header">
+
+                            <h3>
+                                Order Summary
+                            </h3>
+
+                            <i class="fa-solid fa-chart-pie"></i>
+
+                        </div>
+
+
+                        <div class="summary-content">
+
+
+                            <div class="donut-container">
+
+                                <canvas id="orderChart"></canvas>
+
+                                <div class="donut-center">
+
+                                    <strong id="chartTotal">
+                                        0
+                                    </strong>
+
+                                    <span>
+                                        Total Orders
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="legend">
+
+
+                                <div>
+
+                                    <i class="legend-dot green-dot"></i>
+
+                                    <span>
+                                        Delivered
+                                    </span>
+
+                                    <b id="legendDelivered">
+                                        0
+                                    </b>
+
+                                </div>
+
+
+                                <div>
+
+                                    <i class="legend-dot blue-dot"></i>
+
+                                    <span>
+                                        In Transit
+                                    </span>
+
+                                    <b id="legendTransit">
+                                        0
+                                    </b>
+
+                                </div>
+
+
+                                <div>
+
+                                    <i class="legend-dot orange-dot"></i>
+
+                                    <span>
+                                        Pending
+                                    </span>
+
+                                    <b id="legendPending">
+                                        0
+                                    </b>
+
+                                </div>
+
+
+                                <div>
+
+                                    <i class="legend-dot red-dot"></i>
+
+                                    <span>
+                                        Cancelled
+                                    </span>
+
+                                    <b id="legendCancelled">
+                                        0
+                                    </b>
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- QUICK FILTERS -->
+
+                    <div class="side-card">
+
+                        <div class="side-card-header">
+
+                            <h3>
+                                Quick Filters
+                            </h3>
+
+                            <i class="fa-solid fa-filter"></i>
+
+                        </div>
+
+
+                        <button
+                            class="quick-filter active"
+                            data-status="All"
+                        >
+
+                            <span>
+                                <i class="fa-solid fa-layer-group"></i>
+                                All Orders
+                            </span>
+
+                            <b id="quickAll">
+                                0
+                            </b>
+
+                        </button>
+
+
+                        <button
+                            class="quick-filter"
+                            data-status="Delivered"
+                        >
+
+                            <span>
+                                <i class="fa-solid fa-circle-check"></i>
+                                Delivered
+                            </span>
+
+                            <b id="quickDelivered">
+                                0
+                            </b>
+
+                        </button>
+
+
+                        <button
+                            class="quick-filter"
+                            data-status="In Transit"
+                        >
+
+                            <span>
+                                <i class="fa-solid fa-truck"></i>
+                                In Transit
+                            </span>
+
+                            <b id="quickTransit">
+                                0
+                            </b>
+
+                        </button>
+
+
+                        <button
+                            class="quick-filter"
+                            data-status="Pending"
+                        >
+
+                            <span>
+                                <i class="fa-solid fa-clock"></i>
+                                Pending
+                            </span>
+
+                            <b id="quickPending">
+                                0
+                            </b>
+
+                        </button>
+
+
+                        <button
+                            class="quick-filter"
+                            data-status="Cancelled"
+                        >
+
+                            <span>
+                                <i class="fa-solid fa-circle-xmark"></i>
+                                Cancelled
+                            </span>
+
+                            <b id="quickCancelled">
+                                0
+                            </b>
+
+                        </button>
+
+
+                    </div>
+
+
+
+                    <!-- HELP -->
+
+                    <div class="side-card help-card">
+
+
+                        <div class="help-icon">
+
+                            <i class="fa-solid fa-headset"></i>
+
+                        </div>
+
+
+                        <h3>
+                            Need Help?
+                        </h3>
+
+
+                        <p>
+                            If you have questions or issues
+                            regarding purchase orders, our
+                            support team is available to help.
+                        </p>
+
+
+                        <button
+                            onclick="window.location.href='/VendorHelp'"
+                        >
+
+                            <i class="fa-solid fa-headset"></i>
+
+                            Contact Support
+
+                        </button>
+
+
+                    </div>
+
+
+                </aside>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- FOOTER -->
+
+        <footer>
+
+            <span>
+                © 2024 VendorIQ. All rights reserved.
+            </span>
+
+            <span>
+                Privacy Policy
+                &nbsp; | &nbsp;
+                Terms of Service
+            </span>
+
+        </footer>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     ORDER DETAILS MODAL
+========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="orderModal"
+>
+
+
+    <div class="modal">
+
+
+        <button
+            class="modal-close"
+            id="modalClose"
+        >
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+
+        <div class="modal-title">
+
+            <div class="modal-title-icon">
+
+                <i class="fa-solid fa-file-invoice"></i>
+
+            </div>
+
+            <div>
+
+                <h2>
+                    Purchase Order Details
+                </h2>
+
+                <span>
+                    Complete purchase order information
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div id="orderDetails"></div>
+
+
+    </div>
+
+</div>
+
+
+
+<script
+    src="/static/VendorPurchaseOrders.js"
+></script>
+
+
+</body>
+
+</html>

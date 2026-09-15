@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Bill | VendorIQ</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #020817;
+            --panel: #071a33;
+            --panel2: #091f3a;
+            --border: rgba(59,130,246,.18);
+
+            --text: #f1f6ff;
+            --muted: #7087a5;
+
+            --blue: #3b82f6;
+            --cyan: #06b6d4;
+            --green: #10b981;
+            --red: #ef4444;
+        }
+
+        body {
+            min-height: 100vh;
+
+            font-family:
+                Inter,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            color: var(--text);
+
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(37,99,235,.10),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 80%,
+                    rgba(6,182,212,.06),
+                    transparent 30%
+                ),
+                var(--bg);
+        }
+
+        .page {
+            width: 100%;
+            max-width: 1150px;
+
+            margin: auto;
+
+            padding: 30px;
+        }
+
+        /* Header */
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 25px;
+        }
+
+        .title {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .title-icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 13px;
+
+            color: #60a5fa;
+
+            background: rgba(59,130,246,.12);
+
+            border: 1px solid rgba(59,130,246,.22);
+
+            box-shadow:
+                0 0 25px rgba(59,130,246,.08);
+        }
+
+        h1 {
+            font-size: 25px;
+        }
+
+        .subtitle {
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 11px 16px;
+
+            color: #a8bad3;
+
+            background: #071a33;
+
+            border: 1px solid var(--border);
+
+            border-radius: 10px;
+
+            text-decoration: none;
+
+            font-size: 12px;
+
+            transition: .25s;
+        }
+
+        .back-btn:hover {
+            color: white;
+
+            border-color: var(--blue);
+
+            transform: translateY(-2px);
+        }
+
+        /* Card */
+
+        .card {
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(7,26,51,.98),
+                    rgba(4,17,34,.98)
+                );
+
+            border: 1px solid var(--border);
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 20px 50px rgba(0,0,0,.3);
+
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+
+            border-bottom:
+                1px solid rgba(96,165,250,.08);
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+        }
+
+        .card-header p {
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        .form {
+            padding: 25px;
+        }
+
+        .grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 20px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+
+            gap: 7px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            color: #9db0c9;
+
+            font-size: 11px;
+
+            font-weight: 600;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+
+            min-height: 43px;
+
+            padding: 10px 13px;
+
+            color: #dce9fb;
+
+            background: #06172d;
+
+            border: 1px solid rgba(59,130,246,.17);
+
+            border-radius: 10px;
+
+            outline: none;
+
+            font-family: inherit;
+
+            font-size: 12px;
+
+            transition: .25s;
+        }
+
+        textarea {
+            min-height: 100px;
+
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: rgba(59,130,246,.55);
+
+            box-shadow:
+                0 0 0 3px rgba(59,130,246,.07);
+        }
+
+        option {
+            background: #071a33;
+        }
+
+        .amount-box {
+            position: relative;
+        }
+
+        .amount-box span {
+            position: absolute;
+
+            left: 13px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            color: #6f86a5;
+
+            font-size: 12px;
+        }
+
+        .amount-box input {
+            padding-left: 30px;
+        }
+
+        /* Footer */
+
+        .form-footer {
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 10px;
+
+            margin-top: 25px;
+
+            padding-top: 20px;
+
+            border-top:
+                1px solid rgba(96,165,250,.08);
+        }
+
+        button {
+            min-height: 42px;
+
+            padding: 0 18px;
+
+            border-radius: 10px;
+
+            border: none;
+
+            cursor: pointer;
+
+            font-family: inherit;
+
+            font-size: 12px;
+
+            font-weight: 650;
+
+            transition: .25s;
+        }
+
+        .cancel {
+            color: #9db0c9;
+
+            background: #091c34;
+
+            border: 1px solid var(--border);
+        }
+
+        .cancel:hover {
+            color: white;
+        }
+
+        .save {
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #0891b2
+                );
+
+            box-shadow:
+                0 8px 22px rgba(37,99,235,.18);
+        }
+
+        .save:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 12px 28px rgba(37,99,235,.3);
+        }
+
+        @media(max-width:700px) {
+            .page {
+                padding: 18px 12px;
+            }
+
+            .page-header {
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 15px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="page-header">
+
+        <div class="title">
+
+            <div class="title-icon">
+                <i class="fa-solid fa-file-invoice"></i>
+            </div>
+
+            <div>
+                <h1>Create Bill</h1>
+                <p class="subtitle">
+                    Create a new vendor bill
+                </p>
+            </div>
+
+        </div>
+
+        <a href="/AccountsPayable" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Payables
+        </a>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-header">
+            <h2>Bill Information</h2>
+            <p>Enter the details of the vendor invoice</p>
+        </div>
+
+
+        <form class="form" id="billForm">
+
+            <div class="grid">
+
+                <div class="field">
+                    <label>Vendor</label>
+
+                    <select id="vendor" required>
+                        <option value="">Select Vendor</option>
+                        <option>ABC Industries</option>
+                        <option>Global Supplies Ltd</option>
+                        <option>Tech Solutions Pvt Ltd</option>
+                        <option>Prime Logistics</option>
+                    </select>
+                </div>
+
+
+                <div class="field">
+                    <label>Invoice Number</label>
+
+                    <input
+                        type="text"
+                        id="invoiceNumber"
+                        placeholder="INV-2026-001"
+                        required
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label>Invoice Date</label>
+
+                    <input
+                        type="date"
+                        id="invoiceDate"
+                        required
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label>Due Date</label>
+
+                    <input
+                        type="date"
+                        id="dueDate"
+                        required
+                    >
+                </div>
+
+
+                <div class="field">
+                    <label>Amount</label>
+
+                    <div class="amount-box">
+
+                        <span>₹</span>
+
+                        <input
+                            type="number"
+                            id="amount"
+                            placeholder="0.00"
+                            min="0"
+                            step="0.01"
+                            required
+                        >
+
+                    </div>
+                </div>
+
+
+                <div class="field">
+                    <label>Payment Terms</label>
+
+                    <select id="terms">
+                        <option>Net 15</option>
+                        <option>Net 30</option>
+                        <option>Net 45</option>
+                        <option>Net 60</option>
+                    </select>
+                </div>
+
+
+                <div class="field full">
+                    <label>Description</label>
+
+                    <textarea
+                        id="description"
+                        placeholder="Enter bill description..."
+                    ></textarea>
+                </div>
+
+            </div>
+
+
+            <div class="form-footer">
+
+                <button
+                    type="button"
+                    class="cancel"
+                    onclick="window.location.href='/AccountsPayable'"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="save"
+                >
+                    <i class="fa-solid fa-check"></i>
+                    Create Bill
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+/* =========================================================
+   VendorIQ - Create Bill
+   Connects to FastAPI / PostgreSQL
+   ========================================================= */
+
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+
+// ---------------------------------------------------------
+// Get JWT token
+// ---------------------------------------------------------
+function getToken() {
+    return (
+        localStorage.getItem("access_token") ||
+        localStorage.getItem("token") ||
+        localStorage.getItem("jwt_token") ||
+        sessionStorage.getItem("access_token") ||
+        sessionStorage.getItem("token") ||
+        sessionStorage.getItem("jwt_token")
+    );
+}
+
+
+// ---------------------------------------------------------
+// API request helper
+// ---------------------------------------------------------
+async function apiFetch(url, options = {}) {
+
+    const token = getToken();
+
+    const headers = {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+    };
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+        ...options,
+        headers
+    });
+
+    let data = null;
+
+    try {
+        data = await response.json();
+    } catch {
+        data = null;
+    }
+
+    if (!response.ok) {
+
+        const message =
+            data?.detail ||
+            data?.message ||
+            `Request failed (${response.status})`;
+
+        throw new Error(message);
+    }
+
+    return data;
+}
+
+
+// ---------------------------------------------------------
+// Set today's date
+// ---------------------------------------------------------
+function setDefaultDate() {
+
+    const invoiceDate =
+        document.getElementById("invoiceDate");
+
+    if (invoiceDate && !invoiceDate.value) {
+
+        const today =
+            new Date().toISOString().split("T")[0];
+
+        invoiceDate.value = today;
+    }
+}
+
+
+// ---------------------------------------------------------
+// Validate dates
+// ---------------------------------------------------------
+function validateDates() {
+
+    const invoiceDate =
+        document.getElementById("invoiceDate").value;
+
+    const dueDate =
+        document.getElementById("dueDate").value;
+
+    if (!invoiceDate || !dueDate) {
+        return false;
+    }
+
+    if (new Date(dueDate) < new Date(invoiceDate)) {
+
+        alert("Due date cannot be before invoice date.");
+
+        return false;
+    }
+
+    return true;
+}
+
+
+// ---------------------------------------------------------
+// Create Bill
+// ---------------------------------------------------------
+document
+    .getElementById("billForm")
+    .addEventListener("submit", async function (e) {
+
+        e.preventDefault();
+
+        try {
+
+            const vendor =
+                document.getElementById("vendor").value.trim();
+
+            const invoiceNo =
+                document
+                    .getElementById("invoiceNumber")
+                    .value
+                    .trim();
+
+            const billDate =
+                document.getElementById("invoiceDate").value;
+
+            const dueDate =
+                document.getElementById("dueDate").value;
+
+            const amount =
+                parseFloat(
+                    document.getElementById("amount").value
+                );
+
+
+            // ---------------------------------------------
+            // Validation
+            // ---------------------------------------------
+
+            if (!vendor) {
+                alert("Please select a vendor.");
+                return;
+            }
+
+            if (!invoiceNo) {
+                alert("Please enter invoice number.");
+                return;
+            }
+
+            if (!billDate) {
+                alert("Please select invoice date.");
+                return;
+            }
+
+            if (!dueDate) {
+                alert("Please select due date.");
+                return;
+            }
+
+            if (!amount || amount <= 0) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+
+            if (!validateDates()) {
+                return;
+            }
+
+
+            // ---------------------------------------------
+            // EXACT backend payload
+            // FinancePayable
+            // ---------------------------------------------
+
+            const billData = {
+
+                invoice_no: invoiceNo,
+
+                vendor: vendor,
+
+                amount: amount,
+
+                bill_date: billDate,
+
+                due_date: dueDate,
+
+                payment_status: "Pending"
+            };
+
+
+            console.log(
+                "Sending bill to FastAPI:",
+                billData
+            );
+
+
+            // ---------------------------------------------
+            // Disable button
+            // ---------------------------------------------
+
+            const saveButton =
+                document.querySelector(".save");
+
+            if (saveButton) {
+
+                saveButton.disabled = true;
+
+                saveButton.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin"></i> Creating...';
+            }
+
+
+            // ---------------------------------------------
+            // POST → FastAPI
+            // ---------------------------------------------
+
+            const result = await apiFetch(
+                `${API_BASE_URL}/api/finance/accounts-payable/bills`,
+                {
+                    method: "POST",
+                    body: JSON.stringify(billData)
+                }
+            );
+
+
+            console.log(
+                "Bill created:",
+                result
+            );
+
+
+            alert(
+                result?.message ||
+                "Bill created successfully!"
+            );
+
+
+            // ---------------------------------------------
+            // Return to Accounts Payable
+            // ---------------------------------------------
+
+            window.location.href =
+                "/AccountsPayable";
+
+        } catch (error) {
+
+            console.error(
+                "Create bill error:",
+                error
+            );
+
+            alert(
+                "Unable to create bill.\n\n" +
+                error.message
+            );
+
+            const saveButton =
+                document.querySelector(".save");
+
+            if (saveButton) {
+
+                saveButton.disabled = false;
+
+                saveButton.innerHTML =
+                    '<i class="fa-solid fa-check"></i> Create Bill';
+            }
+        }
+
+    });
+
+
+// ---------------------------------------------------------
+// Initialize
+// ---------------------------------------------------------
+document.addEventListener(
+    "DOMContentLoaded",
+    setDefaultDate
+);
+</script>
+
+</body>
+</html>

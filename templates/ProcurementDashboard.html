@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        VendorIQ - Procurement Dashboard
+    </title>
+
+
+    <!-- Font Awesome -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- Dashboard CSS -->
+
+    <link
+        rel="stylesheet"
+        href="/static/ProcurementDashboard.css"
+    >
+
+
+    <!-- Chart.js -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================================
+     SIDEBAR
+====================================================== -->
+
+<aside class="sidebar">
+
+
+    <div class="brand">
+
+        <div class="brand-icon">
+
+            <i class="fa-solid fa-industry"></i>
+
+        </div>
+
+        <div>
+
+            <h2>
+                VendorIQ
+            </h2>
+
+            <span>
+                Vendor Reliability Platform
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="sidebar-section">
+
+        MAIN MENU
+
+    </div>
+
+
+    <nav>
+
+
+        <a
+            href="/ManagerDashboard"
+            class="nav-link active"
+        >
+
+            <i class="fa-solid fa-house"></i>
+
+            <span>
+                Dashboard
+            </span>
+
+        </a>
+
+
+        <a
+            href="/ProcurementRequests"
+            class="nav-link"
+        >
+
+            <i class="fa-regular fa-clipboard"></i>
+
+            <span>
+                Procurement Requests
+            </span>
+
+        </a>
+
+
+        <a
+            href="/ProcurementPurchaseOrder"
+            class="nav-link"
+        >
+
+            <i class="fa-solid fa-cart-shopping"></i>
+
+            <span>
+                Purchase Orders
+            </span>
+
+        </a>
+
+
+        <a
+            href="/ProcurementApprovals"
+            class="nav-link"
+        >
+
+            <i class="fa-regular fa-square-check"></i>
+
+            <span>
+                Approvals
+            </span>
+
+        </a>
+
+
+        <a
+            href="/ProcurementVendors"
+            class="nav-link"
+        >
+
+            <i class="fa-solid fa-user-group"></i>
+
+            <span>
+                Vendors
+            </span>
+
+        </a>
+
+
+        <a
+            href="/OrderTracking"
+            class="nav-link"
+        >
+
+            <i class="fa-solid fa-box"></i>
+
+            <span>
+                Order Tracking
+            </span>
+
+        </a>
+
+
+        <a
+            href="/ProcurementInvoices"
+            class="nav-link"
+        >
+
+            <i class="fa-regular fa-file-lines"></i>
+
+            <span>
+                Invoices
+            </span>
+
+        </a>
+
+
+        <a
+            href="/ProcurementReports"
+            class="nav-link"
+        >
+
+            <i class="fa-regular fa-chart-bar"></i>
+
+            <span>
+                Reports
+            </span>
+
+        </a>
+
+
+        <a
+            href="/ProcurementAnalytics"
+            class="nav-link"
+        >
+
+            <i class="fa-solid fa-chart-line"></i>
+
+            <span>
+                Analytics
+            </span>
+
+        </a>
+
+
+    </nav>
+
+
+    <div class="sidebar-divider"></div>
+
+
+    <div class="sidebar-section">
+
+        COMMUNICATION
+
+    </div>
+
+
+    <nav>
+
+
+        <a
+            href="/ProcurementNotifications"
+            class="nav-link"
+        >
+
+            <i class="fa-regular fa-bell"></i>
+
+            <span>
+                Notifications
+            </span>
+
+            <b
+                class="notification-badge"
+                id="notificationCount"
+            >
+                0
+            </b>
+
+        </a>
+
+
+        <a
+            href="/Messages"
+            class="nav-link"
+        >
+
+            <i class="fa-regular fa-envelope"></i>
+
+            <span>
+                Messages
+            </span>
+
+            <b
+                class="notification-badge"
+                id="messageCount"
+            >
+                0
+            </b>
+
+        </a>
+
+
+    </nav>
+
+
+    <div class="sidebar-divider"></div>
+
+
+    <!-- SUPPORT -->
+
+    <div class="sidebar-section">
+
+        SUPPORT
+
+    </div>
+
+
+    <nav>
+
+
+        <a
+            href="/ProcurementHelpSupport"
+            class="nav-link"
+        >
+
+            <i class="fa-regular fa-circle-question"></i>
+
+            <span>
+                Help & Support
+            </span>
+
+        </a>
+
+
+        <a
+            href="/ProcurementSettings"
+            class="nav-link"
+        >
+
+            <i class="fa-solid fa-gear"></i>
+
+            <span>
+                Settings
+            </span>
+
+        </a>
+
+        <a href="/login" class="nav-link">
+            
+            <i class="fa-solid fa-right-from-bracket"></i>
+
+            <span>Logout</span>
+            
+        </a>
+
+    </nav>
+
+
+    <!-- USER -->
+
+    <div class="sidebar-user">
+
+        <div class="avatar">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+
+        <div>
+
+            <strong id = "headerUserName">
+                -
+            </strong>
+
+            <small id="headerUserRole">
+                Procurement Manager
+            </small>
+
+            <span class="online">
+
+                <i></i>
+
+                Online
+
+            </span>
+
+        </div>
+
+    </div>
+
+
+</aside>
+
+
+<!-- ======================================================
+     MAIN
+====================================================== -->
+
+<main class="main">
+
+
+    <!-- HEADER -->
+
+    <header class="topbar">
+
+
+        <div>
+
+            <h1>
+                Procurement Dashboard
+            </h1>
+
+            <p>
+                Welcome back, Manager!
+            </p>
+
+        </div>
+
+
+        <div class="header-actions">
+
+
+            <div class="search">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    placeholder="Search anything..."
+                    id="searchInput"
+                >
+
+            </div>
+
+
+            <button class="icon-button">
+
+                <i class="fa-regular fa-bell"></i>
+
+                <span>
+                    6
+                </span>
+
+            </button>
+
+
+            <button class="icon-button">
+
+                <i class="fa-regular fa-envelope"></i>
+
+                <span>
+                    3
+                </span>
+
+            </button>
+
+            <!-- ==========================================================
+                USER PROFILE DROPDOWN
+            ========================================================== -->
+
+            <div class="user-menu" onclick="openProfile()">
+
+                <!-- USER HEADER -->
+                <div
+                    class="user-profile"
+                    id="userProfileButton"
+                >
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div class="user-details">
+
+                        <strong id="headUserName">
+                            -
+                        </strong>
+
+                        <small id="headUserRole">
+                            Procurement Manager
+                        </small>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- FILTER BAR -->
+
+    <div class="toolbar">
+
+        <div></div>
+
+        <div class="toolbar-right">
+
+            <button class="date-button">
+
+                <i class="fa-regular fa-calendar"></i>
+
+                01 May 2024 - 31 May 2024
+
+                <i class="fa-solid fa-chevron-down"></i>
+
+            </button>
+
+
+            <button
+                class="refresh-button"
+                id="refreshButton"
+            >
+
+                <i class="fa-solid fa-rotate"></i>
+
+                Refresh
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         KPI CARDS
+    ================================================== -->
+
+    <section class="kpi-grid">
+
+
+        <div class="kpi-card">
+
+            <div class="kpi-icon purple">
+
+                <i class="fa-solid fa-wallet"></i>
+
+            </div>
+
+            <div>
+
+                <span>
+                    Total Spend (MTD)
+                </span>
+
+                <strong id="totalSpend">
+                    $0
+                </strong>
+
+                <small class="positive">
+                    0%
+                </small>
+
+                <p>
+                    vs Apr 2024
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="kpi-card">
+
+            <div class="kpi-icon blue">
+
+                <i class="fa-solid fa-cart-shopping"></i>
+
+            </div>
+
+            <div>
+
+                <span>
+                    Active POs
+                </span>
+
+                <strong id="activePOs">
+                    0
+                </strong>
+
+                <small class="positive">
+                    0%
+                </small>
+
+                <p>
+                    Current
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="kpi-card">
+
+            <div class="kpi-icon orange">
+
+                <i class="fa-solid fa-hourglass-half"></i>
+
+            </div>
+
+            <div>
+
+                <span>
+                    Pending Approvals
+                </span>
+
+                <strong id="pendingApprovals">
+                    0
+                </strong>
+
+                <small class="negative">
+                    0%
+                </small>
+
+                <p>
+                    Requires Action
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="kpi-card">
+
+            <div class="kpi-icon green">
+
+                <i class="fa-solid fa-truck"></i>
+
+            </div>
+
+            <div>
+
+                <span>
+                    On-Time Delivery
+                </span>
+
+                <strong id="onTimeDelivery">
+                    0%
+                </strong>
+
+                <small class="positive">
+                    0%
+                </small>
+
+                <p>
+                    Current
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="kpi-card">
+
+            <div class="kpi-icon pink">
+
+                <i class="fa-solid fa-piggy-bank"></i>
+
+            </div>
+
+            <div>
+
+                <span>
+                    Savings (YTD)
+                </span>
+
+                <strong>
+                    $0
+                </strong>
+
+                <small class="positive">
+                    0%
+                </small>
+
+                <p>
+                    vs Apr 2024
+                </p>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- ==================================================
+         TOP DASHBOARD
+    ================================================== -->
+
+    <section class="dashboard-grid top-grid">
+
+
+        <!-- PROCUREMENT OVERVIEW -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    (i) Procurement Overview
+                </h2>
+
+            </div>
+
+
+            <div class="chart-container">
+
+                <div class="donut-wrapper">
+
+                    <canvas
+                        id="procurementChart"
+                    ></canvas>
+
+                    <div class="donut-center">
+
+                        <strong id="totalPOCenter">
+                            0
+                        </strong>
+
+                        <span>
+                            Total POs
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="legend"
+                    id="procurementLegend"
+                ></div>
+
+            </div>
+
+
+            <a href="#">
+                View Full Overview →
+            </a>
+
+        </div>
+
+
+        <!-- ACTIVE PURCHASE ORDERS -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    (ii) Active Purchase Orders
+                </h2>
+
+                <a href="/PurchaseOrders">
+                    View All POs →
+                </a>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                PO Number
+                            </th>
+
+                            <th>
+                                Vendor
+                            </th>
+
+                            <th>
+                                Amount
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Expected Delivery
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="purchaseOrderTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <a href="/PurchaseOrders">
+                View All Active POs →
+            </a>
+
+        </div>
+
+
+        <!-- VENDOR PERFORMANCE -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    (iii) Vendor Performance Summary
+                </h2>
+
+                <a href="/ProcurementVendors">
+                    View All Vendors →
+                </a>
+
+            </div>
+
+
+            <div class="score">
+
+                <strong>
+                    0
+                </strong>
+
+                <span>
+                    /100
+                </span>
+
+                <p>
+                    Avg. Vendor Score
+                </p>
+
+            </div>
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Vendor
+                        </th>
+
+                        <th>
+                            Quality
+                        </th>
+
+                        <th>
+                            Delivery
+                        </th>
+
+                        <th>
+                            Service
+                        </th>
+
+                        <th>
+                            Score
+                        </th>
+
+                        <th>
+                            Trend
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="vendorTable">
+
+                </tbody>
+
+            </table>
+
+
+            <a href="/ProcurementVendors">
+                View Performance Report →
+            </a>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- ==================================================
+         SECOND ROW
+    ================================================== -->
+
+    <section class="dashboard-grid middle-grid">
+
+
+        <!-- COST ANALYSIS -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    (iv) Procurement Cost Analysis
+                </h2>
+
+                <a href="/ProcurementAnalytics">
+                    View Spend Analytics →
+                </a>
+
+            </div>
+
+
+            <div class="spend-value">
+
+                <strong id="costSpend">
+                    $0
+                </strong>
+
+                <span>
+                    Total Spend (MTD)
+                </span>
+
+            </div>
+
+
+            <div class="chart-large">
+
+                <canvas
+                    id="spendChart"
+                ></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- SPEND CATEGORY -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    Spend by Category (MTD)
+                </h2>
+
+            </div>
+
+
+            <div class="category-chart">
+
+                <canvas
+                    id="categoryChart"
+                ></canvas>
+
+            </div>
+
+
+            <a href="/ProcurementAnalytics">
+                View Cost Analysis →
+            </a>
+
+        </div>
+
+
+        <!-- DELIVERY STATUS -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    (v) Delivery Status
+                </h2>
+
+            </div>
+
+
+            <div class="delivery-stats">
+
+
+                <div>
+
+                    <strong
+                        id="deliveryOnTime"
+                    >
+                        0%
+                    </strong>
+
+                    <span>
+                        On-Time Delivery
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        0%
+                    </strong>
+
+                    <span>
+                        Delayed Delivery
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <strong>
+                        0 days
+                    </strong>
+
+                    <span>
+                        Avg. Delay
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <strong
+                        id="totalDeliveries"
+                    >
+                        0
+                    </strong>
+
+                    <span>
+                        Total Deliveries
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="chart-large">
+
+                <canvas
+                    id="deliveryChart"
+                ></canvas>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- ==================================================
+         WORKFLOW
+    ================================================== -->
+
+    <section class="card workflow-card">
+
+
+        <div class="card-header">
+
+            <h2>
+                Procurement Management Workflow
+            </h2>
+
+        </div>
+
+
+        <div class="workflow">
+
+
+            <div class="workflow-step">
+
+                <div class="workflow-icon blue">
+                    <i class="fa-regular fa-clipboard"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        1. Request
+                    </strong>
+
+                    <span>
+                        Create Procurement Request
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+
+            <div class="workflow-step">
+
+                <div class="workflow-icon green">
+                    <i class="fa-regular fa-square-check"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        2. Approval
+                    </strong>
+
+                    <span>
+                        Review & Approve
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+
+            <div class="workflow-step">
+
+                <div class="workflow-icon purple">
+                    <i class="fa-regular fa-file-lines"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        3. PO Creation
+                    </strong>
+
+                    <span>
+                        Generate Purchase Order
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+
+            <div class="workflow-step">
+
+                <div class="workflow-icon orange">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        4. Vendor Assignment
+                    </strong>
+
+                    <span>
+                        Assign to Vendor
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+
+            <div class="workflow-step">
+
+                <div class="workflow-icon cyan">
+                    <i class="fa-solid fa-box"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        5. Order Tracking
+                    </strong>
+
+                    <span>
+                        Track Order Status
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+
+            <div class="workflow-step">
+
+                <div class="workflow-icon blue">
+                    <i class="fa-solid fa-file-invoice"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        6. Invoice Management
+                    </strong>
+
+                    <span>
+                        Process & Pay Invoice
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+
+            <div class="workflow-step">
+
+                <div class="workflow-icon green">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        7. Completion
+                    </strong>
+
+                    <span>
+                        Order Completed
+                    </span>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         BOTTOM
+    ================================================== -->
+
+    <section class="bottom-grid">
+
+
+        <!-- NOTIFICATIONS -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    Recent Notifications
+                </h2>
+
+            </div>
+
+            <div
+                id="notifications"
+                class="activity-list"
+            ></div>
+
+            <a href="/ProcurementNotifications">
+                View All Notifications →
+            </a>
+
+        </div>
+
+
+        <!-- APPROVALS -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    My Pending Approvals
+                </h2>
+
+            </div>
+
+            <div class="activity-list">
+
+                <div class="activity">
+
+                    <i class="fa-regular fa-user"></i>
+
+                    <span>
+                        PO-2024-1258 requires approval
+                    </span>
+
+                    <b>
+                        $42,300
+                    </b>
+
+                </div>
+
+
+                <div class="activity">
+
+                    <i class="fa-regular fa-user"></i>
+
+                    <span>
+                        -
+                    </span>
+
+                    <b>
+                        $0
+                    </b>
+
+                </div>
+
+
+                <div class="activity">
+
+                    <i class="fa-regular fa-file-lines"></i>
+
+                    <span>
+                        Invoice requires approval
+                    </span>
+
+                    <b>
+                        $0
+                    </b>
+
+                </div>
+
+            </div>
+
+            <a href="/ProcurementApprovals">
+                View All Approvals →
+            </a>
+
+        </div>
+
+
+        <!-- MESSAGES -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    Recent Messages
+                </h2>
+
+            </div>
+
+            <div
+                id="messages"
+                class="activity-list"
+            ></div>
+
+            <a href="/Messages">
+                View All Messages →
+            </a>
+
+        </div>
+
+
+        <!-- STATUS -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    Procurement Status Legend
+                </h2>
+
+            </div>
+
+
+            <div class="status-legend">
+
+                <div>
+                    <span class="status pending">
+                        Pending
+                    </span>
+
+                    <small>
+                        Request submitted, awaiting approval
+                    </small>
+                </div>
+
+
+                <div>
+                    <span class="status approved">
+                        Approved
+                    </span>
+
+                    <small>
+                        Request approved, PO pending
+                    </small>
+                </div>
+
+
+                <div>
+                    <span class="status ordered">
+                        Ordered
+                    </span>
+
+                    <small>
+                        Purchase order sent to vendor
+                    </small>
+                </div>
+
+
+                <div>
+                    <span class="status delivered">
+                        Delivered
+                    </span>
+
+                    <small>
+                        Goods/Services delivered
+                    </small>
+                </div>
+
+
+                <div>
+                    <span class="status completed">
+                        Completed
+                    </span>
+
+                    <small>
+                        Order & payment completed
+                    </small>
+                </div>
+
+
+                <div>
+                    <span class="status cancelled">
+                        Cancelled
+                    </span>
+
+                    <small>
+                        Order cancelled
+                    </small>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+<script
+    src="/static/ProcurementDashboard.js"
+></script>
+
+
+</body>
+
+</html>

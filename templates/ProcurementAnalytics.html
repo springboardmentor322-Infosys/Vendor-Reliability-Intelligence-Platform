@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>VendorIQ - Analytics</title>
+
+    <link rel="stylesheet"
+          href="/static/ProcurementAnalytics.css">
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-industry"></i>
+            </div>
+ 
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+        <nav>
+
+            <a href="/ManagerDashboard"
+               class="menu-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/ProcurementRequests"
+               class="menu-item">
+                <i class="fa-regular fa-clipboard"></i>
+                <span>Procurement Requests</span>
+            </a>
+
+            <a href="/ProcurementPurchaseOrder"
+               class="menu-item">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Purchase Orders</span>
+            </a>
+
+            <a href="/ProcurementApprovals"
+               class="menu-item">
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+            </a>
+
+            <a href="/ProcurementVendors"
+               class="menu-item">
+                <i class="fa-solid fa-user-group"></i>
+                <span>Vendors</span>
+            </a>
+
+            <a href="/OrderTracking"
+               class="menu-item">
+                <i class="fa-solid fa-box"></i>
+                <span>Order Tracking</span>
+            </a>
+
+            <a href="/ProcurementInvoices"
+               class="menu-item">
+                <i class="fa-regular fa-file-lines"></i>
+                <span>Invoices</span>
+            </a>
+
+            <a href="/ProcurementReports"
+               class="menu-item">
+                <i class="fa-regular fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+
+            <a href="/ProcurementAnalytics"
+               class="menu-item active">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Analytics</span>
+            </a>
+
+        </nav>
+
+        <div class="menu-title communication-title">
+            COMMUNICATION
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementNotifications"
+               class="menu-item">
+                <i class="fa-regular fa-bell"></i>
+                <span>Notifications</span>
+                <b class="badge">6</b>
+            </a>
+
+            <a href="/Messages"
+               class="menu-item">
+                <i class="fa-regular fa-envelope"></i>
+                <span>Messages</span>
+                <b class="badge">3</b>
+            </a>
+
+        </nav>
+
+        <div class="menu-title communication-title">
+            SUPPORT
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementHelpSupport"
+               class="menu-item">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/ProcurementSettings"
+               class="menu-item">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/login" class="menu-item">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="profile-box">
+
+            <div class="profile-avatar">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div class="profile-info">
+                <strong id="sidebarName">
+                    James Anderson
+                </strong>
+
+                <span id="sidebarRole">
+                    Procurement Manager
+                </span>
+
+                <small>
+                    <i class="fa-solid fa-circle"></i>
+                    Online
+                </small>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="page-heading">
+
+                <h1>Analytics</h1>
+
+                <div class="breadcrumb">
+                    <span>Dashboard</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <strong>Analytics</strong>
+                </div>
+
+            </div>
+
+            <div class="top-actions">
+
+                <div class="global-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input
+                        type="text"
+                        placeholder="Search anything...">
+                </div>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>6</span>
+                </button>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-envelope"></i>
+                    <span>3</span>
+                </button>
+
+                <div class="user-top" onclick="openProfile()">
+
+                    <div class="top-avatar">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerName">James Anderson</strong>
+                        <small id="headerRole">Procurement Manager</small>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             ACTION BAR
+        ================================================== -->
+
+        <section class="action-bar">
+
+            <div></div>
+
+            <div class="action-buttons">
+
+                <div class="date-picker">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <input
+                        type="date"
+                        id="startDate">
+
+                    <span>-</span>
+
+                    <input
+                        type="date"
+                        id="endDate">
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+                <button
+                    class="refresh-button"
+                    id="refreshButton">
+
+                    <i class="fa-solid fa-rotate"></i>
+                    Refresh
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span>Total Spend (MTD)</span>
+
+                    <strong id="totalSpend">
+                        $0
+                    </strong>
+
+                    <small>
+                        vs previous period
+                        <b id="spendChange">0%</b>
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span>Total POs</span>
+
+                    <strong id="totalPOs">
+                        0
+                    </strong>
+
+                    <small>
+                        vs previous period
+                        <b id="poChange">0%</b>
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span>Avg. PO Value</span>
+
+                    <strong id="avgPO">
+                        $0
+                    </strong>
+
+                    <small>
+                        vs previous period
+                        <b id="avgPOChange">0%</b>
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon pink">
+                    <i class="fa-solid fa-piggy-bank"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span>Savings (YTD)</span>
+
+                    <strong id="savings">
+                        $0
+                    </strong>
+
+                    <small>
+                        vs previous period
+                        <b id="savingsChange">0%</b>
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-truck"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span>On-Time Delivery</span>
+
+                    <strong id="onTimeDelivery">
+                        0%
+                    </strong>
+
+                    <small>
+                        vs previous period
+                        <b id="deliveryChange">0%</b>
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon violet">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span>Supplier Performance</span>
+
+                    <strong>
+                        <span id="supplierPerformance">
+                            0
+                        </span>
+                        / 5
+                    </strong>
+
+                    <small>
+                        vs previous period
+                        <b id="supplierChange">0</b>
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FILTER TABS
+        ================================================== -->
+
+        <section class="analytics-tabs">
+
+            <button class="tab active">
+                Overview
+            </button>
+
+            <button class="tab">
+                Spend Analysis
+            </button>
+
+            <button class="tab">
+                Supplier Analysis
+            </button>
+
+            <button class="tab">
+                Category Analysis
+            </button>
+
+            <button class="tab">
+                Performance Analysis
+            </button>
+
+            <button class="tab">
+                Risk Analysis
+            </button>
+
+            <button class="filter-button">
+
+                <i class="fa-solid fa-filter"></i>
+                Filters
+
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             FILTERS
+        ================================================== -->
+
+        <section class="filters">
+
+            <div class="filter-field">
+
+                <label>Department</label>
+
+                <select id="departmentFilter">
+                    <option value="All">
+                        All Departments
+                    </option>
+                </select>
+
+            </div>
+
+
+            <div class="filter-field">
+
+                <label>Category</label>
+
+                <select id="categoryFilter">
+                    <option value="All">
+                        All Categories
+                    </option>
+                </select>
+
+            </div>
+
+
+            <div class="filter-field">
+
+                <label>Vendor</label>
+
+                <select id="vendorFilter">
+                    <option value="All">
+                        All Vendors
+                    </option>
+                </select>
+
+            </div>
+
+
+            <div class="filter-field">
+
+                <label>Location</label>
+
+                <select id="locationFilter">
+                    <option value="All">
+                        All Locations
+                    </option>
+                </select>
+
+            </div>
+
+
+            <button
+                class="reset-button"
+                id="resetFilters">
+
+                <i class="fa-solid fa-rotate"></i>
+                Reset
+
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             ROW 1
+        ================================================== -->
+
+        <section class="dashboard-grid">
+
+            <div class="panel large">
+
+                <div class="panel-header">
+
+                    <h3>Spend Trend (MTD)</h3>
+
+                    <div class="legend">
+                        <span>
+                            <i class="dot actual"></i>
+                            Actual Spend
+                        </span>
+
+                        <span>
+                            <i class="dot budget"></i>
+                            Budget
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="spendTrendChart"></canvas>
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Spend by Category (MTD)</h3>
+
+                </div>
+
+                <div class="donut-layout">
+
+                    <div class="donut-chart">
+                        <canvas id="categoryChart"></canvas>
+                        <div class="donut-center">
+                            <strong id="categoryTotal">
+                                $0
+                            </strong>
+                            <span>Total Spend</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="chart-legend"
+                        id="categoryLegend">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Spend by Department (MTD)</h3>
+
+                </div>
+
+                <div
+                    id="departmentList"
+                    class="department-list">
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ROW 2
+            ================================================== -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Top Spending Vendors (MTD)</h3>
+
+                </div>
+
+                <div class="vendor-table">
+
+                    <div class="vendor-head">
+                        <span>Vendor</span>
+                        <span>Spend (USD)</span>
+                        <span>% of Total</span>
+                    </div>
+
+                    <div id="vendorRows"></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Purchase Order Status (MTD)</h3>
+
+                </div>
+
+                <div class="donut-layout">
+
+                    <div class="donut-chart">
+                        <canvas id="poStatusChart"></canvas>
+
+                        <div class="donut-center">
+                            <strong id="poTotal">
+                                0
+                            </strong>
+                            <span>Total POs</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="chart-legend"
+                        id="poLegend">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Invoice Aging (All Time)</h3>
+
+                </div>
+
+                <div class="chart-container small">
+                    <canvas id="agingChart"></canvas>
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ROW 3
+            ================================================== -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>On-Time Delivery Trend</h3>
+
+                </div>
+
+                <div class="delivery-content">
+
+                    <div class="chart-container small">
+                        <canvas id="deliveryChart"></canvas>
+                    </div>
+
+                    <div class="delivery-score">
+
+                        <strong id="deliveryScore">
+                            0%
+                        </strong>
+
+                        <span>
+                            MTD Performance
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Supplier Performance Distribution</h3>
+
+                </div>
+
+                <div class="donut-layout">
+
+                    <div class="donut-chart">
+
+                        <canvas
+                            id="supplierChart">
+                        </canvas>
+
+                        <div class="donut-center">
+                            <strong id="supplierScore">
+                                0
+                            </strong>
+                            <span>Avg. Score</span>
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="chart-legend"
+                        id="supplierLegend">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Savings Analysis (YTD)</h3>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="savingsChart"></canvas>
+                </div>
+
+                <div class="saving-total">
+                    <strong id="savingTotal">
+                        $0
+                    </strong>
+                    <span>Total Savings</span>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="/static/ProcurementAnalytics.js"></script>
+
+</body>
+</html>

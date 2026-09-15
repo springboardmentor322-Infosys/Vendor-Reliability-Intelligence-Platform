@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Auditor Dashboard | VendorIQ</title>
+
+    <!-- Font Awesome 6.5.2 -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <!-- Dashboard CSS -->
+    <link
+        rel="stylesheet"
+        href="/static/AuditorDashboard.css"
+    >
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <!-- BRAND -->
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+
+                <div class="brand-name">
+                    VendorIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <nav class="sidebar-nav">
+
+            <!-- Dashboard -->
+
+            <a
+                class="nav-item active"
+                href="/AuditorDashboard"
+            >
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+
+            <!-- Audit Assignments -->
+
+            <a
+                class="nav-item"
+                href="/AuditAssignments"
+            >
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Audit Assignments</span>
+            </a>
+
+
+            <!-- Planning & Risk -->
+
+            <a
+                class="nav-item"
+                href="/PlanningRisk"
+            >
+                <i class="fa-solid fa-flag"></i>
+                <span>Planning & Risk</span>
+            </a>
+
+
+            <!-- Audits in Progress -->
+
+            <a
+                class="nav-item"
+                href="/AuditsInProgress"
+            >
+                <i class="fa-solid fa-list-check"></i>
+                <span>Audits in Progress</span>
+            </a>
+
+
+            <!-- Evidence & Documents -->
+
+            <a
+                class="nav-item"
+                href="/EvidenceDocuments"
+            >
+                <i class="fa-solid fa-folder-open"></i>
+                <span>Evidence & Documents</span>
+            </a>
+
+
+            <!-- Issues & Findings -->
+
+            <a
+                class="nav-item"
+                href="/IssuesFindings"
+            >
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Issues & Findings</span>
+            </a>
+
+
+            <!-- Reports -->
+
+            <a
+                class="nav-item"
+                href="/AuditorReports"
+            >
+                <i class="fa-solid fa-file-lines"></i>
+                <span>Reports</span>
+            </a>
+
+
+            <!-- Compliance Tracker -->
+
+            <a
+                class="nav-item"
+                href="/ComplianceTracker"
+            >
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Compliance Tracker</span>
+            </a>
+
+
+            <!-- Recommendations -->
+
+            <a
+                class="nav-item"
+                href="/Recommendations"
+            >
+                <i class="fa-regular fa-lightbulb"></i>
+                <span>Recommendations</span>
+            </a>
+
+
+            <!-- Analytics -->
+
+            <a
+                class="nav-item"
+                href="/AuditorAnalytics"
+            >
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Analytics</span>
+            </a>
+
+
+            <!-- Calendar -->
+
+            <a
+                class="nav-item"
+                href="/Calendar"
+            >
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Calendar</span>
+            </a>
+
+
+            <!-- Notifications -->
+
+            <a
+                class="nav-item"
+                href="/AuditorNotifications"
+            >
+
+                <i class="fa-solid fa-bell"></i>
+
+                <span>
+                    Notifications
+                </span>
+
+                <span
+                    id="notificationBadge"
+                    class="nav-badge"
+                >
+                    0
+                </span>
+
+            </a>
+
+
+            <!-- Messages -->
+
+            <a
+                class="nav-item"
+                href="/AuditorMessages"
+            >
+                <i class="fa-regular fa-envelope"></i>
+                <span>Messages</span>
+            </a>
+
+
+            <!-- Settings -->
+
+            <a
+                class="nav-item"
+                href="/AuditorSettings"
+            >
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+
+            <!-- Help & Support -->
+
+            <a
+                class="nav-item"
+                href="/AuditorHelp"
+            >
+                <i class="fa-solid fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/login" class="nav-item">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <!-- SIDEBAR USER -->
+
+        <div class="sidebar-user">
+
+            <div
+                class="avatar"
+                id="sidebarAvatar"
+            >
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="sidebar-user-info">
+
+                <strong id="sidebarName">
+                    Auditor
+                </strong>
+
+                <span>
+                    Senior Auditor
+                </span>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <h1>
+                    Auditor Dashboard
+                </h1>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <!-- SEARCH -->
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        id="globalSearch"
+                        type="text"
+                        placeholder="Search audits, reports, entities..."
+                    >
+
+                </div>
+
+
+                <!-- NOTIFICATIONS -->
+
+                <button
+                    class="notification-button"
+                    type="button"
+                    aria-label="Notifications"
+                >
+
+                    <i class="fa-solid fa-bell"></i>
+
+                    <span id="topNotificationBadge">
+                        0
+                    </span>
+
+                </button>
+
+
+                <!-- PROFILE -->
+
+                <div class="profile">
+
+                    <div
+                        class="profile-avatar"
+                        id="profileAvatar"
+                    >
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div class="profile-info">
+
+                        <strong id="profileName">
+                            Auditor
+                        </strong>
+
+                        <span>
+                            Senior Auditor
+                        </span>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
+
+        <section class="content">
+
+
+            <!-- =================================================
+                 WELCOME
+            ================================================== -->
+
+            <div class="welcome-row">
+
+                <div>
+
+                    <h2>
+
+                        Welcome back,
+
+                        <span id="welcomeName">
+                            Auditor
+                        </span>
+
+                    </h2>
+
+                    <p>
+                        Here's what's happening with your audits today.
+                    </p>
+
+                </div>
+
+
+                <!-- DATE -->
+
+                <button
+                    id="dateButton"
+                    class="date-button"
+                    type="button"
+                >
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <span id="currentDate">
+                        Loading...
+                    </span>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </button>
+
+            </div>
+
+
+            <!-- =================================================
+                 KPI CARDS
+            ================================================== -->
+
+            <section class="kpi-grid">
+
+
+                <!-- TOTAL ASSIGNMENTS -->
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon blue">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                    </div>
+
+                    <div class="kpi-content">
+
+                        <span>
+                            Total Assignments
+                        </span>
+
+                        <strong id="totalAssignments">
+                            0
+                        </strong>
+
+                        <small class="positive">
+                            Audit assignments
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- IN PROGRESS -->
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon green">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+
+                    <div class="kpi-content">
+
+                        <span>
+                            In Progress
+                        </span>
+
+                        <strong id="inProgress">
+                            0
+                        </strong>
+
+                        <small class="positive">
+                            Active audits
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ISSUES FOUND -->
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon orange">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+
+                    <div class="kpi-content">
+
+                        <span>
+                            Issues Found
+                        </span>
+
+                        <strong id="issuesFound">
+                            0
+                        </strong>
+
+                        <small class="warning">
+                            Findings identified
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- REPORTS COMPLETED -->
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon purple">
+                        <i class="fa-solid fa-file-circle-check"></i>
+                    </div>
+
+                    <div class="kpi-content">
+
+                        <span>
+                            Reports Completed
+                        </span>
+
+                        <strong id="reportsCompleted">
+                            0
+                        </strong>
+
+                        <small class="positive">
+                            Completed reports
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- COMPLIANCE SCORE -->
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon cyan">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div class="kpi-content">
+
+                        <span>
+                            Compliance Score
+                        </span>
+
+                        <strong>
+
+                            <span id="complianceScore">
+                                0
+                            </span>%
+
+                        </strong>
+
+                        <small class="positive">
+                            Overall score
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 CHARTS + UPCOMING
+            ================================================== -->
+
+            <section class="dashboard-grid top-grid">
+
+
+                <!-- AUDIT PROGRESS -->
+
+                <div class="panel progress-panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Audit Progress Overview
+                        </h3>
+
+                    </div>
+
+
+                    <div class="chart-area">
+
+                        <div class="donut-container">
+
+                            <canvas
+                                id="progressChart"
+                            ></canvas>
+
+                            <div class="donut-center">
+
+                                <strong id="chartTotal">
+                                    0
+                                </strong>
+
+                                <span>
+                                    Total
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            id="progressLegend"
+                            class="legend"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="panel-footer">
+
+                        <a href="/AuditAssignments">
+
+                            View all assignments
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STATUS CHART -->
+
+                <div class="panel status-panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Audit by Status
+                        </h3>
+
+                    </div>
+
+                    <div class="status-chart">
+
+                        <canvas
+                            id="statusChart"
+                        ></canvas>
+
+                    </div>
+
+                </div>
+
+
+                <!-- UPCOMING ACTIVITIES -->
+
+                <div class="panel upcoming-panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Upcoming Audit Activities
+                        </h3>
+
+                    </div>
+
+                    <div
+                        id="upcomingList"
+                        class="upcoming-list"
+                    >
+
+                        <div class="loading">
+                            Loading...
+                        </div>
+
+                    </div>
+
+                    <div class="panel-footer">
+
+                        <a href="/Calendar">
+
+                            View full calendar
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 BOTTOM
+            ================================================== -->
+
+            <section class="dashboard-grid bottom-grid">
+
+
+                <!-- RECENT FINDINGS -->
+
+                <div class="panel findings-panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Recent Issues / Findings
+                        </h3>
+
+                    </div>
+
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Issue
+                                    </th>
+
+                                    <th>
+                                        Audit
+                                    </th>
+
+                                    <th>
+                                        Severity
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="findingsTable">
+
+                                <tr>
+
+                                    <td colspan="4">
+                                        Loading...
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <div class="panel-footer">
+
+                        <a href="/IssuesFindings">
+
+                            View all issues
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- COMPLIANCE -->
+
+                <div class="panel compliance-panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Compliance Overview
+                        </h3>
+
+                    </div>
+
+
+                    <div class="compliance-meter">
+
+                        <div
+                            class="meter"
+                            id="complianceMeter"
+                        >
+
+                            <div class="meter-inner">
+
+                                <strong>
+
+                                    <span
+                                        id="complianceMeterValue"
+                                    >
+                                        0
+                                    </span>%
+
+                                </strong>
+
+                                <span>
+                                    Overall Compliance Score
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="compliance-change">
+
+                        <i class="fa-solid fa-chart-line"></i>
+
+                        Current score
+
+                    </div>
+
+                </div>
+
+
+                <!-- DOCUMENT UPLOADS -->
+
+                <div class="panel uploads-panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Document Uploads
+                        </h3>
+
+                    </div>
+
+
+                    <div class="upload-content">
+
+                        <div class="upload-icon">
+
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                        </div>
+
+                        <strong id="documentsUploaded">
+                            0
+                        </strong>
+
+                        <span>
+                            Documents uploaded this month
+                        </span>
+
+                    </div>
+
+
+                    <div class="panel-footer">
+
+                        <a href="/EvidenceDocuments">
+
+                            Go to documents
+
+                            <i class="fa-solid fa-arrow-right"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================
+     DASHBOARD JAVASCRIPT
+====================================================== -->
+
+<script src="/static/AuditorDashboard.js"></script>
+
+</body>
+
+</html>

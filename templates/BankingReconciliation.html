@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Banking & Reconciliation | VendorIQ 
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="/static/BankingReconciliation.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+        <nav class="menu">
+
+            <a href="/financerdashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/BudgetManagement">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Budget Management</span>
+            </a>
+
+            <a href="/Expenditure">
+                <i class="fa-solid fa-circle-dollar-to-slot"></i>
+                <span>Expenditures</span>
+            </a>
+
+            <a href="/Revenue">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Revenue</span>
+            </a>
+
+            <a href="/AccountsPayable">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span>Accounts Payable</span>
+            </a>
+
+            <a href="/AccountsReceivable">
+                <i class="fa-solid fa-money-check-dollar"></i>
+                <span>Accounts Receivable</span>
+            </a>
+
+            <a
+                href="/BankingReconciliation"
+                class="active"
+            >
+                <i class="fa-solid fa-building-columns"></i>
+                <span>Banking & Reconciliation</span>
+            </a>
+
+            <a href="/FinancialReports">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Financial Reports</span>
+            </a>
+
+            <a href="/Compliance">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Compliance</span>
+            </a>
+
+            <a href="/FinancerApprovals">
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+                <b class="badge red">5</b>
+            </a>
+
+            <a href="/FinancerNotifications">
+                <i class="fa-regular fa-bell"></i>
+                <span>Alerts & Notifications</span>
+                <b class="badge red">8</b>
+            </a>
+
+            <a href="/FinancerDocument">
+                <i class="fa-regular fa-file"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/FinancerSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/FinancerHelp">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-profile">
+
+            <i class="fa-solid fa-user"></i>
+
+            <div>
+
+                <strong id="sidebarName">
+                    Rajesh Kumar
+                </strong>
+
+                <small id="sidebarRole">
+                    Finance Officer
+                </small>
+
+                <span class="online">
+                    <i></i>
+                    Online
+                </span>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================================================= -->
+    <!-- MAIN -->
+    <!-- ================================================= -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div>
+
+                <h1>
+                    Banking & Reconciliation
+                </h1>
+
+                <p>
+                    Manage bank accounts, track transactions,
+                    and reconcile bank statements.
+                </p>
+
+            </div>
+
+            <div class="header-actions">
+
+                <div class="search">
+
+                    <input
+                        id="globalSearch"
+                        type="text"
+                        placeholder="Search anything..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>3</span>
+                </button>
+
+                <div class="user">
+
+                    <i class="fa-solid fa-user"></i>
+
+                    <div>
+
+                        <strong id="profileName">
+                            Rajesh Kumar
+                        </strong>
+
+                        <small id="profileRole">
+                            Finance Officer
+                        </small>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- DATE FILTER -->
+
+        <div class="toolbar">
+
+            <div></div>
+
+            <div class="date-filter">
+
+                <i class="fa-regular fa-calendar"></i>
+
+                <input
+                    type="date"
+                    id="fromDate"
+                >
+
+                <span>-</span>
+
+                <input
+                    type="date"
+                    id="toDate"
+                >
+
+                <button
+                    id="applyDate"
+                    class="apply-btn"
+                >
+                    Apply
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- KPI CARDS -->
+        <!-- ================================================= -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card blue">
+
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-building-columns"></i>
+                </div>
+
+                <div>
+                    <h4>Total Bank Balance</h4>
+
+                    <h2 id="totalBankBalance">
+                        ₹0
+                    </h2>
+
+                    <p id="accountCount">
+                        Across 0 Accounts
+                    </p>
+
+                    <span class="trend positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        Current balance
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card green">
+
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div>
+
+                    <h4>Reconciled Balance</h4>
+
+                    <h2 id="reconciledBalance">
+                        ₹0
+                    </h2>
+
+                    <p id="reconciledPercent">
+                        0% of Total Balance
+                    </p>
+
+                    <span class="trend positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        Reconciled
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card orange">
+
+                <div class="kpi-icon">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+
+                <div>
+
+                    <h4>Unreconciled Balance</h4>
+
+                    <h2 id="unreconciledBalance">
+                        ₹0
+                    </h2>
+
+                    <p id="unreconciledPercent">
+                        0% of Total Balance
+                    </p>
+
+                    <span class="trend negative">
+                        <i class="fa-solid fa-arrow-down"></i>
+                        Needs attention
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card purple">
+
+                <div class="kpi-icon">
+                    <i class="fa-regular fa-file-lines"></i>
+                </div>
+
+                <div>
+
+                    <h4>Transactions This Month</h4>
+
+                    <h2 id="transactionCount">
+                        0
+                    </h2>
+
+                    <p>Across All Accounts</p>
+
+                    <span class="trend positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        Transactions
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card blue">
+
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </div>
+
+                <div>
+
+                    <h4>Reconciliation Rate</h4>
+
+                    <h2 id="reconciliationRate">
+                        0%
+                    </h2>
+
+                    <p>This Period</p>
+
+                    <div class="progress">
+                        <span id="reconciliationProgress"></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- CHARTS -->
+        <!-- ================================================= -->
+
+        <section class="dashboard-grid">
+
+            <div class="panel cash-flow-panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>Cash Flow Summary</h3>
+                    </div>
+
+                    <select>
+                        <option>This Period</option>
+                        <option>This Month</option>
+                        <option>This Year</option>
+                    </select>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="cashFlowChart"></canvas>
+                </div>
+
+            </div>
+
+
+            <div class="panel reconciliation-panel">
+
+                <div class="panel-header">
+
+                    <h3>Reconciliation Status</h3>
+
+                    <select>
+                        <option>This Month</option>
+                        <option>This Year</option>
+                    </select>
+
+                </div>
+
+                <div class="donut-wrapper">
+
+                    <canvas
+                        id="reconciliationChart"
+                    ></canvas>
+
+                    <div class="donut-center">
+
+                        <strong
+                            id="donutPercentage"
+                        >
+                            0%
+                        </strong>
+
+                        <span>Reconciled</span>
+
+                    </div>
+
+                </div>
+
+                <div
+                    class="legend"
+                    id="reconciliationLegend"
+                ></div>
+
+                <div class="success-message">
+                    <i class="fa-regular fa-circle-check"></i>
+                    <span>
+                        Good job! Your reconciliation
+                        rate is excellent.
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="panel overview-panel">
+
+                <div class="panel-header">
+
+                    <h3>Reconciliation Overview</h3>
+
+                    <select>
+                        <option>This Month</option>
+                        <option>This Year</option>
+                    </select>
+
+                </div>
+
+                <div class="overview-list">
+
+                    <div class="overview-item">
+                        <i class="fa-regular fa-file-lines blue-icon"></i>
+                        <span>Total Statements</span>
+                        <strong id="totalStatements">0</strong>
+                    </div>
+
+                    <div class="overview-item">
+                        <i class="fa-solid fa-circle-check green-icon"></i>
+                        <span>Reconciled</span>
+                        <strong id="reconciledStatements">0</strong>
+                    </div>
+
+                    <div class="overview-item">
+                        <i class="fa-regular fa-clock orange-icon"></i>
+                        <span>In Progress</span>
+                        <strong id="inProgressStatements">0</strong>
+                    </div>
+
+                    <div class="overview-item">
+                        <i class="fa-solid fa-hourglass purple-icon"></i>
+                        <span>Pending</span>
+                        <strong id="pendingStatements">0</strong>
+                    </div>
+
+                    <div class="overview-item">
+                        <i class="fa-solid fa-circle-xmark red-icon"></i>
+                        <span>Failed</span>
+                        <strong id="failedStatements">0</strong>
+                    </div>
+
+                </div>
+
+                <a href="#" class="view-link">
+                    View all reconciliations
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- LOWER SECTION -->
+        <!-- ================================================= -->
+
+        <section class="lower-grid">
+
+            <!-- BANK ACCOUNTS -->
+
+            <div class="panel bank-accounts">
+
+                <div class="panel-header">
+
+                    <h3>Bank Accounts</h3>
+
+                    <a href="#">
+                        View All Accounts
+                    </a>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                        <tr>
+
+                            <th>Bank Account</th>
+                            <th>Account No.</th>
+                            <th>Bank</th>
+                            <th>Account Type</th>
+                            <th>Balance (₹)</th>
+                            <th>Reconciled Balance (₹)</th>
+                            <th>Status</th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody
+                            id="bankAccountsBody"
+                        ></tbody>
+
+                        <tfoot>
+
+                        <tr>
+
+                            <td colspan="4">
+                                <strong>Total</strong>
+                            </td>
+
+                            <td id="tableTotalBalance">
+                                ₹0
+                            </td>
+
+                            <td id="tableReconciledBalance">
+                                ₹0
+                            </td>
+
+                            <td></td>
+
+                        </tr>
+
+                        </tfoot>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT RECONCILIATIONS -->
+
+            <div class="panel recent-reconciliations">
+
+                <div class="panel-header">
+
+                    <h3>Recent Reconciliations</h3>
+
+                    <a href="#">
+                        View All
+                    </a>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                        <tr>
+
+                            <th>Account</th>
+                            <th>Statement Date</th>
+                            <th>Reconciled On</th>
+                            <th>Status</th>
+                            <th>Difference (₹)</th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody
+                            id="recentReconciliationsBody"
+                        ></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- QUICK ACTIONS -->
+
+            <div>
+
+                <div class="panel quick-actions">
+
+                    <div class="panel-header">
+                        <h3>Quick Actions</h3>
+                    </div>
+
+                    <button
+                        onclick="uploadStatement()"
+                    >
+                        <i class="fa-solid fa-upload"></i>
+                        Upload Bank Statement
+                    </button>
+
+                    <button
+                        onclick="matchTransactions()"
+                    >
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        Match Transactions
+                    </button>
+
+                    <button
+                        onclick="reconcileAccount()"
+                    >
+                        <i class="fa-solid fa-circle-check"></i>
+                        Reconcile Account
+                    </button>
+
+                    <button
+                        onclick="manualJournal()"
+                    >
+                        <i class="fa-solid fa-book"></i>
+                        Manual Journal Entry
+                    </button>
+
+                    <button
+                        onclick="bankRegister()"
+                    >
+                        <i class="fa-solid fa-building-columns"></i>
+                        Bank Account Register
+                    </button>
+
+                    <button
+                        onclick="reconciliationReport()"
+                    >
+                        <i class="fa-solid fa-file-circle-check"></i>
+                        Reconciliation Report
+                    </button>
+
+                </div>
+
+
+                <!-- SUMMARY -->
+
+                <div class="panel reconciliation-summary">
+
+                    <h3>Reconciliation Summary</h3>
+
+                    <div>
+                        <span>
+                            Ending Balance as per Bank
+                        </span>
+
+                        <strong id="endingBankBalance">
+                            ₹0
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>
+                            Ending Balance in Books
+                        </span>
+
+                        <strong id="endingBooksBalance">
+                            ₹0
+                        </strong>
+                    </div>
+
+                    <div class="difference-row">
+
+                        <span>
+                            Difference
+                        </span>
+
+                        <strong id="endingDifference">
+                            ₹0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- FOOTER -->
+        <!-- ================================================= -->
+
+        <footer>
+
+            <span>
+                © 2025 FinManage. All rights reserved.
+            </span>
+
+            <span>
+                Version 2.1.0
+                <i></i>
+            </span>
+
+        </footer>
+
+    </main>
+
+</div>
+
+<script src="/static/BankingReconciliation.js"></script>
+
+</body>
+</html>

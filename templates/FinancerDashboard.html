@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Finance Officer Dashboard | VendorIQ
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/FinancerDashboard.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+
+            <div>
+
+                <h2>VendorIQ</h2>
+
+                <span>
+                    Vendor Reliability System
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a
+                href="/financerdashboard"
+                class="nav-item active"
+            >
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+
+            <a
+                href="/BudgetManagement"
+                class="nav-item"
+            >
+                <i class="fa-solid fa-wallet"></i>
+                <span>Budget Management</span>
+            </a>
+
+
+            <a
+                href="/Expenditure"
+                class="nav-item"
+            >
+                <i class="fa-solid fa-circle-dollar-to-slot"></i>
+                <span>Expenditures</span>
+            </a>
+
+
+            <a
+                href="/Revenue"
+                class="nav-item"
+            >
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Revenue</span>
+            </a>
+
+
+            <a
+                href="/AccountsPayable"
+                class="nav-item"
+            >
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span>Accounts Payable</span>
+            </a>
+
+
+            <a
+                href="/AccountsReceivable"
+                class="nav-item"
+            >
+                <i class="fa-solid fa-money-check-dollar"></i>
+                <span>Accounts Receivable</span>
+            </a>
+
+
+            <a
+                href="/BankingReconciliation"
+                class="nav-item"
+            >
+                <i class="fa-solid fa-building-columns"></i>
+                <span>Banking &amp; Reconciliation</span>
+            </a>
+
+
+            <a
+                href="/FinancialReports"
+                class="nav-item"
+            >
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Financial Reports</span>
+            </a>
+
+
+            <a
+                href="/Compliance"
+                class="nav-item"
+            >
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Compliance</span>
+            </a>
+
+
+            <a
+                href="/FinancerApprovals"
+                class="nav-item"
+            >
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+
+                <span
+                    class="badge"
+                    id="approvalBadge"
+                >
+                    0
+                </span>
+
+            </a>
+
+
+            <a
+                href="/FinancerNotifications"
+                class="nav-item"
+            >
+                <i class="fa-regular fa-bell"></i>
+                <span>Alerts &amp; Notifications</span>
+
+                <span
+                    class="badge"
+                    id="notificationBadge"
+                >
+                    0
+                </span>
+
+            </a>
+
+
+            <a href="/FinanceCommunication" class="nav-item">
+                <i class="fa-solid fa-comments"></i>
+                <span>Communication</span>
+            </a>
+
+
+            <a
+                href="/FinancerDocument"
+                class="nav-item"
+            >
+                <i class="fa-regular fa-file"></i>
+                <span>Documents</span>
+            </a>
+
+
+            <a
+                href="/FinancerSettings"
+                class="nav-item"
+            >
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+
+            <a
+                href="/FinancerHelp"
+                class="nav-item"
+            >
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help &amp; Support</span>
+            </a>
+
+            <a href="/login" class="nav-item">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-user">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="user-details">
+
+                <strong id="sidebarUserName">
+                    Finance Officer
+                </strong>
+
+                <span>
+                    Finance Officer
+                </span>
+
+                <small>
+                    <i class="online-dot"></i>
+                    Online
+                </small>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div class="header-title">
+
+                <h1>
+                    Finance Officer Dashboard
+                </h1>
+
+                <p id="welcomeText">
+                    Welcome back! Here's what's happening
+                    with your finances today.
+                </p>
+
+            </div>
+
+
+            <div class="header-actions">
+
+                <div class="search-box">
+
+                    <input
+                        type="text"
+                        placeholder="Search anything..."
+                        id="globalSearch"
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+
+                <button class="icon-button">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span
+                        class="top-badge"
+                        id="topNotificationBadge"
+                    >
+                        0
+                    </span>
+
+                </button>
+
+
+                <div
+                    class="profile"
+                    id="profileButton"
+                >
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+
+                        <strong id="profileName">
+                            Finance Officer
+                        </strong>
+
+                        <span>
+                            Finance Officer
+                        </span>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- DATE BAR -->
+
+        <section class="toolbar">
+
+            <div></div>
+
+            <div class="toolbar-right">
+
+                <div class="date-selector">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <span id="dateRange">
+                        Current Financial Year
+                    </span>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+                <button
+                    class="refresh-btn"
+                    id="refreshBtn"
+                >
+
+                    <i class="fa-solid fa-rotate"></i>
+
+                    Refresh
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span>
+                        Total Budget
+                    </span>
+
+                    <strong id="totalBudget">
+                        ₹ 0
+                    </strong>
+
+                    <small class="positive">
+                        Annual Budget
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon red">
+                    <i class="fa-solid fa-money-bill-transfer"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span>
+                        Total Expenditure
+                    </span>
+
+                    <strong id="totalExpenses">
+                        ₹ 0
+                    </strong>
+
+                    <small>
+                        YTD Expenses
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span>
+                        Total Revenue
+                    </span>
+
+                    <strong id="totalRevenue">
+                        ₹ 0
+                    </strong>
+
+                    <small class="positive">
+                        YTD Revenue
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-solid fa-percent"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span>
+                        Budget Utilization
+                    </span>
+
+                    <strong id="budgetUtilization">
+                        0%
+                    </strong>
+
+                    <small>
+                        Budget Used
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+
+                <div class="kpi-content">
+
+                    <span>
+                        Pending Approvals
+                    </span>
+
+                    <strong id="pendingApprovals">
+                        0
+                    </strong>
+
+                    <small>
+                        Requires Approval
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FIRST ROW
+        ================================================== -->
+
+        <section class="dashboard-grid top-grid">
+
+            <!-- CASH FLOW -->
+
+            <div class="card cash-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h2>
+                            Cash Flow Overview
+                        </h2>
+
+                    </div>
+
+                    <select
+                        id="cashFlowPeriod"
+                        class="period-select"
+                    >
+
+                        <option value="year">
+                            This Year
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="legend">
+
+                    <span>
+                        <i class="legend-dot revenue"></i>
+                        Revenue
+                    </span>
+
+                    <span>
+                        <i class="legend-dot expense"></i>
+                        Expenditure
+                    </span>
+
+                    <span>
+                        <i class="legend-dot net"></i>
+                        Net Cash Flow
+                    </span>
+
+                </div>
+
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="cashFlowChart"
+                    ></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- EXPENSE CATEGORY -->
+
+            <div class="card expense-card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Expense by Category
+                    </h2>
+
+                    <select
+                        class="period-select"
+                    >
+
+                        <option>
+                            This Year
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="donut-wrapper">
+
+                    <canvas
+                        id="expenseCategoryChart"
+                    ></canvas>
+
+                    <div class="donut-center">
+
+                        <strong
+                            id="expenseCenterValue"
+                        >
+                            ₹ 0
+                        </strong>
+
+                        <span>
+                            Total Expenses
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="expenseLegend"
+                    class="expense-legend"
+                ></div>
+
+            </div>
+
+
+            <!-- QUICK ACTIONS -->
+
+            <div class="card quick-card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Quick Actions
+                    </h2>
+
+                </div>
+
+
+                <div class="quick-actions">
+
+                    <button
+                        data-url="/BudgetManagement"
+                    >
+
+                        <span class="quick-icon blue">
+                            <i class="fa-solid fa-plus"></i>
+                        </span>
+
+                        Create New Budget
+
+                    </button>
+
+
+                    <button
+                        data-url="/BudgetManagement"
+                    >
+
+                        <span class="quick-icon blue">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </span>
+
+                        Add New Expense
+
+                    </button>
+
+
+                    <button
+                        data-url="/FinancialReports"
+                    >
+
+                        <span class="quick-icon green">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </span>
+
+                        Generate Report
+
+                    </button>
+
+
+                    <button
+                        data-url="/BankingReconciliation"
+                    >
+
+                        <span class="quick-icon blue">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </span>
+
+                        Bank Reconciliation
+
+                    </button>
+
+
+                    <button
+                        data-url="/FinancerApprovals"
+                    >
+
+                        <span class="quick-icon green">
+                            <i class="fa-regular fa-circle-check"></i>
+                        </span>
+
+                        Submit for Approval
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SECOND ROW
+        ================================================== -->
+
+        <section class="dashboard-grid bottom-grid">
+
+            <!-- BUDGET VS ACTUAL -->
+
+            <div class="card budget-card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Budget vs Actual
+                    </h2>
+
+                    <select
+                        class="period-select"
+                    >
+
+                        <option>
+                            This Year
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="budgetActualChart"
+                    ></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT TRANSACTIONS -->
+
+            <div class="card transaction-card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Recent Transactions
+                    </h2>
+
+                    <button
+                        class="view-all"
+                        id="viewTransactions"
+                    >
+                        View All
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="transactionList"
+                    class="transaction-list"
+                ></div>
+
+            </div>
+
+
+            <!-- ALERTS -->
+
+            <div class="card alerts-card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Alerts &amp; Notifications
+                    </h2>
+
+                    <button
+                        class="view-all"
+                        id="viewAlerts"
+                    >
+                        View All
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="alertList"
+                    class="alert-list"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <footer class="footer">
+
+            <span>
+                © 2025 FinManage. All rights reserved.
+            </span>
+
+            <span>
+                Version 2.1.0
+                <i class="online-dot"></i>
+            </span>
+
+        </footer>
+
+    </main>
+
+</div>
+
+
+<script src="/static/FinancerDashboard.js"></script>
+
+</body>
+
+</html>

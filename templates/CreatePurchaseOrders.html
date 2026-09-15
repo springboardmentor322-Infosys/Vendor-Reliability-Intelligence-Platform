@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Purchase Order</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/CreatePurchaseOrders.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/supplychaindashboard">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="/demand-planning">
+                <i class="fa-solid fa-chart-line"></i>
+                Demand Planning
+            </a>
+
+            <a
+                href="/supplychainprocurement"
+                class="active"
+            >
+                <i class="fa-solid fa-cart-shopping"></i>
+                Procurement
+            </a>
+
+            <a href="/suppliers">
+                <i class="fa-solid fa-users"></i>
+                Suppliers
+            </a>
+
+            <a href="/inventory">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                Inventory
+            </a>
+
+            <a href="/ordersshipments">
+                <i class="fa-solid fa-truck"></i>
+                Orders & Shipments
+            </a>
+
+            <a href="/warehouses">
+                <i class="fa-solid fa-warehouse"></i>
+                Warehouses
+            </a>
+
+            <a href="/transportation">
+                <i class="fa-solid fa-truck-fast"></i>
+                Transportation
+            </a>
+
+            <a href="/analyticsreports">
+                <i class="fa-solid fa-chart-column"></i>
+                Analytics & Reports
+            </a>
+
+            <a href="/alertsnotifications">
+                <i class="fa-regular fa-bell"></i>
+                Alerts & Notifications
+            </a>
+
+            <a href="/documents">
+                <i class="fa-regular fa-file-lines"></i>
+                Documents
+            </a>
+
+            <a href="/supplychainsettings">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <!-- QUICK ACTIONS -->
+
+        <div class="quick-actions">
+
+            <h4>Quick Actions</h4>
+
+            <button onclick="window.location.href='/CreatePurchaseOrder'">
+                <i class="fa-solid fa-cart-plus"></i>
+                Create Purchase Order
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/AddSupplier'">
+                <i class="fa-solid fa-user-plus"></i>
+                Add New Supplier
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/CreateShipment'">
+                <i class="fa-solid fa-ship"></i>
+                Create Shipment
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/UploadDocument'">
+                <i class="fa-solid fa-upload"></i>
+                Upload Document
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+
+        <div class="user-card" onclick="openSupplyChainProfile()">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <strong>Arjun Kumar</strong>
+
+            <span>Supply Chain Manager</span>
+
+            <small>
+                <i class="fa-solid fa-circle"></i>
+                Online
+            </small>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <h1>Supply Chain Dashboard</h1>
+
+            <div class="top-actions">
+
+                <div class="search">
+
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <button class="top-icon">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>5</span>
+                </button>
+
+                <div class="date-box">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <div>
+                        <strong id="currentDate">
+                            --
+                        </strong>
+
+                        <small id="currentTime">
+                            --
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div class="content">
+
+
+            <!-- =================================================
+                 STEPPER
+            ================================================== -->
+
+            <div class="stepper">
+
+                <div
+                    class="step active"
+                    data-step="1"
+                >
+                    <span>1</span>
+                    <label>Purchase Order Details</label>
+                </div>
+
+                <div class="step-line"></div>
+
+                <div
+                    class="step"
+                    data-step="2"
+                >
+                    <span>2</span>
+                    <label>Items & Pricing</label>
+                </div>
+
+                <div class="step-line"></div>
+
+                <div
+                    class="step"
+                    data-step="3"
+                >
+                    <span>3</span>
+                    <label>Review & Submit</label>
+                </div>
+
+            </div>
+
+
+            <div class="page-grid">
+
+
+                <!-- =================================================
+                     LEFT
+                ================================================== -->
+
+                <section class="left-column">
+
+
+                    <!-- =============================================
+                         STEP 1
+                    ============================================== -->
+
+                    <div
+                        class="card step-panel active"
+                        data-panel="1"
+                    >
+
+                        <div class="card-title">
+
+                            <h2>
+                                Purchase Order Details
+                            </h2>
+
+                        </div>
+
+
+                        <div class="form-grid">
+
+
+                            <div class="field">
+
+                                <label>
+                                    PO Type
+                                    <span>*</span>
+                                </label>
+
+                                <select id="poType">
+
+                                    <option>
+                                        Standard Purchase Order
+                                    </option>
+
+                                    <option>
+                                        Blanket Purchase Order
+                                    </option>
+
+                                    <option>
+                                        Service Purchase Order
+                                    </option>
+
+                                    <option>
+                                        Emergency Purchase Order
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    PO Number
+                                </label>
+
+                                <div class="input-action">
+
+                                    <input
+                                        id="poNumber"
+                                        readonly
+                                    >
+
+                                    <button
+                                        type="button"
+                                        id="generateNumber"
+                                    >
+                                        <i class="fa-solid fa-rotate"></i>
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    PO Date
+                                    <span>*</span>
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="orderDate"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Supplier
+                                    <span>*</span>
+                                </label>
+
+                                <select
+                                    id="vendorId"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select Supplier
+                                    </option>
+
+                                </select>
+
+                                <button
+                                    class="link-button"
+                                    id="viewSupplier"
+                                    type="button"
+                                >
+                                    View Supplier
+                                </button>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Supplier Reference
+                                </label>
+
+                                <input
+                                    id="supplierReference"
+                                    placeholder="SUP-REF-0098"
+                                >
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Required Delivery Date
+                                    <span>*</span>
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="requiredDeliveryDate"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Contact Person
+                                </label>
+
+                                <input
+                                    id="contactPerson"
+                                    placeholder="Contact person"
+                                >
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Phone
+                                </label>
+
+                                <input
+                                    id="contactPhone"
+                                    placeholder="+91"
+                                >
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    id="contactEmail"
+                                    placeholder="supplier@email.com"
+                                >
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Payment Method
+                                </label>
+
+                                <select id="paymentMethod">
+
+                                    <option>
+                                        Bank Transfer
+                                    </option>
+
+                                    <option>
+                                        Credit Card
+                                    </option>
+
+                                    <option>
+                                        Letter of Credit
+                                    </option>
+
+                                    <option>
+                                        Cash
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Payment Terms
+                                </label>
+
+                                <select id="paymentTerms">
+
+                                    <option>
+                                        Net 30 Days
+                                    </option>
+
+                                    <option>
+                                        Net 15 Days
+                                    </option>
+
+                                    <option>
+                                        Net 45 Days
+                                    </option>
+
+                                    <option>
+                                        Net 60 Days
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Incoterms
+                                </label>
+
+                                <select id="incoterms">
+
+                                    <option>
+                                        FOB - Free on Board
+                                    </option>
+
+                                    <option>
+                                        CIF - Cost Insurance Freight
+                                    </option>
+
+                                    <option>
+                                        EXW - Ex Works
+                                    </option>
+
+                                    <option>
+                                        DDP - Delivered Duty Paid
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Currency
+                                </label>
+
+                                <select id="currency">
+
+                                    <option value="USD">
+                                        USD - US Dollar
+                                    </option>
+
+                                    <option value="INR">
+                                        INR - Indian Rupee
+                                    </option>
+
+                                    <option value="EUR">
+                                        EUR - Euro
+                                    </option>
+
+                                    <option value="GBP">
+                                        GBP - British Pound
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Exchange Rate
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="exchangeRate"
+                                    step="0.0001"
+                                    value="1"
+                                >
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Delivery To
+                                </label>
+
+                                <select id="warehouseId">
+
+                                    <option value="">
+                                        Select Warehouse
+                                    </option>
+
+                                </select>
+
+                                <div
+                                    id="warehouseInfo"
+                                    class="warehouse-info"
+                                ></div>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="notes-area">
+
+                            <label>
+                                Additional Information
+                            </label>
+
+                            <textarea
+                                id="notes"
+                                placeholder="Enter notes or special instructions for the supplier..."
+                            ></textarea>
+
+                        </div>
+
+
+                        <div class="step-actions">
+
+                            <button
+                                class="primary-btn"
+                                id="toItems"
+                                type="button"
+                            >
+                                Continue to Items
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =============================================
+                         STEP 2
+                    ============================================== -->
+
+                    <div
+                        class="card step-panel"
+                        data-panel="2"
+                    >
+
+                        <div class="card-title">
+
+                            <h2>
+                                Items & Pricing
+                            </h2>
+
+                            <button
+                                class="secondary-btn"
+                                id="addItem"
+                                type="button"
+                            >
+                                <i class="fa-solid fa-plus"></i>
+                                Add Item
+                            </button>
+
+                        </div>
+
+
+                        <div class="table-wrapper">
+
+                            <table>
+
+                                <thead>
+
+                                <tr>
+
+                                    <th>#</th>
+
+                                    <th>
+                                        Item / Description
+                                    </th>
+
+                                    <th>
+                                        Item Code
+                                    </th>
+
+                                    <th>
+                                        UOM
+                                    </th>
+
+                                    <th>
+                                        Quantity
+                                    </th>
+
+                                    <th>
+                                        Unit Price
+                                    </th>
+
+                                    <th>
+                                        Tax %
+                                    </th>
+
+                                    <th>
+                                        Amount
+                                    </th>
+
+                                    <th>
+                                        Actions
+                                    </th>
+
+                                </tr>
+
+                                </thead>
+
+                                <tbody id="itemsBody"></tbody>
+
+                            </table>
+
+                        </div>
+
+
+                        <div class="add-row">
+
+                            <button
+                                id="addRow"
+                                type="button"
+                            >
+                                <i class="fa-solid fa-plus"></i>
+                                Add New Row
+                            </button>
+
+                        </div>
+
+
+                        <div class="bottom-grid">
+
+
+                            <div class="notes-card">
+
+                                <label>
+                                    Notes
+                                </label>
+
+                                <textarea
+                                    id="itemNotes"
+                                    placeholder="Enter notes or special instructions for the supplier..."
+                                ></textarea>
+
+                            </div>
+
+
+                            <div class="upload-card">
+
+                                <label>
+                                    Attach Documents
+                                </label>
+
+                                <div
+                                    class="drop-zone"
+                                    id="dropZone"
+                                >
+
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                                    <span>
+                                        Drag & drop files here or
+                                    </span>
+
+                                    <button
+                                        type="button"
+                                        id="browseFiles"
+                                    >
+                                        Browse Files
+                                    </button>
+
+                                    <input
+                                        type="file"
+                                        id="fileInput"
+                                        multiple
+                                        hidden
+                                    >
+
+                                </div>
+
+                                <small>
+                                    PO terms, drawings, specifications, etc.
+                                </small>
+
+                                <div
+                                    id="fileList"
+                                    class="file-list"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="step-actions">
+
+                            <button
+                                class="secondary-btn"
+                                id="backDetails"
+                                type="button"
+                            >
+                                <i class="fa-solid fa-arrow-left"></i>
+                                Back
+                            </button>
+
+                            <button
+                                class="primary-btn"
+                                id="toReview"
+                                type="button"
+                            >
+                                Review Purchase Order
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =============================================
+                         STEP 3
+                    ============================================== -->
+
+                    <div
+                        class="card step-panel"
+                        data-panel="3"
+                    >
+
+                        <div class="card-title">
+
+                            <h2>
+                                Review & Submit
+                            </h2>
+
+                        </div>
+
+
+                        <div id="reviewContent"></div>
+
+
+                        <div class="step-actions">
+
+                            <button
+                                class="secondary-btn"
+                                id="backItems"
+                                type="button"
+                            >
+                                <i class="fa-solid fa-arrow-left"></i>
+                                Back
+                            </button>
+
+                            <button
+                                class="primary-btn"
+                                id="submitPO"
+                                type="button"
+                            >
+                                Submit Purchase Order
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================================
+                     RIGHT SUMMARY
+                ================================================== -->
+
+                <aside class="right-column">
+
+
+                    <div class="card summary-card">
+
+                        <div class="card-title">
+
+                            <h2>
+                                <i class="fa-regular fa-file-lines"></i>
+                                PO Summary
+                            </h2>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>PO Number</span>
+
+                            <strong id="summaryPONumber">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>PO Date</span>
+
+                            <strong id="summaryDate">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>Supplier</span>
+
+                            <strong id="summarySupplier">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>Delivery To</span>
+
+                            <strong id="summaryWarehouse">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>Required Delivery Date</span>
+
+                            <strong id="summaryDelivery">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>Payment Terms</span>
+
+                            <strong id="summaryPayment">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>Currency</span>
+
+                            <strong id="summaryCurrency">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <hr>
+
+
+                        <div class="summary-row">
+
+                            <span>Subtotal</span>
+
+                            <strong id="summarySubtotal">
+                                0.00
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>Taxes</span>
+
+                            <strong id="summaryTax">
+                                0.00
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>Shipping</span>
+
+                            <strong id="summaryShipping">
+                                0.00
+                            </strong>
+
+                        </div>
+
+
+                        <hr>
+
+
+                        <div class="summary-total">
+
+                            <span>Total</span>
+
+                            <strong id="summaryTotal">
+                                0.00
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="card checklist-card">
+
+                        <h2>Checklist</h2>
+
+                        <div
+                            class="check"
+                            id="checkSupplier"
+                        >
+                            <i class="fa-solid fa-circle-check"></i>
+                            Supplier selected
+                        </div>
+
+                        <div
+                            class="check"
+                            id="checkWarehouse"
+                        >
+                            <i class="fa-solid fa-circle-check"></i>
+                            Delivery address selected
+                        </div>
+
+                        <div
+                            class="check"
+                            id="checkItems"
+                        >
+                            <i class="fa-solid fa-circle-check"></i>
+                            Items added
+                        </div>
+
+                        <div
+                            class="check"
+                            id="checkDate"
+                        >
+                            <i class="fa-solid fa-circle-check"></i>
+                            Required delivery date set
+                        </div>
+
+                        <div
+                            class="check warning"
+                            id="checkDocs"
+                        >
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            Documents attached
+                        </div>
+
+                        <div
+                            class="check pending"
+                            id="checkReview"
+                        >
+                            <i class="fa-regular fa-circle"></i>
+                            Review & submit
+                        </div>
+
+                    </div>
+
+
+                    <div class="card action-card">
+
+                        <button
+                            class="outline-btn"
+                            id="saveDraft"
+                            type="button"
+                        >
+                            Save as Draft
+                        </button>
+
+                        <button
+                            class="primary-btn full"
+                            id="submitPO2"
+                            type="button"
+                        >
+                            Review & Submit PO
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script src="/static/CreatePurchaseOrders.js"></script>
+
+</body>
+
+</html>

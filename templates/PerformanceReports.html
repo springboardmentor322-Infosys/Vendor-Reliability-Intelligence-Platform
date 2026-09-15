@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Performance Reports | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/PerformanceReports.css"
+    >
+
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-cube"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+        <nav>
+
+            <a href="/VendorDashboard">
+                <span><i class="fa-solid fa-house"></i></span>
+                Dashboard
+            </a>
+
+            <a href="/VendorProfile">
+                <span><i class="fa-solid fa-user"></i></span>
+                Vendor Profile
+            </a>
+
+            <a href="/PerformanceOverview">
+                <span><i class="fa-solid fa-chart-column"></i></span>
+                Performance Overview
+            </a>
+
+            <a href="/PurchaseOrders">
+                <span><i class="fa-solid fa-clipboard-list"></i></span>
+                Purchase Orders
+            </a>
+
+            <a href="/VendorContract">
+                <span><i class="fa-regular fa-file-lines"></i></span>
+                Contracts & Compliance
+            </a>
+
+            <a href="/VendorInvoices">
+                <span><i class="fa-regular fa-credit-card"></i></span>
+                Invoices & Payments
+            </a>
+
+            <a href="/VendorCommunication">
+                <span><i class="fa-regular fa-comment"></i></span>
+                Communication
+                <b class="badge">3</b>
+            </a>
+
+            <a href="/VendorDocument">
+                <span><i class="fa-regular fa-folder"></i></span>
+                Documents
+            </a>
+
+            <a href="/VendorNotifications">
+                <span><i class="fa-regular fa-bell"></i></span>
+                Notifications
+                <b class="badge">7</b>
+            </a>
+
+        </nav>
+
+
+        <div class="menu-title">
+            REPORTS
+        </div>
+ 
+        <nav>
+
+            <a
+                class="active"
+                href="/PerformanceReports"
+            >
+                <span><i class="fa-solid fa-chart-line"></i></span>
+                Performance Reports
+            </a>
+
+            <a href="/OrderReports">
+                <span><i class="fa-regular fa-file"></i></span>
+                Order Reports
+            </a>
+
+            <a href="/ComplianceReports">
+                <span><i class="fa-solid fa-shield"></i></span>
+                Compliance Reports
+            </a>
+
+            <a href="/ExportReports">
+                <span><i class="fa-solid fa-download"></i></span>
+                Export Reports
+            </a>
+
+        </nav>
+
+
+        <div class="menu-title">
+            ACCOUNT
+        </div>
+
+        <nav>
+
+            <a href="/VendorSettings">
+                <span><i class="fa-solid fa-gear"></i></span>
+                Settings
+            </a>
+
+            <a href="/VendorHelpSupport">
+                <span><i class="fa-regular fa-circle-question"></i></span>
+                Help & Support
+            </a>
+
+            <a href="/login">
+                <span><i class="fa-solid fa-right-from-bracket"></i></span>
+                Logout
+            </a>
+
+        </nav>
+
+
+        <div class="vendor-card">
+
+            <div class="vendor-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div>
+
+                <strong id="sidebarVendorName">
+                    --
+                </strong>
+
+                <small>
+                    Vendor ID:
+                    <span id="sidebarVendorId">
+                        --
+                    </span>
+                </small>
+
+                <small class="verified">
+                    ● Verified Vendor
+                </small>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Performance Reports
+                </h1>
+
+                <div class="breadcrumb">
+                    Home
+                    <span>/</span>
+                    Performance Reports
+                </div>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <div class="search">
+
+                    <span><i class="fa-solid fa-magnifying-glass"></i></span>
+
+                    <input
+                        id="globalSearch"
+                        type="text"
+                        placeholder="Search reports, metrics, vendors..."
+                    >
+
+                </div>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <b>7</b>
+                </button>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-envelope"></i>
+                    <b>12</b>
+                </button>
+
+                <div class="profile">
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+
+                        <strong id="headerVendorName">
+                            -
+                        </strong>
+
+                        <small>
+                            Vendor
+                        </small>
+
+                    </div>
+
+                    <span><i class="fa-solid fa-chevron-down"></i></span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             FILTER BAR
+        ================================================== -->
+
+        <section class="filter-bar">
+
+            <div class="date-filter">
+
+                <span><i class="fa-regular fa-calendar-days"></i></span>
+
+                <input
+                    type="date"
+                    id="fromDate"
+                >
+
+                <span>-</span>
+
+                <input
+                    type="date"
+                    id="toDate"
+                >
+
+            </div>
+
+
+            <select id="categoryFilter">
+
+                <option value="">
+                    All Categories
+                </option>
+
+            </select>
+
+
+            <select id="vendorFilter">
+
+                <option value="">
+                    All Vendors
+                </option>
+
+            </select>
+
+
+            <button
+                class="filter-button"
+                id="applyFilters"
+            >
+                <i class="fa-solid fa-filter"></i> Filters
+            </button>
+
+
+            <div class="filter-actions">
+
+                <button
+                    class="secondary-button"
+                    id="exportButton"
+                >
+                    <i class="fa-solid fa-download"></i> Export Report
+                </button>
+
+                <button
+                    class="primary-button"
+                    id="scheduleButton"
+                >
+                    <i class="fa-regular fa-calendar"></i> Schedule Report
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Overall Performance Score
+                    </span>
+
+                    <strong id="overallScore">
+                        0
+                    </strong>
+
+                    <small>
+                        /100
+                    </small>
+
+                    <em id="overallChange">
+                        ↑ Performance
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-truck-fast"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        On-Time Delivery
+                    </span>
+
+                    <strong id="onTimeDelivery">
+                        0%
+                    </strong>
+
+                    <em>
+                        Current period
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Quality Score
+                    </span>
+
+                    <strong id="qualityScore">
+                        0
+                    </strong>
+
+                    <small>
+                        /5
+                    </small>
+
+                    <em>
+                        Current period
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Order Fulfillment Rate
+                    </span>
+
+                    <strong id="orderFulfillment">
+                        0%
+                    </strong>
+
+                    <em>
+                        Current period
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Response Time (Avg.)
+                    </span>
+
+                    <strong id="responseTime">
+                        0
+                    </strong>
+
+                    <small>
+                        hrs
+                    </small>
+
+                    <em>
+                        Lower is better
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon red">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Issue Resolution Time (Avg.)
+                    </span>
+
+                    <strong id="issueResolution">
+                        0
+                    </strong>
+
+                    <small>
+                        days
+                    </small>
+
+                    <em>
+                        Lower is better
+                    </em>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CHARTS
+        ================================================== -->
+
+        <section class="chart-grid">
+
+            <div class="panel trend-panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <i class="fa-solid fa-chart-line"></i>
+                        Performance Trend
+                    </h2>
+
+                    <select id="trendRange">
+
+                        <option value="6">
+                            Last 6 Months
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+
+                <div class="legend">
+
+                    <span>
+                        <i class="dot green"></i>
+                        On-Time Delivery (%)
+                    </span>
+
+                    <span>
+                        <i class="dot blue"></i>
+                        Quality Score (/5)
+                    </span>
+
+                    <span>
+                        <i class="dot purple"></i>
+                        Order Fulfillment (%)
+                    </span>
+
+                    <span>
+                        <i class="dot orange"></i>
+                        Overall Score (/100)
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <i class="fa-solid fa-chart-pie"></i>
+                        Performance Score Breakdown
+                    </h2>
+
+                </div>
+
+                <div class="donut-wrapper">
+
+                    <canvas
+                        id="breakdownChart"
+                    ></canvas>
+
+                    <div
+                        class="donut-center"
+                        id="donutScore"
+                    >
+                        0
+                        <small>/100</small>
+                    </div>
+
+                </div>
+
+                <div
+                    class="score-list"
+                    id="scoreBreakdown"
+                ></div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <i class="fa-solid fa-chart-donut"></i>
+                        Score Distribution
+                    </h2>
+
+                </div>
+
+                <div class="donut-wrapper">
+
+                    <canvas
+                        id="distributionChart"
+                    ></canvas>
+
+                    <div
+                        class="donut-center"
+                        id="vendorCount"
+                    >
+                        0
+                        <small>Vendors</small>
+                    </div>
+
+                </div>
+
+                <div
+                    class="score-list"
+                    id="distributionList"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             VENDOR TABLE
+        ================================================== -->
+
+        <section class="panel vendor-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    Vendor Performance Summary
+                </h2>
+
+                <button
+                    class="link-button"
+                    id="viewAllVendors"
+                >
+                    View All Vendors →
+                </button>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Vendor
+                            </th>
+
+                            <th>
+                                Overall Score
+                            </th>
+
+                            <th>
+                                On-Time Delivery
+                            </th>
+
+                            <th>
+                                Quality Score
+                            </th>
+
+                            <th>
+                                Order Fulfillment
+                            </th>
+
+                            <th>
+                                Response Time
+                            </th>
+
+                            <th>
+                                Trend
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="vendorTable">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CATEGORY PERFORMANCE
+        ================================================== -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    Performance by Category
+                </h2>
+
+            </div>
+
+            <div
+                id="categoryPerformance"
+                class="category-performance"
+            ></div>
+
+        </section>
+
+
+        <!-- =================================================
+             RIGHT SIDE INSIGHTS / ACTIONS
+        ================================================== -->
+
+        <section class="bottom-grid">
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Performance Insights
+                    </h2>
+
+                </div>
+
+                <div id="insights"></div>
+
+                <button class="link-button">
+                    View Detailed Insights →
+                </button>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Report Actions
+                    </h2>
+
+                </div>
+
+                <button
+                    class="report-action"
+                    id="downloadExcel"
+                >
+
+                    <span><i class="fa-solid fa-file-excel"></i></span>
+
+                    <div>
+                        <strong>
+                            Download Detailed Report
+                        </strong>
+
+                        <small>
+                            Get complete performance data in Excel
+                        </small>
+                    </div>
+
+                </button>
+
+
+                <button
+                    class="report-action"
+                    id="scheduleMonthly"
+                >
+
+                    <span><i class="fa-regular fa-calendar-days"></i></span>
+
+                    <div>
+                        <strong>
+                            Schedule Monthly Report
+                        </strong>
+
+                        <small>
+                            Receive reports automatically via email
+                        </small>
+                    </div>
+
+                </button>
+
+
+                <button
+                    class="report-action"
+                    id="customReport"
+                >
+
+                    <span><i class="fa-solid fa-sliders"></i></span>
+
+                    <div>
+                        <strong>
+                            Customize Report
+                        </strong>
+
+                        <small>
+                            Choose metrics and generate custom report
+                        </small>
+                    </div>
+
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     SCHEDULE MODAL
+========================================================= -->
+
+<div
+    id="scheduleModal"
+    class="modal hidden"
+>
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>
+                Schedule Performance Report
+            </h2>
+
+            <button id="closeModal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <label>
+            Report Name
+        </label>
+
+        <input
+            id="scheduleName"
+            value="Monthly Performance Report"
+        >
+
+
+        <label>
+            Schedule
+        </label>
+
+        <select id="scheduleType">
+
+            <option value="Monthly">
+                Monthly
+            </option>
+
+            <option value="Weekly">
+                Weekly
+            </option>
+
+            <option value="Quarterly">
+                Quarterly
+            </option>
+
+        </select>
+
+
+        <label>
+            Recipients
+        </label>
+
+        <input
+            id="scheduleRecipients"
+            placeholder="email@example.com"
+        >
+
+
+        <label>
+            Format
+        </label>
+
+        <select id="scheduleFormat">
+
+            <option value="PDF">
+                PDF
+            </option>
+
+            <option value="EXCEL">
+                Excel
+            </option>
+
+        </select>
+
+
+        <button
+            class="primary-button full"
+            id="saveSchedule"
+        >
+            <i class="fa-solid fa-calendar-check"></i>
+            Save Schedule
+        </button>
+
+    </div>
+
+</div>
+
+
+<script src="/static/PerformanceReports.js"></script>
+
+</body>
+</html>

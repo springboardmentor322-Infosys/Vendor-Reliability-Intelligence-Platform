@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SCM - Procurement</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+    <link
+        rel="stylesheet"
+        href="/static/SupplyChainProcurement.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ==================================================
+         SIDEBAR
+    =================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/supplychaindashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="demand-planning">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Demand Planning</span>
+            </a>
+
+            <a
+                href="/supplychainprocurement"
+                class="active"
+            >
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Procurement</span>
+            </a>
+
+            <a href="/suppliers">
+                <i class="fa-solid fa-users"></i>
+                <span>Suppliers</span>
+            </a>
+
+            <a href="/inventory">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                <span>Inventory</span>
+            </a>
+
+            <a href="ordersshipments">
+                <i class="fa-solid fa-truck-fast"></i>
+                <span>Orders & Shipments</span>
+            </a>
+
+            <a href="/warehouses">
+                <i class="fa-solid fa-warehouse"></i>
+                <span>Warehouses</span>
+            </a>
+
+            <a href="/transportation">
+                <i class="fa-solid fa-truck"></i>
+                <span>Transportation</span>
+            </a>
+
+            <a href="/analyticsreports">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Analytics & Reports</span>
+            </a>
+
+            <a href="/alertsnotifications">
+                <i class="fa-solid fa-bell"></i>
+                <span>Alerts & Notifications</span>
+            </a>
+
+            <a href="/documents">
+                <i class="fa-solid fa-file-lines"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/supplychainsettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <div class="quick-actions">
+
+            <h4>Quick Actions</h4>
+
+            <button onclick="window.location.href='/CreatePurchaseOrder'">
+                <i class="fa-solid fa-cart-plus"></i>
+                Create Purchase Order
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/AddSupplier'">
+                <i class="fa-solid fa-user-plus"></i>
+                Add New Supplier
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/CreateShipment'">
+                <i class="fa-solid fa-ship"></i>
+                Create Shipment
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/UploadDocument'">
+                <i class="fa-solid fa-upload"></i>
+                Upload Document
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+        <div class="user-card" onclick="openSupplyChainProfile()">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <strong id="userName">
+                Arjun Kumar
+            </strong>
+
+            <span>
+                Supply Chain Manager
+            </span>
+
+            <small>
+                <i class="fa-solid fa-circle"></i>
+                Online
+            </small>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ==================================================
+         MAIN
+    =================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="title-area">
+
+                <button
+                    class="menu-button"
+                    onclick="toggleSidebar()"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div>
+
+                    <h1>Procurement</h1>
+
+                    <p>
+                        Manage purchase requisitions,
+                        approvals, and procurement activities.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <div class="search">
+
+                    <input
+                        id="searchInput"
+                        type="text"
+                        placeholder="Search..."
+                        oninput="searchDashboard()"
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <b>5</b>
+                </button>
+
+                <div class="date-time">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <div>
+                        <strong id="currentDate">
+                            May 23, 2025
+                        </strong>
+
+                        <span id="currentTime">
+                            10:30 AM
+                        </span>
+                    </div>
+
+                </div>
+
+                <button class="theme-button">
+                    <i class="fa-regular fa-sun"></i>
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <div class="page-actions">
+
+            <button
+                class="secondary-button"
+                onclick="uploadPR()"
+            >
+                <i class="fa-solid fa-upload"></i>
+                Upload PR
+            </button>
+
+            <button
+                class="primary-button"
+                onclick="openPRModal()"
+            >
+                <i class="fa-solid fa-plus"></i>
+                New Purchase Requisition
+            </button>
+
+        </div>
+
+
+        <!-- ==================================================
+             STATISTICS
+        =================================================== -->
+
+        <section class="stats">
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue">
+                    <i class="fa-solid fa-file-invoice"></i>
+                </div>
+
+                <div>
+                    <span>Total PRs</span>
+
+                    <strong id="totalPRs">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        ↑ 12.5% vs last month
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon purple">
+                    <i class="fa-solid fa-money-bill-transfer"></i>
+                </div>
+
+                <div>
+                    <span>Total PO Value</span>
+
+                    <strong id="totalPOValue">
+                        $0
+                    </strong>
+
+                    <small class="positive">
+                        ↑ 8.7% vs last month
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon green">
+                    <i class="fa-solid fa-file-circle-check"></i>
+                </div>
+
+                <div>
+                    <span>Approved POs</span>
+
+                    <strong id="approvedPOs">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        ↑ 15.2% vs last month
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon orange">
+                    <i class="fa-solid fa-file-circle-exclamation"></i>
+                </div>
+
+                <div>
+                    <span>Pending Approvals</span>
+
+                    <strong id="pendingApprovals">
+                        0
+                    </strong>
+
+                    <small class="negative">
+                        ↓ 4.5% vs last month
+                    </small>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             FIRST ROW
+        =================================================== -->
+
+        <section class="dashboard-grid">
+
+            <div class="panel po-overview">
+
+                <div class="panel-header">
+                    <h2>Purchase Order Overview</h2>
+                </div>
+
+                <div class="donut-wrapper">
+
+                    <canvas
+                        id="poChart"
+                    ></canvas>
+
+                    <div class="donut-center">
+
+                        <strong id="totalPOCount">
+                            0
+                        </strong>
+
+                        <span>Total POs</span>
+
+                    </div>
+
+                </div>
+
+                <div
+                    class="legend"
+                    id="poLegend"
+                ></div>
+
+            </div>
+
+
+            <div class="panel recent-orders">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Recent Purchase Orders
+                    </h2>
+
+                    <button>
+                        View All
+                    </button>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                        <tr>
+
+                            <th>PO Number</th>
+                            <th>PR Number</th>
+                            <th>Vendor</th>
+                            <th>Order Date</th>
+                            <th>Status</th>
+                            <th>Order Value</th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody id="recentPOBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel approvals">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Pending Approvals
+                    </h2>
+
+                    <button onclick="loadPendingApprovals()">
+                        View All
+                    </button>
+
+                </div>
+
+                <div
+                    id="pendingApprovalList"
+                    class="approval-list"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             SECOND ROW
+        =================================================== -->
+
+        <section class="dashboard-grid second">
+
+            <div class="panel spend-panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Spend Analysis (YTD)
+                    </h2>
+
+                </div>
+
+                <div class="spend-content">
+
+                    <div class="spend-total">
+
+                        <span>Total Spend</span>
+
+                        <strong id="totalSpend">
+                            $0
+                        </strong>
+
+                        <small class="positive">
+                            ↑ 9.3% vs last year
+                        </small>
+
+                    </div>
+
+                    <div class="chart-container">
+
+                        <canvas
+                            id="spendChart"
+                        ></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel category-panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Top Spending Categories
+                    </h2>
+
+                    <button>
+                        View All
+                    </button>
+
+                </div>
+
+                <div
+                    id="categoryList"
+                    class="category-list"
+                ></div>
+
+            </div>
+
+
+            <div class="panel cycle-panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Procurement Cycle Time
+                    </h2>
+
+                </div>
+
+                <div class="cycle-item">
+
+                    <div class="cycle-icon blue">
+                        <i class="fa-regular fa-clock"></i>
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Average PR Cycle Time
+                        </span>
+
+                        <strong>
+                            2.4 Days
+                        </strong>
+
+                        <small class="positive">
+                            ↓ 10% vs last month
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="cycle-item">
+
+                    <div class="cycle-icon green">
+                        <i class="fa-regular fa-clock"></i>
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Average PO Cycle Time
+                        </span>
+
+                        <strong>
+                            4.7 Days
+                        </strong>
+
+                        <small class="positive">
+                            ↓ 8% vs last month
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             PURCHASE REQUISITIONS
+        =================================================== -->
+
+        <section class="panel requisitions">
+
+            <div class="panel-header">
+
+                <h2>
+                    Purchase Requisitions
+                </h2>
+
+                <button>
+                    View All
+                </button>
+
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>PR Number</th>
+                        <th>Requested By</th>
+                        <th>Department</th>
+                        <th>PR Date</th>
+                        <th>Required Date</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Total Value</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody
+                        id="requisitionBody"
+                    ></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ======================================================
+     CREATE PR MODAL
+======================================================= -->
+
+<div
+    class="modal"
+    id="prModal"
+>
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>
+                New Purchase Requisition
+            </h2>
+
+            <button onclick="closePRModal()">
+                ×
+            </button>
+
+        </div>
+
+        <form
+            id="prForm"
+            onsubmit="createPR(event)"
+        >
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>
+                        Requested By
+                    </label>
+
+                    <input
+                        id="requester"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Department
+                    </label>
+
+                    <input
+                        id="department"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Category
+                    </label>
+
+                    <select id="category">
+
+                        <option>
+                            Raw Materials
+                        </option>
+
+                        <option>
+                            Packaging
+                        </option>
+
+                        <option>
+                            Components
+                        </option>
+
+                        <option>
+                            Equipment
+                        </option>
+
+                        <option>
+                            Services
+                        </option>
+
+                        <option>
+                            Others
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Amount
+                    </label>
+
+                    <input
+                        id="amount"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Required Date
+                    </label>
+
+                    <input
+                        id="requiredDate"
+                        type="date"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Priority
+                    </label>
+
+                    <select id="priority">
+
+                        <option>Low</option>
+                        <option selected>Medium</option>
+                        <option>High</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    rows="4"
+                ></textarea>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    onclick="closePRModal()"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Create Requisition
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script src="/static/SupplyChainProcurement.js"></script>
+
+</body>
+
+</html>

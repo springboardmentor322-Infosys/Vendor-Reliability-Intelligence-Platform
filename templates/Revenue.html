@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Revenue | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+    <link
+        rel="stylesheet"
+        href="/static/Revenue.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+        <nav class="navigation">
+
+            <a href="/financerdashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/BudgetManagement">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Budget Management</span>
+            </a>
+
+            <a href="/Expenditure">
+                <i class="fa-solid fa-circle-dollar-to-slot"></i>
+                <span>Expenditures</span>
+            </a>
+
+            <a
+                href="/Revenue"
+                class="active"
+            >
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Revenue</span>
+            </a>
+
+            <a href="/AccountsPayable">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span>Accounts Payable</span>
+            </a>
+
+            <a href="/AccountsReceivable">
+                <i class="fa-regular fa-money-check-dollar"></i>
+                <span>Accounts Receivable</span>
+            </a>
+
+            <a href="/BankingReconciliation">
+                <i class="fa-solid fa-building-columns"></i>
+                <span>Banking & Reconciliation</span>
+            </a>
+
+            <a href="/FinancialReports">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Financial Reports</span>
+            </a>
+
+            <a href="/Compliance">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Compliance</span>
+            </a>
+
+            <a href="/FinancerApprovals">
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+                <b class="badge">5</b>
+            </a>
+
+            <a href="/FinancerNotifications">
+                <i class="fa-regular fa-bell"></i>
+                <span>Alerts & Notifications</span>
+                <b class="badge">8</b>
+            </a>
+
+            <a href="/FinancerDocuments">
+                <i class="fa-regular fa-file"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/FinancerSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/FinancerHelp">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-user">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div>
+                <strong id="sidebarName">
+                    Finance Officer
+                </strong>
+
+                <small id="sidebarRole">
+                    Finance Officer
+                </small>
+
+                <small class="online">
+                    <i class="fa-solid fa-circle"></i>
+                    Online
+                </small>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Revenue</h1>
+
+                <div class="breadcrumb">
+                    Dashboard
+                    <i class="fa-solid fa-chevron-right"></i>
+                    Revenue
+                </div>
+
+                <p>
+                    Track and analyze revenue performance
+                    across all sources and departments.
+                </p>
+
+            </div>
+
+            <div class="top-actions">
+
+                <div class="search">
+
+                    <input
+                        id="globalSearch"
+                        type="text"
+                        placeholder="Search anything..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <button class="icon-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>3</span>
+                </button>
+
+                <div class="profile">
+
+                    <div class="avatar small">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerName">
+                            Finance Officer
+                        </strong>
+
+                        <small id="headerRole">
+                            Finance Officer
+                        </small>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             FILTER
+        ================================================== -->
+
+        <section class="filters">
+
+            <label>
+                Year
+
+                <select id="yearSelect"></select>
+
+            </label>
+
+            <label>
+                Month
+
+                <select id="monthSelect">
+
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+
+                </select>
+
+            </label>
+
+            <button
+                id="refreshBtn"
+                class="refresh-btn"
+            >
+                <i class="fa-solid fa-rotate"></i>
+                Refresh
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-sack-dollar"></i>
+                </div>
+
+                <div>
+                    <span>Total Revenue</span>
+
+                    <strong id="totalRevenue">
+                        ₹0
+                    </strong>
+
+                    <small>
+                        YTD Revenue
+                    </small>
+
+                    <em id="revenueGrowth">
+                        ↑ 0%
+                    </em>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+
+                <div>
+                    <span>This Month Revenue</span>
+
+                    <strong id="monthRevenue">
+                        ₹0
+                    </strong>
+
+                    <small id="monthLabel">
+                        Current Month
+                    </small>
+
+                    <em id="monthGrowth">
+                        ↑ 0%
+                    </em>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+
+                <div>
+                    <span>Avg. Monthly Revenue</span>
+
+                    <strong id="averageRevenue">
+                        ₹0
+                    </strong>
+
+                    <small>
+                        Last 6 Months
+                    </small>
+
+                    <em>
+                        6 month average
+                    </em>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-solid fa-file-invoice"></i>
+                </div>
+
+                <div>
+                    <span>Total Invoices</span>
+
+                    <strong id="totalInvoices">
+                        0
+                    </strong>
+
+                    <small>
+                        Selected Year
+                    </small>
+
+                    <em>
+                        Revenue invoices
+                    </em>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon red">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+
+                <div class="target-card">
+
+                    <span>Revenue Target</span>
+
+                    <strong id="revenueTarget">
+                        0%
+                    </strong>
+
+                    <small>
+                        Of Annual Target
+                    </small>
+
+                    <div class="progress">
+                        <div
+                            id="targetProgress"
+                            style="width:0%"
+                        ></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CHARTS
+        ================================================== -->
+
+        <section class="dashboard-grid">
+
+            <div class="panel trend-panel">
+
+                <div class="panel-title">
+
+                    <div>
+                        <h2>Revenue Trend</h2>
+                    </div>
+
+                    <span id="trendYear">
+                        This Year
+                    </span>
+
+                </div>
+
+                <div class="chart-box">
+                    <canvas id="revenueTrendChart"></canvas>
+                </div>
+
+            </div>
+
+
+            <div class="panel source-panel">
+
+                <div class="panel-title">
+                    <h2>Revenue by Source</h2>
+                    <span>This Year</span>
+                </div>
+
+                <div class="donut-wrapper">
+
+                    <div class="donut-chart">
+                        <canvas id="sourceChart"></canvas>
+                    </div>
+
+                    <div
+                        id="sourceLegend"
+                        class="source-legend"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel departments-panel">
+
+                <div class="panel-title">
+
+                    <h2>
+                        Top Revenue Generating Departments
+                    </h2>
+
+                    <span>This Year</span>
+
+                </div>
+
+                <div
+                    id="departmentsList"
+                    class="departments-list"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             BOTTOM
+        ================================================== -->
+
+        <section class="bottom-grid">
+
+            <div class="panel overview-panel">
+
+                <div class="panel-title">
+                    <h2>Revenue Overview</h2>
+                    <span>This Year</span>
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                        <tr>
+                            <th>Revenue Source</th>
+                            <th>Budget (₹)</th>
+                            <th>Actual (₹)</th>
+                            <th>Variance (₹)</th>
+                            <th>Variance (%)</th>
+                            <th>Status</th>
+                        </tr>
+
+                        </thead>
+
+                        <tbody id="overviewBody"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel recent-panel">
+
+                <div class="panel-title">
+
+                    <h2>
+                        Recent Revenue Transactions
+                    </h2>
+
+                    <button id="viewAllBtn">
+                        View All
+                    </button>
+
+                </div>
+
+                <div
+                    id="recentTransactions"
+                    class="recent-list"
+                ></div>
+
+            </div>
+
+
+            <div class="panel insights-panel">
+
+                <div class="panel-title">
+                    <h2>Revenue Insights</h2>
+                </div>
+
+                <div
+                    id="insights"
+                    class="insights"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <footer>
+
+            <span>
+                © 2025 FinManage. All rights reserved.
+            </span>
+
+            <span>
+                Version 2.1.0
+                <i class="fa-solid fa-circle"></i>
+            </span>
+
+        </footer>
+
+    </main>
+
+</div>
+
+<script src="/static/Revenue.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SCM - Suppliers</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/Suppliers.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/supplychaindashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="demand-planning">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Demand Planning</span>
+            </a>
+
+            <a href="/supplychainprocurement">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Procurement</span>
+            </a>
+
+            <a
+                href="/suppliers"
+                class="active"
+            >
+                <i class="fa-solid fa-users"></i>
+                <span>Suppliers</span>
+            </a>
+
+            <a href="/inventory">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                <span>Inventory</span>
+            </a>
+
+            <a href="/ordersshipments">
+                <i class="fa-solid fa-truck-fast"></i>
+                <span>Orders & Shipments</span>
+            </a>
+
+            <a href="/warehouses">
+                <i class="fa-solid fa-warehouse"></i>
+                <span>Warehouses</span>
+            </a>
+
+            <a href="/transportation">
+                <i class="fa-solid fa-truck"></i>
+                <span>Transportation</span>
+            </a>
+
+            <a href="/analyticsreports">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Analytics & Reports</span>
+            </a>
+
+            <a href="/alertsnotifications">
+                <i class="fa-solid fa-bell"></i>
+                <span>Alerts & Notifications</span>
+            </a>
+
+            <a href="/documents">
+                <i class="fa-solid fa-folder"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/supplychainsettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <!-- QUICK ACTIONS -->
+
+        <div class="quick-actions">
+
+            <h4>Quick Actions</h4>
+
+            <button onclick="window.location.href='/CreatePurchaseOrder'">
+                <i class="fa-solid fa-cart-plus"></i>
+                Create Purchase Order
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/AddSupplier'">
+                <i class="fa-solid fa-user-plus"></i>
+                Add New Supplier
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/CreateShipment'">
+                <i class="fa-solid fa-ship"></i>
+                Create Shipment
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/UploadDocument'">
+                <i class="fa-solid fa-upload"></i>
+                Upload Document
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+        <!-- PROFILE -->
+
+        <div class="sidebar-profile" onclick="openSupplyChainProfile()">
+
+            <div class="profile-avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <strong>Arjun Kumar</strong>
+
+            <span>Supply Chain Manager</span>
+
+            <div class="online">
+                <i class="fa-solid fa-circle"></i>
+                Online
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div class="title-area">
+
+                <div>
+
+                    <h1>Supply Chain Dashboard</h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <div class="search-box">
+
+                    <input
+                        type="text"
+                        id="globalSearch"
+                        placeholder="Search suppliers..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notification-count">5</span>
+                </button>
+
+                <div class="date-box">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <div>
+                        <strong id="currentDate">
+                            May 23, 2025
+                        </strong>
+
+                        <small id="currentTime">
+                            10:30 AM
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- HEADER BUTTONS -->
+
+        <div class="page-actions">
+
+            <button
+                class="export-button"
+                id="exportButton"
+            >
+                <i class="fa-solid fa-download"></i>
+                Export
+            </button>
+
+            <button
+                class="primary-button"
+                id="addSupplierButton"
+            >
+                <i class="fa-solid fa-plus"></i>
+                Add New Supplier
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+
+                <div>
+                    <span>Total Suppliers</span>
+
+                    <strong id="totalSuppliers">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        <span id="totalTrend">0%</span>
+                        vs last month
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+
+                <div>
+
+                    <span>Active Suppliers</span>
+
+                    <strong id="activeSuppliers">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        <span id="activeTrend">0%</span>
+                        vs last month
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+
+                <div>
+
+                    <span>At Risk Suppliers</span>
+
+                    <strong id="riskSuppliers">
+                        0
+                    </strong>
+
+                    <small class="negative">
+                        <i class="fa-solid fa-arrow-down"></i>
+                        <span id="riskTrend">0%</span>
+                        vs last month
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                </div>
+
+                <div>
+
+                    <span>New Suppliers (This Month)</span>
+
+                    <strong id="newSuppliers">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        <span id="newTrend">0%</span>
+                        vs last month
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-dollar-sign"></i>
+                </div>
+
+                <div>
+
+                    <span>Total Spend (YTD)</span>
+
+                    <strong id="totalSpend">
+                        $0
+                    </strong>
+
+                    <small class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        <span id="spendTrend">0%</span>
+                        vs last year
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ROW 1
+        ================================================== -->
+
+        <section class="dashboard-row row-one">
+
+            <!-- PERFORMANCE -->
+
+            <div class="panel performance-panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Supplier Performance Overview
+                        <i class="fa-regular fa-circle-question"></i>
+                    </h3>
+
+                    <div class="filters">
+
+                        <select id="categoryFilter">
+                            <option value="">All Categories</option>
+                        </select>
+
+                        <select id="yearFilter">
+                            <option value="">This Year</option>
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="chart-legend">
+
+                    <span>
+                        <i class="legend-dot blue-dot"></i>
+                        On-Time Delivery (%)
+                    </span>
+
+                    <span>
+                        <i class="legend-dot green-dot"></i>
+                        Quality Score (%)
+                    </span>
+
+                    <span>
+                        <i class="legend-dot purple-dot"></i>
+                        Compliance (%)
+                    </span>
+
+                </div>
+
+
+                <div class="chart-container">
+
+                    <canvas id="performanceChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="panel status-panel">
+
+                <div class="panel-header">
+
+                    <h3>Suppliers by Status</h3>
+
+                </div>
+
+                <div class="donut-container">
+
+                    <canvas id="statusChart"></canvas>
+
+                    <div class="donut-center">
+
+                        <strong id="statusTotal">
+                            0
+                        </strong>
+
+                        <span>Total Suppliers</span>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="statusLegend"
+                    class="status-legend"
+                ></div>
+
+
+                <button class="view-link">
+                    View All Suppliers
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+            </div>
+
+
+            <!-- TOP SUPPLIERS -->
+
+            <div class="panel top-suppliers-panel">
+
+                <div class="panel-header">
+
+                    <h3>Top Suppliers</h3>
+
+                    <button class="view-all">
+                        View All
+                    </button>
+
+                </div>
+
+                <div id="topSuppliers"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ROW 2
+        ================================================== -->
+
+        <section class="dashboard-row row-two">
+
+            <!-- DISTRIBUTION -->
+
+            <div class="panel distribution-panel">
+
+                <div class="panel-header">
+
+                    <h3>Supplier Distribution</h3>
+
+                </div>
+
+                <div class="distribution-content">
+
+                    <div class="world-map">
+
+                        <div class="map-circle one"></div>
+                        <div class="map-circle two"></div>
+                        <div class="map-circle three"></div>
+
+                        <i class="fa-solid fa-earth-americas"></i>
+
+                    </div>
+
+                    <div
+                        id="regionDistribution"
+                        class="region-list"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SPEND -->
+
+            <div class="panel spend-panel">
+
+                <div class="panel-header">
+
+                    <h3>Spend by Category (YTD)</h3>
+
+                </div>
+
+                <div class="spend-content">
+
+                    <div class="spend-chart">
+
+                        <canvas id="spendChart"></canvas>
+
+                        <div class="spend-center">
+                            <strong id="spendCenter">
+                                $0
+                            </strong>
+                            <span>Total Spend</span>
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="spendLegend"
+                        class="spend-legend"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ASSESSMENTS -->
+
+            <div class="panel assessment-panel">
+
+                <div class="panel-header">
+
+                    <h3>Recent Supplier Assessments</h3>
+
+                    <button class="view-all">
+                        View All
+                    </button>
+
+                </div>
+
+                <div class="assessment-table">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Supplier</th>
+                                <th>Assessment Date</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="assessmentBody"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SUPPLIER DIRECTORY
+        ================================================== -->
+
+        <section class="panel directory-panel">
+
+            <div class="panel-header">
+
+                <h3>Supplier Directory</h3>
+
+                <div class="directory-controls">
+
+                    <div class="directory-search">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <input
+                            type="text"
+                            id="directorySearch"
+                            placeholder="Search suppliers..."
+                        >
+
+                    </div>
+
+                    <select id="directoryCategory">
+                        <option value="">All Categories</option>
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="supplier-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Supplier Name</th>
+                            <th>Category</th>
+                            <th>Contact Person</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>On-Time Delivery</th>
+                            <th>Quality Score</th>
+                            <th>Status</th>
+                            <th>Performance Score</th>
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="supplierTableBody"></tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="table-footer">
+
+                <span id="tableSummary">
+                    Showing 0 suppliers
+                </span>
+
+                <div
+                    id="pagination"
+                    class="pagination"
+                ></div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================
+     ADD SUPPLIER MODAL
+====================================================== -->
+
+<div
+    class="modal-overlay"
+    id="supplierModal"
+>
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+                <h2>Add New Supplier</h2>
+                <p>Create a supplier record</p>
+            </div>
+
+            <button
+                class="close-modal"
+                id="closeModal"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <form id="supplierForm">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>Supplier Name *</label>
+
+                    <input
+                        name="vendor_name"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Category</label>
+
+                    <input
+                        name="category"
+                        placeholder="Raw Materials"
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Country</label>
+
+                    <input name="country">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Contact Person</label>
+
+                    <input name="contact_person">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Email *</label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Phone</label>
+
+                    <input name="phone">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Business Type</label>
+
+                    <input name="business_type">
+
+                </div>
+
+                <div class="form-group full">
+
+                    <label>Address</label>
+
+                    <textarea name="address"></textarea>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-button"
+                    id="cancelModal"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    Add Supplier
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="/static/Suppliers.js"></script>
+
+</body>
+
+</html>

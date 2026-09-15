@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>VendorIQ - Admin Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/Admindashboard.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <h1>VendorIQ</h1>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+
+        <nav>
+
+            
+            <a class="nav-item active">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/UserManagement" class="nav-item">
+                <i class="fa-solid fa-users"></i>
+                <span>User Management</span>
+            </a>
+
+            <a href="/VendorManagement" class="nav-item">
+                <i class="fa-solid fa-user-group"></i>
+                <span>Vendor Management</span>
+            </a>
+
+            <a href="/ProcurementOverview" class="nav-item">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span>Procurement Overview</span>
+            </a>
+
+            <a href="/ContractCompliance" class="nav-item">
+                <i class="fa-regular fa-file-lines"></i>
+                <span>Contracts & Compliance</span>
+            </a>
+
+            <a href="/InvoicesPayments" class="nav-item">
+                <i class="fa-regular fa-credit-card"></i>
+                <span>Invoices & Payments</span>
+            </a>
+
+            <a href="/Communication" class="nav-item">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Communication</span>
+            </a>
+
+            <a href="/PerformanceAnalytics" class="nav-item">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Performance Analytics</span>
+            </a>
+
+            <a href="/ReportsExports" class="nav-item">
+                <i class="fa-regular fa-folder-open"></i>
+                <span>Reports & Exports</span>
+            </a>
+
+            <a href="/Notifications" class="nav-item notification">
+                <i class="fa-regular fa-bell"></i>
+                <span>Notifications</span>
+                <b>15</b>
+            </a>
+
+
+            <div class="menu-title">
+                ADMINISTRATION
+            </div>
+
+
+            <a href="/RolesPermissions" class="nav-item">
+                <i class="fa-solid fa-user-shield"></i>
+                <span>Role & Permissions</span>
+            </a>
+
+            <a href="/SystemSettings" class="nav-item">
+                <i class="fa-solid fa-gear"></i>
+                <span>System Settings</span>
+            </a>
+
+            <a href="/AuditLogs" class="nav-item">
+                <i class="fa-solid fa-list"></i>
+                <span>Audit Logs</span>
+            </a>
+
+            <a href="/DataManagement" class="nav-item">
+                <i class="fa-solid fa-database"></i>
+                <span>Data Management</span>
+            </a>
+
+            <a href="/SystemHealth" class="nav-item">
+                <i class="fa-solid fa-arrows-to-circle"></i>
+                <span>System Health</span>
+            </a>
+
+
+            <div class="menu-title">
+                SUPPORT
+            </div>
+
+
+            <a href="/HelpSupport" class="nav-item">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/Feedback" class="nav-item">
+                <i class="fa-regular fa-comment"></i>
+                <span>Feedback</span>
+            </a>
+
+            <a href="/login" class="nav-item">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+
+        </nav>
+
+
+        <div class="admin-card">
+
+            <div class="admin-avatar">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+
+                <strong id="sidebarAdminName">Super Admin</strong>
+
+                <span id="sidebarAdminEmail">admin@vendoriq.com</span>
+
+                <small>
+                    <i></i>
+                    Online
+                </small>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================================= -->
+    <!-- MAIN -->
+    <!-- ================================= -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div>
+
+                <h1>Admin Dashboard</h1>
+
+                <div class="breadcrumb">
+                    <a href="/home">Home</a>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <strong>Admin Dashboard</strong>
+                </div>
+
+            </div>
+
+
+            <div class="header-right">
+
+                <div class="search">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        placeholder="Search anything..."
+                    >
+
+                </div>
+
+
+                <button class="header-icon" onclick="window.location.href='/Notifications'">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <b>12</b>
+
+                </button>
+
+
+                <button class="header-icon" onclick="window.location.href='/Communication'">
+
+                    <i class="fa-regular fa-envelope"></i>
+
+                    <b>7</b>
+
+                </button>
+
+
+                <div class="profile" onclick="openAdminProfile()">
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+
+                        <strong id="headerAdminName">Admin User</strong>
+
+                        <span id="headerAdminRole">Super Administrator</span>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- FILTER -->
+
+        <div class="toolbar">
+
+            <button class="date-picker">
+
+                <i class="fa-regular fa-calendar"></i>
+
+                01 May 2024 - 31 May 2024
+
+                <i class="fa-solid fa-chevron-down"></i>
+
+            </button>
+
+            <button class="refresh" onclick="loadDashboard()">
+
+                <i class="fa-solid fa-rotate"></i>
+
+                Refresh
+
+            </button>
+
+        </div>
+
+
+        <!-- ================================= -->
+        <!-- KPI CARDS -->
+        <!-- ================================= -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+
+                <div>
+
+                    <span>Total Users</span>
+
+                    <h3 id="totalUsers">0</h3>
+
+                    <small class="positive">
+                        ↑ 12.5%
+                    </small>
+
+                    <p>vs last 30 days</p>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+
+                <div>
+
+                    <span>Total Vendors</span>
+
+                    <h3 id="totalVendors">0</h3>
+
+                    <small class="positive">
+                        ↑ 8.3%
+                    </small>
+
+                    <p>vs last 30 days</p>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-solid fa-clipboard"></i>
+                </div>
+
+                <div>
+
+                    <span>Total Purchase Orders</span>
+
+                    <h3 id="totalOrders">0</h3>
+
+                    <small class="positive">
+                        ↑ 15.7%
+                    </small>
+
+                    <p>vs last 30 days</p>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+
+                <div>
+
+                    <span>Total Spend</span>
+
+                    <h3 id="totalSpend">$0</h3>
+
+                    <small class="positive">
+                        ↑ 18.6%
+                    </small>
+
+                    <p>vs last 30 days</p>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon cyan">
+                    <i class="fa-solid fa-file-lines"></i>
+                </div>
+
+                <div>
+
+                    <span>Active Contracts</span>
+
+                    <h3 id="activeContracts">0</h3>
+
+                    <small class="positive">
+                        ↑ 6.7%
+                    </small>
+
+                    <p>vs last 30 days</p>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon mint">
+                    <i class="fa-solid fa-shield"></i>
+                </div>
+
+                <div>
+
+                    <span>Compliance Score</span>
+
+                    <h3 id="complianceScore">0%</h3>
+
+                    <small class="positive">
+                        ↑ 5.3%
+                    </small>
+
+                    <p>vs last 30 days</p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================= -->
+        <!-- MAIN CHARTS -->
+        <!-- ================================= -->
+
+        <section class="dashboard-grid top-grid">
+
+
+            <!-- VENDOR RELIABILITY -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Vendor Reliability Distribution</h3>
+
+                    <i class="fa-regular fa-circle-question"></i>
+
+                </div>
+
+
+                <div class="donut-layout">
+
+                    <div class="donut">
+
+                        <canvas id="reliabilityChart"></canvas>
+
+                        <div class="donut-center">
+
+                            <strong id="vendorCount">
+                                0
+                            </strong>
+
+                            <span>Total Vendors</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="legend">
+
+                        <div>
+                            <i class="dot excellent"></i>
+                            Excellent (80-100)
+                            <strong id="excellent">0</strong>
+                        </div>
+
+                        <div>
+                            <i class="dot good"></i>
+                            Good (60-79)
+                            <strong id="good">0</strong>
+                        </div>
+
+                        <div>
+                            <i class="dot average"></i>
+                            Average (40-59)
+                            <strong id="average">0</strong>
+                        </div>
+
+                        <div>
+                            <i class="dot poor"></i>
+                            Poor (20-39)
+                            <strong id="poor">0</strong>
+                        </div>
+
+                        <div>
+                            <i class="dot critical"></i>
+                            Critical (0-19)
+                            <strong id="critical">0</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <a class="panel-link" href="/ReportsExports">
+                    View Vendor Reliability Report →
+                </a>
+
+            </div>
+
+
+            <!-- PROCUREMENT -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Procurement Overview</h3>
+
+                </div>
+
+
+                <div class="chart-legend">
+
+                    <span>
+                        <i class="line purple-line"></i>
+                        Orders
+                    </span>
+
+                    <span>
+                        <i class="line green-line"></i>
+                        Spend (USD)
+                    </span>
+
+                </div>
+
+
+                <canvas id="procurementChart"></canvas>
+
+                <a class="panel-link" href="/ProcurementOverview">
+                    View Procurement Analytics →
+                </a>
+
+            </div>
+
+
+            <!-- TOP VENDORS -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Top 5 Vendors by Reliability Score</h3>
+
+                </div>
+
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+                        <th>Vendor</th>
+                        <th>Category</th>
+                        <th>Reliability Score</th>
+                        <th>Trend</th>
+                    </tr>
+
+                    </thead>
+
+                    <tbody id="topVendors"></tbody>
+
+                </table>
+
+
+                <a class="panel-link" href="/VendorManagement">
+                    View All Vendors →
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================= -->
+        <!-- SECOND ROW -->
+        <!-- ================================= -->
+
+        <section class="dashboard-grid second-grid">
+
+
+            <!-- USER MANAGEMENT -->
+
+            <div class="panel compact">
+
+                <div class="panel-header">
+
+                    <h3>User Management</h3>
+
+                </div>
+
+
+                <div class="stat-row">
+
+                    <div class="mini-icon blue">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+
+                    <div>
+                        <small>Total Users</small>
+                        <strong id="usersSmall">0</strong>
+                    </div>
+
+                    <strong id="activeUsers">0</strong>
+
+                </div>
+
+
+                <div class="stat-row">
+
+                    <div class="mini-icon green">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+
+                    <div>
+                        <small>Active Users</small>
+                        <strong id="activeUserCount">0</strong>
+                    </div>
+
+                    <div>
+                        <small>New This Month</small>
+                        <strong>18</strong>
+                    </div>
+
+                </div>
+
+
+                <a class="panel-link" href="/UserManagement">
+                    Manage Users →
+                </a>
+
+            </div>
+
+
+            <!-- CONTRACT ALERTS -->
+
+            <div class="panel compact">
+
+                <div class="panel-header">
+
+                    <h3>
+                        <i class="fa-solid fa-triangle-exclamation alert-title"></i>
+                        Contract Alerts
+                    </h3>
+
+                </div>
+
+
+                <div class="alert-row">
+
+                    <i class="fa-regular fa-clock"></i>
+
+                    <strong id="expiringContracts">0</strong>
+
+                    <span>Contracts Expiring Soon</span>
+
+                </div>
+
+
+                <div class="alert-row">
+
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+
+                    <strong id="expiredContracts">0</strong>
+
+                    <span>Contracts Expired</span>
+
+                </div>
+
+
+                <div class="alert-row">
+
+                    <i class="fa-regular fa-file"></i>
+
+                    <strong id="pendingContracts">0</strong>
+
+                    <span>Pending Renewals</span>
+
+                </div>
+
+
+                <a class="panel-link" href="/ContractCompliance">
+                    View All Alerts →
+                </a>
+
+            </div>
+
+
+            <!-- COMPLIANCE -->
+
+            <div class="panel compact">
+
+                <div class="panel-header">
+
+                    <h3>Compliance Overview</h3>
+
+                </div>
+
+
+                <div class="compliance-layout">
+
+                    <div class="small-donut">
+
+                        <canvas id="complianceChart"></canvas>
+
+                        <strong>112</strong>
+
+                    </div>
+
+
+                    <div class="legend">
+
+                        <div>
+                            <i class="dot excellent"></i>
+                            Compliant
+                            <strong id="compliant">0</strong>
+                        </div>
+
+                        <div>
+                            <i class="dot average"></i>
+                            At Risk
+                            <strong id="atRisk">0</strong>
+                        </div>
+
+                        <div>
+                            <i class="dot critical"></i>
+                            Non-Compliant
+                            <strong id="nonCompliant">0</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <a class="panel-link" href="/ContractCompliance">
+                    View Compliance Report →
+                </a>
+
+            </div>
+
+
+            <!-- INVOICES -->
+
+            <div class="panel compact">
+
+                <div class="panel-header">
+
+                    <h3>Invoice Overview</h3>
+
+                </div>
+
+
+                <div class="invoice-row">
+
+                    <span>
+                        <i class="fa-regular fa-file-lines"></i>
+                        Total Invoices
+                    </span>
+
+                    <strong id="invoiceTotal">0</strong>
+
+                </div>
+
+
+                <div class="invoice-row">
+
+                    <span>
+                        <i class="fa-regular fa-calendar-check"></i>
+                        Paid Invoices
+                    </span>
+
+                    <strong id="invoicePaid">0</strong>
+
+                </div>
+
+
+                <div class="invoice-row">
+
+                    <span>
+                        <i class="fa-regular fa-user"></i>
+                        Pending Invoices
+                    </span>
+
+                    <strong id="invoicePending">0</strong>
+
+                </div>
+
+
+                <div class="invoice-row">
+
+                    <span>
+                        <i class="fa-regular fa-clock"></i>
+                        Overdue Invoices
+                    </span>
+
+                    <strong id="invoiceOverdue">0</strong>
+
+                </div>
+
+
+                <a class="panel-link" href="/InvoicesPayments">
+                    View All Invoices →
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================= -->
+        <!-- TABLES -->
+        <!-- ================================= -->
+
+        <section class="dashboard-grid bottom-grid">
+
+
+            <!-- PURCHASE ORDERS -->
+
+            <div class="panel orders-panel">
+
+                <div class="panel-header">
+
+                    <h3>Recent Purchase Orders</h3>
+
+                    <a>View All</a>
+
+                </div>
+
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>PO Number</th>
+                        <th>Vendor</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Order Date</th>
+                        <th>Delivery Date</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody id="purchaseOrders"></tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- SYSTEM HEALTH -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>System Health</h3>
+
+                </div>
+
+
+                <div class="health-list">
+
+                    <div>
+                        <span>
+                            <i class="fa-solid fa-network-wired"></i>
+                            Backend Services
+                        </span>
+                        <b>Healthy</b>
+                    </div>
+
+                    <div>
+                        <span>
+                            <i class="fa-solid fa-database"></i>
+                            Database
+                        </span>
+                        <b>Healthy</b>
+                    </div>
+
+                    <div>
+                        <span>
+                            <i class="fa-regular fa-folder"></i>
+                            Storage
+                        </span>
+                        <b>Healthy</b>
+                    </div>
+
+                    <div>
+                        <span>
+                            <i class="fa-regular fa-envelope"></i>
+                            Email Service
+                        </span>
+                        <b>Healthy</b>
+                    </div>
+
+                    <div>
+                        <span>
+                            <i class="fa-solid fa-code"></i>
+                            API Gateway
+                        </span>
+                        <b>Healthy</b>
+                    </div>
+
+                </div>
+
+
+                <a class="panel-link" href="/SystemHealth">
+                    View System Logs →
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================= -->
+        <!-- FOOTER KPI -->
+        <!-- ================================= -->
+
+        <section class="footer-stats">
+
+            <div>
+
+                <i class="fa-solid fa-medal"></i>
+
+                <span>Avg. Reliability Score</span>
+
+                <strong>78<small>/100</small></strong>
+
+                <div class="spark"></div>
+
+            </div>
+
+
+            <div>
+
+                <i class="fa-solid fa-shield"></i>
+
+                <span>On-Time Delivery</span>
+
+                <strong>92.6%</strong>
+
+                <div class="spark"></div>
+
+            </div>
+
+
+            <div>
+
+                <i class="fa-regular fa-clock"></i>
+
+                <span>Avg. Response Time</span>
+
+                <strong>12.4 hrs</strong>
+
+                <div class="spark"></div>
+
+            </div>
+
+
+            <div>
+
+                <i class="fa-solid fa-box"></i>
+
+                <span>Order Completion Rate</span>
+
+                <strong>96.3%</strong>
+
+                <div class="spark"></div>
+
+            </div>
+
+
+            <div>
+
+                <i class="fa-solid fa-person-circle-exclamation"></i>
+
+                <span>Total Vendors at Risk</span>
+
+                <strong>23</strong>
+
+                <div class="spark"></div>
+
+            </div>
+
+
+            <div>
+
+                <i class="fa-solid fa-coins"></i>
+
+                <span>Total Savings (YTD)</span>
+
+                <strong>$312,450</strong>
+
+                <div class="spark"></div>
+
+            </div>
+
+        </section>
+
+        <!-- =========================================================
+            PENDING VENDOR APPROVAL
+            ========================================================= -->
+
+        <section
+            class="dashboard-section"
+            id="vendorApprovalSection"
+        >
+
+            <div class="card vendor-approval-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h2>
+                            Pending Vendor Approval
+                        </h2>
+
+                        <p class="section-subtitle">
+                            Review vendor registrations awaiting
+                            administrator approval.
+                        </p>
+
+                    </div>
+
+                    <div
+                        class="pending-count"
+                        id="pendingVendorCount"
+                    >
+                        0 Pending
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+                    TABLE
+                    ============================================= -->
+
+                <div class="table-container">
+
+                    <table
+                        id="pendingVendorTable"
+                        class="approval-table"
+                    >
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Vendor ID
+                                </th>
+
+                                <th>
+                                    Company
+                                </th>
+
+                                <th>
+                                    Country
+                                </th>
+
+                                <th>
+                                    Email
+                                </th>
+
+                                <th>
+                                    Phone
+                                </th>
+
+                                <th>
+                                    Business Type
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="pendingVendorTableBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="8"
+                                    class="loading-cell"
+                                >
+                                    Loading pending vendors...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="/static/Admindashboard.js"></script>
+
+</body>
+</html>

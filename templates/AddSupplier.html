@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SCM - Add New Supplier</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="stylesheet" href="/static/AddSupplier.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =========================================================
+         SIDEBAR
+    ========================================================== -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-logo">
+                <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div class="brand-copy">
+                <h1>VendorIQ</h1>
+                <span>Vendor Reliability Platform</span>
+            </div>
+        </div>
+
+        <nav class="main-nav">
+
+            <a href="/supplychaindashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/demand-planning">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Demand Planning</span>
+            </a>
+
+            <a href="/supplychainprocurement">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Procurement</span>
+            </a>
+
+            <a href="/suppliers" class="active">
+                <i class="fa-solid fa-users"></i>
+                <span>Suppliers</span>
+            </a>
+
+            <a href="/inventory">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                <span>Inventory</span>
+            </a>
+
+            <a href="/ordersshipments">
+                <i class="fa-solid fa-truck-fast"></i>
+                <span>Orders & Shipments</span>
+            </a>
+
+            <a href="/warehouses">
+                <i class="fa-solid fa-warehouse"></i>
+                <span>Warehouses</span>
+            </a>
+
+            <a href="/transportation">
+                <i class="fa-solid fa-truck"></i>
+                <span>Transportation</span>
+            </a>
+
+            <a href="/analyticsreports">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Analytics & Reports</span>
+            </a>
+
+            <a href="/alertsnotifications" class="notification-link">
+                <i class="fa-solid fa-bell"></i>
+                <span>Alerts & Notifications</span>
+                <b>3</b>
+            </a>
+
+            <a href="/documents">
+                <i class="fa-regular fa-file-lines"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/supplychainsettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="quick-actions">
+
+            <div class="quick-title">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Quick Actions</span>
+            </div>
+
+            <button type="button"
+                    onclick="window.location.href='/CreatePurchaseOrder'">
+                <span class="quick-icon blue">
+                    <i class="fa-solid fa-cart-plus"></i>
+                </span>
+                <span>Create Purchase Order</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <button type="button"
+                    class="quick-active"
+                    onclick="window.location.href='/AddSupplier'">
+                <span class="quick-icon cyan">
+                    <i class="fa-solid fa-user-plus"></i>
+                </span>
+                <span>Add New Supplier</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <button type="button"
+                    onclick="window.location.href='/CreateShipment'">
+                <span class="quick-icon purple">
+                    <i class="fa-solid fa-ship"></i>
+                </span>
+                <span>Create Shipment</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <button type="button"
+                    onclick="window.location.href='/UploadDocument'">
+                <span class="quick-icon orange">
+                    <i class="fa-solid fa-upload"></i>
+                </span>
+                <span>Upload Document</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+        </div>
+
+        <div class="sidebar-profile" onclick="openSupplyChainProfile()">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <div class="profile-copy">
+                <strong>Arjun Kumar</strong>
+                <span>Supply Chain Manager</span>
+
+                <div class="online">
+                    <span></span>
+                    Online
+                </div>
+            </div>
+
+            <i class="fa-solid fa-chevron-right profile-arrow"></i>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+         MAIN
+    ========================================================== -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div class="page-title">
+                <h2>Supply Chain Dashboard</h2>
+            </div>
+
+            <div class="top-actions">
+
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text"
+                           placeholder="Search suppliers, orders, inventory...">
+                </div>
+
+                <button class="theme-btn icon-btn" type="button"
+                        title="Dark mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+
+                <button class="icon-btn notification" type="button">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>3</span>
+                </button>
+
+                <button class="icon-btn" type="button">
+                    <i class="fa-regular fa-calendar-days"></i>
+                </button>
+
+                <div class="date-box">
+                    <strong>Sep 8, 2025</strong>
+                    <span>10:24 AM</span>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+        <div class="content">
+
+            <!-- HERO -->
+            <section class="supplier-hero">
+
+                <div class="hero-icon">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+
+                <div class="hero-copy">
+                    <h1>Add New Supplier</h1>
+                    <p>Register a new supplier to expand your trusted network</p>
+                </div>
+
+                <div class="hero-art">
+
+                    <div class="hero-ring ring-one"></div>
+                    <div class="hero-ring ring-two"></div>
+
+                    <i class="fa-solid fa-handshake"></i>
+
+                    <div class="hero-message">
+                        <span>Better Suppliers</span>
+                        <strong>Stronger Supply Chain</strong>
+                        <em></em>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- FIVE STEP ORIGINAL WORKFLOW -->
+            <div class="stepper">
+
+                <div class="step active">
+                    <span>1</span>
+                    <strong>Supplier Information</strong>
+                </div>
+
+                <div class="step-line"></div>
+
+                <div class="step">
+                    <span>2</span>
+                    <strong>Business Details</strong>
+                </div>
+
+                <div class="step-line"></div>
+
+                <div class="step">
+                    <span>3</span>
+                    <strong>Contacts & Bank Details</strong>
+                </div>
+
+                <div class="step-line"></div>
+
+                <div class="step">
+                    <span>4</span>
+                    <strong>Documents</strong>
+                </div>
+
+                <div class="step-line"></div>
+
+                <div class="step">
+                    <span>5</span>
+                    <strong>Review & Save</strong>
+                </div>
+
+            </div>
+
+
+            <!-- MAIN GRID -->
+            <div class="page-grid">
+
+                <!-- =================================================
+                     LEFT FORM
+                ================================================== -->
+                <section class="form-column">
+
+                    <form id="supplierForm" autocomplete="off">
+
+                        <!-- REFERENCE DESIGN TABS -->
+                        <div class="form-tabs">
+
+                            <button type="button"
+                                    class="form-tab active">
+                                <i class="fa-solid fa-user"></i>
+                                <span>Supplier Information</span>
+                            </button>
+
+                            <button type="button"
+                                    class="form-tab">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>Contact Details</span>
+                            </button>
+
+                            <button type="button"
+                                    class="form-tab">
+                                <i class="fa-solid fa-building"></i>
+                                <span>Business Details</span>
+                            </button>
+
+                            <button type="button"
+                                    class="form-tab">
+                                <i class="fa-solid fa-file-lines"></i>
+                                <span>Additional Information</span>
+                            </button>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             BASIC INFORMATION
+                        ================================================== -->
+                        <div class="card basic-card">
+
+                            <div class="card-heading">
+                                <div>
+                                    <span class="section-kicker">
+                                        STEP 01
+                                    </span>
+                                    <h3>Basic Information</h3>
+                                </div>
+
+                                <span class="required-note">
+                                    * Required fields
+                                </span>
+                            </div>
+
+
+                            <div class="form-grid">
+
+                                <div class="field">
+                                    <i class="fa-solid fa-user"></i>
+                                    <label>
+                                        Supplier Name <em>*</em>
+                                    </label>
+
+                                    <div class="input-icon">
+                                        <input
+                                            id="supplierName"
+                                            name="supplier_name"
+                                            required
+                                            placeholder="Enter supplier name">
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                    <i class="fa-solid fa-building"></i>
+                                    <label>
+                                        Legal Entity Name
+                                    </label>
+
+                                    <div class="input-icon">
+                                        <input
+                                            id="legalEntityName"
+                                            placeholder="Enter legal entity name">
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                    <i class="fa-solid fa-link"></i>
+                                    <label>Website</label>
+
+                                    <div class="input-icon">
+                                        <input
+                                            id="website"
+                                            type="url"
+                                            placeholder="https://www.example.com">
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                    <i class="fa-solid fa-lock"></i>
+                                    <label>
+                                        Supplier Code <em>*</em>
+                                    </label>
+
+                                    <div class="input-icon disabled">
+                                        <input
+                                            id="supplierCode"
+                                            readonly
+                                            placeholder="Auto generated">
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                    <i class="fa-solid fa-file-invoice"></i>
+                                    <label>Tax ID / GST Number</label>
+
+                                    <div class="input-icon">
+                                        <input
+                                            id="taxId"
+                                            placeholder="Enter tax ID or GST number">
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                    <i class="fa-solid fa-layer-group"></i>
+                                    <label>Industry</label>
+
+                                    <div class="input-icon">
+
+                                        <select id="industry">
+                                            <option value="">
+                                                Select industry
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                    <i class="fa-solid fa-briefcase"></i>
+                                    <label>
+                                        Supplier Type <em>*</em>
+                                    </label>
+
+                                    <div class="input-icon">
+
+                                        <select id="supplierType" required>
+                                            <option value="">
+                                                Select supplier type
+                                            </option>
+                                            <option>Manufacturer</option>
+                                            <option>Distributor</option>
+                                            <option>Wholesaler</option>
+                                            <option>Service Provider</option>
+                                            <option>Contract Manufacturer</option>
+                                            <option>Logistics Provider</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                    <i class="fa-solid fa-fingerprint"></i>
+                                    <label>D-U-N-S Number</label>
+
+                                    <div class="input-icon">
+                                        <input
+                                            id="dunsNumber"
+                                            placeholder="Enter D-U-N-S number">
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    <label>Year Established</label>
+
+                                    <div class="input-icon">
+                                        <input
+                                            id="yearEstablished"
+                                            type="number"
+                                            min="1800"
+                                            max="2100"
+                                            placeholder="Select year">
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                    <i class="fa-solid fa-globe"></i>
+                                    <label>
+                                        Country <em>*</em>
+                                    </label>
+
+                                    <div class="input-icon">
+
+                                        <select id="country" required>
+                                            <option value="">
+                                                Select country
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                    <i class="fa-solid fa-coins"></i>
+                                    <label>
+                                        Currency <em>*</em>
+                                    </label>
+
+                                    <div class="input-icon">
+
+                                        <select id="currency" required>
+                                            <option value="">
+                                                Select currency
+                                            </option>
+                                            <option value="INR">
+                                                INR - Indian Rupee
+                                            </option>
+                                            <option value="USD">
+                                                USD - US Dollar
+                                            </option>
+                                            <option value="EUR">
+                                                EUR - Euro
+                                            </option>
+                                            <option value="GBP">
+                                                GBP - British Pound
+                                            </option>
+                                            <option value="AED">
+                                                AED - UAE Dirham
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                    <i class="fa-solid fa-language"></i>
+                                    <label>Preferred Language</label>
+
+                                    <div class="input-icon">
+
+                                        <select id="preferredLanguage">
+                                            <option value="">
+                                                Select language
+                                            </option>
+                                            <option>English</option>
+                                            <option>Hindi</option>
+                                            <option>Telugu</option>
+                                            <option>Tamil</option>
+                                            <option>Kannada</option>
+                                            <option>Malayalam</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             REGISTERED ADDRESS
+                        ================================================== -->
+                        <div class="card address-card">
+
+                            <div class="card-heading">
+                                <div>
+                                    <span class="section-kicker">
+                                        CONTACT
+                                    </span>
+                                    <h3>Registered Address</h3>
+                                </div>
+                            </div>
+
+
+                            <div class="address-grid">
+
+                                <div class="field wide">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <label>
+                                        Address Line 1 <em>*</em>
+                                    </label>
+
+                                    <div class="input-icon">
+                                        <input
+                                            id="registeredAddress1"
+                                            required
+                                            placeholder="Enter address line 1">
+                                    </div>
+                                </div>
+
+
+                                <div class="field wide">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    <label>Address Line 2</label>
+
+                                    <div class="input-icon">
+                                        <input
+                                            id="registeredAddress2"
+                                            placeholder="Enter address line 2">
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                    <i class="fa-solid fa-city"></i>
+                                    <label>
+                                        City <em>*</em>
+                                    </label>
+
+                                    <div class="input-icon">
+                                        <input
+                                            id="registeredCity"
+                                            required
+                                            placeholder="Enter city">
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                        <i class="fa-solid fa-map"></i>
+                                    <label>
+                                        State / Province <em>*</em>
+                                    </label>
+
+                                    <div class="input-icon">
+                                        <input
+                                            id="registeredState"
+                                            required
+                                            placeholder="Enter state / province">
+                                    </div>
+                                </div>
+
+
+                                <div class="field">
+                                        <i class="fa-solid fa-envelopes-bulk"></i>
+                                    <label>
+                                        Postal / ZIP Code <em>*</em>
+                                    </label>
+
+                                    <div class="input-icon">
+                                        <input
+                                            id="registeredPostal"
+                                            required
+                                            placeholder="Enter postal / ZIP code">
+                                    </div>
+                                </div>
+
+
+                                <div class="field phone-field">
+                                    <label>
+                                        Phone <em>*</em>
+                                    </label>
+
+                                    <div class="phone-control">
+
+                                        <select id="phoneCountry">
+                                            <option value="+91">+91</option>
+                                            <option value="+1">+1</option>
+                                            <option value="+44">+44</option>
+                                            <option value="+971">+971</option>
+                                        </select>
+
+                                        <input
+                                            id="phone"
+                                            required
+                                            placeholder="Enter phone number">
+
+                                    </div>
+                                </div>
+
+
+                                <div class="field email-field">
+                                        <i class="fa-solid fa-envelope"></i>
+                                    <label>
+                                        Email <em>*</em>
+                                    </label>
+
+                                    <div class="input-icon">
+                                        <input
+                                            id="email"
+                                            type="email"
+                                            required
+                                            placeholder="Enter email address">
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <label class="checkbox-row">
+
+                                <input
+                                    id="sameAddress"
+                                    type="checkbox">
+
+                                <span class="checkmark"></span>
+
+                                <span>Same as registered address</span>
+
+                            </label>
+
+
+                            <div class="communication-block">
+
+                                <div class="subheading">
+                                    <div>
+                                        <span class="section-kicker">
+                                            OPTIONAL
+                                        </span>
+
+                                        <h3>
+                                            Communication Address
+                                            <small>(Optional)</small>
+                                        </h3>
+                                    </div>
+
+                                    <i class="fa-solid fa-comments"></i>
+                                </div>
+
+
+                                <div class="address-grid">
+
+                                    <div class="field wide">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        <label>Address Line 1</label>
+
+                                        <div class="input-icon">
+                                            <input
+                                                id="communicationAddress1"
+                                                placeholder="Enter address line 1">
+                                        </div>
+                                    </div>
+
+
+                                    <div class="field wide">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        <label>Address Line 2</label>
+
+                                        <div class="input-icon">
+                                            <input
+                                                id="communicationAddress2"
+                                                placeholder="Enter address line 2">
+                                        </div>
+                                    </div>
+
+
+                                    <div class="field">                                   
+                                        <i class="fa-solid fa-city"></i>
+                                        <label>City</label>
+
+                                        <div class="input-icon">
+                                            <input
+                                                id="communicationCity"
+                                                placeholder="Enter city">
+                                        </div>
+                                    </div>
+
+
+                                    <div class="field">
+                                        <i class="fa-solid fa-map"></i>
+                                        <label>State / Province</label>
+
+                                        <div class="input-icon">
+                                            <input
+                                                id="communicationState"
+                                                placeholder="Enter state / province">
+                                        </div>
+                                    </div>
+
+
+                                    <div class="field">
+                                        <i class="fa-solid fa-envelopes-bulk"></i>
+                                        <label>Postal / ZIP Code</label>
+
+                                        <div class="input-icon">
+                                            <input
+                                                id="communicationPostal"
+                                                placeholder="Enter postal / ZIP code">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             ACTIONS
+                        ================================================== -->
+                        <div class="form-actions">
+
+                            <button
+                                type="button"
+                                id="cancelBtn"
+                                class="btn secondary">
+
+                                <i class="fa-solid fa-rotate-left"></i>
+                                Cancel
+
+                            </button>
+
+
+                            <div class="action-right">
+
+                                <button
+                                    type="button"
+                                    id="draftBtn"
+                                    class="btn outline">
+
+                                    <i class="fa-regular fa-floppy-disk"></i>
+                                    Save as Draft
+
+                                </button>
+
+
+                                <button
+                                    type="submit"
+                                    id="continueBtn"
+                                    class="btn primary">
+
+                                    Save & Continue
+                                    <i class="fa-solid fa-arrow-right"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </section>
+
+
+                <!-- =================================================
+                     RIGHT PANEL
+                ================================================== -->
+                <aside class="right-column">
+
+
+                    <!-- REGISTRATION STEPS -->
+                    <div class="side-card registration-card">
+
+                        <h3>Supplier Registration Steps</h3>
+
+                        <div class="registration-step active">
+
+                            <span>1</span>
+
+                            <div>
+                                <strong>Supplier Information</strong>
+                                <small>Basic supplier details</small>
+                            </div>
+
+                        </div>
+
+
+                        <div class="registration-step">
+
+                            <span>2</span>
+
+                            <div>
+                                <strong>Contact Details</strong>
+                                <small>Person & communication info</small>
+                            </div>
+
+                        </div>
+
+
+                        <div class="registration-step">
+
+                            <span>3</span>
+
+                            <div>
+                                <strong>Business Details</strong>
+                                <small>Category, type & financial info</small>
+                            </div>
+
+                        </div>
+
+
+                        <div class="registration-step">
+
+                            <span>4</span>
+
+                            <div>
+                                <strong>Additional Information</strong>
+                                <small>Notes & attachments</small>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- QUICK TIPS -->
+                    <div class="side-card quick-tips">
+
+                        <h3>
+                            <i class="fa-regular fa-lightbulb"></i>
+                            Quick Tips
+                        </h3>
+
+                        <ul>
+                            <li>Ensure GST/TAX details are valid</li>
+                            <li>Use official company name</li>
+                            <li>Select correct business category</li>
+                            <li>Keep contact information up to date</li>
+                        </ul>
+
+                    </div>
+
+
+                    <!-- SUPPLIER OVERVIEW
+                         Original IDs preserved for JS -->
+                    <div class="side-card overview">
+
+                        <h3>Supplier Overview</h3>
+
+                        <div class="supplier-icon">
+                            <i class="fa-solid fa-building-circle-check"></i>
+                        </div>
+
+                        <strong id="overviewName">
+                            New Supplier
+                        </strong>
+
+                        <span id="overviewStatus">
+                            Not saved yet
+                        </span>
+
+                        <hr>
+
+                        <div class="stats">
+
+                            <div>
+                                <strong id="poCount">0</strong>
+                                <span>POs</span>
+                            </div>
+
+                            <div>
+                                <strong id="shipmentCount">0</strong>
+                                <span>Shipments</span>
+                            </div>
+
+                            <div>
+                                <strong id="itemCount">0</strong>
+                                <span>Items</span>
+                            </div>
+
+                            <div>
+                                <strong id="spendAmount">$0.00</strong>
+                                <span>Spend</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ORIGINAL CHECKLIST PRESERVED -->
+                    <div class="side-card checklist-card">
+
+                        <h3>Checklist</h3>
+
+                        <div class="check-item active">
+                            <span>1</span>
+                            <strong>Basic Information</strong>
+                            <small>In Progress</small>
+                        </div>
+
+                        <div class="check-item">
+                            <span>2</span>
+                            <strong>Business Details</strong>
+                            <small>Pending</small>
+                        </div>
+
+                        <div class="check-item">
+                            <span>3</span>
+                            <strong>Contacts & Bank Details</strong>
+                            <small>Pending</small>
+                        </div>
+
+                        <div class="check-item">
+                            <span>4</span>
+                            <strong>Documents</strong>
+                            <small>Pending</small>
+                        </div>
+
+                        <div class="check-item">
+                            <span>5</span>
+                            <strong>Review & Save</strong>
+                            <small>Pending</small>
+                        </div>
+
+                    </div>
+
+
+                    <!-- INFORMATION -->
+                    <div class="side-card information">
+
+                        <div class="info-title">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <strong>Information</strong>
+                        </div>
+
+                        <p>
+                            Add accurate supplier information to ensure
+                            smooth procurement and timely payments.
+                        </p>
+
+                        <ul>
+                            <li>Fields marked with <b>*</b> are mandatory.</li>
+                            <li>You can save as draft and continue later.</li>
+                        </ul>
+
+                    </div>
+
+
+                    <!-- QUICK TIPS / HELP -->
+                    <div class="side-card help">
+
+                        <div class="help-icon">
+                            ?
+                        </div>
+
+                        <div>
+                            <strong>Help</strong>
+
+                            <p>
+                                Need help adding a supplier?
+                            </p>
+
+                            <a href="#">
+                                View User Guide
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        </div>
+
+                    </div>
+
+
+                    <!-- REFERENCE IMAGE PROMO -->
+                    <div class="supplier-promo">
+
+                        <div class="promo-icon">
+                            <i class="fa-solid fa-chart-column"></i>
+                        </div>
+
+                        <div>
+                            <strong>Trusted Suppliers</strong>
+                            <span>Build a Resilient Tomorrow</span>
+                        </div>
+
+                        <div class="promo-wave wave-one"></div>
+                        <div class="promo-wave wave-two"></div>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<div id="toast" class="toast"></div>
+
+
+<!-- Existing JavaScript path preserved -->
+<script src="/static/AddSupplier.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,3485 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* =========================================================
+   VENDORIQ - ADVANCED DARK MODE
+   No HTML / class changes required
+   ========================================================= */
+
+/* =========================================================
+   1. RESET
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+:root {
+    --bg-main: #030712;
+    --bg-primary: #050b18;
+    --bg-secondary: #071226;
+    --bg-card: rgba(10, 20, 40, 0.78);
+    --bg-card-solid: #09152b;
+
+    --navy: #071633;
+    --navy-dark: #020617;
+
+    --purple: #8b5cf6;
+    --purple-bright: #a855f7;
+    --purple-dark: #5b21b6;
+
+    --blue: #3b82f6;
+    --cyan: #22d3ee;
+
+    --green: #22c55e;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --yellow: #eab308;
+
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #7f8ea8;
+
+    --border: rgba(148, 163, 184, 0.14);
+    --border-bright: rgba(139, 92, 246, 0.35);
+
+    --shadow:
+        0 20px 50px rgba(0, 0, 0, 0.35);
+
+    --glow-purple:
+        0 0 25px rgba(139, 92, 246, 0.25);
+
+    --glow-blue:
+        0 0 25px rgba(59, 130, 246, 0.25);
+
+    --transition:
+        0.28s cubic-bezier(.4, 0, .2, 1);
+}
+
+
+/* =========================================================
+   2. BODY
+   ========================================================= */
+
+body {
+
+    font-family:
+        Inter,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    color: var(--text-primary);
+
+    background:
+        radial-gradient(
+            circle at 15% 10%,
+            rgba(88, 28, 135, 0.16),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 85% 15%,
+            rgba(30, 64, 175, 0.14),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 70% 90%,
+            rgba(6, 182, 212, 0.08),
+            transparent 25%
+        ),
+        linear-gradient(
+            135deg,
+            #020617,
+            #030b1c 45%,
+            #061126
+        );
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+}
+
+
+/* Animated background */
+
+body::before {
+
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    opacity: .35;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.025) 1px,
+            transparent 1px
+        );
+
+    background-size: 45px 45px;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            black,
+            transparent
+        );
+
+    animation:
+        gridMove 18s linear infinite;
+
+    z-index: -1;
+}
+
+@keyframes gridMove {
+
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(45px);
+    }
+}
+
+
+/* =========================================================
+   3. SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+::-webkit-scrollbar-track {
+    background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+
+    background:
+        linear-gradient(
+            180deg,
+            #7c3aed,
+            #2563eb
+        );
+
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a855f7;
+}
+
+
+/* =========================================================
+   4. SIDEBAR
+   ========================================================= */
+
+.sidebar {
+
+    position: fixed;
+
+    left: 0;
+    top: 0;
+
+    width: 228px;
+    height: 100vh;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(5, 10, 28, .97),
+            rgba(4, 12, 31, .98)
+        );
+
+    backdrop-filter: blur(20px);
+
+    color: white;
+
+    padding: 18px 16px;
+
+    overflow-y: auto;
+
+    z-index: 100;
+
+    border-right:
+        1px solid
+        rgba(139, 92, 246, .16);
+
+    box-shadow:
+        10px 0 40px rgba(0,0,0,.35);
+
+    animation:
+        sidebarEnter .7s ease both;
+}
+
+@keyframes sidebarEnter {
+
+    from {
+        opacity: 0;
+        transform: translateX(-25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+/* Sidebar ambient glow */
+
+.sidebar::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 180px;
+    height: 180px;
+
+    top: 20%;
+
+    left: -100px;
+
+    background: #7c3aed;
+
+    filter: blur(100px);
+
+    opacity: .12;
+
+    pointer-events: none;
+
+    animation:
+        sidebarGlow 5s ease-in-out infinite alternate;
+}
+
+@keyframes sidebarGlow {
+
+    from {
+        transform: translateY(0);
+        opacity: .08;
+    }
+
+    to {
+        transform: translateY(100px);
+        opacity: .18;
+    }
+}
+
+
+/* =========================================================
+   5. BRAND
+   ========================================================= */
+
+.brand {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    padding-bottom: 20px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.08);
+
+    position: relative;
+}
+
+.brand-logo {
+
+    width: 34px;
+    height: 38px;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #a855f7,
+            #4f46e5,
+            #2563eb
+        );
+
+    font-size: 19px;
+
+    box-shadow:
+        0 0 20px
+        rgba(139,92,246,.5);
+
+    animation:
+        logoPulse 3s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+
+    0%,100% {
+        box-shadow:
+            0 0 15px
+            rgba(139,92,246,.35);
+    }
+
+    50% {
+        box-shadow:
+            0 0 30px
+            rgba(139,92,246,.7);
+    }
+}
+
+.brand h2 {
+
+    font-size: 20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ffffff,
+            #bba5ff,
+            #60a5fa
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+}
+
+.brand span {
+
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 9px;
+
+    color: #8290ad;
+}
+
+
+/* =========================================================
+   6. SIDEBAR MENU
+   ========================================================= */
+
+.menu-title {
+
+    margin:
+        17px 3px 8px;
+
+    color: #71809f;
+
+    font-size: 10px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1.2px;
+}
+
+.sidebar-menu {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+.sidebar-menu a {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    min-height: 38px;
+
+    padding: 0 10px;
+
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    color: #b8c3d8;
+
+    font-size: 12px;
+
+    margin-bottom: 4px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    transition:
+        transform var(--transition),
+        background var(--transition),
+        color var(--transition),
+        box-shadow var(--transition);
+}
+
+.sidebar-menu a::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 3px;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            #a855f7,
+            #3b82f6
+        );
+
+    transform: scaleY(0);
+
+    transition:
+        transform .25s ease;
+}
+
+.sidebar-menu a:hover {
+
+    color: white;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(139,92,246,.14),
+            rgba(59,130,246,.05)
+        );
+
+    transform:
+        translateX(4px);
+
+    box-shadow:
+        inset 0 0 20px
+        rgba(139,92,246,.05);
+}
+
+.sidebar-menu a:hover::before {
+    transform: scaleY(1);
+}
+
+.sidebar-menu a.active {
+
+    color: white;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(124,58,237,.95),
+            rgba(79,70,229,.82)
+        );
+
+    box-shadow:
+        0 8px 25px
+        rgba(124,58,237,.28),
+        inset 0 1px 0
+        rgba(255,255,255,.15);
+
+    animation:
+        activeGlow 3s ease-in-out infinite;
+}
+
+@keyframes activeGlow {
+
+    0%,100% {
+        box-shadow:
+            0 8px 20px
+            rgba(124,58,237,.2);
+    }
+
+    50% {
+        box-shadow:
+            0 8px 30px
+            rgba(124,58,237,.4);
+    }
+}
+
+.sidebar-menu a i {
+
+    width: 17px;
+
+    text-align: center;
+
+    font-size: 14px;
+
+    transition:
+        transform .25s ease;
+}
+
+.sidebar-menu a:hover i {
+    transform: scale(1.15);
+}
+
+.notification-badge {
+
+    margin-left: auto;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ef4444,
+            #dc2626
+        );
+
+    border-radius: 20px;
+
+    min-width: 20px;
+    height: 20px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 9px;
+
+    box-shadow:
+        0 0 12px
+        rgba(239,68,68,.5);
+
+    animation:
+        badgePulse 2s infinite;
+}
+
+@keyframes badgePulse {
+
+    0%,100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+
+/* =========================================================
+   7. ADMIN CARD
+   ========================================================= */
+
+.administration,
+.support {
+
+    padding-top: 14px;
+
+    margin-top: 15px;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.06);
+}
+
+.admin-card {
+
+    display: flex;
+
+    gap: 10px;
+
+    align-items: center;
+
+    margin-top: 20px;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(67,56,202,.24),
+            rgba(30,27,75,.6)
+        );
+
+    border:
+        1px solid
+        rgba(139,92,246,.16);
+
+    box-shadow:
+        inset 0 1px 0
+        rgba(255,255,255,.05);
+
+    transition:
+        transform .3s ease,
+        box-shadow .3s ease;
+}
+
+.admin-card:hover {
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 12px 30px
+        rgba(0,0,0,.3),
+        0 0 20px
+        rgba(139,92,246,.12);
+}
+
+.admin-avatar {
+
+    width: 34px;
+    height: 34px;
+
+    border-radius: 9px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #8b5cf6,
+            #4f46e5
+        );
+
+    box-shadow:
+        0 0 15px
+        rgba(139,92,246,.35);
+}
+
+.admin-card strong {
+    display: block;
+    font-size: 11px;
+}
+
+.admin-card span {
+
+    display: block;
+
+    font-size: 8px;
+
+    color: #8794ad;
+
+    margin-top: 3px;
+}
+
+.admin-card small {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    margin-top: 4px;
+
+    font-size: 8px;
+
+    color: #cbd5e1;
+}
+
+.online-dot {
+
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+
+    box-shadow:
+        0 0 10px
+        #22c55e;
+
+    animation:
+        onlinePulse 1.8s infinite;
+}
+
+@keyframes onlinePulse {
+
+    0%,100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: .55;
+        transform: scale(.75);
+    }
+}
+
+
+/* =========================================================
+   8. MAIN
+   ========================================================= */
+
+.main {
+
+    margin-left: 228px;
+
+    width:
+        calc(100% - 228px);
+
+    padding:
+        16px 24px 25px;
+
+    animation:
+        mainEnter .7s ease both;
+}
+
+@keyframes mainEnter {
+
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   9. HEADER
+   ========================================================= */
+
+.topbar {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-top: 5px;
+
+    padding-bottom: 15px;
+
+    border-bottom:
+        1px solid
+        rgba(148,163,184,.12);
+}
+
+.topbar h1 {
+
+    font-size: 22px;
+
+    letter-spacing: -.6px;
+
+    padding-left: 25px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ffffff,
+            #b9c7e4,
+            #9d7cff
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+}
+
+.breadcrumb {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    margin-top: 10px;
+
+    font-size: 11px;
+
+    color: #66738f;
+
+    padding-left: 25px;
+}
+
+.breadcrumb a {
+
+    color: #9b7cff;
+
+    text-decoration: none;
+
+    transition: color .25s ease;
+}
+
+.breadcrumb a:hover {
+    color: #c4b5fd;
+}
+
+.breadcrumb strong {
+    color: #b8c3d8;
+}
+
+.breadcrumb i {
+    font-size: 8px;
+    color: #52617c;
+}
+
+
+/* =========================================================
+   10. TOP ACTIONS
+   ========================================================= */
+
+.top-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+}
+
+.search-box {
+
+    width: 176px;
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 0 12px;
+
+    background:
+        rgba(9,21,43,.75);
+
+    border:
+        1px solid
+        rgba(148,163,184,.14);
+
+    border-radius: 9px;
+
+    backdrop-filter: blur(12px);
+
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+.search-box:focus-within {
+
+    border-color:
+        rgba(139,92,246,.55);
+
+    box-shadow:
+        0 0 20px
+        rgba(139,92,246,.12);
+}
+
+.search-box i {
+
+    font-size: 11px;
+
+    color: #7483a2;
+}
+
+.search-box input {
+
+    border: 0;
+    outline: 0;
+
+    width: 100%;
+
+    font-size: 10px;
+
+    color: #e2e8f0;
+
+    background: transparent;
+}
+
+.search-box input::placeholder {
+    color: #66738f;
+}
+
+
+/* =========================================================
+   11. ROUND BUTTON
+   ========================================================= */
+
+.round-button {
+
+    position: relative;
+
+    width: 35px;
+    height: 35px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(10,21,42,.8);
+
+    border:
+        1px solid
+        rgba(148,163,184,.15);
+
+    color: #cbd5e1;
+
+    cursor: pointer;
+
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+.round-button:hover {
+
+    transform:
+        translateY(-2px);
+
+    border-color:
+        rgba(139,92,246,.5);
+
+    box-shadow:
+        0 0 18px
+        rgba(139,92,246,.2);
+
+    color: white;
+}
+
+.round-button b {
+
+    position: absolute;
+
+    top: -4px;
+    right: -3px;
+
+    width: 15px;
+    height: 15px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ef4444,
+            #dc2626
+        );
+
+    color: white;
+
+    font-size: 8px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    box-shadow:
+        0 0 10px
+        rgba(239,68,68,.55);
+}
+
+
+/* =========================================================
+   12. PROFILE
+   ========================================================= */
+
+.profile {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+.profile-avatar {
+
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(139,92,246,.25),
+            rgba(59,130,246,.18)
+        );
+
+    color: #b69cff;
+
+    border:
+        1px solid
+        rgba(139,92,246,.2);
+
+    box-shadow:
+        0 0 15px
+        rgba(139,92,246,.12);
+}
+
+.profile strong {
+
+    display: block;
+
+    font-size: 11px;
+
+    color: #e5e7eb;
+}
+
+.profile small {
+
+    display: block;
+
+    font-size: 9px;
+
+    color: #71809c;
+
+    margin-top: 3px;
+}
+
+.profile > i {
+
+    font-size: 9px;
+
+    margin-left: 5px;
+
+    color: #71809c;
+}
+
+
+/* =========================================================
+   13. TOOLBAR
+   ========================================================= */
+
+.toolbar {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 8px;
+
+    margin:
+        17px 0 10px;
+}
+
+.toolbar-right {
+
+    display: flex;
+
+    gap: 8px;
+}
+
+.date-filter {
+
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 0 11px;
+
+    border:
+        1px solid
+        rgba(148,163,184,.15);
+
+    background:
+        rgba(9,21,43,.75);
+
+    color: #cbd5e1;
+
+    border-radius: 8px;
+
+    font-size: 9px;
+
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+
+.date-filter:hover {
+
+    border-color:
+        rgba(139,92,246,.4);
+
+    box-shadow:
+        0 0 15px
+        rgba(139,92,246,.1);
+}
+
+.refresh-btn {
+
+    height: 32px;
+
+    padding: 0 13px;
+
+    border:
+        1px solid
+        rgba(139,92,246,.55);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(139,92,246,.14),
+            rgba(59,130,246,.08)
+        );
+
+    color: #b9a1ff;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 9px;
+
+    transition:
+        all .25s ease;
+}
+
+.refresh-btn:hover {
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #4f46e5
+        );
+
+    box-shadow:
+        0 0 22px
+        rgba(124,58,237,.35);
+
+    transform:
+        translateY(-2px);
+}
+
+.refresh-btn:active {
+    transform: scale(.96);
+}
+
+
+/* =========================================================
+   14. KPI GRID
+   ========================================================= */
+
+.kpi-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(6, 1fr);
+
+    gap: 10px;
+
+    margin-bottom: 10px;
+}
+
+
+/* =========================================================
+   15. KPI CARD
+   ========================================================= */
+
+.kpi-card {
+
+    min-height: 92px;
+
+    padding: 13px;
+
+    display: flex;
+
+    gap: 10px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10,22,44,.88),
+            rgba(6,16,34,.72)
+        );
+
+    border:
+        1px solid
+        rgba(148,163,184,.13);
+
+    border-radius: 11px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    backdrop-filter: blur(15px);
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.18);
+
+    transition:
+        transform .3s cubic-bezier(.2,.8,.2,1),
+        border-color .3s ease,
+        box-shadow .3s ease;
+}
+
+
+/* animated shine */
+
+.kpi-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: -100%;
+
+    width: 70%;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.06),
+            transparent
+        );
+
+    transform: skewX(-20deg);
+
+    transition:
+        left .7s ease;
+}
+
+.kpi-card:hover::before {
+    left: 140%;
+}
+
+.kpi-card:hover {
+
+    transform:
+        translateY(-6px);
+
+    border-color:
+        rgba(139,92,246,.35);
+
+    box-shadow:
+        0 18px 40px
+        rgba(0,0,0,.3),
+        0 0 25px
+        rgba(139,92,246,.08);
+}
+
+
+/* =========================================================
+   16. KPI ICONS
+   ========================================================= */
+
+.kpi-icon {
+
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border:
+        1px solid
+        rgba(255,255,255,.07);
+
+    transition:
+        transform .3s ease,
+        box-shadow .3s ease;
+}
+
+.kpi-card:hover .kpi-icon {
+
+    transform:
+        rotate(-5deg)
+        scale(1.08);
+}
+
+.kpi-icon.blue {
+
+    background:
+        rgba(59,130,246,.13);
+
+    color: #60a5fa;
+
+    box-shadow:
+        0 0 18px
+        rgba(59,130,246,.12);
+}
+
+.kpi-icon.green {
+
+    background:
+        rgba(34,197,94,.12);
+
+    color: #4ade80;
+
+    box-shadow:
+        0 0 18px
+        rgba(34,197,94,.1);
+}
+
+.kpi-icon.orange {
+
+    background:
+        rgba(245,158,11,.12);
+
+    color: #fbbf24;
+
+    box-shadow:
+        0 0 18px
+        rgba(245,158,11,.1);
+}
+
+.kpi-icon.red {
+
+    background:
+        rgba(239,68,68,.12);
+
+    color: #f87171;
+
+    box-shadow:
+        0 0 18px
+        rgba(239,68,68,.1);
+}
+
+.kpi-icon.purple {
+
+    background:
+        rgba(139,92,246,.14);
+
+    color: #a78bfa;
+
+    box-shadow:
+        0 0 18px
+        rgba(139,92,246,.14);
+}
+
+
+/* =========================================================
+   17. KPI TEXT
+   ========================================================= */
+
+.kpi-card span {
+
+    display: block;
+
+    font-size: 9px;
+
+    color: #8795ae;
+}
+
+.kpi-card strong {
+
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 19px;
+
+    color: #f8fafc;
+
+    letter-spacing: -.4px;
+}
+
+.kpi-card p {
+
+    margin-top: 5px;
+
+    font-size: 8px;
+
+    color: #65738f;
+}
+
+
+/* =========================================================
+   18. GRID LAYOUTS
+   ========================================================= */
+
+.grid-two {
+
+    display: grid;
+
+    grid-template-columns:
+        1.1fr 1fr;
+
+    gap: 10px;
+
+    margin-bottom: 10px;
+}
+
+.grid-three {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 10px;
+
+    margin-bottom: 10px;
+}
+
+.grid-one {
+    margin-bottom: 10px;
+}
+
+
+/* =========================================================
+   19. PANELS
+   ========================================================= */
+
+.panel {
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10,21,43,.86),
+            rgba(5,15,32,.76)
+        );
+
+    border:
+        1px solid
+        rgba(148,163,184,.13);
+
+    border-radius: 11px;
+
+    padding: 14px;
+
+    min-width: 0;
+
+    backdrop-filter:
+        blur(18px);
+
+    box-shadow:
+        0 15px 35px
+        rgba(0,0,0,.2);
+
+    position: relative;
+
+    overflow: hidden;
+
+    transition:
+        border-color .3s ease,
+        box-shadow .3s ease,
+        transform .3s ease;
+}
+
+
+/* top glow */
+
+.panel::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 12px;
+    right: 12px;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(139,92,246,.45),
+            transparent
+        );
+
+    opacity: .5;
+}
+
+.panel:hover {
+
+    border-color:
+        rgba(139,92,246,.25);
+
+    box-shadow:
+        0 20px 45px
+        rgba(0,0,0,.3),
+        0 0 25px
+        rgba(139,92,246,.05);
+}
+
+.panel-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    margin-bottom: 12px;
+}
+
+.panel-header h2 {
+
+    font-size: 12px;
+
+    color: #f1f5f9;
+
+    letter-spacing: -.1px;
+}
+
+.panel-header p {
+
+    margin-top: 4px;
+
+    font-size: 8px;
+
+    color: #6f7e99;
+}
+
+.view-link {
+
+    color: #a78bfa;
+
+    font-size: 8px;
+
+    text-decoration: none;
+
+    transition: color .25s ease;
+}
+
+.view-link:hover {
+    color: #c4b5fd;
+}
+
+
+/* =========================================================
+   20. TABLE
+   ========================================================= */
+
+.table-wrapper {
+
+    width: 100%;
+
+    overflow-y: auto;
+
+    overflow-x: auto;
+
+    height: 350px;
+}
+
+table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+th {
+
+    text-align: left;
+
+    padding: 8px 5px;
+
+    font-size: 8px;
+
+    font-weight: 600;
+
+    color: #7483a0;
+
+    border-bottom:
+        1px solid
+        rgba(148,163,184,.1);
+
+    text-transform: uppercase;
+
+    letter-spacing: .3px;
+}
+
+td {
+
+    padding: 9px 5px;
+
+    font-size: 8px;
+
+    color: #cbd5e1;
+
+    border-bottom:
+        1px solid
+        rgba(148,163,184,.07);
+
+    white-space: nowrap;
+
+    transition:
+        background .2s ease,
+        color .2s ease;
+
+    min-height: 0;
+}
+
+tbody tr {
+
+    transition:
+        transform .2s ease;
+}
+
+tbody tr:hover {
+
+    background:
+        rgba(139,92,246,.045);
+
+}
+
+tbody tr:hover td {
+
+    color: #f1f5f9;
+
+}
+
+
+/* =========================================================
+   21. BADGES
+   ========================================================= */
+
+.badge {
+
+    display: inline-block;
+
+    padding: 4px 8px;
+
+    border-radius: 6px;
+
+    font-size: 7px;
+
+    font-weight: 600;
+
+    border:
+        1px solid
+        transparent;
+
+    transition:
+        transform .2s ease;
+}
+
+.badge:hover {
+    transform: scale(1.05);
+}
+
+.badge-green {
+
+    background:
+        rgba(34,197,94,.11);
+
+    color: #4ade80;
+
+    border-color:
+        rgba(34,197,94,.18);
+
+    box-shadow:
+        0 0 10px
+        rgba(34,197,94,.05);
+}
+
+.badge-orange {
+
+    background:
+        rgba(245,158,11,.11);
+
+    color: #fbbf24;
+
+    border-color:
+        rgba(245,158,11,.18);
+}
+
+.badge-red {
+
+    background:
+        rgba(239,68,68,.11);
+
+    color: #f87171;
+
+    border-color:
+        rgba(239,68,68,.18);
+}
+
+.badge-blue {
+
+    background:
+        rgba(59,130,246,.11);
+
+    color: #60a5fa;
+
+    border-color:
+        rgba(59,130,246,.18);
+}
+
+
+/* =========================================================
+   22. RENEWAL SECTION
+   ========================================================= */
+
+.renewal-summary {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 22px;
+
+    min-height: 145px;
+}
+
+
+/* =========================================================
+   23. DONUT
+   ========================================================= */
+
+.renewal-donut {
+
+    width: 130px;
+    height: 130px;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            #ef4444 0 37%,
+            #f59e0b 37% 62%,
+            #eab308 62% 87%,
+            #22c55e 87% 100%
+        );
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+
+    box-shadow:
+        0 0 25px
+        rgba(139,92,246,.08);
+
+    animation:
+        donutRotate 10s linear infinite;
+}
+
+@keyframes donutRotate {
+
+    from {
+        filter:
+            drop-shadow(
+                0 0 3px
+                rgba(139,92,246,.1)
+            );
+    }
+
+    50% {
+        filter:
+            drop-shadow(
+                0 0 10px
+                rgba(139,92,246,.25)
+            );
+    }
+
+    to {
+        filter:
+            drop-shadow(
+                0 0 3px
+                rgba(139,92,246,.1)
+            );
+    }
+}
+
+.donut-inner {
+
+    width: 86px;
+    height: 86px;
+
+    border-radius: 50%;
+
+    background:
+        #071226;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    border:
+        1px solid
+        rgba(255,255,255,.06);
+
+    box-shadow:
+        inset 0 0 20px
+        rgba(0,0,0,.35);
+}
+
+.donut-inner strong {
+
+    font-size: 20px;
+
+    color: #f8fafc;
+}
+
+.donut-inner span {
+
+    font-size: 7px;
+
+    color: #71809b;
+
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   24. RENEWAL LEGEND
+   ========================================================= */
+
+.renewal-legend {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 13px;
+
+    flex: 1;
+}
+
+.renewal-legend div,
+.compliance-list div {
+
+    display: grid;
+
+    grid-template-columns:
+        9px 1fr auto;
+
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 8px;
+
+    color: #cbd5e1;
+}
+
+.dot {
+
+    width: 8px;
+    height: 8px;
+
+    display: inline-block;
+
+    border-radius: 50%;
+}
+
+.dot.green {
+
+    background: #22c55e;
+
+    box-shadow:
+        0 0 9px
+        rgba(34,197,94,.65);
+}
+
+.dot.orange {
+
+    background: #f59e0b;
+
+    box-shadow:
+        0 0 9px
+        rgba(245,158,11,.55);
+}
+
+.dot.red {
+
+    background: #ef4444;
+
+    box-shadow:
+        0 0 9px
+        rgba(239,68,68,.55);
+}
+
+.dot.yellow {
+
+    background: #eab308;
+
+    box-shadow:
+        0 0 9px
+        rgba(234,179,8,.5);
+}
+
+
+/* =========================================================
+   25. RENEWAL LIST
+   ========================================================= */
+
+.renewal-list {
+
+    margin-top: 7px;
+
+    max-height: 135px;
+
+    overflow-y: auto;
+}
+
+.renewal-item {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 8px 0;
+
+    border-top:
+        1px solid
+        rgba(148,163,184,.07);
+
+    font-size: 8px;
+
+    color: #d5dbea;
+
+    transition:
+        padding-left .2s ease,
+        background .2s ease;
+}
+
+.renewal-item:hover {
+
+    padding-left: 5px;
+
+    color: white;
+}
+
+.renewal-item small {
+
+    display: block;
+
+    color: #697894;
+
+    margin-top: 3px;
+}
+
+/*
+/* =========================================================
+   26. COMPLIANCE
+   ========================================================= 
+
+.compliance-box {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-around;
+
+    min-height: 145px;
+}
+
+
+/* =========================================================
+   27. COMPLIANCE GAUGE
+   ========================================================= 
+
+.gauge {
+
+    width: 135px;
+    height: 75px;
+
+    position: relative;
+
+    border-radius:
+        135px 135px 0 0;
+
+   /* background:
+        conic-gradient(
+            from 270deg,
+            #22c55e 0 0%,
+            #1e293b 0 100%
+        );
+
+    filter:
+        drop-shadow(
+            0 0 15px
+            rgba(34,197,94,.15)
+        );
+        
+
+    animation:
+        gaugeGlow 3s ease-in-out infinite;
+}
+
+/*@keyframes gaugeGlow {
+
+    0%,100% {
+        filter:
+            drop-shadow(
+                0 0 8px
+                rgba(34,197,94,.1)
+            );
+    }
+
+    50% {
+        filter:
+            drop-shadow(
+                0 0 20px
+                rgba(34,197,94,.25)
+            );
+    }
+}
+
+.gauge::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 18px;
+
+    bottom: 0;
+
+    width: 99px;
+    height: 50px;
+
+    border-radius:
+        99px 99px 0 0;
+
+    background:
+        #09152b;
+
+    box-shadow:
+        inset 0 0 15px
+        rgba(0,0,0,.4);
+}
+
+.gauge > div {
+
+    position: absolute;
+
+    z-index: 2;
+
+    bottom: 7px;
+
+    width: 100%;
+
+    text-align: center;
+}
+
+.gauge strong {
+
+    display: block;
+
+    font-size: 20px;
+
+    color: #f8fafc;
+}
+
+.gauge span {
+
+    font-size: 7px;
+
+    color: #71809b;
+}
+
+.compliance-list {
+
+    width: 45%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 13px;
+}*/
+
+
+/* =========================================================
+   28. UNAVAILABLE CONTENT
+   ========================================================= */
+
+.unavailable-content {
+
+    min-height: 145px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    color: #66738f;
+}
+
+.unavailable-content i {
+
+    font-size: 28px;
+
+    color: #8b5cf6;
+
+    margin-bottom: 12px;
+
+    filter:
+        drop-shadow(
+            0 0 12px
+            rgba(139,92,246,.4)
+        );
+
+    animation:
+        floatingIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatingIcon {
+
+    0%,100% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(-6px);
+    }
+}
+
+.unavailable-content strong {
+
+    font-size: 10px;
+
+    color: #cbd5e1;
+}
+
+.unavailable-content span {
+
+    max-width: 230px;
+
+    margin-top: 7px;
+
+    line-height: 1.5;
+
+    font-size: 8px;
+
+    color: #687792;
+}
+
+
+/* =========================================================
+   29. ERROR
+   ========================================================= */
+
+.error-message {
+
+    display: none;
+
+    padding: 10px 13px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(239,68,68,.1);
+
+    border:
+        1px solid
+        rgba(239,68,68,.2);
+
+    color: #f87171;
+
+    font-size: 10px;
+
+    margin-top: 10px;
+
+    box-shadow:
+        0 0 20px
+        rgba(239,68,68,.08);
+
+    animation:
+        errorShake .35s ease;
+}
+
+@keyframes errorShake {
+
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-4px);
+    }
+
+    50% {
+        transform: translateX(4px);
+    }
+
+    75% {
+        transform: translateX(-2px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+
+/* =========================================================
+   30. SELECTION
+   ========================================================= */
+
+::selection {
+
+    background:
+        rgba(139,92,246,.35);
+
+    color: white;
+}
+
+
+/* =========================================================
+   31. FOCUS
+   ========================================================= */
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+
+    outline:
+        2px solid
+        rgba(139,92,246,.7);
+
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   32. RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1250px) {
+
+    .kpi-grid {
+
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+}
+
+
+@media (max-width: 1000px) {
+
+    .grid-two,
+    .grid-three {
+
+        grid-template-columns: 1fr;
+    }
+
+    .kpi-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 750px) {
+
+    .sidebar {
+
+        position: relative;
+
+        width: 100%;
+
+        height: auto;
+
+        min-height: auto;
+    }
+
+    .main {
+
+        margin-left: 0;
+
+        width: 100%;
+
+        padding:
+            14px;
+    }
+
+    .topbar {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+    .top-actions {
+
+        flex-wrap: wrap;
+
+        width: 100%;
+    }
+
+    .search-box {
+
+        width: 100%;
+    }
+
+    .kpi-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .toolbar {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .toolbar-right {
+
+        width: 100%;
+    }
+
+    .renewal-summary {
+
+        flex-direction: column;
+
+        padding: 10px 0;
+    }
+
+    .compliance-box {
+
+        flex-direction: column;
+
+        gap: 20px;
+
+        padding: 10px 0;
+    }
+
+    .compliance-list {
+
+        width: 90%;
+    }
+}
+
+
+/* =========================================================
+   33. REDUCED MOTION ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration: .01ms !important;
+
+        animation-iteration-count: 1 !important;
+
+        scroll-behavior: auto !important;
+
+        transition-duration: .01ms !important;
+    }
+}
+
+
+/* ==========================================================
+   VENDORIQ - COMPLIANCE MONITORING
+   Dark Enterprise Glassmorphism
+   ========================================================== */
+
+
+/* ==========================================================
+   PANEL
+   ========================================================== */
+
+.panel {
+    position: relative;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10, 21, 43, 0.94),
+            rgba(5, 15, 32, 0.88)
+        );
+
+    border: 1px solid rgba(148, 163, 184, 0.14);
+
+    border-radius: 14px;
+
+    padding: 16px;
+
+    min-width: 0;
+
+    overflow: hidden;
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.025);
+
+    transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+/* Top glowing line */
+
+.panel::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 15px;
+    right: 15px;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(139, 92, 246, 0.75),
+            rgba(59, 130, 246, 0.55),
+            transparent
+        );
+
+    opacity: 0.65;
+}
+
+
+/* Ambient glow */
+
+.panel::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 160px;
+    height: 160px;
+
+    right: -90px;
+    bottom: -90px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(139, 92, 246, 0.13),
+            transparent 70%
+        );
+
+    pointer-events: none;
+}
+
+
+/* Hover */
+
+.panel:hover {
+
+    border-color:
+        rgba(139, 92, 246, 0.30);
+
+    box-shadow:
+        0 22px 50px rgba(0, 0, 0, 0.38),
+        0 0 30px rgba(139, 92, 246, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.035);
+
+    transform: translateY(-1px);
+}
+
+
+/* ==========================================================
+   PANEL HEADER
+   ========================================================== */
+
+.panel-header {
+
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    margin-bottom: 14px;
+}
+
+
+.panel-header h2 {
+
+    margin: 0;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    line-height: 1.4;
+
+    letter-spacing: -0.15px;
+
+    color: #f8fafc;
+}
+
+
+.panel-header p {
+
+    margin: 4px 0 0;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 8px;
+
+    font-weight: 400;
+
+    line-height: 1.5;
+
+    color: #71809b;
+
+}
+
+
+/* ==========================================================
+   COMPLIANCE BOX
+   ========================================================== */
+
+.compliance-box {
+
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-around;
+
+    gap: 20px;
+
+    min-height: 145px;
+
+    padding: 8px 4px;
+}
+
+
+/* ==========================================================
+   COMPLIANCE GAUGE
+   ========================================================== */
+
+.gauge {
+    --gauge-size: 180px;
+    --gauge-height: 90px;
+    --gauge-thickness: 12px;
+    --gauge-progress: 87%;
+
+    position: relative;
+
+    width: var(--gauge-size);
+    height: var(--gauge-height);
+
+    flex: 0 0 auto;
+
+    overflow: hidden;
+
+    /* Creates the actual semicircle shape */
+    border-radius: var(--gauge-size) var(--gauge-size) 0 0;
+
+    /* No default background */
+    background: transparent;
+
+    filter:
+        drop-shadow(
+            0 0 12px rgba(34, 197, 94, 0.18)
+        );
+
+    transition:
+        filter 0.4s ease,
+        transform 0.3s ease;
+}
+
+
+/* ==========================================================
+   GAUGE TRACK
+   ========================================================== */
+
+.gauge::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 100%;
+    height: 200%;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            from 270deg,
+            #1e293b 0deg 180deg,
+            transparent 180deg 360deg
+        );
+
+    /*
+       Mask creates a clean ring.
+    */
+
+    -webkit-mask:
+        radial-gradient(
+            circle,
+            transparent calc(50% - var(--gauge-thickness)),
+            #000 calc(50% - var(--gauge-thickness) + 1px),
+            #000 50%,
+            transparent 50.5%
+        );
+
+    mask:
+        radial-gradient(
+            circle,
+            transparent calc(50% - var(--gauge-thickness)),
+            #000 calc(50% - var(--gauge-thickness) + 1px),
+            #000 50%,
+            transparent 50.5%
+        );
+
+    z-index: 1;
+}
+
+
+/* ==========================================================
+   GAUGE PROGRESS
+   ========================================================== */
+
+.gauge::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 100%;
+    height: 200%;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            from 270deg,
+            #22c55e 0deg,
+            #22c55e calc(var(--gauge-progress) * 1.8),
+            transparent calc(var(--gauge-progress) * 1.8),
+            transparent 360deg
+        );
+
+    -webkit-mask:
+        radial-gradient(
+            circle,
+            transparent calc(50% - var(--gauge-thickness)),
+            #000 calc(50% - var(--gauge-thickness) + 1px),
+            #000 50%,
+            transparent 50.5%
+        );
+
+    mask:
+        radial-gradient(
+            circle,
+            transparent calc(50% - var(--gauge-thickness)),
+            #000 calc(50% - var(--gauge-thickness) + 1px),
+            #000 50%,
+            transparent 50.5%
+        );
+
+    z-index: 2;
+
+    filter:
+        drop-shadow(
+            0 0 7px rgba(34, 197, 94, 0.45)
+        );
+
+    transition:
+        background 0.7s ease,
+        filter 0.4s ease;
+}
+
+
+/* ==========================================================
+   GAUGE CENTER CONTENT
+   ========================================================== */
+
+.gauge > div {
+
+    position: absolute;
+
+    left: 0;
+    bottom: 5px;
+
+    width: 100%;
+
+    z-index: 5;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    text-align: center;
+
+    pointer-events: none;
+}
+
+
+/* ==========================================================
+   PERCENTAGE
+   ========================================================== */
+
+.gauge strong {
+
+    display: block;
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 22px;
+
+    font-weight: 800;
+
+    line-height: 1;
+
+    letter-spacing: -0.7px;
+
+    text-shadow:
+        0 0 14px rgba(255, 255, 255, 0.12);
+}
+
+
+/* ==========================================================
+   LABEL
+   ========================================================== */
+
+.gauge span {
+
+    display: block;
+
+    margin-top: 5px;
+
+    color: #ffffff;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 7px;
+
+    font-weight: 500;
+
+    line-height: 1;
+
+    letter-spacing: 0.35px;
+
+    text-transform: uppercase;
+}
+
+
+/* ==========================================================
+   HOVER
+   ========================================================== */
+
+.gauge:hover {
+
+    transform: scale(1.025);
+
+    filter:
+        drop-shadow(
+            0 0 18px rgba(34, 197, 94, 0.28)
+        );
+}
+
+
+/* ==========================================================
+   SCORE COLORS
+   ========================================================== */
+
+/* Excellent */
+
+.gauge.high {
+
+    --gauge-progress: 90%;
+}
+
+.gauge.high::after {
+
+    background:
+        conic-gradient(
+            from 270deg,
+            #22c55e 0deg 162deg,
+            transparent 162deg 360deg
+        );
+}
+
+
+/* Medium */
+
+.gauge.medium {
+
+    --gauge-progress: 65%;
+}
+
+.gauge.medium::after {
+
+    background:
+        conic-gradient(
+            from 270deg,
+            #f59e0b 0deg 117deg,
+            transparent 117deg 360deg
+        );
+
+    filter:
+        drop-shadow(
+            0 0 7px rgba(245, 158, 11, 0.45)
+        );
+}
+
+
+/* Low */
+
+.gauge.low {
+
+    --gauge-progress: 35%;
+}
+
+.gauge.low::after {
+
+    background:
+        conic-gradient(
+            from 270deg,
+            #ef4444 0deg 63deg,
+            transparent 63deg 360deg
+        );
+
+    filter:
+        drop-shadow(
+            0 0 7px rgba(239, 68, 68, 0.45)
+        );
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 750px) {
+
+    .gauge {
+
+        --gauge-size: 150px;
+        --gauge-height: 78px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .gauge {
+
+        --gauge-size: 140px;
+        --gauge-height: 73px;
+        --gauge-thickness: 11px;
+    }
+
+    .gauge strong {
+
+        font-size: 20px;
+    }
+}
+
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .gauge,
+    .gauge::after {
+
+        transition: none;
+    }
+}
+
+
+/* ==========================================================
+   GAUGE ANIMATION
+   ========================================================== */
+
+@keyframes complianceGaugeGlow {
+
+    0%,
+    100% {
+
+        filter:
+            drop-shadow(
+                0 0 12px rgba(34, 197, 94, 0.12)
+            );
+
+    }
+
+    50% {
+
+        filter:
+            drop-shadow(
+                0 0 21px rgba(34, 197, 94, 0.23)
+            );
+
+    }
+}
+
+
+/* ==========================================================
+   COMPLIANCE LIST
+   ========================================================== */
+
+.compliance-list {
+
+    width: 46%;
+
+    min-width: 120px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 11px;
+}
+
+
+/* ==========================================================
+   COMPLIANCE ROW
+   ========================================================== */
+
+.compliance-list > div {
+
+    position: relative;
+
+    display: grid;
+
+    grid-template-columns:
+        9px
+        minmax(0, 1fr)
+        auto;
+
+    align-items: center;
+
+    gap: 8px;
+
+    min-height: 29px;
+
+    padding: 6px 8px;
+
+    border: 1px solid
+        rgba(148, 163, 184, 0.08);
+
+    border-radius: 7px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(15, 29, 55, 0.65),
+            rgba(8, 20, 39, 0.48)
+        );
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.02);
+
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+.compliance-list > div:hover {
+
+    border-color:
+        rgba(139, 92, 246, 0.22);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(22, 39, 72, 0.78),
+            rgba(9, 23, 45, 0.62)
+        );
+
+    transform: translateX(2px);
+}
+
+
+/* ==========================================================
+   COMPLIANCE LABEL
+   ========================================================== */
+
+.compliance-list > div span {
+
+    min-width: 0;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 8px;
+
+    font-weight: 500;
+
+    color: #cbd5e1;
+}
+
+
+/* ==========================================================
+   COMPLIANCE COUNT
+   ========================================================== */
+
+.compliance-list > div strong {
+
+    min-width: 22px;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    color: #f8fafc;
+}
+
+
+/* ==========================================================
+   STATUS DOT
+   ========================================================== */
+
+.dot {
+
+    display: inline-block;
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    position: relative;
+
+    flex-shrink: 0;
+}
+
+
+/* Dot center */
+
+.dot::after {
+
+    content: "";
+
+    position: absolute;
+
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.65);
+
+    transform:
+        translate(-50%, -50%);
+}
+
+
+/* ==========================================================
+   GREEN - COMPLIANT
+   ========================================================== */
+
+.dot.green {
+
+    background: #22c55e;
+
+    box-shadow:
+        0 0 5px rgba(34, 197, 94, 0.70),
+        0 0 11px rgba(34, 197, 94, 0.30);
+
+    animation:
+        compliantPulse 2.4s ease-in-out infinite;
+}
+
+
+/* ==========================================================
+   ORANGE - AT RISK
+   ========================================================== */
+
+.dot.orange {
+
+    background: #f59e0b;
+
+    box-shadow:
+        0 0 5px rgba(245, 158, 11, 0.70),
+        0 0 11px rgba(245, 158, 11, 0.30);
+
+    animation:
+        riskPulse 2.2s ease-in-out infinite;
+}
+
+
+/* ==========================================================
+   RED - NON COMPLIANT
+   ========================================================== */
+
+.dot.red {
+
+    background: #ef4444;
+
+    box-shadow:
+        0 0 5px rgba(239, 68, 68, 0.70),
+        0 0 11px rgba(239, 68, 68, 0.30);
+
+    animation:
+        nonCompliantPulse 2s ease-in-out infinite;
+}
+
+
+/* ==========================================================
+   DOT ANIMATIONS
+   ========================================================== */
+
+@keyframes compliantPulse {
+
+    0%,
+    100% {
+
+        box-shadow:
+            0 0 5px rgba(34, 197, 94, 0.55),
+            0 0 10px rgba(34, 197, 94, 0.20);
+
+    }
+
+    50% {
+
+        box-shadow:
+            0 0 7px rgba(34, 197, 94, 0.85),
+            0 0 15px rgba(34, 197, 94, 0.40);
+
+    }
+}
+
+
+@keyframes riskPulse {
+
+    0%,
+    100% {
+
+        box-shadow:
+            0 0 5px rgba(245, 158, 11, 0.55),
+            0 0 10px rgba(245, 158, 11, 0.20);
+
+    }
+
+    50% {
+
+        box-shadow:
+            0 0 7px rgba(245, 158, 11, 0.85),
+            0 0 15px rgba(245, 158, 11, 0.40);
+
+    }
+}
+
+
+@keyframes nonCompliantPulse {
+
+    0%,
+    100% {
+
+        box-shadow:
+            0 0 5px rgba(239, 68, 68, 0.55),
+            0 0 10px rgba(239, 68, 68, 0.20);
+
+    }
+
+    50% {
+
+        box-shadow:
+            0 0 7px rgba(239, 68, 68, 0.90),
+            0 0 15px rgba(239, 68, 68, 0.42);
+
+    }
+}
+
+
+/* ==========================================================
+   OPTIONAL SCORE COLOR STATES
+   These work automatically if JS adds the classes.
+   ========================================================== */
+
+.gauge.compliance-high {
+
+    filter:
+        drop-shadow(
+            0 0 20px rgba(34, 197, 94, 0.30)
+        );
+}
+
+
+.gauge.compliance-medium {
+
+    filter:
+        drop-shadow(
+            0 0 20px rgba(245, 158, 11, 0.30)
+        );
+}
+
+
+.gauge.compliance-low {
+
+    filter:
+        drop-shadow(
+            0 0 20px rgba(239, 68, 68, 0.30)
+        );
+}
+
+
+/* ==========================================================
+   RESPONSIVE - TABLET
+   ========================================================== */
+
+@media (max-width: 900px) {
+
+    .compliance-box {
+
+        justify-content: center;
+
+        gap: 25px;
+
+    }
+
+    .gauge {
+
+        width: 140px;
+
+        height: 78px;
+    }
+
+    .gauge::after {
+
+        left: 17px;
+
+        width: 106px;
+
+        height: 54px;
+    }
+
+    .compliance-list {
+
+        width: 48%;
+    }
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE - MOBILE
+   ========================================================== */
+
+@media (max-width: 750px) {
+
+    .panel {
+
+        padding: 14px;
+
+        border-radius: 12px;
+    }
+
+    .compliance-box {
+
+        flex-direction: column;
+
+        justify-content: center;
+
+        align-items: center;
+
+        gap: 20px;
+
+        padding: 12px 0;
+
+    }
+
+    .gauge {
+
+        width: 150px;
+
+        height: 82px;
+    }
+
+    .gauge::after {
+
+        left: 18px;
+
+        width: 114px;
+
+        height: 57px;
+    }
+
+    .compliance-list {
+
+        width: 90%;
+
+        max-width: 330px;
+
+        min-width: 0;
+    }
+
+}
+
+
+/* ==========================================================
+   SMALL MOBILE
+   ========================================================== */
+
+@media (max-width: 480px) {
+
+    .panel {
+
+        padding: 12px;
+    }
+
+    .panel-header {
+
+        margin-bottom: 10px;
+    }
+
+    .panel-header h2 {
+
+        font-size: 12px;
+    }
+
+    .panel-header p {
+
+        font-size: 7px;
+    }
+
+    .compliance-box {
+
+        gap: 17px;
+    }
+
+    .compliance-list {
+
+        width: 100%;
+    }
+
+    .compliance-list > div {
+
+        min-height: 28px;
+
+        padding: 6px 7px;
+
+        grid-template-columns:
+            8px
+            minmax(0, 1fr)
+            auto;
+
+        gap: 7px;
+    }
+
+    .compliance-list > div span {
+
+        font-size: 8px;
+    }
+
+    .compliance-list > div strong {
+
+        font-size: 9px;
+    }
+
+}
+
+
+/* ==========================================================
+   ACCESSIBILITY
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .panel,
+    .gauge,
+    .compliance-list > div {
+
+        transition: none;
+    }
+
+    .gauge,
+    .dot.green,
+    .dot.orange,
+    .dot.red {
+
+        animation: none;
+    }
+
+}

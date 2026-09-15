@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Invoices | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/ProcurementInvoices.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-industry"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+        <nav>
+
+            <a href="/ManagerDashboard">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="/ProcurementRequests">
+                <i class="fa-regular fa-clipboard"></i>
+                Procurement Requests
+            </a>
+
+            <a href="/ProcurementPurchaseOrder">
+                <i class="fa-solid fa-cart-shopping"></i>
+                Purchase Orders
+            </a>
+
+            <a href="/ProcurementApprovals">
+                <i class="fa-regular fa-square-check"></i>
+                Approvals
+            </a>
+
+            <a href="/ProcurementVendors">
+                <i class="fa-solid fa-user-group"></i>
+                Vendors
+            </a>
+
+            <a href="/OrderTracking">
+                <i class="fa-solid fa-box"></i>
+                Order Tracking
+            </a>
+
+            <a
+                href="/ProcurementInvoices"
+                class="active"
+            >
+                <i class="fa-regular fa-file-lines"></i>
+                Invoices
+            </a>
+
+            <a href="/ProcurementReports">
+                <i class="fa-regular fa-chart-bar"></i>
+                Reports
+            </a>
+
+            <a href="/ProcurementAnalytics">
+                <i class="fa-solid fa-chart-line"></i>
+                Analytics
+            </a>
+
+        </nav>
+
+        <div class="menu-title">
+            COMMUNICATION
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementNotifications">
+                <i class="fa-regular fa-bell"></i>
+                Notifications
+                <b class="badge">6</b>
+            </a>
+
+            <a href="/Messages">
+                <i class="fa-regular fa-envelope"></i>
+                Messages
+                <b class="badge">3</b>
+            </a>
+
+        </nav>
+
+        <div class="menu-title">
+            SUPPORT
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementHelpSupport">
+                <i class="fa-regular fa-circle-question"></i>
+                Help & Support
+            </a>
+
+            <a href="/ProcurementSettings">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+
+        </nav>
+
+        <div class="user-card">
+
+            <div class="avatar">
+               <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div class="user-info">
+
+                <strong id="sidebarName">
+                    James Anderson
+                </strong>
+
+                <span id="sidebarRole">
+                    Procurement Manager
+                </span>
+
+                <small>
+                    <i class="online-dot"></i>
+                    Online
+                </small>
+
+            </div>
+
+            <i class="fa-solid fa-chevron-down"></i>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div>
+
+                <h1>Invoices</h1>
+
+                <div class="breadcrumb">
+                    Invoice Management
+                    <span><i class="fa-solid fa-chevron-right"></i></span>
+                    Invoices
+                </div>
+
+            </div>
+
+            <div class="header-actions">
+
+                <div class="global-search">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        placeholder="Search anything..."
+                    >
+
+                </div>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <b>6</b>
+                </button>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-envelope"></i>
+                    <b>3</b>
+                </button>
+
+                <div class="profile">
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div onclick="openProfile()">
+                        <strong id="headerName">
+                            James Anderson
+                        </strong>
+
+                        <span id="headerRole">
+                            Procurement Manager
+                        </span>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ACTION BAR -->
+
+        <div class="page-actions">
+
+            <button
+                id="exportBtn"
+                class="secondary-btn"
+            >
+                <i class="fa-solid fa-download"></i>
+                Export
+            </button>
+
+            <button
+                id="uploadInvoiceBtn"
+                class="primary-btn"
+            >
+                <i class="fa-solid fa-plus"></i>
+                Upload Invoice
+            </button>
+
+        </div>
+
+
+        <!-- KPI -->
+
+        <section class="kpis">
+
+            <div class="kpi">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-regular fa-file-lines"></i>
+                </div>
+
+                <div>
+                    <span>Total Invoices</span>
+                    <strong id="totalInvoices">0</strong>
+
+                    <small class="positive">
+                        ↑ 12.6%
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi">
+
+                <div class="kpi-icon green">
+                    <i class="fa-regular fa-circle-check"></i>
+                </div>
+
+                <div>
+                    <span>Paid</span>
+                    <strong id="paidInvoices">0</strong>
+
+                    <small class="positive">
+                        ↑ 16.3%
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+
+                <div>
+                    <span>Pending Approval</span>
+                    <strong id="pendingInvoices">0</strong>
+
+                    <small class="negative">
+                        ↓ 8.7%
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-money-bill-transfer"></i>
+                </div>
+
+                <div>
+                    <span>Overdue</span>
+                    <strong id="overdueInvoices">0</strong>
+
+                    <small class="negative">
+                        ↓ 15.4%
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi">
+
+                <div class="kpi-icon violet">
+                    <i class="fa-regular fa-file-circle-xmark"></i>
+                </div>
+
+                <div>
+                    <span>Draft</span>
+                    <strong id="draftInvoices">0</strong>
+
+                    <small class="positive">
+                        ↑ 27.3%
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi">
+
+                <div class="kpi-icon red">
+                    <i class="fa-regular fa-credit-card"></i>
+                </div>
+
+                <div>
+                    <span>Total Amount (MTD)</span>
+                    <strong id="mtdAmount">
+                        $0
+                    </strong>
+
+                    <small class="positive">
+                        ↑ 18.6%
+                    </small>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- FILTER -->
+
+        <section class="filter-card">
+
+            <div class="filter-search">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    id="invoiceSearch"
+                    placeholder="Search invoices by number, vendor..."
+                >
+
+            </div>
+
+            <div class="filter">
+
+                <label>Status</label>
+
+                <select id="statusFilter">
+
+                    <option>All</option>
+                    <option>Pending Approval</option>
+                    <option>Paid</option>
+                    <option>Overdue</option>
+                    <option>Draft</option>
+                    <option>Rejected</option>
+
+                </select>
+
+            </div>
+
+            <div class="filter">
+
+                <label>Vendor</label>
+
+                <select id="vendorFilter">
+
+                    <option value="All">
+                        All Vendors
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="filter">
+
+                <label>Date Range</label>
+
+                <input
+                    id="dateFrom"
+                    type="date"
+                >
+
+                <span class="date-separator">–</span>
+
+                <input
+                    id="dateTo"
+                    type="date"
+                >
+
+            </div>
+
+            <div class="filter">
+
+                <label>Due Date</label>
+
+                <select id="dueFilter">
+
+                    <option>All</option>
+                    <option>Due Soon</option>
+                    <option>Overdue</option>
+
+                </select>
+
+            </div>
+
+            <button
+                id="resetFilters"
+                class="reset-btn"
+            >
+                <i class="fa-solid fa-rotate-right"></i>
+                Reset
+            </button>
+
+        </section>
+
+
+        <!-- TABS -->
+
+        <div class="tabs">
+
+            <button
+                class="tab active"
+                data-status="All"
+            >
+                All Invoices
+            </button>
+
+            <button
+                class="tab"
+                data-status="Pending Approval"
+            >
+                Pending Approval
+            </button>
+
+            <button
+                class="tab"
+                data-status="Overdue"
+            >
+                Overdue
+            </button>
+
+            <button
+                class="tab"
+                data-status="Paid"
+            >
+                Paid
+            </button>
+
+            <button
+                class="tab"
+                data-status="Draft"
+            >
+                Draft
+            </button>
+
+        </div>
+
+
+        <!-- CONTENT -->
+
+        <section class="content-grid">
+
+            <!-- TABLE -->
+
+            <div class="table-card">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Invoice Number</th>
+                            <th>Vendor</th>
+                            <th>PO Number</th>
+                            <th>Invoice Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                            <th>Balance Due</th>
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="invoiceTable">
+
+                    </tbody>
+
+                </table>
+
+
+                <div class="pagination">
+
+                    <span id="paginationText">
+                        Showing 0 invoices
+                    </span>
+
+                    <div class="pages">
+
+                        <button id="previousPage">
+                            ‹
+                        </button>
+
+                        <div id="pageButtons"></div>
+
+                        <button id="nextPage">
+                            ›
+                        </button>
+
+                        <select id="pageSize">
+                            <option value="10">
+                                10 / page
+                            </option>
+                            <option value="20">
+                                20 / page
+                            </option>
+                            <option value="50">
+                                50 / page
+                            </option>
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- DETAIL -->
+
+            <aside
+                class="details-card"
+                id="detailsPanel"
+            >
+
+                <div class="details-header">
+
+                    <strong>
+                        Invoice Details
+                    </strong>
+
+                    <button id="closeDetails">
+                        ×
+                    </button>
+
+                </div>
+
+                <div id="invoiceDetails">
+
+                    <div class="empty-details">
+
+                        <i class="fa-regular fa-file-lines"></i>
+
+                        <p>
+                            Select an invoice to view details
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- UPLOAD MODAL -->
+
+<div
+    id="uploadModal"
+    class="modal hidden"
+>
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>Upload Invoice</h2>
+
+            <button id="closeUpload">
+                ×
+            </button>
+
+        </div>
+
+        <form id="invoiceForm">
+
+            <label>
+                Invoice Number
+            </label>
+
+            <input
+                id="newInvoiceNumber"
+                required
+            >
+
+            <label>
+                Vendor
+            </label>
+
+            <select
+                id="newVendor"
+                required
+            ></select>
+
+            <label>
+                Purchase Order
+            </label>
+
+            <input
+                id="newPO"
+                type="number"
+            >
+
+            <label>
+                Amount
+            </label>
+
+            <input
+                id="newAmount"
+                type="number"
+                min="0"
+                step="0.01"
+                required
+            >
+
+            <label>
+                Invoice Date
+            </label>
+
+            <input
+                id="newInvoiceDate"
+                type="date"
+                required
+            >
+
+            <label>
+                Due Date
+            </label>
+
+            <input
+                id="newDueDate"
+                type="date"
+            >
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    id="cancelUpload"
+                    class="secondary-btn"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                >
+                    Save Invoice
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="/static/ProcurementInvoices.js"></script>
+
+</body>
+
+</html>

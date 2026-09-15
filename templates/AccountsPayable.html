@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Accounts Payable | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/AccountsPayable.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+
+            <div>
+                <strong>VendorIQ</strong>
+                <small>Vendor Reliability Platform</small>
+            </div>
+
+        </div>
+
+        <nav>
+
+            <a href="/financerdashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/BudgetManagement">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Budget Management</span>
+            </a>
+
+            <a href="/Expenditure">
+                <i class="fa-solid fa-circle-dollar-to-slot"></i>
+                <span>Expenditures</span>
+            </a>
+
+            <a href="/Revenue">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Revenue</span>
+            </a>
+
+            <a
+                href="/AccountsPayable"
+                class="active"
+            >
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span>Accounts Payable</span>
+            </a>
+
+            <a href="/AccountsReceivable">
+                <i class="fa-solid fa-money-check-dollar"></i>
+                <span>Accounts Receivable</span>
+            </a>
+
+            <a href="/BankingReconciliation">
+                <i class="fa-solid fa-building-columns"></i>
+                <span>Banking & Reconciliation</span>
+            </a>
+
+            <a href="/FinancialReports">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Financial Reports</span>
+            </a>
+
+            <a href="/Compliance">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Compliance</span>
+            </a>
+
+            <a href="/FinancerApprovals">
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+                <b class="badge red">5</b>
+            </a>
+
+            <a href="/FinancerNotifications">
+                <i class="fa-regular fa-bell"></i>
+                <span>Alerts & Notifications</span>
+                <b class="badge red">8</b>
+            </a>
+
+            <a href="/FinancerDocument">
+                <i class="fa-regular fa-file"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/FinancerSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/FinancerHelp">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-user">
+
+            <i class="fa-solid fa-user"></i>
+
+            <div>
+                <strong id="sideName">
+                    Finance Officer
+                </strong>
+
+                <small>
+                    Finance Officer
+                </small>
+
+                <span>
+                    <i class="fa-solid fa-circle"></i>
+                    Online
+                </span>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="heading">
+
+                <h1>Accounts Payable</h1>
+
+                <div class="breadcrumb">
+                    Dashboard
+                    <span><i class="fa-solid fa-chevron-right"></i></span>
+                    Accounts Payable
+                </div>
+
+                <p>
+                    Manage vendor bills, track payments,
+                    and monitor outstanding liabilities.
+                </p>
+
+            </div>
+
+            <div class="top-actions">
+
+                <div class="search">
+
+                    <input
+                        id="globalSearch"
+                        type="text"
+                        placeholder="Search anything..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <div class="notification">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span>3</span>
+
+                </div>
+
+                <div class="profile">
+
+                    <i class="fa-solid fa-user"></i>
+
+                    <div>
+
+                        <strong id="profileName">
+                            Finance Officer
+                        </strong>
+
+                        <small>
+                            Finance Officer
+                        </small>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- DATE FILTER -->
+
+        <div class="filter-row">
+
+            <div></div>
+
+            <div class="date-filter">
+
+                <i class="fa-regular fa-calendar"></i>
+
+                <input
+                    type="date"
+                    id="fromDate"
+                >
+
+                <span>-</span>
+
+                <input
+                    type="date"
+                    id="toDate"
+                >
+
+                <button id="applyFilter">
+                    Apply
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+
+                <div>
+                    <small>Total Payable</small>
+
+                    <h2 id="totalPayable">
+                        ₹0
+                    </h2>
+
+                    <p>
+                        All Outstanding Bills
+                    </p>
+
+                    <span class="positive">
+                        ↑ Outstanding liabilities
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-file-circle-exclamation"></i>
+                </div>
+
+                <div>
+                    <small>Overdue Amount</small>
+
+                    <h2 id="overdueAmount">
+                        ₹0
+                    </h2>
+
+                    <p>
+                        Overdue Bills
+                    </p>
+
+                    <span class="negative">
+                        ↑ Requires attention
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+
+                <div>
+                    <small>Due Within 7 Days</small>
+
+                    <h2 id="dueSoon">
+                        ₹0
+                    </h2>
+
+                    <p>
+                        Due Soon
+                    </p>
+
+                    <span class="warning">
+                        Upcoming payments
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-solid fa-money-bill-transfer"></i>
+                </div>
+
+                <div>
+                    <small>Paid This Month</small>
+
+                    <h2 id="paidThisMonth">
+                        ₹0
+                    </h2>
+
+                    <p id="currentMonth">
+                        Current Month Payments
+                    </p>
+
+                    <span class="positive">
+                        ↑ Payments completed
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon cyan">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+
+                <div>
+                    <small>Pending Bills</small>
+
+                    <h2 id="pendingBills">
+                        0
+                    </h2>
+
+                    <p>
+                        Total Bills
+                    </p>
+
+                    <a href="#">
+                        View all bills
+                    </a>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CHART AREA
+        ================================================== -->
+
+        <section class="middle-grid">
+
+            <div class="panel trend-panel">
+
+                <div class="panel-header">
+
+                    <h3>Payables Trend</h3>
+
+                    <select id="trendPeriod">
+                        <option>This Year</option>
+                        <option>Last Year</option>
+                    </select>
+
+                </div>
+
+                <div class="legend">
+
+                    <span>
+                        <i class="blue-dot"></i>
+                        Total Payable
+                    </span>
+
+                    <span>
+                        <i class="green-dot"></i>
+                        Paid Amount
+                    </span>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="payablesTrendChart"
+                    ></canvas>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel aging-panel">
+
+                <div class="panel-header">
+
+                    <h3>Payables by Ageing</h3>
+
+                    <select>
+                        <option>This Year</option>
+                    </select>
+
+                </div>
+
+                <div class="aging-content">
+
+                    <div class="donut-wrap">
+
+                        <canvas
+                            id="agingChart"
+                        ></canvas>
+
+                        <div class="donut-center">
+
+                            <strong id="agingTotal">
+                                ₹0
+                            </strong>
+
+                            <span>
+                                Total Payable
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="agingLegend"
+                        class="aging-legend"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel vendors-panel">
+
+                <div class="panel-header">
+
+                    <h3>Top Vendors by Payable</h3>
+
+                    <select>
+                        <option>This Year</option>
+                    </select>
+
+                </div>
+
+                <div id="topVendors"></div>
+
+                <a class="view-vendors">
+                    View all vendors
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             BOTTOM
+        ================================================== -->
+
+        <section class="bottom-grid">
+
+            <div class="panel bills-panel">
+
+                <div class="panel-header">
+
+                    <h3>Recent Bills</h3>
+
+                    <a href="#">
+                        View All Bills
+                    </a>
+
+                </div>
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Bill No.</th>
+                                <th>Vendor</th>
+                                <th>Bill Date</th>
+                                <th>Due Date</th>
+                                <th>Amount (₹)</th>
+                                <th>Status</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="billsBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="pagination">
+
+                    <span id="billInfo">
+                        Showing 0 bills
+                    </span>
+
+                    <div id="paginationButtons"></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel payment-panel">
+
+                <div class="panel-header">
+
+                    <h3>Payment Summary</h3>
+
+                    <select>
+                        <option>This Month</option>
+                    </select>
+
+                </div>
+
+                <div class="summary-list">
+
+                    <div>
+                        <span>
+                            <i class="fa-solid fa-money-check"></i>
+                            Total Payments Made
+                        </span>
+
+                        <strong id="summaryPayments">
+                            ₹0
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>
+                            <i class="fa-solid fa-receipt"></i>
+                            Total Bills Paid
+                        </span>
+
+                        <strong id="summaryBills">
+                            0
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>
+                            <i class="fa-regular fa-clock"></i>
+                            Average Payment Days
+                        </span>
+
+                        <strong id="summaryDays">
+                            0 Days
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>
+                            <i class="fa-solid fa-check"></i>
+                            Early Payments
+                        </span>
+
+                        <strong id="summaryEarly">
+                            ₹0
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>
+                            <i class="fa-solid fa-percent"></i>
+                            Discounts Avail. Taken
+                        </span>
+
+                        <strong id="summaryDiscount">
+                            ₹0
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                QUICK ACTIONS PANEL
+                ===================================================== -->
+
+            <div class="panel quick-panel">
+
+                <div class="panel-header">
+                    <div>
+                        <h3>Quick Actions</h3>
+                        <span class="panel-subtitle">
+                            Manage your accounts payable
+                        </span>
+                    </div>
+
+                    <i class="fa-solid fa-bolt quick-header-icon"></i>
+                </div>
+
+                <div class="quick-actions">
+
+                    <!-- Create Bill -->
+                    <button
+                        type="button"
+                        class="quick-action"
+                        onclick="createBill()"
+                    >
+                        <span class="quick-action-icon blue">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </span>
+
+                        <span class="quick-action-content">
+                            <strong>Create Bill</strong>
+                            <small>Add a new vendor bill</small>
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right quick-arrow"></i>
+                    </button>
+
+
+                    <!-- Record Payment -->
+                    <button
+                        type="button"
+                        class="quick-action"
+                        onclick="recordPayment()"
+                    >
+                        <span class="quick-action-icon green">
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                        </span>
+
+                        <span class="quick-action-content">
+                            <strong>Record Payment</strong>
+                            <small>Record a vendor payment</small>
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right quick-arrow"></i>
+                    </button>
+
+
+                    <!-- View Pending -->
+                    <button
+                        type="button"
+                        class="quick-action"
+                        onclick="viewPendingBills()"
+                    >
+                        <span class="quick-action-icon orange">
+                            <i class="fa-solid fa-clock"></i>
+                        </span>
+
+                        <span class="quick-action-content">
+                            <strong>Pending Bills</strong>
+                            <small>Review unpaid bills</small>
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right quick-arrow"></i>
+                    </button>
+
+
+                    <!-- Overdue Bills -->
+                    <button
+                        type="button"
+                        class="quick-action"
+                        onclick="viewOverdueBills()"
+                    >
+                        <span class="quick-action-icon red">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </span>
+
+                        <span class="quick-action-content">
+                            <strong>Overdue Bills</strong>
+                            <small>Review overdue payments</small>
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right quick-arrow"></i>
+                    </button>
+
+
+                    <!-- Vendor Payments -->
+                    <button
+                        type="button"
+                        class="quick-action"
+                        onclick="viewVendorPayments()"
+                    >
+                        <span class="quick-action-icon purple">
+                            <i class="fa-solid fa-building"></i>
+                        </span>
+
+                        <span class="quick-action-content">
+                            <strong>Vendor Payments</strong>
+                            <small>View vendor payment history</small>
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right quick-arrow"></i>
+                    </button>
+
+
+                    <!-- Export Report -->
+                    <button
+                        type="button"
+                        class="quick-action"
+                        onclick="exportPayablesReport()"
+                    >
+                        <span class="quick-action-icon cyan">
+                            <i class="fa-solid fa-file-export"></i>
+                        </span>
+
+                        <span class="quick-action-content">
+                            <strong>Export Report</strong>
+                            <small>Download payable report</small>
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right quick-arrow"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             OVERDUE ALERT
+        ================================================== -->
+
+        <div class="overdue-alert">
+
+            <div>
+
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <strong>
+                    Overdue Bills
+                </strong>
+
+                <span id="overdueMessage">
+                    Loading overdue bills...
+                </span>
+
+            </div>
+
+            <a onclick="viewOverdueBills()">
+                View Overdue Bills
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+        </div>
+
+
+        <footer>
+
+            <span>
+                © 2025 FinManage. All rights reserved.
+            </span>
+
+            <span>
+                Version 2.1.0
+                <i class="fa-solid fa-circle"></i>
+            </span>
+
+        </footer>
+
+    </main>
+
+</div>
+
+<script src="/static/AccountsPayable.js"></script>
+
+</body>
+</html>

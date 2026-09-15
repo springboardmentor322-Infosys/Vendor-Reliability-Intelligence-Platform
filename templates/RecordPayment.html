@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Record Payment | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #020817;
+            --panel: #071a33;
+            --border: rgba(59,130,246,.18);
+
+            --text: #f1f6ff;
+            --muted: #7087a5;
+
+            --green: #10b981;
+            --blue: #3b82f6;
+        }
+
+        body {
+            min-height: 100vh;
+
+            font-family:
+                Inter,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            color: var(--text);
+
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(16,185,129,.07),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 80%,
+                    rgba(37,99,235,.07),
+                    transparent 30%
+                ),
+                var(--bg);
+        }
+
+        .page {
+            max-width: 1000px;
+
+            margin: auto;
+
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 25px;
+        }
+
+        .heading {
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+        }
+
+        .icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 13px;
+
+            color: #34d399;
+
+            background:
+                rgba(16,185,129,.11);
+
+            border:
+                1px solid rgba(16,185,129,.2);
+        }
+
+        h1 {
+            font-size: 25px;
+        }
+
+        .subtitle {
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+        }
+
+        .back {
+            padding: 11px 15px;
+
+            color: #9db0c9;
+
+            background: #071a33;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 10px;
+
+            text-decoration: none;
+
+            font-size: 12px;
+        }
+
+        .card {
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(7,26,51,.98),
+                    rgba(4,17,34,.98)
+                );
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 20px 50px rgba(0,0,0,.3);
+        }
+
+        .card-title {
+            padding: 20px 24px;
+
+            border-bottom:
+                1px solid rgba(96,165,250,.08);
+        }
+
+        .card-title h2 {
+            font-size: 16px;
+        }
+
+        .card-title p {
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        form {
+            padding: 25px;
+        }
+
+        .grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 20px;
+        }
+
+        .field {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 7px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            color: #9db0c9;
+
+            font-size: 11px;
+
+            font-weight: 600;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+
+            min-height: 43px;
+
+            padding: 10px 13px;
+
+            color: #dce9fb;
+
+            background: #06172d;
+
+            border:
+                1px solid rgba(59,130,246,.17);
+
+            border-radius: 10px;
+
+            outline: none;
+
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 90px;
+
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color:
+                rgba(16,185,129,.5);
+
+            box-shadow:
+                0 0 0 3px rgba(16,185,129,.06);
+        }
+
+        .footer {
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 10px;
+
+            margin-top: 25px;
+
+            padding-top: 20px;
+
+            border-top:
+                1px solid rgba(96,165,250,.08);
+        }
+
+        button {
+            min-height: 42px;
+
+            padding: 0 18px;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            font-family: inherit;
+
+            font-weight: 650;
+        }
+
+        .cancel {
+            color: #9db0c9;
+
+            background: #091c34;
+
+            border:
+                1px solid var(--border);
+        }
+
+        .save {
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #059669,
+                    #0d9488
+                );
+
+            border: none;
+
+            box-shadow:
+                0 8px 22px rgba(16,185,129,.15);
+        }
+
+        .save:hover {
+            transform: translateY(-2px);
+        }
+
+        @media(max-width:700px) {
+
+            .page {
+                padding: 18px 12px;
+            }
+
+            .header {
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 15px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="header">
+
+        <div class="heading">
+
+            <div class="icon">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+            </div>
+
+            <div>
+                <h1>Record Payment</h1>
+
+                <p class="subtitle">
+                    Record a payment made to a vendor
+                </p>
+            </div>
+
+        </div>
+
+        <a
+            href="/AccountsPayable"
+            class="back"
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Payables
+        </a>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-title">
+
+            <h2>Payment Information</h2>
+
+            <p>
+                Enter payment details for the selected vendor bill
+            </p>
+
+        </div>
+
+
+        <form id="paymentForm">
+
+            <div class="grid">
+
+                <div class="field">
+
+                    <label>Vendor</label>
+
+                    <select required>
+
+                        <option value="">
+                            Select Vendor
+                        </option>
+
+                        <option>
+                            ABC Industries
+                        </option>
+
+                        <option>
+                            Global Supplies Ltd
+                        </option>
+
+                        <option>
+                            Tech Solutions Pvt Ltd
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Bill / Invoice</label>
+
+                    <select required>
+
+                        <option value="">
+                            Select Invoice
+                        </option>
+
+                        <option>
+                            INV-2026-001
+                        </option>
+
+                        <option>
+                            INV-2026-002
+                        </option>
+
+                        <option>
+                            INV-2026-003
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Payment Date</label>
+
+                    <input
+                        type="date"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Payment Method</label>
+
+                    <select required>
+
+                        <option>
+                            Bank Transfer
+                        </option>
+
+                        <option>
+                            NEFT
+                        </option>
+
+                        <option>
+                            RTGS
+                        </option>
+
+                        <option>
+                            UPI
+                        </option>
+
+                        <option>
+                            Cheque
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Payment Amount</label>
+
+                    <input
+                        type="number"
+                        placeholder="₹ 0.00"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>Transaction Reference</label>
+
+                    <input
+                        type="text"
+                        placeholder="Transaction ID / UTR"
+                    >
+
+                </div>
+
+
+                <div class="field full">
+
+                    <label>Notes</label>
+
+                    <textarea
+                        placeholder="Add payment notes..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <div class="footer">
+
+                <button
+                    type="button"
+                    class="cancel"
+                    onclick="window.location.href='/AccountsPayable'"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="save"
+                >
+                    <i class="fa-solid fa-check"></i>
+                    Record Payment
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+/* =========================================================
+   VendorIQ - Record Payment
+   Connects to FastAPI / PostgreSQL
+   ========================================================= */
+
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+let bills = [];
+
+
+// ---------------------------------------------------------
+// Get JWT token
+// ---------------------------------------------------------
+function getToken() {
+
+    return (
+        localStorage.getItem("access_token") ||
+        localStorage.getItem("token") ||
+        localStorage.getItem("jwt_token") ||
+        sessionStorage.getItem("access_token") ||
+        sessionStorage.getItem("token") ||
+        sessionStorage.getItem("jwt_token")
+    );
+}
+
+
+// ---------------------------------------------------------
+// API helper
+// ---------------------------------------------------------
+async function apiFetch(url, options = {}) {
+
+    const token = getToken();
+
+    const headers = {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+    };
+
+    if (token) {
+        headers["Authorization"] =
+            `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+        ...options,
+        headers
+    });
+
+    let data = null;
+
+    try {
+        data = await response.json();
+    } catch {
+        data = null;
+    }
+
+    if (!response.ok) {
+
+        const message =
+            data?.detail ||
+            data?.message ||
+            `Request failed (${response.status})`;
+
+        throw new Error(message);
+    }
+
+    return data;
+}
+
+
+// ---------------------------------------------------------
+// Normalize backend list
+// ---------------------------------------------------------
+function getItems(data) {
+
+    if (Array.isArray(data)) {
+        return data;
+    }
+
+    if (Array.isArray(data?.items)) {
+        return data.items;
+    }
+
+    if (Array.isArray(data?.bills)) {
+        return data.bills;
+    }
+
+    if (Array.isArray(data?.data)) {
+        return data.data;
+    }
+
+    return [];
+}
+
+
+// ---------------------------------------------------------
+// Load existing bills
+// ---------------------------------------------------------
+async function loadBills() {
+
+    try {
+
+        const data = await apiFetch(
+            `${API_BASE_URL}/api/finance/accounts-payable/bills`
+        );
+
+        bills = getItems(data);
+
+        console.log(
+            "Accounts payable bills:",
+            bills
+        );
+
+        populateVendorDropdown();
+
+        populateInvoiceDropdown();
+
+    } catch (error) {
+
+        console.error(
+            "Unable to load bills:",
+            error
+        );
+
+        alert(
+            "Unable to load vendor bills.\n\n" +
+            error.message
+        );
+    }
+}
+
+
+// ---------------------------------------------------------
+// Populate vendors
+// ---------------------------------------------------------
+function populateVendorDropdown() {
+
+    const vendorSelect =
+        document.getElementById("paymentVendor");
+
+    if (!vendorSelect) return;
+
+    vendorSelect.innerHTML =
+        '<option value="">Select Vendor</option>';
+
+
+    const vendors = [
+        ...new Set(
+            bills
+                .map(bill => bill.vendor)
+                .filter(Boolean)
+        )
+    ];
+
+
+    vendors.forEach(vendor => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = vendor;
+
+        option.textContent = vendor;
+
+        vendorSelect.appendChild(option);
+    });
+}
+
+
+// ---------------------------------------------------------
+// Populate invoices
+// ---------------------------------------------------------
+function populateInvoiceDropdown() {
+
+    const invoiceSelect =
+        document.getElementById("paymentInvoice");
+
+    if (!invoiceSelect) return;
+
+    invoiceSelect.innerHTML =
+        '<option value="">Select Invoice</option>';
+
+
+    bills.forEach(bill => {
+
+        const status =
+            String(
+                bill.payment_status || ""
+            ).toLowerCase();
+
+
+        // Don't show fully paid bills
+        if (status === "paid") {
+            return;
+        }
+
+
+        const option =
+            document.createElement("option");
+
+        option.value =
+            bill.invoice_no;
+
+        option.textContent =
+            `${bill.invoice_no} — ${bill.vendor} — ₹${Number(bill.amount || 0).toLocaleString("en-IN")}`;
+
+        option.dataset.vendor =
+            bill.vendor || "";
+
+        option.dataset.amount =
+            bill.amount || 0;
+
+        invoiceSelect.appendChild(option);
+    });
+}
+
+
+// ---------------------------------------------------------
+// Invoice selected
+// Automatically select vendor
+// ---------------------------------------------------------
+document
+    .getElementById("paymentInvoice")
+    ?.addEventListener(
+        "change",
+        function () {
+
+            const selected =
+                this.options[this.selectedIndex];
+
+            if (!selected) return;
+
+            const vendor =
+                selected.dataset.vendor;
+
+            const vendorSelect =
+                document.getElementById(
+                    "paymentVendor"
+                );
+
+            if (vendorSelect && vendor) {
+
+                vendorSelect.value =
+                    vendor;
+            }
+        }
+    );
+
+
+// ---------------------------------------------------------
+// Default payment date
+// ---------------------------------------------------------
+function setPaymentDate() {
+
+    const dateInput =
+        document.getElementById("paymentDate");
+
+    if (
+        dateInput &&
+        !dateInput.value
+    ) {
+
+        dateInput.value =
+            new Date()
+                .toISOString()
+                .split("T")[0];
+    }
+}
+
+
+// ---------------------------------------------------------
+// Record Payment
+// ---------------------------------------------------------
+document
+    .getElementById("paymentForm")
+    .addEventListener(
+        "submit",
+        async function (e) {
+
+            e.preventDefault();
+
+
+            try {
+
+                const vendor =
+                    document
+                        .getElementById(
+                            "paymentVendor"
+                        )
+                        .value
+                        .trim();
+
+
+                const invoiceNo =
+                    document
+                        .getElementById(
+                            "paymentInvoice"
+                        )
+                        .value
+                        .trim();
+
+
+                const paymentDate =
+                    document
+                        .getElementById(
+                            "paymentDate"
+                        )
+                        .value;
+
+
+                const amount =
+                    parseFloat(
+                        document
+                            .getElementById(
+                                "paymentAmount"
+                            )
+                            .value
+                    );
+
+
+                // -----------------------------------------
+                // Validation
+                // -----------------------------------------
+
+                if (!vendor) {
+
+                    alert(
+                        "Please select a vendor."
+                    );
+
+                    return;
+                }
+
+
+                if (!invoiceNo) {
+
+                    alert(
+                        "Please select an invoice."
+                    );
+
+                    return;
+                }
+
+
+                if (!paymentDate) {
+
+                    alert(
+                        "Please select payment date."
+                    );
+
+                    return;
+                }
+
+
+                if (!amount || amount <= 0) {
+
+                    alert(
+                        "Please enter a valid payment amount."
+                    );
+
+                    return;
+                }
+
+
+                // -----------------------------------------
+                // Backend FinancePayment payload
+                // -----------------------------------------
+
+                const paymentData = {
+
+                    invoice_no: invoiceNo,
+
+                    vendor: vendor,
+
+                    amount: amount,
+
+                    payment_date: paymentDate,
+
+                    status: "Completed",
+
+                    early_payment: false,
+
+                    discount_amount: 0
+                };
+
+
+                console.log(
+                    "Sending payment:",
+                    paymentData
+                );
+
+
+                // -----------------------------------------
+                // Disable button
+                // -----------------------------------------
+
+                const button =
+                    document.querySelector(
+                        ".save"
+                    );
+
+                if (button) {
+
+                    button.disabled = true;
+
+                    button.innerHTML =
+                        '<i class="fa-solid fa-spinner fa-spin"></i> Recording...';
+                }
+
+
+                // -----------------------------------------
+                // POST to FastAPI
+                // -----------------------------------------
+
+                const result =
+                    await apiFetch(
+                        `${API_BASE_URL}/api/finance/accounts-payable/payments`,
+                        {
+                            method: "POST",
+                            body:
+                                JSON.stringify(
+                                    paymentData
+                                )
+                        }
+                    );
+
+
+                console.log(
+                    "Payment recorded:",
+                    result
+                );
+
+
+                alert(
+                    result?.message ||
+                    "Payment recorded successfully!"
+                );
+
+
+                // -----------------------------------------
+                // Return to Accounts Payable
+                // -----------------------------------------
+
+                window.location.href =
+                    "/AccountsPayable";
+
+
+            } catch (error) {
+
+                console.error(
+                    "Record payment error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to record payment.\n\n" +
+                    error.message
+                );
+
+
+                const button =
+                    document.querySelector(
+                        ".save"
+                    );
+
+                if (button) {
+
+                    button.disabled = false;
+
+                    button.innerHTML =
+                        '<i class="fa-solid fa-check"></i> Record Payment';
+                }
+            }
+        }
+    );
+
+
+// ---------------------------------------------------------
+// Initialize
+// ---------------------------------------------------------
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        setPaymentDate();
+
+        loadBills();
+    }
+);
+</script>
+
+</body>
+</html>

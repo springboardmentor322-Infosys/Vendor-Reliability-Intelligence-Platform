@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Compliance Reports</title>
+
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link
+        rel="stylesheet"
+        href="/static/VendorComplianceReports.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-cube"></i>
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    VendorIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/VendorDashboard">
+                <span><i class="fa-solid fa-house"></i></span>
+                Dashboard
+            </a>
+
+            <a href="/VendorProfile">
+                <span><i class="fa-solid fa-user"></i></span>
+                Vendor Profile
+            </a>
+
+            <a href="/PerformanceOverview">
+                <span><i class="fa-solid fa-chart-column"></i></span>
+                Performance Overview
+            </a>
+
+            <a href="/PurchaseOrders">
+                <span><i class="fa-solid fa-clipboard-list"></i></span>
+                Purchase Orders
+            </a>
+
+            <a href="/VendorContract">
+                <span><i class="fa-regular fa-file-lines"></i></span>
+                Contracts & Compliance
+            </a>
+
+            <a href="/VendorInvoices">
+                <span><i class="fa-regular fa-credit-card"></i></span>
+                Invoices & Payments
+            </a>
+
+            <a href="/VendorCommunication">
+                <span><i class="fa-regular fa-comment"></i></span>
+                Communication
+                <b class="notification-badge">3</b>
+            </a>
+
+            <a href="/VendorDocument">
+                <span><i class="fa-regular fa-folder"></i></span>
+                Documents
+            </a>
+
+            <a href="/VendorNotifications">
+                <span><i class="fa-regular fa-bell"></i></span>
+                Notifications
+                <b class="notification-badge">7</b>
+            </a>
+
+        </nav>
+
+
+        <div class="menu-title">
+            REPORTS
+        </div>
+
+        <nav class="navigation">
+
+            <a href="/PerformanceReports">
+                <span><i class="fa-solid fa-chart-line"></i></span>
+                Performance Reports
+            </a>
+
+            <a href="/OrderReports">
+                <span><i class="fa-regular fa-file"></i></span>
+                Order Reports
+            </a>
+ 
+            <a
+                href="/ComplianceReports"
+                class="active"
+            >
+                <span><i class="fa-solid fa-shield"></i></span>
+                Compliance Reports
+            </a>
+
+            <a href="/ExportReports">
+                <span><i class="fa-solid fa-download"></i></span>
+                Export Reports
+            </a>
+
+        </nav>
+
+
+        <div class="menu-title">
+            ACCOUNT
+        </div>
+
+        <nav class="navigation">
+
+            <a href="/VendorSettings">
+                <span><i class="fa-solid fa-gear"></i></span>
+                Settings
+            </a>
+
+            <a href="/VendorHelpSupport">
+                <span><i class="fa-regular fa-circle-question"></i></span>
+                Help & Support
+            </a>
+
+            <a href="/login">
+                <span><i class="fa-solid fa-right-from-bracket"></i></span>
+                Logout
+            </a>
+
+        </nav>
+
+
+        <div class="vendor-card">
+
+            <div class="vendor-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div>
+
+                <strong id="sidebarVendorName">
+                    --
+                </strong>
+
+                <small id="sidebarVendorId">
+                    Vendor ID: --
+                </small>
+
+                <div class="verified">
+                    <span></span>
+                    Verified Vendor
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div>
+
+                <h1>
+                    Compliance Reports
+                </h1>
+
+                <div class="breadcrumb">
+                    Home
+                    <span>/</span>
+                    Compliance Reports
+                </div>
+
+            </div>
+
+
+            <div class="header-actions">
+
+                <div class="global-search">
+
+                    <span><i class="fa-solid fa-magnifying-glass"></i></span>
+
+                    <input
+                        id="globalSearch"
+                        type="text"
+                        placeholder="Search compliance, certificate, audit..."
+                    >
+
+                </div>
+
+
+                <button class="round-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <b>7</b>
+                </button>
+
+                <button class="round-button">
+                    <i class="fa-regular fa-envelope"></i>
+                    <b>12</b>
+                </button>
+
+
+                <div class="profile">
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerVendorName">
+                            --
+                        </strong>
+
+                        <small>
+                            Vendor
+                        </small>
+                    </div>
+
+                    <span>
+                       <i class="fa-solid fa-chevron-down"></i>
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- FILTER BAR -->
+
+        <section class="filter-bar">
+
+            <div class="filter">
+
+                <span><i class="fa-regular fa-calendar-days"></i></span>
+
+                <input
+                    type="date"
+                    id="startDate"
+                >
+
+                <span>-</span>
+
+                <input
+                    type="date"
+                    id="endDate"
+                >
+
+            </div>
+
+
+            <select id="categoryFilter">
+
+                <option value="All">
+                    All Categories
+                </option>
+
+            </select>
+
+
+            <select id="complianceTypeFilter">
+
+                <option value="All">
+                    All Compliance Types
+                </option>
+
+            </select>
+
+
+            <select id="statusFilter">
+
+                <option value="All">
+                    All Statuses
+                </option>
+
+                <option value="Compliant">
+                    Compliant
+                </option>
+
+                <option value="Expiring Soon">
+                    Expiring Soon
+                </option>
+
+                <option value="Pending Review">
+                    Pending Review
+                </option>
+
+                <option value="Non-Compliant">
+                    Non-Compliant
+                </option>
+
+                <option value="Overdue">
+                    Overdue
+                </option>
+
+            </select>
+
+
+            <button
+                class="filter-button"
+                id="applyFilters"
+            >
+                <i class="fa-solid fa-filter"></i> Filters
+            </button>
+
+
+            <div class="filter-spacer"></div>
+
+
+            <button
+                class="secondary-button"
+                id="exportButton"
+            >
+                <i class="fa-solid fa-download"></i> Export Report
+            </button>
+
+
+            <button
+                class="primary-button"
+                id="scheduleButton"
+            >
+                <i class="fa-regular fa-calendar"></i> Schedule Report
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Overall Compliance Score
+                    </span>
+
+                    <strong>
+                        <span id="complianceScore">
+                            0
+                        </span>
+                        <small>/100</small>
+                    </strong>
+
+                    <em class="positive">
+                        ↑ Compliance Score
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-file-circle-check"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Compliant Documents
+                    </span>
+
+                    <strong id="compliantDocuments">
+                        0
+                    </strong>
+
+                    <em class="positive">
+                        Valid Documents
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Expiring Soon
+                    </span>
+
+                    <strong id="expiringSoon">
+                        0
+                    </strong>
+
+                    <em class="warning">
+                        Next 90 days
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon red">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Non-Compliant
+                    </span>
+
+                    <strong id="nonCompliant">
+                        0
+                    </strong>
+
+                    <em class="negative">
+                        Requires action
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Pending Review
+                    </span>
+
+                    <strong id="pendingReview">
+                        0
+                    </strong>
+
+                    <em>
+                        Awaiting review
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon red">
+                    <i class="fa-solid fa-calendar-xmark"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Overdue
+                    </span>
+
+                    <strong id="overdue">
+                        0
+                    </strong>
+
+                    <em class="negative">
+                        Expired documents
+                    </em>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CHARTS
+        ================================================== -->
+
+        <section class="chart-grid">
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <i class="fa-solid fa-chart-line"></i>
+                        Compliance Score Trend
+                    </h2>
+
+                    <select id="trendPeriod">
+                        <option>
+                            Last 6 Months
+                        </option>
+                    </select>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="scoreTrendChart"></canvas>
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <i class="fa-solid fa-chart-pie"></i>
+                        Compliance Status Distribution
+                    </h2>
+
+                </div>
+
+                <div class="donut-layout">
+
+                    <div class="donut-container">
+
+                        <canvas
+                            id="statusChart"
+                        ></canvas>
+
+                        <div class="donut-center">
+
+                            <strong id="donutTotal">
+                                0
+                            </strong>
+
+                            <span>
+                                Total
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="chart-legend"
+                        id="statusLegend"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <i class="fa-solid fa-chart-column"></i>
+                        Compliance by Category
+                    </h2>
+
+                    <select>
+                        <option>
+                            By Category
+                        </option>
+                    </select>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             DOCUMENTS + SIDEBAR
+        ================================================== -->
+
+        <section class="bottom-grid">
+
+            <div class="panel documents-panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Compliance Documents
+                    </h2>
+
+                    <div class="table-actions">
+
+                        <div class="table-search">
+
+                            <span>
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+
+                            <input
+                                id="documentSearch"
+                                placeholder="Search documents..."
+                            >
+
+                        </div>
+
+                        <button
+                            class="secondary-button"
+                            id="downloadButton"
+                        >
+                            <i class="fa-solid fa-download"></i> Download
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Document Name
+                                </th>
+
+                                <th>
+                                    Category
+                                </th>
+
+                                <th>
+                                    Compliance Type
+                                </th>
+
+                                <th>
+                                    Issue Date
+                                </th>
+
+                                <th>
+                                    Expiry Date
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Days Left
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody
+                            id="documentTableBody"
+                        ></tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div class="pagination">
+
+                    <span id="paginationInfo">
+                        Showing 0 documents
+                    </span>
+
+                    <div
+                        id="paginationControls"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RIGHT COLUMN -->
+
+            <aside class="right-column">
+
+                <div class="side-panel">
+
+                    <h2>
+                        Compliance Summary
+                    </h2>
+
+                    <div class="summary-row green">
+                        <span><i class="fa-solid fa-circle-check"></i></span>
+                        <span>
+                            Compliant Documents
+                        </span>
+                        <strong id="summaryCompliant">
+                            0
+                        </strong>
+                    </div>
+
+                    <div class="summary-row orange">
+                        <span><i class="fa-solid fa-triangle-exclamation"></i></span>
+                        <span>
+                            Expiring Soon
+                        </span>
+                        <strong id="summaryExpiring">
+                            0
+                        </strong>
+                    </div>
+
+                    <div class="summary-row purple">
+                        <span><i class="fa-regular fa-clock"></i></span>
+                        <span>
+                            Pending Review
+                        </span>
+                        <strong id="summaryPending">
+                            0
+                        </strong>
+                    </div>
+
+                    <div class="summary-row red">
+                        <span><i class="fa-solid fa-circle-xmark"></i></span>
+                        <span>
+                            Non-Compliant
+                        </span>
+                        <strong id="summaryNonCompliant">
+                            0
+                        </strong>
+                    </div>
+
+                    <div class="summary-row red">
+                        <span><i class="fa-solid fa-calendar-xmark"></i></span>
+                        <span>
+                            Overdue
+                        </span>
+                        <strong id="summaryOverdue">
+                            0
+                        </strong>
+                    </div>
+
+                    <div class="summary-total">
+
+                        <span>
+                            Total Documents
+                        </span>
+
+                        <strong id="summaryTotal">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="side-panel">
+
+                    <div class="side-title">
+
+                        <h2>
+                            Compliance Insights
+                        </h2>
+
+                    </div>
+
+                    <div
+                        id="insights"
+                        class="insights"
+                    ></div>
+
+                    <button
+                        class="link-button"
+                        id="viewInsights"
+                    >
+                        View All Insights <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+
+                <div class="side-panel">
+
+                    <div class="side-title">
+
+                        <h2>
+                            <i class="fa-regular fa-calendar-days"></i>
+                            Upcoming Expiry
+                        </h2>
+
+                        <button
+                            id="viewAllExpiry"
+                            class="small-link"
+                        >
+                            View All
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </div>
+
+                    <div
+                        id="upcomingExpiry"
+                        class="expiry-list"
+                    ></div>
+
+                </div>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="/static/VendorComplianceReports.js"></script>
+
+</body>
+
+</html>

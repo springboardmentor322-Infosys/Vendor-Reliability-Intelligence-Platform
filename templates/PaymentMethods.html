@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>VendorIQ - Payment Methods</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/PaymentMethods.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-cube"></i>
+            </div>
+
+            <div>
+
+                <h1>VendorIQ</h1>
+
+                <span>
+                    Vendor Reliability Platform
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+
+        <nav>
+
+            <a href="/VendorDashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+
+            <a href="/VendorProfile">
+                <i class="fa-solid fa-user"></i>
+                <span>Vendor Profile</span>
+            </a>
+
+
+            <a href="/PerformanceOverview">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Performance Overview</span>
+            </a>
+
+
+            <a href="/PurchaseOrders">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Purchase Orders</span>
+            </a>
+
+
+            <a href="/VendorContract">
+                <i class="fa-regular fa-file-lines"></i>
+                <span>Contracts & Compliance</span>
+            </a>
+
+
+            <a
+                class="active"
+                href="/VendorInvoices"
+            >
+                <i class="fa-regular fa-credit-card"></i>
+                <span>Invoices & Payments</span>
+            </a>
+
+
+            <a href="/VendorCommunication">
+
+                <i class="fa-regular fa-comment-dots"></i>
+
+                <span>Communication</span>
+
+            </a>
+
+
+            <a href="/VendorDocument">
+
+                <i class="fa-regular fa-folder-open"></i>
+
+                <span>Documents</span>
+
+            </a>
+
+
+            <a href="/VendorNotifications">
+
+                <i class="fa-regular fa-bell"></i>
+
+                <span>Notifications</span>
+
+                <b class="badge">
+                    5
+                </b>
+
+            </a>
+
+        </nav>
+
+
+        <!-- =================================================
+             REPORTS
+        ================================================== -->
+
+        <div class="menu-title">
+            REPORTS
+        </div>
+
+
+        <nav>
+
+            <a href="/PerformanceReports">
+
+                <i class="fa-solid fa-chart-line"></i>
+
+                <span>
+                    Performance Reports
+                </span>
+
+            </a>
+
+
+            <a href="/OrderReports">
+
+                <i class="fa-regular fa-file-lines"></i>
+
+                <span>
+                    Order Reports
+                </span>
+
+            </a>
+
+
+            <a href="/ComplianceReports">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                <span>
+                    Compliance Reports
+                </span>
+
+            </a>
+
+
+            <a href="/ExportReports">
+
+                <i class="fa-solid fa-file-export"></i>
+
+                <span>
+                    Export Reports
+                </span>
+
+            </a>
+
+        </nav>
+
+
+        <!-- =================================================
+             ACCOUNT
+        ================================================== -->
+
+        <div class="menu-title">
+            ACCOUNT
+        </div>
+
+
+        <nav>
+
+            <a href="/VendorSettings">
+
+                <i class="fa-solid fa-gear"></i>
+
+                <span>
+                    Settings
+                </span>
+
+            </a>
+
+
+            <a href="/VendorHelpSupport">
+
+                <i class="fa-regular fa-circle-question"></i>
+
+                <span>
+                    Help & Support
+                </span>
+
+            </a>
+
+
+            <a
+                href="/login"
+                id="logoutBtn"
+            >
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <span>
+                    Logout
+                </span>
+
+            </a>
+
+        </nav>
+
+
+        <!-- =================================================
+             VENDOR CARD
+        ================================================== -->
+
+        <div class="vendor-card">
+
+            <div class="avatar">
+
+                <i class="fa-solid fa-user"></i>
+
+            </div>
+
+            <div>
+
+                <strong id="vendorName">
+                    -
+                </strong>
+
+                <small id="vendorId">
+                    Vendor ID: Loading...
+                </small>
+
+                <small class="verified">
+
+                    <i class="fa-solid fa-circle"></i>
+
+                    Verified Vendor
+
+                </small>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <!-- =================================================
+             TOP HEADER
+        ================================================== -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    <i class="fa-solid fa-wallet"></i>
+                    Payment Methods
+                </h1>
+
+                <p>
+                    Manage your vendor payment information.
+                </p>
+
+            </div>
+
+
+            <button
+                class="primary-btn"
+                onclick="openPaymentModal()"
+            >
+
+                <i class="fa-solid fa-plus-circle"></i>
+
+                Add Payment Method
+
+            </button>
+
+        </header>
+
+
+        <!-- =================================================
+             SAVED PAYMENT METHODS
+        ================================================== -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+
+                        <i class="fa-solid fa-credit-card"></i>
+
+                        Saved Payment Methods
+
+                    </h2>
+
+                    <span>
+
+                        <i class="fa-solid fa-shield-halved"></i>
+
+                        Your registered payment accounts
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="methodsContainer"
+                class="methods-grid"
+            >
+
+                <div class="loading-box">
+
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+
+                    Loading payment methods...
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     ADD PAYMENT MODAL
+========================================================== -->
+
+<div
+    id="paymentModal"
+    class="modal"
+>
+
+    <div class="modal-content">
+
+
+        <!-- =================================================
+             MODAL HEADER
+        ================================================== -->
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2>
+
+                    <i class="fa-solid fa-money-check-dollar"></i>
+
+                    Record Payment
+
+                </h2>
+
+                <span>
+
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+
+                    Add a payment transaction for an invoice
+
+                </span>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="close-btn"
+                onclick="closePaymentModal()"
+                aria-label="Close"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             PAYMENT FORM
+        ================================================== -->
+
+        <form id="paymentForm">
+
+            <div class="form-grid">
+
+
+                <!-- =========================================
+                     INVOICE
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label for="invoiceId">
+
+                        <i class="fa-solid fa-file-invoice"></i>
+
+                        Invoice
+
+                    </label>
+
+                    <select
+                        id="invoiceId"
+                        name="invoice_id"
+                        required
+                    >
+
+                        <option value="">
+
+                            Select Invoice
+
+                        </option>
+
+                    </select>
+
+                    <small class="field-help">
+
+                        <i class="fa-solid fa-circle-info"></i>
+
+                        Select the invoice for this payment.
+
+                    </small>
+
+                </div>
+
+
+                <!-- =========================================
+                     PAYMENT REFERENCE
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label for="paymentReference">
+
+                        <i class="fa-solid fa-hashtag"></i>
+
+                        Payment Reference
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="paymentReference"
+                        name="payment_reference"
+                        placeholder="e.g. PAY-2026-000001"
+                        maxlength="100"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- =========================================
+                     PAYMENT DATE
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label for="paymentDate">
+
+                        <i class="fa-regular fa-calendar-days"></i>
+
+                        Payment Date
+
+                    </label>
+
+                    <input
+                        type="date"
+                        id="paymentDate"
+                        name="payment_date"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- =========================================
+                     PAYMENT AMOUNT
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label for="paymentAmount">
+
+                        <i class="fa-solid fa-money-bill-wave"></i>
+
+                        Payment Amount
+
+                    </label>
+
+                    <div class="amount-input">
+
+                        <span>
+
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+
+                        </span>
+
+                        <input
+                            type="number"
+                            id="paymentAmount"
+                            name="amount"
+                            placeholder="0.00"
+                            min="0"
+                            step="0.01"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     PAYMENT METHOD
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label for="paymentMethod">
+
+                        <i class="fa-solid fa-building-columns"></i>
+
+                        Payment Method
+
+                    </label>
+
+                    <select
+                        id="paymentMethod"
+                        name="payment_method"
+                    >
+
+                        <option value="">
+
+                            Select Payment Method
+
+                        </option>
+
+                        <option value="Bank Transfer">
+
+                            <i class="fa-solid fa-building-columns"></i>
+
+                            Bank Transfer
+
+                        </option>
+
+                        <option value="Credit Card">
+
+                            Credit Card
+
+                        </option>
+
+                        <option value="Debit Card">
+
+                            Debit Card
+
+                        </option>
+
+                        <option value="Cheque">
+
+                            Cheque
+
+                        </option>
+
+                        <option value="Cash">
+
+                            Cash
+
+                        </option>
+
+                        <option value="ACH">
+
+                            ACH
+
+                        </option>
+
+                        <option value="Wire Transfer">
+
+                            Wire Transfer
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =========================================
+                     PAYMENT STATUS
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label for="paymentStatus">
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                        Payment Status
+
+                    </label>
+
+                    <select
+                        id="paymentStatus"
+                        name="status"
+                        required
+                    >
+
+                        <option value="Completed">
+                            Completed
+                        </option>
+
+                        <option value="Pending">
+                            Pending
+                        </option>
+
+                        <option value="Failed">
+                            Failed
+                        </option>
+
+                        <option value="Cancelled">
+                            Cancelled
+                        </option>
+
+                        <option value="Refunded">
+                            Refunded
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =========================================
+                     TRANSACTION ID
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label for="transactionId">
+
+                        <i class="fa-solid fa-barcode"></i>
+
+                        Transaction ID
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="transactionId"
+                        name="transaction_id"
+                        placeholder="Enter transaction ID"
+                        maxlength="150"
+                    >
+
+                </div>
+
+
+                <!-- =========================================
+                     PAYMENT NOTES
+                ========================================== -->
+
+                <div class="form-group full">
+
+                    <label for="paymentNotes">
+
+                        <i class="fa-regular fa-note-sticky"></i>
+
+                        Payment Notes
+
+                    </label>
+
+                    <textarea
+                        id="paymentNotes"
+                        name="notes"
+                        rows="4"
+                        placeholder="Enter any additional payment notes..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 FORM ACTIONS
+            ================================================== -->
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    onclick="closePaymentModal()"
+                >
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                >
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    Record Payment
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="/static/PaymentMethods.js"></script>
+
+</body>
+
+</html>

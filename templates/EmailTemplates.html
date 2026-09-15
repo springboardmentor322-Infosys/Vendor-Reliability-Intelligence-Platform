@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        VendorIQ - Email Templates
+    </title>
+
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- Email Templates CSS -->
+    <link
+        rel="stylesheet"
+        href="/static/EmailTemplates.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="app-container">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- BRAND -->
+
+        <div class="brand">
+
+            <div class="brand-logo">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+            </div>
+
+
+            <div class="brand-text">
+
+                <h1>VendorIQ</h1>
+                <span>Vendor Reliability Platform</span>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =========================================================
+            NOTIFICATIONS MENU
+        ========================================================= -->
+
+        <div class="sidebar-menu-item notification-menu">
+
+            <!-- Notifications link -->
+            <div class="notification-main">
+
+                <a href="/Notifications" class="notification-link">
+
+                    <span class="menu-left">
+
+                        <i class="fa-solid fa-bell"></i>
+
+                        <span>Notifications</span>
+
+                    </span>
+
+                </a>
+
+
+                <!-- Dropdown arrow -->
+                <button
+                    type="button"
+                    class="notification-toggle"
+                    onclick="toggleNotificationMenu(event)"
+                >
+
+                    <i
+                        class="fa-solid fa-chevron-down notification-arrow"
+                    ></i>
+
+                </button>
+
+            </div>
+
+
+            <!-- Dropdown -->
+            <div
+                class="notification-submenu"
+                id="notificationSubmenu"
+            >
+
+                <a
+                    href="/NotificationSettings"
+                    class="notification-submenu-item"
+                >
+
+                    <i class="fa-solid fa-gear"></i>
+
+                    <span>
+                        Notification Settings
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/EmailTemplates"
+                    class="notification-submenu-item"
+                >
+
+                    <i class="fa-solid fa-envelope"></i>
+
+                    <span>
+                        Email Templates
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/SMSTemplates"
+                    class="notification-submenu-item"
+                >
+
+                    <i class="fa-solid fa-comment-sms"></i>
+
+                    <span>
+                        SMS Templates
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/NotificationLogs"
+                    class="notification-submenu-item"
+                >
+
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+
+                    <span>
+                        Notification Logs
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- HEADER -->
+
+        <header class="page-header">
+
+
+            <div class="header-text">
+
+                <h1>
+                    Email Templates
+                </h1>
+
+                <p>
+                    Create and manage notification email templates.
+                </p>
+
+            </div>
+
+
+            <button
+                class="new-template-btn"
+                id="newTemplateBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-plus"></i>
+
+                New Template
+
+            </button>
+
+        </header>
+
+
+
+        <!-- =================================================
+             SEARCH / FILTER BAR
+        ================================================== -->
+
+        <section
+            class="toolbar"
+            id="templateToolbar"
+        >
+
+            <div class="search-box">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search email templates..."
+                >
+
+            </div>
+
+
+            <select
+                id="statusFilter"
+                class="status-filter"
+            >
+
+                <option value="all">
+                    All Status
+                </option>
+
+                <option value="Active">
+                    Active
+                </option>
+
+                <option value="Inactive">
+                    Inactive
+                </option>
+
+            </select>
+
+        </section>
+
+
+
+        <!-- =================================================
+             LOADING
+        ================================================== -->
+
+        <div
+            class="loading-state"
+            id="loadingState"
+        >
+
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            <span>
+                Loading email templates...
+            </span>
+
+        </div>
+
+
+
+        <!-- =================================================
+             EMPTY STATE
+        ================================================== -->
+
+        <section
+            class="empty-state"
+            id="emptyState"
+            style="display:none;"
+        >
+
+            <div class="empty-icon">
+
+                <i class="fa-regular fa-envelope"></i>
+
+            </div>
+
+
+            <h2>
+                No email templates found
+            </h2>
+
+
+            <p>
+                Create your first email template.
+            </p>
+
+
+            <button
+                class="empty-create-btn"
+                id="emptyCreateBtn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-plus"></i>
+
+                Create Template
+
+            </button>
+
+        </section>
+
+
+
+        <!-- =================================================
+             TEMPLATE TABLE
+        ================================================== -->
+
+        <section
+            class="templates-card"
+            id="templatesCard"
+            style="display:none;"
+        >
+
+            <div class="table-wrapper">
+
+                <table class="templates-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Template Name
+                            </th>
+
+                            <th>
+                                Subject
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Created
+                            </th>
+
+                            <th>
+                                Updated
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="templatesTableBody"
+                    >
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     EMAIL TEMPLATE MODAL
+========================================================== -->
+
+<div
+    class="modal-overlay"
+    id="templateModal"
+>
+
+
+    <div class="modal">
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="modal-header">
+
+            <div>
+
+                <h2 id="modalTitle">
+                    New Email Template
+                </h2>
+
+                <p>
+                    Create an email notification template.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="close-modal-btn"
+                id="closeModalBtn"
+                aria-label="Close"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <form
+            id="templateForm"
+        >
+
+
+            <!-- Hidden ID -->
+
+            <input
+                type="hidden"
+                id="templateId"
+            >
+
+
+            <!-- TEMPLATE NAME -->
+
+            <div class="form-group">
+
+                <label for="templateName">
+
+                    Template Name
+
+                    <span>
+                        *
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="templateName"
+                    placeholder="Example: Purchase Order Approved"
+                    maxlength="255"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- SUBJECT -->
+
+            <div class="form-group">
+
+                <label for="templateSubject">
+
+                    Email Subject
+
+                    <span>
+                        *
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="templateSubject"
+                    placeholder="Example: Purchase Order {{po_number}} Approved"
+                    maxlength="500"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- BODY -->
+
+            <div class="form-group">
+
+                <label for="templateBody">
+
+                    Email Body
+
+                    <span>
+                        *
+                    </span>
+
+                </label>
+
+
+                <textarea
+                    id="templateBody"
+                    rows="10"
+                    placeholder="Write your email content here..."
+                    required
+                ></textarea>
+
+
+                <div class="field-help">
+
+                    You can use variables such as:
+
+                    <code>{{vendor_name}}</code>
+
+                    <code>{{po_number}}</code>
+
+                    <code>{{contract_number}}</code>
+
+                    <code>{{admin_name}}</code>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- STATUS -->
+
+            <div class="form-group">
+
+                <label for="templateStatus">
+
+                    Status
+
+                </label>
+
+
+                <select
+                    id="templateStatus"
+                >
+
+                    <option value="Active">
+                        Active
+                    </option>
+
+                    <option value="Inactive">
+                        Inactive
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- FORM ACTIONS -->
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    id="cancelBtn"
+                >
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                    id="saveTemplateBtn"
+                >
+
+                    <i class="fa-solid fa-floppy-disk"></i>
+
+                    Save Template
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     DELETE CONFIRMATION MODAL
+========================================================== -->
+
+<div
+    class="modal-overlay"
+    id="deleteModal"
+>
+
+
+    <div class="delete-modal">
+
+
+        <div class="delete-icon">
+
+            <i class="fa-solid fa-trash"></i>
+
+        </div>
+
+
+        <h2>
+            Delete Template?
+        </h2>
+
+
+        <p>
+            Are you sure you want to delete this email template?
+            This action cannot be undone.
+        </p>
+
+
+        <div class="delete-actions">
+
+            <button
+                type="button"
+                class="cancel-btn"
+                id="cancelDeleteBtn"
+            >
+                Cancel
+            </button>
+
+
+            <button
+                type="button"
+                class="delete-btn"
+                id="confirmDeleteBtn"
+            >
+
+                <i class="fa-solid fa-trash"></i>
+
+                Delete
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     TOAST
+========================================================== -->
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+
+<script
+    src="/static/EmailTemplates.js"
+></script>
+
+
+</body>
+
+</html>

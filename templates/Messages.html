@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Procurement Communication | VendorIQ</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/Messages.css"
+    >
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    VendorIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    Reliability Platform
+                </div>
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <div class="sidebar-section">
+
+                MAIN MENU
+
+            </div>
+
+            <a href="/ManagerDashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>
+                    Dashboard
+                </span>
+            </a>
+
+            <a href="/ProcurementRequests">
+                <i class="fa-regular fa-clipboard"></i>
+                <span>
+                    Procurement Requests
+                </span>
+            </a>
+
+            <a href="/ProcurementPurchaseOrder">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span>Purchase Orders</span>
+            </a>
+
+            <a
+                href="/ProcurementApprovals"
+            >
+
+                <i class="fa-regular fa-square-check"></i>
+
+                <span>
+                    Approvals
+                </span>
+
+            </a>
+
+            <a
+                href="/ProcurementVendors"
+            >
+
+                <i class="fa-solid fa-user-group"></i>
+
+                <span>
+                    Vendors
+                </span>
+
+            </a>
+
+
+            <a
+                href="/OrderTracking"
+            >
+
+                <i class="fa-solid fa-box"></i>
+
+                <span>
+                    Order Tracking
+                </span>
+
+            </a>
+
+
+            <a
+                href="/ProcurementInvoices"
+            >
+
+                <i class="fa-regular fa-file-lines"></i>
+
+                <span>
+                    Invoices
+                </span>
+
+            </a>
+
+
+            <a
+                href="/ProcurementReports"
+            >
+
+                <i class="fa-regular fa-chart-bar"></i>
+
+                <span>
+                    Reports
+                </span>
+
+            </a>
+
+
+            <a
+                href="/ProcurementAnalytics"
+            >
+
+                <i class="fa-solid fa-chart-line"></i>
+
+                <span>
+                    Analytics
+                </span>
+
+            </a>
+
+            <div class="sidebar-section">
+
+                COMMUNICATION
+
+            </div>
+
+            <a
+                href="/ProcurementNotifications"
+            >
+
+                <i class="fa-regular fa-bell"></i>
+
+                <span>
+                    Notifications
+                </span>
+
+                <b
+                    class="notification-badge"
+                    id="notificationCount"
+                >
+                    0
+                </b>
+
+            </a>
+
+
+            <a
+                href="/Messages"
+            >
+
+                <i class="fa-regular fa-envelope"></i>
+
+                <span>
+                    Messages
+                </span>
+
+                <b
+                    class="notification-badge"
+                    id="messageCount"
+                >
+                    0
+                </b>
+
+            </a>
+
+            <div class="sidebar-section">
+
+                SUPPORT
+
+            </div>
+
+            <a
+                href="/ProcurementHelpSupport"
+            >
+
+                <i class="fa-regular fa-circle-question"></i>
+
+                <span>
+                    Help & Support
+                </span>
+
+            </a>
+
+
+            <a
+                href="/ProcurementSettings"
+            >
+
+                <i class="fa-solid fa-gear"></i>
+
+                <span>
+                    Settings
+                </span>
+
+            </a>
+
+            <a href="/login">
+                
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <span>Logout</span>
+                
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="page-header">
+
+            <div>
+
+                <div class="eyebrow">
+                    PROCUREMENT DASHBOARD
+                </div>
+
+                <h1>
+                    Communication Center
+                </h1>
+
+                <p>
+                    Communicate directly with vendors and internal teams.
+                </p>
+
+            </div>
+
+
+            <div class="header-actions">
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search contacts..."
+                    >
+
+                </div>
+
+                <button
+                    class="icon-button"
+                    id="refreshButton"
+                    title="Refresh"
+                >
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             CATEGORY FILTERS
+        ================================================== -->
+
+        <section class="category-bar">
+
+            <button
+                class="category-btn active"
+                data-filter="all"
+            >
+                <i class="fa-solid fa-layer-group"></i>
+                All
+            </button>
+
+            <button
+                class="category-btn"
+                data-filter="vendor"
+            >
+                <i class="fa-solid fa-truck"></i>
+                Vendors
+            </button>
+
+            <button
+                class="category-btn"
+                data-filter="admin"
+            >
+                <i class="fa-solid fa-user-shield"></i>
+                Admin
+            </button>
+
+            <button
+                class="category-btn"
+                data-filter="supply_chain"
+            >
+                <i class="fa-solid fa-boxes-stacked"></i>
+                Supply Chain
+            </button>
+
+            <button
+                class="category-btn"
+                data-filter="finance"
+            >
+                <i class="fa-solid fa-coins"></i>
+                Finance
+            </button>
+
+            <button
+                class="category-btn"
+                data-filter="audit"
+            >
+                <i class="fa-solid fa-user-check"></i>
+                Audit
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             SUMMARY
+        ================================================== -->
+
+        <section class="summary-grid">
+
+            <div class="summary-card">
+
+                <div class="summary-icon vendor">
+                    <i class="fa-solid fa-truck"></i>
+                </div>
+
+                <div>
+                    <span>Vendors</span>
+                    <strong id="vendorCount">0</strong>
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon admin">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+
+                <div>
+                    <span>Admin</span>
+                    <strong id="adminCount">0</strong>
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon supply">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+
+                <div>
+                    <span>Supply Chain</span>
+                    <strong id="supplyCount">0</strong>
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon finance">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+
+                <div>
+                    <span>Finance</span>
+                    <strong id="financeCount">0</strong>
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon audit">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+
+                <div>
+                    <span>Audit</span>
+                    <strong id="auditCount">0</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CONTACT TABLE
+        ================================================== -->
+
+        <section class="communication-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>
+                        Communication Contacts
+                    </h2>
+
+                    <span id="contactCount">
+                        0 contacts
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Type</th>
+
+                            <th>Person / Company</th>
+
+                            <th>ID / Role</th>
+
+                            <th>Department / Category</th>
+
+                            <th>Email / Contact</th>
+
+                            <th>Last Conversation</th>
+
+                            <th>Status</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="contactsTableBody">
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="loading-row"
+                            >
+                                <i class="fa-solid fa-spinner fa-spin"></i>
+                                Loading contacts...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     MESSAGE MODAL
+========================================================== -->
+
+<div
+    class="modal-overlay"
+    id="messageModal"
+>
+
+    <div
+        class="message-modal"
+        role="dialog"
+        aria-modal="true"
+    >
+
+        <!-- MODAL HEADER -->
+
+        <div class="modal-header">
+
+            <div class="recipient-info">
+
+                <div
+                    class="recipient-avatar"
+                    id="modalAvatar"
+                >
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div>
+
+                    <h3 id="modalRecipientName">
+                        Conversation
+                    </h3>
+
+                    <div
+                        class="recipient-meta"
+                        id="modalRecipientMeta"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="close-modal"
+                id="closeModal"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <!-- CONVERSATION -->
+
+        <div
+            class="conversation-body"
+            id="conversationBody"
+        >
+
+            <div class="conversation-loading">
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                Loading conversation...
+
+            </div>
+
+        </div>
+
+
+        <!-- COMPOSER -->
+
+        <div class="message-composer">
+
+            <textarea
+                id="messageInput"
+                rows="2"
+                placeholder="Write your message..."
+            ></textarea>
+
+
+            <button
+                id="sendMessageButton"
+                class="send-button"
+            >
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+                Send
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="/static/Messages.js"></script>
+
+</body>
+</html>

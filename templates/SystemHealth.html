@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        VendorIQ - System Health
+    </title>
+
+
+    <link
+        rel="stylesheet"
+        href="/static/SystemHealth.css"
+    >
+
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+</head>
+
+
+<body>
+
+
+<div class="app-container">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="brand">
+
+            <div class="brand-logo">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+            </div>
+
+            <div>
+
+                <div class="brand-name">
+                    VendorIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+
+        <nav class="sidebar-menu">
+
+
+            <a href="/AdminDashboard.html">
+
+                <i class="fa-solid fa-house"></i>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a href="/UserManagement">
+
+                <i class="fa-solid fa-users"></i>
+
+                <span>
+                    User Management
+                </span>
+
+            </a>
+
+
+            <a href="/VendorManagement">
+
+                <i class="fa-solid fa-user-group"></i>
+
+                <span>
+                    Vendor Management
+                </span>
+
+            </a>
+
+
+            <a href="/ProcurementOverview">
+
+                <i class="fa-solid fa-file-invoice"></i>
+
+                <span>
+                    Procurement Overview
+                </span>
+
+            </a>
+
+
+            <a href="/ContractCompliance">
+
+                <i class="fa-regular fa-file-lines"></i>
+
+                <span>
+                    Contracts & Compliance
+                </span>
+
+            </a>
+
+
+            <a href="/InvoicesPayments">
+
+                <i class="fa-regular fa-credit-card"></i>
+
+                <span>
+                    Invoices & Payments
+                </span>
+
+            </a>
+
+
+            <a href="/Communication">
+
+                <i class="fa-solid fa-share-nodes"></i>
+
+                <span>
+                    Communication
+                </span>
+
+            </a>
+
+
+            <a href="/PerformanceAnalytics">
+
+                <i class="fa-solid fa-chart-column"></i>
+
+                <span>
+                    Performance Analytics
+                </span>
+
+            </a>
+
+
+            <a href="/ReportsExports">
+
+                <i class="fa-regular fa-folder-open"></i>
+
+                <span>
+                    Reports & Exports
+                </span>
+
+            </a>
+
+
+            <a href="/Notifications">
+
+                <i class="fa-regular fa-bell"></i>
+
+                <span>
+                    Notifications
+                </span>
+
+                <span class="notification-badge">
+                    15
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        <div class="menu-title administration-title">
+            ADMINISTRATION
+        </div>
+
+
+        <nav class="sidebar-menu">
+
+
+            <a href="/RolesPermissions">
+
+                <i class="fa-solid fa-user-shield"></i>
+
+                <span>
+                    Role & Permissions
+                </span>
+
+            </a>
+
+
+            <a href="/SystemSettings">
+
+                <i class="fa-solid fa-gear"></i>
+
+                <span>
+                    System Settings
+                </span>
+
+            </a>
+
+
+            <a href="/AuditLogs">
+
+                <i class="fa-solid fa-list"></i>
+
+                <span>
+                    Audit Logs
+                </span>
+
+            </a>
+
+
+            <a href="/DataManagement">
+
+                <i class="fa-solid fa-database"></i>
+
+                <span>
+                    Data Management
+                </span>
+
+            </a>
+
+
+            <a
+                href="/SystemHealth"
+                class="active"
+            >
+
+                <i class="fa-solid fa-arrows-to-circle"></i>
+
+                <span>
+                    System Health
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        <div class="menu-title">
+            SUPPORT
+        </div>
+
+
+        <nav class="sidebar-menu">
+
+
+            <a href="/HelpSupport">
+
+                <i class="fa-regular fa-circle-question"></i>
+
+                <span>
+                    Help & Support
+                </span>
+
+            </a>
+
+
+            <a href="/Feedback">
+
+                <i class="fa-regular fa-comment"></i>
+
+                <span>
+                    Feedback
+                </span>
+
+            </a>
+
+
+            <a href="/login">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+                
+                <span>Logout</span>
+            
+            </a>
+
+
+        </nav>
+
+
+        <div class="admin-card">
+
+            <div class="admin-avatar">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+            </div>
+
+            <div>
+
+                <strong id="sidebarAdminName">
+                    Super Admin
+                </strong>
+
+                <span id="sidebarAdminEmail">
+                    admin@vendoriq.com
+                </span>
+
+                <small>
+                    <i></i>
+                    Online
+                </small>
+
+            </div>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <header class="header">
+
+
+            <div>
+
+                <h1>
+                    System Health and Performance
+                </h1>
+
+                <div class="breadcrumb">
+
+                    <a href="/home">
+                        Home
+                    </a>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                    <strong>
+                        System Health
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="header-right">
+
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        placeholder="Search anything..."
+                    >
+
+                </div>
+
+
+                <button class="header-icon">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span>
+                        12
+                    </span>
+
+                </button>
+
+
+                <button class="header-icon">
+
+                    <i class="fa-regular fa-envelope"></i>
+
+                    <span>
+                        7
+                    </span>
+
+                </button>
+
+
+                <div class="profile" onclick="openAdminProfile()">
+
+                    <div class="profile-avatar">
+
+                        <i class="fa-solid fa-user"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong id="headerAdminName">
+                            Admin User
+                        </strong>
+
+                        <span id="headerAdminRole">
+                            Super Administrator
+                        </span>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             TOOLBAR
+        ================================================== -->
+
+        <div class="toolbar">
+
+            <div></div>
+
+            <div class="toolbar-right">
+
+                <select
+                    id="timeRange"
+                    class="date-select"
+                >
+
+                    <option value="7">
+                        Last 7 Days
+                    </option>
+
+                    <option value="30">
+                        Last 30 Days
+                    </option>
+
+                    <option value="90">
+                        Last 90 Days
+                    </option>
+
+                </select>
+
+
+                <button
+                    id="refreshButton"
+                    class="refresh-button"
+                >
+
+                    <i class="fa-solid fa-rotate"></i>
+
+                    Refresh
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             SUMMARY CARDS
+        ================================================== -->
+
+        <section class="summary-grid">
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon green">
+
+                    <i class="fa-solid fa-wave-square"></i>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Uptime (30 Days)
+                    </span>
+
+                    <strong id="uptime">
+                        --%
+                    </strong>
+
+                    <small class="positive">
+                        Excellent
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon purple">
+
+                    <i class="fa-regular fa-clock"></i>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Avg Response Time
+                    </span>
+
+                    <strong id="avgResponse">
+                        -- ms
+                    </strong>
+
+                    <small class="positive">
+                        Good
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon blue">
+
+                    <i class="fa-solid fa-circle-nodes"></i>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Requests
+                    </span>
+
+                    <strong id="totalRequests">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        Live
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon red">
+
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Error Rate
+                    </span>
+
+                    <strong id="errorRate">
+                        0%
+                    </strong>
+
+                    <small class="positive">
+                        Low
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon blue">
+
+                    <i class="fa-solid fa-users"></i>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Active Users Now
+                    </span>
+
+                    <strong id="activeUsers">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        Online
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-icon green">
+
+                    <i class="fa-solid fa-heart-pulse"></i>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        System Health Score
+                    </span>
+
+                    <strong id="healthScore">
+                        0 
+                    </strong>
+                    <span>/100</span>
+
+                    <small class="positive">
+                        Excellent
+                    </small>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             ROW 1
+        ================================================== -->
+
+        <section class="dashboard-grid three-columns">
+
+
+            <!-- SYSTEM PERFORMANCE -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <span>1.</span>
+                        System Performance
+                    </h2>
+
+                    <select>
+                        <option>
+                            Last 7 Days
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="metric-list">
+
+
+                    <div class="metric-row">
+
+                        <div class="metric-icon purple">
+
+                            <i class="fa-solid fa-microchip"></i>
+
+                        </div>
+
+                        <div class="metric-info">
+
+                            <span>
+                                CPU Usage
+                            </span>
+
+                            <strong id="cpuUsage">
+                                --%
+                            </strong>
+
+                        </div>
+
+                        <div class="mini-chart">
+
+                            <canvas
+                                id="cpuChart"
+                            ></canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="metric-row">
+
+                        <div class="metric-icon green">
+
+                            <i class="fa-solid fa-memory"></i>
+
+                        </div>
+
+                        <div class="metric-info">
+
+                            <span>
+                                Memory Usage
+                            </span>
+
+                            <strong id="memoryUsage">
+                                --%
+                            </strong>
+
+                        </div>
+
+                        <div class="mini-chart">
+
+                            <canvas
+                                id="memoryChart"
+                            ></canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="metric-row">
+
+                        <div class="metric-icon orange">
+
+                            <i class="fa-solid fa-hard-drive"></i>
+
+                        </div>
+
+                        <div class="metric-info">
+
+                            <span>
+                                Disk Usage
+                            </span>
+
+                            <strong id="diskUsage">
+                                --%
+                            </strong>
+
+                        </div>
+
+                        <div class="mini-chart">
+
+                            <canvas
+                                id="diskChart"
+                            ></canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="metric-row">
+
+                        <div class="metric-icon blue">
+
+                            <i class="fa-solid fa-network-wired"></i>
+
+                        </div>
+
+                        <div class="metric-info">
+
+                            <span>
+                                Network I/O
+                            </span>
+
+                            <strong id="networkUsage">
+                                -- MB
+                            </strong>
+
+                        </div>
+
+                        <div class="mini-chart">
+
+                            <canvas
+                                id="networkChart"
+                            ></canvas>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <a class="panel-link">
+                    View Detailed Metrics
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+
+            <!-- API RESPONSE -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <span>2.</span>
+                        API Response Time
+                    </h2>
+
+                    <select>
+                        <option>
+                            Last 7 Days
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="big-stat">
+
+                    <span>
+                        Average Response Time
+                    </span>
+
+                    <div>
+
+                        <strong id="apiAverage">
+                            --ms
+                        </strong>
+
+                        <label class="status-good">
+                            Good
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <div class="large-chart">
+
+                    <canvas
+                        id="apiChart"
+                    ></canvas>
+
+                </div>
+
+
+                <a class="panel-link">
+                    View API Performance
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+
+            <!-- DATABASE -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <span>3.</span>
+                        Database Query Performance
+                    </h2>
+
+                    <select>
+                        <option>
+                            Last 7 Days
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="database-stats">
+
+
+                    <div>
+
+                        <span>
+                            Avg Query Time
+                        </span>
+
+                        <strong id="avgQueryTime">
+                            --ms
+                        </strong>
+
+                        <label class="status-good">
+                            Good
+                        </label>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            Slow Queries
+                        </span>
+
+                        <strong id="slowQueries">
+                            0
+                        </strong>
+
+                        <label class="status-good">
+                            Low
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <div class="slow-query-title">
+                    Top 5 Slowest Queries
+                </div>
+
+
+                <div
+                    class="query-list"
+                    id="queryList"
+                >
+
+                    <div class="query-row">
+                        Loading...
+                    </div>
+
+                </div>
+
+
+                <a class="panel-link">
+                    View Query Performance
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+            <!-- DASHBOARD LOAD -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <span>4.</span>
+                        Dashboard Loading Time
+                    </h2>
+
+                    <select>
+                        <option>
+                            Last 7 Days
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="big-stat">
+
+                    <span>
+                        Average Load Time
+                    </span>
+
+                    <div>
+
+                        <strong id="dashboardLoad">
+                            --s
+                        </strong>
+
+                        <label class="status-good">
+                            Good
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <div class="large-chart">
+
+                    <canvas
+                        id="loadChart"
+                    ></canvas>
+
+                </div>
+
+
+                <a class="panel-link">
+                    View Load Time Details
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+
+            <!-- CONCURRENT -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <span>5.</span>
+                        Concurrent User Handling
+                    </h2>
+
+                    <select>
+                        <option>
+                            Last 7 Days
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="big-stat">
+
+                    <span>
+                        Peak Concurrent Users
+                    </span>
+
+                    <div>
+
+                        <strong id="peakUsers">
+                            0
+                        </strong>
+
+                        <small>
+                            Users
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="large-chart">
+
+                    <canvas
+                        id="concurrencyChart"
+                    ></canvas>
+
+                </div>
+
+
+                <a class="panel-link">
+                    View User Analytics
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+
+            <!-- SYSTEM HEALTH -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <span>6.</span>
+                        System Health
+                    </h2>
+
+                </div>
+
+
+                <div
+                    class="service-list"
+                    id="serviceList"
+                >
+
+                    <div class="service-row">
+                        Loading...
+                    </div>
+
+                </div>
+
+
+                <a class="panel-link">
+                    View All System Health
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             BOTTOM
+        ================================================== -->
+
+        <section class="bottom-grid">
+
+
+            <!-- ALERTS -->
+
+            <div class="panel alerts-panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        System Alerts
+                    </h2>
+
+                </div>
+
+
+                <div class="alert-summary">
+
+
+                    <div>
+
+                        <i class="fa-solid fa-triangle-exclamation critical"></i>
+
+                        <strong id="criticalAlerts">
+                            0
+                        </strong>
+
+                        <span>
+                            Critical
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <i class="fa-solid fa-triangle-exclamation warning"></i>
+
+                        <strong id="warningAlerts">
+                            0
+                        </strong>
+
+                        <span>
+                            Warning
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <i class="fa-solid fa-circle-info info"></i>
+
+                        <strong id="infoAlerts">
+                            0
+                        </strong>
+
+                        <span>
+                            Info
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <i class="fa-regular fa-circle-check resolved"></i>
+
+                        <strong id="resolvedAlerts">
+                            0
+                        </strong>
+
+                        <span>
+                            Resolved
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+                <a class="panel-link">
+                    View All Alerts
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+
+
+            <!-- RECENT ISSUES -->
+
+            <div class="panel issues-panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Recent Issues
+                    </h2>
+
+                    <a>
+                        View All
+                    </a>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Issue
+                                </th>
+
+                                <th>
+                                    Severity
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Detected At
+                                </th>
+
+                                <th>
+                                    Resolved At
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="issuesTable">
+
+                            <tr>
+
+                                <td colspan="5">
+                                    Loading...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<script
+    src="/static/SystemHealth.js"
+></script>
+
+
+</body>
+
+</html>

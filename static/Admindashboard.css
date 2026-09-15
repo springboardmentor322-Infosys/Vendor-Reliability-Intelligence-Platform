@@ -1,0 +1,3001 @@
+/* =========================================================
+   VendorIQ - Advanced Dark Admin Dashboard
+   Futuristic / Glassmorphism / Neon UI
+   ========================================================= */
+
+/* =========================================================
+   1. ROOT VARIABLES
+   ========================================================= */
+
+:root {
+    --bg-main: #020617;
+    --bg-primary: #030b1c;
+    --bg-secondary: #061329;
+    --bg-tertiary: #0a1933;
+
+    --panel: rgba(7, 20, 42, 0.78);
+    --panel-solid: #08172f;
+    --panel-hover: rgba(10, 28, 56, 0.94);
+
+    --border: rgba(82, 142, 255, 0.18);
+    --border-hover: rgba(72, 151, 255, 0.55);
+
+    --text-primary: #f8fafc;
+    --text-secondary: #a9bad5;
+    --text-muted: #6f83a3;
+
+    --blue: #2495ff;
+    --blue-light: #42b5ff;
+    --cyan: #00e5ff;
+
+    --purple: #7c3cff;
+    --purple-light: #a855f7;
+
+    --green: #00d9a5;
+    --green-light: #22e6b8;
+
+    --orange: #ff9d2e;
+    --yellow: #ffc247;
+
+    --red: #ff416c;
+    --pink: #ff3d81;
+
+    --shadow:
+        0 18px 50px rgba(0, 0, 0, 0.35);
+
+    --blue-glow:
+        0 0 25px rgba(36, 149, 255, 0.25);
+
+    --purple-glow:
+        0 0 25px rgba(124, 60, 255, 0.25);
+
+    --green-glow:
+        0 0 25px rgba(0, 217, 165, 0.22);
+
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+
+    --sidebar-width: 240px;
+
+    --transition:
+        all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* =========================================================
+   2. RESET
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(
+            circle at 10% 10%,
+            rgba(24, 91, 180, 0.14),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 90% 20%,
+            rgba(100, 40, 220, 0.12),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 60% 90%,
+            rgba(0, 180, 220, 0.08),
+            transparent 30%
+        ),
+        var(--bg-main);
+
+    color: var(--text-primary);
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    overflow-x: hidden;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+
+    pointer-events: none;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,0.015) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,0.015) 1px,
+            transparent 1px
+        );
+
+    background-size: 50px 50px;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            black 0%,
+            transparent 90%
+        );
+
+    z-index: -1;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+
+/* =========================================================
+   3. APP LAYOUT
+   ========================================================= */
+
+.app {
+    min-height: 100vh;
+    display: flex;
+}
+
+
+/* =========================================================
+   4. SIDEBAR
+   ========================================================= */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: var(--sidebar-width);
+
+    padding: 15px 16px 18px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(4, 16, 37, 0.98),
+            rgba(2, 10, 25, 0.99)
+        );
+
+    border-right: 1px solid rgba(64, 139, 255, 0.16);
+
+    box-shadow:
+        10px 0 45px rgba(0, 0, 0, 0.28);
+
+    z-index: 1000;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(64, 139, 255, 0.25) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(64, 139, 255, 0.25);
+    border-radius: 20px;
+}
+
+
+/* =========================================================
+   5. BRAND
+   ========================================================= */
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    padding: 4px 10px 25px;
+
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+
+    margin-bottom: 20px;
+}
+
+.brand-icon {
+    width: 46px;
+    height: 46px;
+
+    flex-shrink: 0;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 14px;
+
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #087cff,
+            #5639ff
+        );
+
+    box-shadow:
+        0 0 20px rgba(37, 130, 255, 0.4),
+        inset 0 0 15px rgba(255,255,255,0.1);
+
+    position: relative;
+}
+
+.brand-icon::before {
+    content: "";
+
+    position: absolute;
+    inset: -3px;
+
+    border-radius: inherit;
+
+    border: 1px solid rgba(0, 229, 255, 0.25);
+
+    animation: pulseBorder 2.5s infinite;
+}
+
+.brand-icon i {
+    font-size: 22px;
+}
+
+.brand h1 {
+    font-size: 21px;
+    font-weight: 800;
+
+    letter-spacing: -0.5px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ffffff,
+            #73c9ff,
+            #9b7cff
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+}
+
+.brand span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #7187a7;
+
+    font-size: 10px;
+
+    letter-spacing: 0.2px;
+}
+
+
+/* =========================================================
+   6. MENU TITLES
+   ========================================================= */
+
+.menu-title {
+    padding: 12px 12px 8px;
+
+    color: #526887;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+}
+
+
+/* =========================================================
+   7. NAVIGATION
+   ========================================================= */
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-item {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    min-height: 43px;
+
+    padding: 10px 13px;
+
+    color: #8ea3c1;
+
+    border-radius: 10px;
+
+    font-size: 12px;
+
+    transition: var(--transition);
+
+    overflow: hidden;
+}
+
+.nav-item::before {
+    content: "";
+
+    position: absolute;
+
+    left: -100%;
+    top: 0;
+    bottom: 0;
+
+    width: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(42, 148, 255, 0.08)
+        );
+
+    transition: left 0.35s ease;
+}
+
+.nav-item:hover::before {
+    left: 0;
+}
+
+.nav-item i {
+    width: 20px;
+
+    text-align: center;
+
+    font-size: 15px;
+
+    color: #6f87a9;
+
+    transition: var(--transition);
+}
+
+.nav-item:hover {
+    color: #ffffff;
+
+    background:
+        rgba(25, 76, 135, 0.18);
+
+    transform: translateX(3px);
+}
+
+.nav-item:hover i {
+    color: var(--blue-light);
+
+    transform: scale(1.12);
+}
+
+.nav-item.active {
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(16, 112, 255, 0.25),
+            rgba(101, 55, 255, 0.24)
+        );
+
+    box-shadow:
+        inset 0 0 20px rgba(30, 120, 255, 0.08),
+        0 0 20px rgba(30, 120, 255, 0.08);
+}
+
+.nav-item.active::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 7px;
+    bottom: 7px;
+
+    width: 3px;
+
+    border-radius: 0 5px 5px 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            #00cfff,
+            #546dff
+        );
+
+    box-shadow:
+        0 0 12px #149cff;
+}
+
+.nav-item.active i {
+    color: #4ab7ff;
+}
+
+.nav-item.notification b {
+    margin-left: auto;
+
+    min-width: 21px;
+    height: 21px;
+
+    display: grid;
+    place-items: center;
+
+    padding: 0 5px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff3b67,
+            #ff1451
+        );
+
+    color: white;
+
+    font-size: 10px;
+
+    box-shadow:
+        0 0 12px rgba(255, 52, 101, 0.4);
+
+    animation: notificationPulse 2s infinite;
+}
+
+
+/* =========================================================
+   8. ADMIN CARD
+   ========================================================= */
+
+.admin-card {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    margin-top: 20px;
+
+    padding: 12px;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(17, 51, 102, 0.65),
+            rgba(11, 23, 51, 0.85)
+        );
+
+    border: 1px solid rgba(62, 137, 255, 0.16);
+
+    overflow: hidden;
+}
+
+.admin-card::before {
+    content: "";
+
+    position: absolute;
+
+    width: 80px;
+    height: 80px;
+
+    right: -30px;
+    top: -35px;
+
+    border-radius: 50%;
+
+    background: rgba(53, 131, 255, 0.1);
+
+    filter: blur(15px);
+}
+
+.admin-avatar {
+    width: 40px;
+    height: 40px;
+
+    flex-shrink: 0;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #126cff,
+            #7542ff
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 0 18px rgba(50, 117, 255, 0.3);
+}
+
+.admin-card strong {
+    display: block;
+
+    font-size: 12px;
+}
+
+.admin-card span {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #7085a4;
+
+    font-size: 10px;
+}
+
+.admin-card small {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    margin-top: 5px;
+
+    color: #43d9a7;
+
+    font-size: 9px;
+}
+
+.admin-card small i {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #28dc9e;
+
+    box-shadow:
+        0 0 8px #28dc9e;
+
+    animation: onlinePulse 1.8s infinite;
+}
+
+
+/* =========================================================
+   9. MAIN
+   ========================================================= */
+
+.main {
+    width: calc(100% - var(--sidebar-width));
+
+    margin-left: var(--sidebar-width);
+
+    min-width: 0;
+
+    padding: 0 30px 35px;
+
+    position: relative;
+}
+
+
+/* =========================================================
+   10. HEADER
+   ========================================================= */
+
+.header {
+    height: 82px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    border-bottom: 1px solid rgba(90, 136, 201, 0.12);
+
+    position: relative;
+}
+
+.header::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: -1px;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(54, 144, 255, 0.35),
+            transparent
+        );
+}
+
+.header h1 {
+    font-size: 25px;
+
+    font-weight: 750;
+
+    letter-spacing: -0.7px;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 5px;
+
+    font-size: 11px;
+
+    color: #637895;
+}
+
+.breadcrumb a {
+    transition: color 0.2s ease;
+}
+
+.breadcrumb a:hover {
+    color: var(--blue-light);
+}
+
+.breadcrumb i {
+    font-size: 8px;
+}
+
+.breadcrumb strong {
+    color: #a9bad2;
+}
+
+
+/* =========================================================
+   11. HEADER RIGHT
+   ========================================================= */
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search {
+    width: 270px;
+
+    height: 39px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 0 13px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(8, 26, 53, 0.72);
+
+    border: 1px solid rgba(67, 133, 220, 0.2);
+
+    transition: var(--transition);
+}
+
+.search:focus-within {
+    border-color: rgba(45, 153, 255, 0.65);
+
+    box-shadow:
+        0 0 0 3px rgba(37, 132, 255, 0.08),
+        0 0 20px rgba(37, 132, 255, 0.08);
+}
+
+.search i {
+    color: #6e89ad;
+}
+
+.search input {
+    width: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    font-size: 11px;
+}
+
+.search input::placeholder {
+    color: #627a9b;
+}
+
+.header-icon {
+    position: relative;
+
+    width: 39px;
+    height: 39px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid rgba(68, 135, 220, 0.16);
+
+    border-radius: 10px;
+
+    background: rgba(8, 25, 50, 0.7);
+
+    color: #8da4c3;
+
+    transition: var(--transition);
+}
+
+.header-icon:hover {
+    color: #ffffff;
+
+    border-color: rgba(45, 151, 255, 0.5);
+
+    background: rgba(21, 61, 112, 0.55);
+
+    transform: translateY(-2px);
+}
+
+.header-icon b {
+    position: absolute;
+
+    top: -5px;
+    right: -5px;
+
+    min-width: 17px;
+    height: 17px;
+
+    display: grid;
+    place-items: center;
+
+    padding: 0 4px;
+
+    border-radius: 50%;
+
+    background: #ff3b68;
+
+    color: #ffffff;
+
+    font-size: 8px;
+
+    border: 2px solid var(--bg-primary);
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 5px 7px 5px 5px;
+
+    border-radius: 11px;
+
+    cursor: pointer;
+
+    transition: var(--transition);
+}
+
+.profile:hover {
+    background: rgba(39, 84, 145, 0.2);
+}
+
+.profile-avatar {
+    width: 35px;
+    height: 35px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #146bff,
+            #6b39ff
+        );
+
+    color: white;
+
+    box-shadow:
+        0 0 15px rgba(50, 108, 255, 0.25);
+}
+
+.profile strong {
+    display: block;
+
+    font-size: 11px;
+}
+
+.profile span {
+    display: block;
+
+    color: #6f85a4;
+
+    font-size: 9px;
+
+    margin-top: 2px;
+}
+
+.profile > i {
+    margin-left: 3px;
+
+    color: #607695;
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   12. TOOLBAR
+   ========================================================= */
+
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    padding: 20px 0;
+}
+
+.date-picker,
+.refresh {
+    min-height: 38px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 0 14px;
+
+    border-radius: 9px;
+
+    background:
+        rgba(7, 23, 47, 0.7);
+
+    border: 1px solid rgba(64, 132, 219, 0.18);
+
+    color: #8da3c0;
+
+    font-size: 10px;
+
+    transition: var(--transition);
+}
+
+.date-picker:hover,
+.refresh:hover {
+    color: #ffffff;
+
+    border-color: rgba(56, 151, 255, 0.48);
+
+    background: rgba(17, 49, 91, 0.75);
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.refresh i {
+    transition: transform 0.5s ease;
+}
+
+.refresh:hover i {
+    transform: rotate(180deg);
+}
+
+
+/* =========================================================
+   13. KPI GRID
+   ========================================================= */
+
+.kpi-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(6, minmax(0, 1fr));
+
+    gap: 13px;
+
+    margin-bottom: 16px;
+}
+
+.kpi-card {
+    position: relative;
+
+    min-height: 125px;
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: 13px;
+
+    padding: 18px;
+
+    border-radius: var(--radius-lg);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10, 28, 58, 0.9),
+            rgba(4, 15, 34, 0.88)
+        );
+
+    border: 1px solid rgba(67, 137, 227, 0.15);
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.22);
+
+    overflow: hidden;
+
+    transition:
+        transform 0.35s ease,
+        border-color 0.35s ease,
+        box-shadow 0.35s ease;
+}
+
+.kpi-card::before {
+    content: "";
+
+    position: absolute;
+
+    width: 130px;
+    height: 130px;
+
+    right: -55px;
+    bottom: -75px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(29, 136, 255, 0.18),
+            transparent 65%
+        );
+
+    transition: transform 0.5s ease;
+}
+
+.kpi-card::after {
+    content: "";
+
+    position: absolute;
+
+    left: -100%;
+    top: 0;
+
+    width: 70%;
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(76, 172, 255, 0.8),
+            transparent
+        );
+
+    animation: cardScan 5s linear infinite;
+}
+
+.kpi-card:hover {
+    transform: translateY(-6px);
+
+    border-color:
+        rgba(57, 151, 255, 0.45);
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.35),
+        0 0 25px rgba(38, 131, 255, 0.08);
+}
+
+.kpi-card:hover::before {
+    transform: scale(1.5);
+}
+
+.kpi-icon {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 12px;
+
+    font-size: 17px;
+
+    position: relative;
+}
+
+.kpi-icon.blue {
+    color: #44adff;
+    background: rgba(29, 127, 255, 0.14);
+    box-shadow: inset 0 0 20px rgba(29, 127, 255, 0.08);
+}
+
+.kpi-icon.green {
+    color: #31e0ae;
+    background: rgba(0, 215, 158, 0.13);
+}
+
+.kpi-icon.purple {
+    color: #a77aff;
+    background: rgba(130, 60, 255, 0.14);
+}
+
+.kpi-icon.orange {
+    color: #ffae42;
+    background: rgba(255, 147, 36, 0.13);
+}
+
+.kpi-icon.cyan {
+    color: #27e5ff;
+    background: rgba(0, 207, 236, 0.12);
+}
+
+.kpi-icon.mint {
+    color: #4de5c0;
+    background: rgba(0, 217, 165, 0.12);
+}
+
+.kpi-card > div:last-child {
+    min-width: 0;
+}
+
+.kpi-card span {
+    display: block;
+
+    color: #8ea5c3;
+
+    font-size: 10px;
+}
+
+.kpi-card h3 {
+    margin-top: 7px;
+
+    font-size: 24px;
+
+    line-height: 1;
+
+    letter-spacing: -0.8px;
+}
+
+.kpi-card small {
+    display: inline-block;
+
+    margin-top: 7px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+.kpi-card small.positive {
+    color: #25dba5;
+}
+
+.kpi-card p {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #566d8d;
+
+    font-size: 8px;
+}
+
+
+/* =========================================================
+   14. DASHBOARD GRIDS
+   ========================================================= */
+
+.dashboard-grid {
+    display: grid;
+
+    gap: 15px;
+
+    margin-bottom: 15px;
+}
+
+.top-grid {
+    grid-template-columns:
+        1fr 1.15fr 1.25fr;
+}
+
+.second-grid {
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+}
+
+.bottom-grid {
+    grid-template-columns:
+        1.5fr 0.9fr;
+}
+
+
+/* =========================================================
+   15. PANELS
+   ========================================================= */
+
+.panel {
+    position: relative;
+
+    min-width: 0;
+
+    padding: 18px;
+
+    border-radius: var(--radius-lg);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(8, 25, 52, 0.9),
+            rgba(4, 15, 33, 0.9)
+        );
+
+    border: 1px solid rgba(68, 135, 219, 0.15);
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.2);
+
+    overflow: hidden;
+
+    transition:
+        border-color 0.3s ease,
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.panel::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at 100% 0%,
+            rgba(34, 125, 255, 0.07),
+            transparent 35%
+        );
+}
+
+.panel:hover {
+    border-color: rgba(64, 144, 242, 0.28);
+
+    box-shadow:
+        0 18px 50px rgba(0, 0, 0, 0.3);
+}
+
+.panel.compact {
+    min-height: 190px;
+}
+
+.panel-header {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 17px;
+}
+
+.panel-header h3 {
+    font-size: 13px;
+
+    font-weight: 700;
+
+    letter-spacing: -0.1px;
+}
+
+.panel-header > i {
+    color: #58708f;
+
+    font-size: 11px;
+
+    cursor: help;
+}
+
+.panel-header a {
+    color: #4ba9ff;
+
+    font-size: 10px;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   16. DONUT
+   ========================================================= */
+
+.donut-layout {
+    display: flex;
+    align-items: center;
+
+    gap: 17px;
+
+    min-height: 180px;
+}
+
+.donut {
+    width: 155px;
+    height: 155px;
+
+    flex-shrink: 0;
+
+    position: relative;
+}
+
+.donut canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.donut-center {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+}
+
+.donut-center strong {
+    font-size: 24px;
+}
+
+.donut-center span {
+    margin-top: 3px;
+
+    color: #6d84a2;
+
+    font-size: 8px;
+}
+
+.legend {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 11px;
+}
+
+.legend > div {
+    display: grid;
+
+    grid-template-columns:
+        9px 1fr auto;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: #7f95b2;
+
+    font-size: 9px;
+}
+
+.legend strong {
+    color: #dbe8f8;
+
+    font-size: 10px;
+}
+
+.dot {
+    width: 7px;
+    height: 7px;
+
+    display: block;
+
+    border-radius: 50%;
+}
+
+.dot.excellent {
+    background: #10d6a0;
+    box-shadow: 0 0 7px rgba(16,214,160,0.45);
+}
+
+.dot.good {
+    background: #28a8ff;
+    box-shadow: 0 0 7px rgba(40,168,255,0.4);
+}
+
+.dot.average {
+    background: #ffb429;
+    box-shadow: 0 0 7px rgba(255,180,41,0.4);
+}
+
+.dot.poor {
+    background: #ff704b;
+    box-shadow: 0 0 7px rgba(255,112,75,0.4);
+}
+
+.dot.critical {
+    background: #ff3d69;
+    box-shadow: 0 0 7px rgba(255,61,105,0.4);
+}
+
+
+/* =========================================================
+   17. PANEL LINKS
+   ========================================================= */
+
+.panel-link {
+    position: relative;
+
+    display: block;
+
+    margin-top: 15px;
+
+    padding-top: 13px;
+
+    border-top: 1px solid rgba(255,255,255,0.05);
+
+    color: #4aa8ff;
+
+    font-size: 9px;
+
+    transition: var(--transition);
+}
+
+.panel-link:hover {
+    color: #7dc5ff;
+
+    transform: translateX(3px);
+}
+
+
+/* =========================================================
+   18. PROCUREMENT CHART
+   ========================================================= */
+
+.chart-legend {
+    display: flex;
+    gap: 18px;
+
+    margin-bottom: 5px;
+}
+
+.chart-legend span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #7389a7;
+
+    font-size: 9px;
+}
+
+.line {
+    width: 16px;
+    height: 2px;
+
+    border-radius: 5px;
+}
+
+.purple-line {
+    background: #8b5cf6;
+
+    box-shadow:
+        0 0 8px rgba(139, 92, 246, 0.7);
+}
+
+.green-line {
+    background: #16d6a2;
+
+    box-shadow:
+        0 0 8px rgba(22, 214, 162, 0.7);
+}
+
+.panel canvas {
+    max-height: 215px;
+}
+
+
+/* =========================================================
+   19. TABLES
+   ========================================================= */
+
+.panel table {
+    font-size: 9px;
+}
+
+.panel thead th {
+    padding: 9px 6px;
+
+    color: #607694;
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    text-align: left;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.06);
+}
+
+.panel tbody td {
+    padding: 10px 6px;
+
+    color: #9eb0c9;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.035);
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.panel tbody tr:hover td {
+    color: #e9f4ff;
+
+    background:
+        rgba(37, 120, 220, 0.055);
+}
+
+.panel tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   20. STAT ROW
+   ========================================================= */
+
+.stat-row {
+    display: grid;
+
+    grid-template-columns:
+        40px 1fr auto;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 10px 0;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.04);
+}
+
+.stat-row:last-of-type {
+    border-bottom: none;
+}
+
+.mini-icon {
+    width: 34px;
+    height: 34px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+}
+
+.mini-icon.blue {
+    color: #42a9ff;
+    background: rgba(42, 145, 255, 0.12);
+}
+
+.mini-icon.green {
+    color: #28dca7;
+    background: rgba(40, 220, 167, 0.11);
+}
+
+.stat-row small {
+    display: block;
+
+    color: #617794;
+
+    font-size: 8px;
+}
+
+.stat-row strong {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 13px;
+}
+
+.stat-row > strong {
+    color: #3ed7aa;
+}
+
+
+/* =========================================================
+   21. ALERT ROW
+   ========================================================= */
+
+.alert-row {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 11px 0;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.04);
+}
+
+.alert-row:last-of-type {
+    border-bottom: none;
+}
+
+.alert-row > i {
+    width: 30px;
+    height: 30px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 8px;
+
+    color: #ffae43;
+
+    background:
+        rgba(255, 159, 48, 0.1);
+}
+
+.alert-row strong {
+    min-width: 20px;
+
+    font-size: 14px;
+}
+
+.alert-row span {
+    color: #7c91ad;
+
+    font-size: 9px;
+}
+
+
+/* =========================================================
+   22. COMPLIANCE
+   ========================================================= */
+
+.compliance-layout {
+    display: flex;
+    align-items: center;
+
+    gap: 18px;
+}
+
+.small-donut {
+    position: relative;
+
+    width: 105px;
+    height: 105px;
+
+    flex-shrink: 0;
+}
+
+.small-donut canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.small-donut > strong {
+    position: absolute;
+
+    inset: 0;
+
+    display: grid;
+    place-items: center;
+
+    font-size: 17px;
+}
+
+
+/* =========================================================
+   23. INVOICES
+   ========================================================= */
+
+.invoice-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 10px 0;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.04);
+}
+
+.invoice-row:last-of-type {
+    border-bottom: none;
+}
+
+.invoice-row span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #788eab;
+
+    font-size: 9px;
+}
+
+.invoice-row span i {
+    width: 20px;
+
+    text-align: center;
+
+    color: #4baaff;
+}
+
+.invoice-row strong {
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   24. PURCHASE ORDER TABLE
+   ========================================================= */
+
+.orders-panel {
+    min-height: 275px;
+}
+
+.orders-panel .panel-header a {
+    color: #4daaff;
+
+    font-size: 9px;
+}
+
+.orders-panel table {
+    min-width: 560px;
+}
+
+.orders-panel {
+    overflow-x: auto;
+}
+
+.orders-panel::-webkit-scrollbar {
+    height: 4px;
+}
+
+.orders-panel::-webkit-scrollbar-thumb {
+    background: rgba(71, 144, 235, 0.2);
+    border-radius: 10px;
+}
+
+
+/* =========================================================
+   25. STATUS BADGES
+   ========================================================= */
+
+.status,
+.badge,
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 8px;
+
+    border-radius: 20px;
+
+    font-size: 8px;
+
+    font-weight: 700;
+}
+
+.status.active,
+.status.completed,
+.status.paid,
+.badge.success {
+    color: #3ce0ad;
+
+    background:
+        rgba(31, 218, 163, 0.1);
+
+    border: 1px solid rgba(31, 218, 163, 0.16);
+}
+
+.status.pending,
+.badge.warning {
+    color: #ffbe4b;
+
+    background:
+        rgba(255, 182, 64, 0.1);
+
+    border: 1px solid rgba(255, 182, 64, 0.16);
+}
+
+.status.cancelled,
+.status.failed,
+.status.overdue,
+.badge.danger {
+    color: #ff6481;
+
+    background:
+        rgba(255, 65, 108, 0.1);
+
+    border: 1px solid rgba(255, 65, 108, 0.16);
+}
+
+
+/* =========================================================
+   26. SYSTEM ACTIVITY
+   ========================================================= */
+
+.activity-list {
+    position: relative;
+
+    padding-left: 5px;
+}
+
+.activity-list::before {
+    content: "";
+
+    position: absolute;
+
+    left: 10px;
+    top: 7px;
+    bottom: 7px;
+
+    width: 1px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(50, 162, 255, 0.45),
+            rgba(50, 162, 255, 0.05)
+        );
+}
+
+.activity-item {
+    position: relative;
+
+    display: flex;
+
+    gap: 12px;
+
+    padding: 7px 0 13px;
+}
+
+.activity-dot {
+    position: relative;
+
+    z-index: 2;
+
+    width: 12px;
+    height: 12px;
+
+    margin-top: 3px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background:
+        #1a8fff;
+
+    border: 3px solid #07182f;
+
+    box-shadow:
+        0 0 8px rgba(26, 143, 255, 0.65);
+}
+
+.activity-content strong {
+    display: block;
+
+    color: #c6d5e9;
+
+    font-size: 9px;
+}
+
+.activity-content span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #637a99;
+
+    font-size: 8px;
+}
+
+.activity-time {
+    margin-left: auto;
+
+    color: #526a88;
+
+    font-size: 7px;
+}
+
+
+/* =========================================================
+   27. SYSTEM HEALTH
+   ========================================================= */
+
+.health-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.health-list > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 10px 0;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.04);
+}
+
+.health-list > div:last-child {
+    border-bottom: none;
+}
+
+.health-list span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #8398b4;
+
+    font-size: 9px;
+}
+
+.health-list span i {
+    width: 20px;
+
+    text-align: center;
+
+    color: #4aa8ff;
+}
+
+.health-list b {
+    position: relative;
+
+    padding-left: 11px;
+
+    color: #3bdbab;
+
+    font-size: 8px;
+}
+
+.health-list b::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 50%;
+
+    width: 5px;
+    height: 5px;
+
+    transform: translateY(-50%);
+
+    border-radius: 50%;
+
+    background: #29dca4;
+
+    box-shadow:
+        0 0 7px #29dca4;
+}
+
+
+/* =========================================================
+   28. FOOTER STATS
+   ========================================================= */
+
+.footer-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(6, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-top: 15px;
+}
+
+.footer-stats > div {
+    position: relative;
+
+    min-height: 105px;
+
+    padding: 16px;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(8, 25, 51, 0.82),
+            rgba(4, 14, 31, 0.85)
+        );
+
+    border:
+        1px solid rgba(66, 133, 214, 0.13);
+
+    overflow: hidden;
+
+    transition: var(--transition);
+}
+
+.footer-stats > div:hover {
+    transform: translateY(-4px);
+
+    border-color:
+        rgba(54, 148, 255, 0.35);
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.footer-stats i {
+    display: block;
+
+    margin-bottom: 10px;
+
+    color: #45aaff;
+
+    font-size: 13px;
+}
+
+.footer-stats span {
+    display: block;
+
+    color: #7087a4;
+
+    font-size: 8px;
+}
+
+.footer-stats strong {
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 16px;
+}
+
+.footer-stats strong small {
+    color: #687f9e;
+
+    font-size: 8px;
+}
+
+.spark {
+    position: absolute;
+
+    right: 13px;
+    bottom: 13px;
+
+    width: 48px;
+    height: 17px;
+
+    opacity: 0.8;
+
+    background:
+        linear-gradient(
+            135deg,
+            transparent 35%,
+            #208eff 36%,
+            #208eff 40%,
+            transparent 41%,
+            transparent 53%,
+            #22cfa7 54%,
+            #22cfa7 58%,
+            transparent 59%
+        );
+}
+
+
+/* =========================================================
+   29. VENDOR APPROVAL SECTION
+   ========================================================= */
+
+.dashboard-section {
+    margin-top: 16px;
+}
+
+.vendor-approval-card,
+.card {
+    position: relative;
+
+    padding: 20px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(8, 25, 52, 0.92),
+            rgba(4, 14, 31, 0.92)
+        );
+
+    border:
+        1px solid rgba(65, 137, 225, 0.17);
+
+    box-shadow:
+        0 20px 45px rgba(0,0,0,0.22);
+
+    overflow: hidden;
+}
+
+.vendor-approval-card::before {
+    content: "";
+
+    position: absolute;
+
+    width: 250px;
+    height: 250px;
+
+    right: -100px;
+    top: -150px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(57, 129, 255, 0.11),
+            transparent 68%
+        );
+
+    pointer-events: none;
+}
+
+.card-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 18px;
+}
+
+.card-header h2 {
+    font-size: 17px;
+
+    font-weight: 750;
+}
+
+.section-subtitle {
+    margin-top: 5px;
+
+    color: #687f9e;
+
+    font-size: 9px;
+}
+
+.pending-count {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 8px 12px;
+
+    border-radius: 20px;
+
+    color: #ffbd4b;
+
+    background:
+        rgba(255, 179, 55, 0.1);
+
+    border:
+        1px solid rgba(255, 179, 55, 0.18);
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   30. APPROVAL TABLE
+   ========================================================= */
+
+.table-container {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border:
+        1px solid rgba(70, 135, 213, 0.1);
+
+    border-radius: 13px;
+}
+
+.table-container::-webkit-scrollbar {
+    height: 5px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.02);
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: rgba(55, 137, 232, 0.25);
+
+    border-radius: 10px;
+}
+
+.approval-table {
+    min-width: 850px;
+}
+
+.approval-table th {
+    padding: 13px 12px;
+
+    text-align: left;
+
+    color: #6c84a2;
+
+    background:
+        rgba(7, 24, 49, 0.8);
+
+    font-size: 8px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.7px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.05);
+}
+
+.approval-table td {
+    padding: 13px 12px;
+
+    color: #a8bad1;
+
+    font-size: 9px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.04);
+
+    transition: background 0.25s ease;
+}
+
+.approval-table tbody tr:hover td {
+    background:
+        rgba(33, 118, 217, 0.07);
+
+    color: #ffffff;
+}
+
+.approval-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.loading-cell {
+    padding: 30px !important;
+
+    text-align: center;
+
+    color: #6b82a1 !important;
+}
+
+
+/* =========================================================
+   31. BUTTONS
+   ========================================================= */
+
+.btn,
+button {
+    outline: none;
+}
+
+.btn-primary {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    min-height: 36px;
+
+    padding: 0 14px;
+
+    border: 1px solid rgba(55, 155, 255, 0.4);
+
+    border-radius: 9px;
+
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #087fff,
+            #5c36ff
+        );
+
+    box-shadow:
+        0 8px 22px rgba(45, 105, 255, 0.22);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    transition: var(--transition);
+
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: -100%;
+
+    width: 70%;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,0.2),
+            transparent
+        );
+
+    transition: left 0.5s ease;
+}
+
+.btn-primary:hover::before {
+    left: 130%;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 30px rgba(45, 105, 255, 0.35);
+}
+
+
+/* =========================================================
+   32. FORM ELEMENTS
+   ========================================================= */
+
+input,
+select,
+textarea {
+    color: #e9f3ff;
+
+    background:
+        rgba(5, 18, 39, 0.85);
+
+    border:
+        1px solid rgba(70, 139, 219, 0.2);
+
+    border-radius: 9px;
+
+    outline: none;
+
+    transition: var(--transition);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color:
+        rgba(48, 151, 255, 0.6);
+
+    box-shadow:
+        0 0 0 3px rgba(48, 151, 255, 0.08);
+}
+
+select option {
+    background: #07172f;
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   33. SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar {
+    width: 7px;
+}
+
+::-webkit-scrollbar-track {
+    background: #020918;
+}
+
+::-webkit-scrollbar-thumb {
+    background:
+        linear-gradient(
+            180deg,
+            #114c86,
+            #1c2d54
+        );
+
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background:
+        linear-gradient(
+            180deg,
+            #197dd0,
+            #493f9c
+        );
+}
+
+
+/* =========================================================
+   34. SELECTION
+   ========================================================= */
+
+::selection {
+    background: rgba(37, 143, 255, 0.35);
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   35. ANIMATIONS
+   ========================================================= */
+
+@keyframes pulseBorder {
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.9;
+        transform: scale(1.08);
+    }
+}
+
+@keyframes notificationPulse {
+    0% {
+        box-shadow:
+            0 0 0 0 rgba(255, 52, 101, 0.45);
+    }
+
+    70% {
+        box-shadow:
+            0 0 0 7px rgba(255, 52, 101, 0);
+    }
+
+    100% {
+        box-shadow:
+            0 0 0 0 rgba(255, 52, 101, 0);
+    }
+}
+
+@keyframes onlinePulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.45;
+        transform: scale(0.75);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes cardScan {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 130%;
+    }
+}
+
+@keyframes floatUp {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes glow {
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+
+/* =========================================================
+   36. LOAD ANIMATION
+   ========================================================= */
+
+.kpi-card,
+.panel,
+.footer-stats > div,
+.vendor-approval-card {
+    animation:
+        dashboardFade 0.65s ease both;
+}
+
+.kpi-card:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.kpi-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.kpi-card:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.kpi-card:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.kpi-card:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.kpi-card:nth-child(6) {
+    animation-delay: 0.3s;
+}
+
+@keyframes dashboardFade {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   37. CHART CONTAINER
+   ========================================================= */
+
+canvas {
+    filter:
+        drop-shadow(
+            0 0 4px rgba(42, 143, 255, 0.05)
+        );
+}
+
+
+/* =========================================================
+   38. EMPTY STATES
+   ========================================================= */
+
+.empty-state {
+    min-height: 120px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    color: #617896;
+
+    font-size: 10px;
+}
+
+.empty-state i {
+    color: #315578;
+
+    font-size: 22px;
+}
+
+
+/* =========================================================
+   39. TOOLTIP-LIKE ELEMENTS
+   ========================================================= */
+
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+
+    position: absolute;
+
+    left: 50%;
+    bottom: calc(100% + 8px);
+
+    transform:
+        translateX(-50%)
+        translateY(5px);
+
+    padding: 6px 9px;
+
+    border-radius: 6px;
+
+    color: #dcecff;
+
+    background: #071a35;
+
+    border:
+        1px solid rgba(62, 139, 229, 0.2);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.35);
+
+    font-size: 9px;
+
+    white-space: nowrap;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+
+    z-index: 100;
+}
+
+[data-tooltip]:hover::after {
+    opacity: 1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+
+/* =========================================================
+   40. RESPONSIVE - LARGE LAPTOP
+   ========================================================= */
+
+@media (max-width: 1500px) {
+
+    .kpi-grid {
+        grid-template-columns:
+            repeat(3, 1fr);
+    }
+
+    .top-grid {
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .top-grid .panel:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .footer-stats {
+        grid-template-columns:
+            repeat(6, 1fr);
+    }
+}
+
+
+/* =========================================================
+   41. RESPONSIVE - TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    :root {
+        --sidebar-width: 78px;
+    }
+
+    .sidebar {
+        width: 78px;
+
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .brand {
+        justify-content: center;
+
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .brand > div:last-child,
+    .menu-title,
+    .nav-item span,
+    .nav-item b,
+    .admin-card > div:last-child {
+        display: none;
+    }
+
+    .brand {
+        border-bottom: none;
+    }
+
+    .brand-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .nav-item {
+        justify-content: center;
+
+        padding: 12px;
+    }
+
+    .nav-item i {
+        width: auto;
+
+        font-size: 17px;
+    }
+
+    .admin-card {
+        justify-content: center;
+
+        padding: 8px;
+    }
+
+    .main {
+        width: calc(100% - 78px);
+
+        margin-left: 78px;
+    }
+
+    .header {
+        flex-wrap: wrap;
+
+        height: auto;
+
+        padding: 20px 0;
+    }
+
+    .header-right {
+        width: 100%;
+    }
+
+    .search {
+        flex: 1;
+    }
+
+    .second-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .bottom-grid {
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .orders-panel {
+        grid-column: 1 / -1;
+    }
+
+    .footer-stats {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+}
+
+
+/* =========================================================
+   42. RESPONSIVE - MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    :root {
+        --sidebar-width: 0px;
+    }
+
+    body {
+        font-size: 14px;
+    }
+
+    .sidebar {
+        position: fixed;
+
+        width: 250px;
+
+        transform:
+            translateX(-100%);
+
+        transition:
+            transform 0.35s ease;
+    }
+
+    .sidebar.mobile-open {
+        transform:
+            translateX(0);
+    }
+
+    .main {
+        width: 100%;
+
+        margin-left: 0;
+
+        padding:
+            0 14px 25px;
+    }
+
+    .header {
+        padding: 15px 0;
+    }
+
+    .header h1 {
+        font-size: 21px;
+    }
+
+    .header-right {
+        flex-wrap: wrap;
+    }
+
+    .search {
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+    .profile > div:nth-child(2),
+    .profile > i {
+        display: none;
+    }
+
+    .toolbar {
+        justify-content: stretch;
+    }
+
+    .date-picker,
+    .refresh {
+        flex: 1;
+
+        justify-content: center;
+    }
+
+    .kpi-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .top-grid,
+    .second-grid,
+    .bottom-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .top-grid .panel:last-child {
+        grid-column: auto;
+    }
+
+    .orders-panel {
+        grid-column: auto;
+    }
+
+    .footer-stats {
+        grid-template-columns:
+            1fr;
+    }
+
+    .donut-layout {
+        justify-content: center;
+    }
+
+    .card-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .pending-count {
+        align-self: flex-start;
+    }
+}
+
+
+/* =========================================================
+   43. REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
+/* =========================================================
+   44. EXTRA NEON EFFECTS
+   ========================================================= */
+
+.kpi-card:nth-child(1):hover {
+    box-shadow:
+        0 18px 45px rgba(0,0,0,0.35),
+        0 0 25px rgba(36,149,255,0.12);
+}
+
+.kpi-card:nth-child(2):hover {
+    box-shadow:
+        0 18px 45px rgba(0,0,0,0.35),
+        0 0 25px rgba(0,217,165,0.1);
+}
+
+.kpi-card:nth-child(3):hover {
+    box-shadow:
+        0 18px 45px rgba(0,0,0,0.35),
+        0 0 25px rgba(124,60,255,0.12);
+}
+
+.kpi-card:nth-child(4):hover {
+    box-shadow:
+        0 18px 45px rgba(0,0,0,0.35),
+        0 0 25px rgba(255,157,46,0.1);
+}
+
+.kpi-card:nth-child(5):hover {
+    box-shadow:
+        0 18px 45px rgba(0,0,0,0.35),
+        0 0 25px rgba(0,229,255,0.1);
+}
+
+.kpi-card:nth-child(6):hover {
+    box-shadow:
+        0 18px 45px rgba(0,0,0,0.35),
+        0 0 25px rgba(0,217,165,0.1);
+}
+
+
+/* =========================================================
+   45. GLASS HIGHLIGHT
+   ========================================================= */
+
+.panel,
+.kpi-card,
+.footer-stats > div,
+.vendor-approval-card {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+
+/* =========================================================
+   46. FOCUS ACCESSIBILITY
+   ========================================================= */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline:
+        2px solid rgba(53, 159, 255, 0.7);
+
+    outline-offset: 2px;
+}
+
+
+/* =========================================================
+   47. FINAL POLISH
+   ========================================================= */
+
+strong,
+h1,
+h2,
+h3 {
+    text-rendering: optimizeLegibility;
+}
+
+.panel-link,
+.nav-item,
+button,
+.profile {
+    user-select: none;
+}
+
+.fa-solid,
+.fa-regular {
+    line-height: 1;
+}
+
+
+/* =========================================================
+   END - VendorIQ Advanced Dark Admin Dashboard
+   ========================================================= */

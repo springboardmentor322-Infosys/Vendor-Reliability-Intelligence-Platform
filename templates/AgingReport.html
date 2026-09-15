@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Aging Report - VendorIQ</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet">
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+* {
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root {
+    --bg:#020817;
+    --sidebar:#061329;
+    --card:rgba(10,25,48,.88);
+    --border:rgba(148,163,184,.15);
+    --text:#e5eefb;
+    --muted:#91a4bd;
+    --blue:#3b82f6;
+}
+
+body {
+    font-family:Inter,sans-serif;
+    background:
+        radial-gradient(circle at 80% 10%,rgba(139,92,246,.1),transparent 30%),
+        var(--bg);
+    color:var(--text);
+    min-height:100vh;
+}
+
+.sidebar {
+    width:260px;
+    position:fixed;
+    inset:0 auto 0 0;
+    background:rgba(6,19,41,.97);
+    border-right:1px solid var(--border);
+    padding:25px 16px;
+}
+
+.brand {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:21px;
+    font-weight:800;
+    margin-bottom:35px;
+}
+
+.brand-icon {
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(135deg,#3b82f6,#06b6d4);
+}
+
+.nav-title {
+    color:#607594;
+    font-size:11px;
+    text-transform:uppercase;
+    margin:20px 10px 10px;
+}
+
+.nav a {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:13px;
+    border-radius:10px;
+    color:var(--muted);
+    text-decoration:none;
+    margin-bottom:5px;
+}
+
+.nav a:hover,
+.nav a.active {
+    color:white;
+    background:rgba(59,130,246,.14);
+}
+
+.main {
+    margin-left:260px;
+    padding:30px;
+}
+
+.header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.header h1 {
+    font-size:27px;
+}
+
+.header p {
+    color:var(--muted);
+    margin-top:5px;
+}
+
+.actions {
+    display:flex;
+    gap:9px;
+}
+
+.btn {
+    border:1px solid var(--border);
+    background:#0e203a;
+    color:white;
+    padding:11px 16px;
+    border-radius:9px;
+    cursor:pointer;
+    font-family:inherit;
+    font-weight:600;
+}
+
+.btn-primary {
+    background:linear-gradient(135deg,#3b82f6,#2563eb);
+    border:none;
+}
+
+.filters {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:15px;
+    padding:20px;
+    display:grid;
+    grid-template-columns:1fr 1fr auto;
+    gap:15px;
+    align-items:end;
+    margin-bottom:20px;
+}
+
+label {
+    display:block;
+    color:#b8c7da;
+    font-size:12px;
+    margin-bottom:7px;
+    font-weight:600;
+}
+
+input {
+    width:100%;
+    background:#020817;
+    border:1px solid var(--border);
+    color:white;
+    padding:12px;
+    border-radius:9px;
+    outline:none;
+}
+
+.summary {
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.summary-card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:17px;
+}
+
+.summary-card span {
+    color:var(--muted);
+    font-size:11px;
+}
+
+.summary-card strong {
+    display:block;
+    font-size:18px;
+    margin-top:9px;
+}
+
+.chart-grid {
+    display:grid;
+    grid-template-columns:1fr 1.6fr;
+    gap:20px;
+    margin-bottom:20px;
+}
+
+.card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:22px;
+}
+
+.card h2 {
+    font-size:17px;
+    margin-bottom:18px;
+}
+
+.chart-container {
+    height:310px;
+    position:relative;
+}
+
+.table-wrap {
+    overflow:auto;
+}
+
+table {
+    width:100%;
+    min-width:900px;
+    border-collapse:collapse;
+}
+
+th,
+td {
+    padding:13px 10px;
+    border-bottom:1px solid var(--border);
+    text-align:left;
+}
+
+th {
+    color:var(--muted);
+    font-size:11px;
+    text-transform:uppercase;
+}
+
+td {
+    font-size:13px;
+}
+
+.total {
+    font-weight:700;
+}
+
+.bad {
+    color:#f87171;
+}
+
+.good {
+    color:#4ade80;
+}
+
+.empty {
+    text-align:center;
+    padding:40px;
+    color:var(--muted);
+}
+
+@media(max-width:1200px) {
+    .summary {
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .chart-grid {
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:800px) {
+    .sidebar {display:none;}
+    .main {margin-left:0;padding:18px;}
+    .filters {grid-template-columns:1fr;}
+    .summary {grid-template-columns:1fr 1fr;}
+}
+
+@media(max-width:500px) {
+    .summary {grid-template-columns:1fr;}
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+<div class="brand">
+    <div class="brand-icon">
+        <i class="fa-solid fa-chart-line"></i>
+    </div>
+    VendorIQ
+</div>
+
+<div class="nav-title">Finance</div>
+
+<nav class="nav">
+
+<a href="/AccountsReceivable">
+    <i class="fa-solid fa-file-invoice-dollar"></i>
+    Accounts Receivable
+</a>
+
+<a href="/AccountsReceivable/CreateInvoice">
+    <i class="fa-solid fa-file-circle-plus"></i>
+    Create Invoice
+</a>
+
+<a href="/AccountsPayable/RecordPayment">
+    <i class="fa-solid fa-credit-card"></i>
+    Record Payment
+</a>
+
+<a href="/AccountsReceivable/CustomerStatements">
+    <i class="fa-solid fa-user"></i>
+    Customer Statements
+</a>
+
+<a href="/AccountsReceivable/OverdueInvoices">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    Overdue Invoices
+</a>
+
+<a href="/AccountsReceivable/Agingreport" class="active">
+    <i class="fa-solid fa-chart-pie"></i>
+    Aging Report
+</a>
+
+</nav>
+
+</aside>
+
+<main class="main">
+
+<div class="header">
+
+<div>
+    <h1>Accounts Receivable Aging Report</h1>
+    <p>Analyze outstanding receivables by aging period.</p>
+</div>
+
+<div class="actions">
+
+<button class="btn"
+        onclick="loadReport()">
+    <i class="fa-solid fa-rotate"></i>
+    Refresh
+</button>
+
+<button class="btn btn-primary"
+        onclick="exportCSV()">
+    <i class="fa-solid fa-download"></i>
+    Export
+</button>
+
+</div>
+
+</div>
+
+<div class="filters">
+
+<div>
+    <label>From Date</label>
+    <input type="date" id="fromDate">
+</div>
+
+<div>
+    <label>To Date</label>
+    <input type="date" id="toDate">
+</div>
+
+<button class="btn btn-primary"
+        onclick="loadReport()">
+    Generate Report
+</button>
+
+</div>
+
+<div class="summary">
+
+<div class="summary-card">
+    <span>Total Receivables</span>
+    <strong id="total">₹0.00</strong>
+</div>
+
+<div class="summary-card">
+    <span>Current</span>
+    <strong id="current">₹0.00</strong>
+</div>
+
+<div class="summary-card">
+    <span>0-30 Days</span>
+    <strong id="days30">₹0.00</strong>
+</div>
+
+<div class="summary-card">
+    <span>31-60 Days</span>
+    <strong id="days60">₹0.00</strong>
+</div>
+
+<div class="summary-card">
+    <span>61-90 Days</span>
+    <strong id="days90">₹0.00</strong>
+</div>
+
+<div class="summary-card">
+    <span>90+ Days</span>
+    <strong id="days120">₹0.00</strong>
+</div>
+
+</div>
+
+<div class="chart-grid">
+
+<div class="card">
+
+<h2>
+    <i class="fa-solid fa-chart-pie"></i>
+    Aging Distribution
+</h2>
+
+<div class="chart-container">
+    <canvas id="agingChart"></canvas>
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>
+    <i class="fa-solid fa-chart-column"></i>
+    Aging Summary
+</h2>
+
+<div class="chart-container">
+    <canvas id="barChart"></canvas>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>
+    <i class="fa-solid fa-table"></i>
+    Customer Aging Details
+</h2>
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+    <th>Customer</th>
+    <th>Current</th>
+    <th>0-30</th>
+    <th>31-60</th>
+    <th>61-90</th>
+    <th>91-120</th>
+    <th>120+</th>
+    <th>Total</th>
+</tr>
+</thead>
+
+<tbody id="agingTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</main>
+
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+
+let agingChart = null;
+let barChart = null;
+let reportData = null;
+
+function getToken() {
+
+    return localStorage.getItem("access_token") ||
+           localStorage.getItem("token") ||
+           sessionStorage.getItem("access_token") ||
+           sessionStorage.getItem("token") ||
+           "";
+}
+
+async function apiFetch(url, options = {}) {
+
+    const token = getToken();
+
+    const headers = {
+        "Content-Type":"application/json",
+        ...(options.headers || {})
+    };
+
+    if (token) {
+        headers.Authorization =
+            `Bearer ${token}`;
+    }
+
+    const response =
+        await fetch(API_BASE + url, {
+            ...options,
+            headers,
+            credentials:"include"
+        });
+
+    let data = {};
+
+    try {
+        data = await response.json();
+    } catch {}
+
+    if (!response.ok) {
+        throw new Error(
+            data.detail ||
+            data.message ||
+            `HTTP ${response.status}`
+        );
+    }
+
+    return data;
+}
+
+function money(value) {
+
+    return new Intl.NumberFormat("en-IN", {
+        style:"currency",
+        currency:"INR"
+    }).format(Number(value) || 0);
+}
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+async function loadReport() {
+
+    try {
+
+        const params =
+            new URLSearchParams({
+                from_date:
+                    document.getElementById("fromDate").value,
+
+                to_date:
+                    document.getElementById("toDate").value
+            });
+
+        const data =
+            await apiFetch(
+                `/api/finance/accounts-receivable/aging?${params}`
+            );
+
+        reportData = data;
+
+        renderSummary(data);
+        renderCharts(data);
+        renderTable(data);
+
+    } catch(error) {
+
+        document.getElementById("agingTable").innerHTML = `
+            <tr>
+                <td colspan="8">
+                    <div class="empty">
+                        Unable to load aging report.<br>
+                        ${escapeHTML(error.message)}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+function getBuckets(data) {
+
+    const source =
+        data.aging ||
+        data.buckets ||
+        data.summary ||
+        {};
+
+    return {
+
+        current:
+            Number(
+                source.current ??
+                source.current_amount ??
+                data.current ??
+                0
+            ),
+
+        days30:
+            Number(
+                source["0-30"] ??
+                source["0_30"] ??
+                source.days_0_30 ??
+                data.days_0_30 ??
+                0
+            ),
+
+        days60:
+            Number(
+                source["31-60"] ??
+                source["31_60"] ??
+                source.days_31_60 ??
+                data.days_31_60 ??
+                0
+            ),
+
+        days90:
+            Number(
+                source["61-90"] ??
+                source["61_90"] ??
+                source.days_61_90 ??
+                data.days_61_90 ??
+                0
+            ),
+
+        days120:
+            Number(
+                source["91-120"] ??
+                source["91_120"] ??
+                source.days_91_120 ??
+                data.days_91_120 ??
+                0
+            ),
+
+        over120:
+            Number(
+                source["120+"] ??
+                source.over_120 ??
+                source.days_120_plus ??
+                data.days_120_plus ??
+                0
+            )
+    };
+}
+
+function renderSummary(data) {
+
+    const buckets =
+        getBuckets(data);
+
+    const total =
+        buckets.current +
+        buckets.days30 +
+        buckets.days60 +
+        buckets.days90 +
+        buckets.days120 +
+        buckets.over120;
+
+    document.getElementById("total").textContent =
+        money(data.total_receivables ?? total);
+
+    document.getElementById("current").textContent =
+        money(buckets.current);
+
+    document.getElementById("days30").textContent =
+        money(buckets.days30);
+
+    document.getElementById("days60").textContent =
+        money(buckets.days60);
+
+    document.getElementById("days90").textContent =
+        money(buckets.days90);
+
+    document.getElementById("days120").textContent =
+        money(
+            buckets.days120 +
+            buckets.over120
+        );
+}
+
+function renderCharts(data) {
+
+    const buckets =
+        getBuckets(data);
+
+    const labels = [
+        "Current",
+        "0-30 Days",
+        "31-60 Days",
+        "61-90 Days",
+        "91-120 Days",
+        "120+ Days"
+    ];
+
+    const values = [
+        buckets.current,
+        buckets.days30,
+        buckets.days60,
+        buckets.days90,
+        buckets.days120,
+        buckets.over120
+    ];
+
+    if (agingChart)
+        agingChart.destroy();
+
+    if (barChart)
+        barChart.destroy();
+
+    const ctx =
+        document.getElementById("agingChart");
+
+    agingChart =
+        new Chart(ctx, {
+
+            type:"doughnut",
+
+            data:{
+                labels,
+                datasets:[{
+                    data:values,
+                    borderWidth:0
+                }]
+            },
+
+            options:{
+                responsive:true,
+                maintainAspectRatio:false,
+
+                plugins:{
+                    legend:{
+                        position:"bottom",
+                        labels:{
+                            color:"#b8c7da",
+                            padding:15
+                        }
+                    }
+                }
+            }
+
+        });
+
+    const barCtx =
+        document.getElementById("barChart");
+
+    barChart =
+        new Chart(barCtx, {
+
+            type:"bar",
+
+            data:{
+                labels,
+                datasets:[{
+                    label:"Receivables",
+                    data:values,
+                    borderRadius:7
+                }]
+            },
+
+            options:{
+                responsive:true,
+                maintainAspectRatio:false,
+
+                scales:{
+                    x:{
+                        ticks:{
+                            color:"#91a4bd"
+                        },
+                        grid:{
+                            color:"rgba(148,163,184,.08)"
+                        }
+                    },
+
+                    y:{
+                        ticks:{
+                            color:"#91a4bd",
+                            callback:value =>
+                                "₹" +
+                                Number(value).toLocaleString("en-IN")
+                        },
+                        grid:{
+                            color:"rgba(148,163,184,.08)"
+                        }
+                    }
+                },
+
+                plugins:{
+                    legend:{
+                        display:false
+                    }
+                }
+            }
+
+        });
+}
+
+function renderTable(data) {
+
+    const rows =
+        data.customers ||
+        data.customer_aging ||
+        data.details ||
+        data.records ||
+        [];
+
+    const tbody =
+        document.getElementById("agingTable");
+
+    if (!rows.length) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8">
+                    <div class="empty">
+                        No customer aging records found.
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    tbody.innerHTML =
+        rows.map(row => {
+
+            const current =
+                Number(row.current ?? 0);
+
+            const d30 =
+                Number(
+                    row["0-30"] ??
+                    row.days_0_30 ??
+                    row.days30 ??
+                    0
+                );
+
+            const d60 =
+                Number(
+                    row["31-60"] ??
+                    row.days_31_60 ??
+                    row.days60 ??
+                    0
+                );
+
+            const d90 =
+                Number(
+                    row["61-90"] ??
+                    row.days_61_90 ??
+                    row.days90 ??
+                    0
+                );
+
+            const d120 =
+                Number(
+                    row["91-120"] ??
+                    row.days_91_120 ??
+                    row.days120 ??
+                    0
+                );
+
+            const over120 =
+                Number(
+                    row["120+"] ??
+                    row.over_120 ??
+                    row.over120 ??
+                    0
+                );
+
+            const total =
+                Number(
+                    row.total ??
+                    current +
+                    d30 +
+                    d60 +
+                    d90 +
+                    d120 +
+                    over120
+                );
+
+            return `
+                <tr>
+
+                    <td>
+                        <strong>
+                            ${escapeHTML(
+                                row.customer_name ||
+                                row.customer ||
+                                row.name ||
+                                ""
+                            )}
+                        </strong>
+                    </td>
+
+                    <td class="good">${money(current)}</td>
+
+                    <td>${money(d30)}</td>
+
+                    <td>${money(d60)}</td>
+
+                    <td>${money(d90)}</td>
+
+                    <td class="bad">${money(d120)}</td>
+
+                    <td class="bad">${money(over120)}</td>
+
+                    <td class="total">${money(total)}</td>
+
+                </tr>
+            `;
+
+        }).join("");
+}
+
+function exportCSV() {
+
+    if (!reportData) {
+        alert("Generate the aging report first.");
+        return;
+    }
+
+    const rows =
+        reportData.customers ||
+        reportData.customer_aging ||
+        reportData.details ||
+        [];
+
+    if (!rows.length) {
+        alert("No aging data available.");
+        return;
+    }
+
+    const headers = [
+        "Customer",
+        "Current",
+        "0-30",
+        "31-60",
+        "61-90",
+        "91-120",
+        "120+",
+        "Total"
+    ];
+
+    const csvRows =
+        rows.map(row => [
+
+            row.customer_name ||
+            row.customer ||
+            row.name ||
+            "",
+
+            row.current ?? 0,
+
+            row["0-30"] ??
+            row.days_0_30 ??
+            0,
+
+            row["31-60"] ??
+            row.days_31_60 ??
+            0,
+
+            row["61-90"] ??
+            row.days_61_90 ??
+            0,
+
+            row["91-120"] ??
+            row.days_91_120 ??
+            0,
+
+            row["120+"] ??
+            row.over_120 ??
+            0,
+
+            row.total ?? 0
+
+        ]);
+
+    const csv = [
+        headers,
+        ...csvRows
+    ].map(row =>
+        row.map(value =>
+            `"${String(value).replace(/"/g,'""')}"`
+        ).join(",")
+    ).join("\n");
+
+    const blob =
+        new Blob(["\ufeff" + csv], {
+            type:"text/csv;charset=utf-8;"
+        });
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+
+    link.download =
+        `ar-aging-report-${new Date().toISOString().slice(0,10)}.csv`;
+
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+
+function today() {
+    return new Date().toISOString().split("T")[0];
+}
+
+function firstDayOfMonth() {
+
+    const date = new Date();
+
+    date.setDate(1);
+
+    return date.toISOString().split("T")[0];
+}
+
+document.getElementById("fromDate").value =
+    firstDayOfMonth();
+
+document.getElementById("toDate").value =
+    today();
+
+loadReport();
+</script>
+
+</body>
+</html>

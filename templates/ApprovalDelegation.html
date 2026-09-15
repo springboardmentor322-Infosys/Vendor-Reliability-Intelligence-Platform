@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Approval Delegation | VendorIQ</title>
+
+<link
+    rel="stylesheet"
+    href="/static/ApprovalDelegation.css"
+>
+
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+>
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar"> 
+
+        <div class="logo">
+            <i class="fa-solid fa-sack-dollar"></i>
+
+            <div>
+                <strong>VendorIQ</strong>
+                <small>Vendor Reliability Platform</small>
+            </div>
+        </div>
+
+        <nav>
+
+            <a href="/financedashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/BudgetManagement">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Budget Management</span>
+            </a>
+
+            <a href="/Expenditure">
+                <i class="fa-solid fa-circle-dollar-to-slot"></i>
+                <span>Expenditures</span>
+            </a>
+
+            <a href="/Revenue">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Revenue</span>
+            </a>
+
+            <a href="/AccountsPayable">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span>Accounts Payable</span>
+            </a>
+
+            <a href="/AccountsReceivable">
+                <i class="fa-solid fa-money-check-dollar"></i>
+                <span>Accounts Receivable</span>
+            </a>
+
+            <a href="/BankingReconciliation">
+                <i class="fa-solid fa-building-columns"></i>
+                <span>Banking & Reconciliation</span>
+            </a>
+
+            <a href="/FinancialReports">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Financial Reports</span>
+            </a>
+
+            <a href="/Compliance">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Compliance</span>
+            </a>
+
+            <a href="/FinancerApprovals" class="active">
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+                <b class="badge">5</b>
+            </a>
+
+            <a href="/FinancerNotifications">
+                <i class="fa-regular fa-bell"></i>
+                <span>Alerts & Notifications</span>
+            </a>
+
+            <a href="/FinancerDocument">
+                <i class="fa-regular fa-file"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/FinancerSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a
+                href="/FinancerHelp"
+            >
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-user">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div>
+                <strong id="sidebarName">Rajesh Kumar</strong>
+                <small>Finance Officer</small>
+                <small class="online">
+                    <span></span> Online
+                </small>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+<main class="main">
+
+<header>
+
+    <div>
+
+        <h1>Approval Delegation</h1>
+
+        <p>
+            Delegate your approval responsibilities to another authorized user.
+        </p>
+
+    </div>
+
+    <button
+        class="primary"
+        onclick="openDelegationModal()"
+    >
+        <i class="fa-solid fa-plus"></i>
+        New Delegation
+    </button>
+
+</header>
+
+
+<section class="card">
+
+    <div class="card-title">
+
+        <div>
+            <h2>Active Delegations</h2>
+
+            <p>
+                Users currently delegated to handle your approvals.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Delegate To</th>
+                    <th>Approval Type</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="delegationTable">
+
+                <tr>
+                    <td colspan="6">
+                        Loading delegations...
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<!-- MODAL -->
+
+<div
+    class="modal"
+    id="delegationModal"
+>
+
+<div class="modal-content">
+
+    <div class="modal-header">
+
+        <h2>Create Delegation</h2>
+
+        <button onclick="closeDelegationModal()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+    </div>
+
+
+    <form id="delegationForm">
+
+        <label>Delegate To</label>
+
+        <select id="delegateUser" required>
+
+            <option value="">
+                Select user
+            </option>
+
+        </select>
+
+
+        <label>Approval Type</label>
+
+        <select id="approvalType" required>
+
+            <option value="all">
+                All Approvals
+            </option>
+
+            <option value="budget">
+                Budget Approvals
+            </option>
+
+            <option value="expense">
+                Expense Approvals
+            </option>
+
+            <option value="payment">
+                Payment Approvals
+            </option>
+
+        </select>
+
+
+        <label>Start Date</label>
+
+        <input
+            type="date"
+            id="startDate"
+            required
+        >
+
+
+        <label>End Date</label>
+
+        <input
+            type="date"
+            id="endDate"
+            required
+        >
+
+
+        <div class="modal-actions">
+
+            <button
+                type="button"
+                class="cancel"
+                onclick="closeDelegationModal()"
+            >
+                Cancel
+            </button>
+
+            <button
+                type="submit"
+                class="primary"
+            >
+                Create Delegation
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="/static/ApprovalDelegation.js"></script>
+
+</body>
+</html>

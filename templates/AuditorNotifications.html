@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Notifications | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/AuditorNotifications.css"
+    >
+
+</head>
+
+<body>
+
+
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
+
+<aside class="sidebar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+
+        <div>
+            <h2>VendorIQ</h2>
+            <span>Vendor Reliability System</span>
+        </div>
+
+    </div>
+
+
+    <nav class="sidebar-menu">
+
+        <a href="/AuditorDashboard">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="/AuditAssignments">
+            <i class="fa-solid fa-clipboard-list"></i>
+            <span>Audit Assignments</span>
+        </a>
+
+        <a href="/PlanningRisk">
+            <i class="fa-solid fa-flag"></i>
+            <span>Planning & Risk</span>
+        </a>
+
+        <a href="/AuditsInProgress">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Audits in Progress</span>
+        </a>
+
+        <a href="/EvidenceDocuments">
+            <i class="fa-solid fa-folder-open"></i>
+            <span>Evidence & Documents</span>
+        </a>
+
+        <a href="/IssuesFindings">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>Issues & Findings</span>
+        </a>
+
+        <a href="/AuditorReports">
+            <i class="fa-solid fa-file-lines"></i>
+            <span>Reports</span>
+        </a>
+
+        <a href="/ComplianceTracker">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Compliance Tracker</span>
+        </a>
+
+        <a href="/Recommendations">
+            <i class="fa-solid fa-lightbulb"></i>
+            <span>Recommendations</span>
+        </a>
+
+        <a href="/AuditorAnalytics">
+            <i class="fa-solid fa-chart-column"></i>
+            <span>Analytics</span>
+        </a>
+
+        <a href="/Calendar">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Calendar</span>
+        </a>
+
+        <a
+            href="/AuditorNotifications"
+            class="active"
+        >
+
+            <i class="fa-solid fa-bell"></i>
+
+            <span>Notifications</span>
+
+            <span
+                class="menu-badge"
+                id="sidebarUnreadCount"
+            >
+                0
+            </span>
+
+        </a>
+
+        <a href="/AuditorMessages">
+            <i class="fa-regular fa-envelope"></i>
+            <span>Messages</span>
+        </a>
+
+        <a href="/AuditorSettings">
+            <i class="fa-solid fa-gear"></i>
+            <span>Settings</span>
+        </a>
+
+        <a href="/AuditorHelp">
+            <i class="fa-solid fa-circle-question"></i>
+            <span>Help & Support</span>
+        </a>
+
+        <a href="/login">
+            <i class="fa-solid fa-circle-question"></i>
+            <span>Logout</span>
+        </a>
+
+    </nav>
+
+
+    <div class="sidebar-profile">
+
+        <div class="profile-avatar">
+            <i class="fa-solid fa-user"></i>
+        </div>
+
+        <div class="profile-info">
+
+            <strong id="sidebarUserName">
+                Loading...
+            </strong>
+
+            <span id="sidebarUserRole">
+                Auditor
+            </span>
+
+        </div>
+
+    </div>
+
+</aside>
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main class="main-content">
+
+
+    <!-- TOPBAR -->
+
+    <header class="topbar">
+
+        <div class="page-heading">
+
+            <h1>Notifications</h1>
+
+        </div>
+
+
+        <div class="topbar-right">
+
+            <div class="search-box">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    id="globalSearch"
+                    placeholder="Search audits, reports, entities..."
+                >
+
+            </div>
+
+
+            <div class="top-notification">
+
+                <i class="fa-regular fa-bell"></i>
+
+                <span
+                    class="top-badge"
+                    id="topUnreadCount"
+                >
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="top-profile">
+
+                <div class="top-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div>
+
+                    <strong id="topUserName">
+                        Loading...
+                    </strong>
+
+                    <span id="topUserRole">
+                        Auditor
+                    </span>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-down"></i>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- CONTENT -->
+
+    <div class="content-wrapper">
+
+
+        <!-- LEFT CONTENT -->
+
+        <section class="notification-section">
+
+
+            <!-- TABS -->
+
+            <div class="notification-toolbar">
+
+                <div class="tabs">
+
+                    <button
+                        class="tab-btn active"
+                        data-tab="All"
+                    >
+                        All
+                    </button>
+
+
+                    <button
+                        class="tab-btn"
+                        data-tab="Unread"
+                    >
+                        Unread
+
+                        <span
+                            class="tab-badge"
+                            id="unreadTabCount"
+                        >
+                            0
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        class="tab-btn"
+                        data-tab="Important"
+                    >
+                        Important
+                    </button>
+
+
+                    <button
+                        class="tab-btn"
+                        data-tab="Mentions"
+                    >
+                        Mentions
+                    </button>
+
+                </div>
+
+
+                <div class="toolbar-actions">
+
+                    <button
+                        class="outline-btn"
+                        id="filterBtn"
+                    >
+
+                        <i class="fa-solid fa-filter"></i>
+
+                        Filters
+
+                    </button>
+
+
+                    <button
+                        class="outline-btn primary-outline"
+                        id="markAllReadBtn"
+                    >
+
+                        <i class="fa-solid fa-check"></i>
+
+                        Mark all as read
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILTER PANEL -->
+
+            <div
+                class="filter-panel"
+                id="filterPanel"
+            >
+
+                <select id="priorityFilter">
+
+                    <option value="">
+                        All Priorities
+                    </option>
+
+                    <option value="Low">
+                        Low
+                    </option>
+
+                    <option value="Medium">
+                        Medium
+                    </option>
+
+                    <option value="High">
+                        High
+                    </option>
+
+                    <option value="Critical">
+                        Critical
+                    </option>
+
+                </select>
+
+
+                <input
+                    type="text"
+                    id="notificationSearch"
+                    placeholder="Search notifications..."
+                >
+
+
+                <button
+                    id="applyFilterBtn"
+                    class="small-primary-btn"
+                >
+                    Apply
+                </button>
+
+            </div>
+
+
+            <!-- NOTIFICATION LIST -->
+
+            <div
+                class="notification-list"
+                id="notificationList"
+            >
+
+                <div class="loading">
+
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+
+                    Loading notifications...
+
+                </div>
+
+            </div>
+
+
+            <!-- PAGINATION -->
+
+            <div class="pagination-section">
+
+                <span id="paginationInfo">
+                    Showing notifications
+                </span>
+
+
+                <div class="pagination-controls">
+
+                    <select id="pageSize">
+
+                        <option value="5">
+                            5 per page
+                        </option>
+
+                        <option
+                            value="10"
+                            selected
+                        >
+                            10 per page
+                        </option>
+
+                        <option value="20">
+                            20 per page
+                        </option>
+
+                    </select>
+
+
+                    <button
+                        class="page-btn"
+                        id="prevPage"
+                    >
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+
+
+                    <div
+                        id="pageNumbers"
+                        class="page-numbers"
+                    ></div>
+
+
+                    <button
+                        class="page-btn"
+                        id="nextPage"
+                    >
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             RIGHT SIDEBAR
+        ====================================================== -->
+
+        <aside class="right-sidebar">
+
+
+            <!-- SUMMARY -->
+
+            <div class="side-card">
+
+                <div class="card-header">
+
+                    <h3>
+                        Notification Summary
+                    </h3>
+
+                    <div class="large-bell">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <div class="summary-left">
+
+                        <div class="summary-icon blue">
+                            <i class="fa-solid fa-inbox"></i>
+                        </div>
+
+                        <span>
+                            All Notifications
+                        </span>
+
+                    </div>
+
+                    <strong id="summaryAll">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <div class="summary-left">
+
+                        <div class="summary-icon red">
+                            <i class="fa-regular fa-circle"></i>
+                        </div>
+
+                        <span>
+                            Unread
+                        </span>
+
+                    </div>
+
+                    <strong
+                        class="danger-text"
+                        id="summaryUnread"
+                    >
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <div class="summary-left">
+
+                        <div class="summary-icon orange">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+
+                        <span>
+                            Important
+                        </span>
+
+                    </div>
+
+                    <strong id="summaryImportant">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <div class="summary-left">
+
+                        <div class="summary-icon purple">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+
+                        <span>
+                            Mentions
+                        </span>
+
+                    </div>
+
+                    <strong id="summaryMentions">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="side-card">
+
+                <h3>
+                    By Category
+                </h3>
+
+
+                <div class="category-content">
+
+                    <div class="donut-wrapper">
+
+                        <canvas
+                            id="categoryChart"
+                        ></canvas>
+
+                    </div>
+
+
+                    <div
+                        id="categoryLegend"
+                        class="category-legend"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PREFERENCES -->
+
+            <div class="side-card">
+
+                <h3>
+                    Notification Preferences
+                </h3>
+
+
+                <div class="preference-row">
+
+                    <div>
+
+                        <i class="fa-solid fa-bell"></i>
+
+                        Email Notifications
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="emailNotifications"
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="preference-row">
+
+                    <div>
+
+                        <i class="fa-solid fa-envelope"></i>
+
+                        In-App Notifications
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="inAppNotifications"
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="preference-row">
+
+                    <div>
+
+                        <i class="fa-solid fa-phone"></i>
+
+                        SMS Notifications
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="smsNotifications"
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="preference-row">
+
+                    <div>
+
+                        <i class="fa-solid fa-circle-exclamation"></i>
+
+                        Important Alerts
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="importantAlerts"
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="preference-row">
+
+                    <div>
+
+                        <i class="fa-solid fa-calendar-days"></i>
+
+                        Audit Reminders
+
+                    </div>
+
+                    <label class="switch">
+
+                        <input
+                            type="checkbox"
+                            id="auditReminders"
+                        >
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+
+                <a
+                    href="/AuditorSettings"
+                    class="settings-link"
+                >
+
+                    Go to Settings
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+
+            <!-- QUICK ACTIONS -->
+
+            <div class="side-card">
+
+                <h3>
+                    Quick Actions
+                </h3>
+
+
+                <a
+                    href="/AuditAssignments"
+                    class="quick-action"
+                >
+
+                    View Audit Assignments
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+
+                <a
+                    href="/EvidenceDocuments"
+                    class="quick-action"
+                >
+
+                    Upload Document
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+
+                <a
+                    href="/AuditorReports"
+                    class="quick-action"
+                >
+
+                    Create New Report
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="/static/AuditorNotifications.js"></script>
+
+</body>
+
+</html>

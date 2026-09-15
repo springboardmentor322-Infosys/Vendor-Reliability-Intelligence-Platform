@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Reports | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="/static/ProcurementReports.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-industry"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+        <nav>
+
+            <a href="/ManagerDashboard">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="/ProcurementRequests">
+                <i class="fa-regular fa-clipboard"></i>
+                Procurement Requests
+            </a>
+
+            <a href="/ProcurementPurchaseOrder">
+                <i class="fa-solid fa-cart-shopping"></i>
+                Purchase Orders
+            </a>
+
+            <a href="/ProcurementApprovals">
+                <i class="fa-regular fa-square-check"></i>
+                Approvals
+            </a>
+
+            <a href="/ProcurementVendors">
+                <i class="fa-solid fa-user-group"></i>
+                Vendors
+            </a>
+
+            <a href="/OrderTracking">
+                <i class="fa-solid fa-box"></i>
+                Order Tracking
+            </a>
+
+            <a href="/ProcurementInvoices">
+                <i class="fa-regular fa-file-lines"></i>
+                Invoices
+            </a>
+
+            <a
+                href="/ProcurementReports"
+                class="active"
+            >
+                <i class="fa-regular fa-chart-bar"></i>
+                Reports
+            </a>
+
+            <a href="/ProcurementAnalytics">
+                <i class="fa-solid fa-chart-line"></i>
+                Analytics
+            </a>
+
+        </nav>
+
+        <div class="menu-title communication">
+            COMMUNICATION
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementNotifications">
+                <i class="fa-regular fa-bell"></i>
+                Notifications
+                <span class="badge">6</span>
+            </a>
+
+            <a href="/Messages">
+                <i class="fa-regular fa-envelope"></i>
+                Messages
+                <span class="badge">3</span>
+            </a>
+
+        </nav>
+
+        <div class="menu-title">
+            SUPPORT
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementHelpSupport">
+                <i class="fa-regular fa-circle-question"></i>
+                Help & Support
+            </a>
+
+            <a href="/ProcurementSettings">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+
+        </nav>
+
+        <div class="user-card">
+
+            <div class="avatar">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div class="user-info">
+
+                <strong id="sidebarUserName">
+                    James Anderson
+                </strong>
+
+                <span id="sidebarUserRole">
+                    Procurement Manager
+                </span>
+
+                <small>
+                    <i></i>
+                    Online
+                </small>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Reports</h1>
+
+                <div class="breadcrumb">
+                    <span>Dashboard</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <strong>Reports</strong>
+                </div>
+
+            </div>
+
+            <div class="top-actions">
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        placeholder="Search anything..."
+                        id="globalSearch"
+                    >
+
+                </div>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>6</span>
+                </button>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-envelope"></i>
+                    <span>3</span>
+                </button>
+
+                <div class="profile">
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerUserName">
+                            James Anderson
+                        </strong>
+
+                        <small id="headerUserRole">
+                            Procurement Manager
+                        </small>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             TOOLBAR
+        ================================================== -->
+
+        <section class="toolbar">
+
+            <div class="date-picker">
+
+                <i class="fa-regular fa-calendar"></i>
+
+                <input
+                    type="date"
+                    id="fromDate"
+                >
+
+                <span>–</span>
+
+                <input
+                    type="date"
+                    id="toDate"
+                >
+
+            </div>
+
+            <button
+                class="export-button"
+                id="exportButton"
+            >
+                <i class="fa-solid fa-download"></i>
+                Export
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+
+                <div>
+
+                    <span>Total Spend (MTD)</span>
+
+                    <strong id="totalSpend">
+                        $0
+                    </strong>
+
+                    <small class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        <span id="spendTrend">0%</span>
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+
+                <div>
+
+                    <span>Total POs</span>
+
+                    <strong id="totalPOs">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        12.5%
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+
+                <div>
+
+                    <span>Avg. PO Value</span>
+
+                    <strong id="avgPOValue">
+                        $0
+                    </strong>
+
+                    <small class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        6.2%
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-truck"></i>
+                </div>
+
+                <div>
+
+                    <span>On-Time Delivery</span>
+
+                    <strong id="onTimeDelivery">
+                        0%
+                    </strong>
+
+                    <small class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        5.7%
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon pink">
+                    <i class="fa-solid fa-piggy-bank"></i>
+                </div>
+
+                <div>
+
+                    <span>Savings (YTD)</span>
+
+                    <strong id="savingsYTD">
+                        $0
+                    </strong>
+
+                    <small class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        22.1%
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon indigo">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+
+                <div>
+
+                    <span>Invoice Cycle Time</span>
+
+                    <strong id="invoiceCycle">
+                        0 Days
+                    </strong>
+
+                    <small class="negative">
+                        <i class="fa-solid fa-arrow-down"></i>
+                        8.3%
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             TABS
+        ================================================== -->
+
+        <div class="report-tabs">
+
+            <button
+                class="tab active"
+                data-tab="spend"
+            >
+                Spend Analysis
+            </button>
+
+            <button
+                class="tab"
+                data-tab="purchase"
+            >
+                Purchase Orders
+            </button>
+
+            <button
+                class="tab"
+                data-tab="vendors"
+            >
+                Vendors
+            </button>
+
+            <button
+                class="tab"
+                data-tab="delivery"
+            >
+                Delivery Performance
+            </button>
+
+            <button
+                class="tab"
+                data-tab="invoices"
+            >
+                Invoices & Payments
+            </button>
+
+            <button
+                class="tab"
+                data-tab="compliance"
+            >
+                Compliance
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             DASHBOARD GRID
+        ================================================== -->
+
+        <section class="dashboard-grid">
+
+
+            <!-- SPEND TREND -->
+
+            <div class="panel chart-panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>Spend Trend</h3>
+
+                        <div class="legend">
+
+                            <span>
+                                <i class="legend-dot actual"></i>
+                                Actual Spend
+                            </span>
+
+                            <span>
+                                <i class="legend-dot budget"></i>
+                                Budget
+                            </span>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="spendTrendChart"></canvas>
+                </div>
+
+                <button class="details-link">
+                    View Details
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Spend by Category (MTD)</h3>
+
+                </div>
+
+                <div class="category-layout">
+
+                    <div class="donut-wrapper">
+
+                        <canvas
+                            id="categoryChart"
+                        ></canvas>
+
+                        <div class="donut-center">
+
+                            <strong id="categoryTotal">
+                                $0
+                            </strong>
+
+                            <span>Total Spend</span>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="category-list"
+                        id="categoryList"
+                    ></div>
+
+                </div>
+
+                <button class="details-link">
+                    View Details
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+            </div>
+
+
+            <!-- TOP VENDORS -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Top Spending Vendors (MTD)</h3>
+
+                </div>
+
+                <div class="table">
+
+                    <div class="table-head">
+                        <span>Vendor</span>
+                        <span>Spend (USD)</span>
+                        <span>% of Total Spend</span>
+                    </div>
+
+                    <div id="topVendors"></div>
+
+                </div>
+
+                <button class="details-link">
+                    View All Vendors
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+            </div>
+
+
+            <!-- DEPARTMENT -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>Spend by Department (MTD)</h3>
+
+                </div>
+
+                <div
+                    id="departmentList"
+                    class="department-list"
+                ></div>
+
+                <button class="details-link">
+                    View Details
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+            </div>
+
+
+            <!-- MONTHLY SUMMARY -->
+
+            <div class="panel monthly-panel">
+
+                <div class="panel-header">
+
+                    <h3>Monthly Spend Summary</h3>
+
+                </div>
+
+                <div class="table">
+
+                    <div class="table-head monthly-head">
+
+                        <span>Month</span>
+                        <span>Actual Spend (USD)</span>
+                        <span>Budget (USD)</span>
+                        <span>Variance (USD)</span>
+                        <span>Variance %</span>
+
+                    </div>
+
+                    <div id="monthlySummary"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- BUDGET CHART -->
+
+            <div class="panel chart-panel">
+
+                <div class="panel-header">
+
+                    <h3>Spend vs Budget</h3>
+
+                    <select id="budgetPeriod">
+
+                        <option value="MTD">
+                            MTD
+                        </option>
+
+                        <option value="YTD">
+                            YTD
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="budgetChart"></canvas>
+                </div>
+
+            </div>
+
+
+            <!-- RIGHT COLUMN -->
+
+            <aside class="right-column">
+
+
+                <!-- REPORT CATEGORIES -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>Report Categories</h3>
+
+                    </div>
+
+                    <div class="report-category-list">
+
+                        <button>
+                            <i class="fa-solid fa-chart-column"></i>
+
+                            <span>
+                                <strong>Spend Analysis</strong>
+                                <small>
+                                    Track spending trends and patterns
+                                </small>
+                            </span>
+
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+
+                        <button>
+                            <i class="fa-solid fa-file-lines"></i>
+
+                            <span>
+                                <strong>Purchase Order Reports</strong>
+                                <small>
+                                    Analyze PO status and performance
+                                </small>
+                            </span>
+
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+
+                        <button>
+                            <i class="fa-solid fa-users"></i>
+
+                            <span>
+                                <strong>Vendor Performance</strong>
+                                <small>
+                                    Evaluate vendor metrics and scorecards
+                                </small>
+                            </span>
+
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+
+                        <button>
+                            <i class="fa-solid fa-truck"></i>
+
+                            <span>
+                                <strong>Delivery Performance</strong>
+                                <small>
+                                    Monitor delivery timeliness
+                                </small>
+                            </span>
+
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+
+                        <button>
+                            <i class="fa-solid fa-file-invoice"></i>
+
+                            <span>
+                                <strong>Invoice & Payment Reports</strong>
+                                <small>
+                                    Track invoices, payments and aging
+                                </small>
+                            </span>
+
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+
+                        <button>
+                            <i class="fa-solid fa-shield-halved"></i>
+
+                            <span>
+                                <strong>Compliance Reports</strong>
+                                <small>
+                                    Monitor compliance and risk metrics
+                                </small>
+                            </span>
+
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RECENT REPORTS -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>Recent Reports</h3>
+
+                    </div>
+
+                    <div id="recentReports"></div>
+
+                    <button class="details-link">
+                        View All Reports
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+
+                <!-- SCHEDULE -->
+
+                <div class="panel schedule-panel">
+
+                    <h3>Schedule Reports</h3>
+
+                    <p>
+                        Automate report delivery on a scheduled basis.
+                    </p>
+
+                    <button
+                        class="schedule-button"
+                        id="scheduleButton"
+                    >
+                        <i class="fa-regular fa-calendar"></i>
+                        Schedule New Report
+                    </button>
+
+                </div>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     SCHEDULE MODAL
+========================================================= -->
+
+<div
+    class="modal"
+    id="scheduleModal"
+>
+
+    <div class="modal-card">
+
+        <button
+            class="modal-close"
+            id="closeModal"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <h2>Schedule New Report</h2>
+
+        <label>
+            Report Name
+        </label>
+
+        <input
+            type="text"
+            id="scheduleName"
+            value="Spend Analysis Report"
+        >
+
+        <label>
+            Schedule
+        </label>
+
+        <select id="scheduleFrequency">
+
+            <option value="Daily">
+                Daily
+            </option>
+
+            <option value="Weekly">
+                Weekly
+            </option>
+
+            <option value="Monthly" selected>
+                Monthly
+            </option>
+
+        </select>
+
+        <label>
+            Format
+        </label>
+
+        <select id="scheduleFormat">
+
+            <option value="PDF">
+                PDF
+            </option>
+
+            <option value="CSV">
+                CSV
+            </option>
+
+            <option value="EXCEL">
+                Excel
+            </option>
+
+        </select>
+
+        <label>
+            Recipients
+        </label>
+
+        <input
+            type="text"
+            id="scheduleRecipients"
+            placeholder="email@example.com"
+        >
+
+        <button
+            class="save-schedule"
+            id="saveSchedule"
+        >
+            Schedule Report
+        </button>
+
+    </div>
+
+</div>
+
+
+<script src="/static/ProcurementReports.js"></script>
+
+</body>
+</html>

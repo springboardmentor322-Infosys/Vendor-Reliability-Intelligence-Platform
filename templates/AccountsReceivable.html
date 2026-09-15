@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Accounts Receivable | VendorIQ</title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/AccountsReceivable.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+
+            <div>
+                <strong>VendorIQ</strong>
+                <small>Vendor Reliability Platform</small>
+            </div>
+
+        </div>
+
+        <nav>
+
+            <a href="/financerdashboard">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="/BudgetManagement">
+                <i class="fa-solid fa-wallet"></i>
+                Budget Management
+            </a>
+
+            <a href="/Expenditure">
+                <i class="fa-solid fa-circle-dollar-to-slot"></i>
+                Expenditures
+            </a>
+
+            <a href="/Revenue">
+                <i class="fa-solid fa-chart-line"></i>
+                Revenue
+            </a>
+
+            <a href="/AccountsPayable">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                Accounts Payable
+            </a>
+
+            <a
+                class="active"
+                href="/AccountsReceivable"
+            >
+                <i class="fa-solid fa-money-check-dollar"></i>
+                Accounts Receivable
+            </a>
+
+            <a href="/BankingReconciliation">
+                <i class="fa-solid fa-building-columns"></i>
+                Banking & Reconciliation
+            </a>
+
+            <a href="/FinancialReports">
+                <i class="fa-solid fa-chart-column"></i>
+                Financial Reports
+            </a>
+
+            <a href="/Compliance">
+                <i class="fa-solid fa-shield-halved"></i>
+                Compliance
+            </a>
+
+            <a href="/FinancerApprovals">
+                <i class="fa-regular fa-square-check"></i>
+                Approvals
+                <span class="badge">5</span>
+            </a>
+
+            <a href="/FinancerNotifications">
+                <i class="fa-regular fa-bell"></i>
+                Alerts & Notifications
+                <span class="badge">8</span>
+            </a>
+
+            <a href="/FinancerDocument">
+                <i class="fa-regular fa-file"></i>
+                Documents
+            </a>
+
+            <a href="/FinancerSettings">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <a href="/FinancerHelp">
+                <i class="fa-regular fa-circle-question"></i>
+                Help & Support
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-user">
+
+            <div class="avatar"><i class="fa-solid fa-user"></i></div>
+
+            <div>
+                <strong id="sidebarName">
+                    Rajesh Kumar
+                </strong>
+
+                <small>
+                    Finance Officer
+                </small>
+
+                <span class="online">
+                    <i></i> Online
+                </span>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <header class="header">
+
+            <div>
+
+                <h1>Accounts Receivable</h1>
+
+                <p>
+                    Track customer invoices, manage receivables,
+                    and monitor collections.
+                </p>
+
+            </div>
+
+            <div class="header-actions">
+
+                <div class="search">
+
+                    <input
+                        id="globalSearch"
+                        type="search"
+                        placeholder="Search anything..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <button class="notification">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span>3</span>
+
+                </button>
+
+                <div class="profile">
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Rajesh Kumar
+                        </strong>
+
+                        <small>
+                            Finance Officer
+                        </small>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- FILTER -->
+
+        <div class="toolbar">
+
+            <div></div>
+
+            <div class="date-filter">
+
+                <i class="fa-regular fa-calendar"></i>
+
+                <input
+                    id="fromDate"
+                    type="date"
+                >
+
+                <span>-</span>
+
+                <input
+                    id="toDate"
+                    type="date"
+                >
+
+                <button id="refreshBtn">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- KPI CARDS -->
+
+        <section class="kpis">
+
+            <div class="kpi">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+
+                <div>
+
+                    <span>Total Receivables</span>
+
+                    <strong id="totalReceivables">
+                        ₹ 0
+                    </strong>
+
+                    <small>
+                        All Outstanding Invoices
+                    </small>
+
+                    <em class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        Live balance
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-file-invoice"></i>
+                </div>
+
+                <div>
+
+                    <span>Overdue Amount</span>
+
+                    <strong id="overdueAmount">
+                        ₹ 0
+                    </strong>
+
+                    <small>
+                        Overdue Invoices
+                    </small>
+
+                    <em class="danger">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        Needs attention
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-solid fa-calendar-days"></i>
+                </div>
+
+                <div>
+
+                    <span>Due Within 30 Days</span>
+
+                    <strong id="dueWithin30">
+                        ₹ 0
+                    </strong>
+
+                    <small>
+                        Due Soon
+                    </small>
+
+                    <em class="warning">
+                        <i class="fa-solid fa-clock"></i>
+                        Due soon
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+
+                <div>
+
+                    <span>Collected This Month</span>
+
+                    <strong id="collectedThisMonth">
+                        ₹ 0
+                    </strong>
+
+                    <small id="collectionMonth">
+                        Current Month Collections
+                    </small>
+
+                    <em class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        Collections
+                    </em>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi">
+
+                <div class="kpi-icon cyan">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+
+                <div>
+
+                    <span>Outstanding Invoices</span>
+
+                    <strong id="outstandingInvoices">
+                        0
+                    </strong>
+
+                    <small>
+                        Total Invoices
+                    </small>
+
+                    <a href="#recentInvoices">
+                        View all invoices
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- CHARTS -->
+
+        <section class="row">
+
+            <div class="card trend-card">
+
+                <div class="card-header">
+
+                    <div>
+                        <h2>Receivables Trend</h2>
+
+                        <div class="legend">
+
+                            <span>
+                                <i class="dot blue-dot"></i>
+                                Total Receivables
+                            </span>
+
+                            <span>
+                                <i class="dot green-dot"></i>
+                                Collected Amount
+                            </span>
+
+                        </div>
+                    </div>
+
+                    <select id="yearSelect">
+
+                    </select>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <canvas id="trendChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <div class="card aging-card">
+
+                <div class="card-header">
+
+                    <h2>Aging Summary</h2>
+
+                    <span class="select-label">
+                        This Year
+                    </span>
+
+                </div>
+
+                <div class="aging-content">
+
+                    <div class="donut">
+
+                        <canvas id="agingChart"></canvas>
+
+                        <div class="donut-center">
+
+                            <strong id="agingTotal">
+                                ₹ 0
+                            </strong>
+
+                            <span>
+                                Total Receivables
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="agingLegend"
+                        class="aging-legend"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card customers-card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Top Customers by Receivables
+                    </h2>
+
+                    <span class="select-label">
+                        This Year
+                    </span>
+
+                </div>
+
+                <div id="topCustomers"></div>
+
+                <a
+                    class="view-link"
+                    href="/customers"
+                >
+                    View all customers
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- LOWER -->
+
+        <section class="row lower">
+
+            <div
+                class="card invoices-card"
+                id="recentInvoices"
+            >
+
+                <div class="card-header">
+
+                    <h2>Recent Invoices</h2>
+
+                    <a href="#">
+                        View All Invoices
+                    </a>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                        <tr>
+
+                            <th>Invoice No.</th>
+                            <th>Customer</th>
+                            <th>Invoice Date</th>
+                            <th>Due Date</th>
+                            <th>Amount (₹)</th>
+                            <th>Status</th>
+                            <th>Days Outstanding</th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody id="invoiceTable"></tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="pagination">
+
+                    <span id="paginationInfo">
+                        Showing 0 invoices
+                    </span>
+
+                    <div id="paginationButtons"></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card collections-card">
+
+                <div class="card-header">
+
+                    <h2>Collections Summary</h2>
+
+                    <span class="select-label">
+                        This Month
+                    </span>
+
+                </div>
+
+                <div class="summary-list">
+
+                    <div>
+                        <span>
+                            <i class="fa-solid fa-file-invoice"></i>
+                            Total Billed
+                        </span>
+
+                        <strong id="totalBilled">
+                            ₹ 0
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                            Total Collected
+                        </span>
+
+                        <strong id="totalCollected">
+                            ₹ 0
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>
+                            <i class="fa-solid fa-circle-check"></i>
+                            Collection Rate
+                        </span>
+
+                        <strong id="collectionRate">
+                            0%
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>
+                            <i class="fa-regular fa-calendar"></i>
+                            Avg. Collection Days
+                        </span>
+
+                        <strong id="averageCollectionDays">
+                            0 Days
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            Bad Debt (YTD)
+                        </span>
+
+                        <strong id="badDebt">
+                            ₹ 0
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card quick-card">
+                <div class="card-header">
+                    <div>
+                        <h2>Quick Actions</h2>
+                        <small class="quick-subtitle">
+                            Frequently used receivables actions
+                        </small>
+                    </div>
+
+                    <span class="quick-status">
+                        <i class="fa-solid fa-bolt"></i>
+                        Quick
+                    </span>
+                </div>
+
+                <div class="quick-actions">
+
+                    <button class="quick-action" id="createInvoiceBtn">
+                        <span class="quick-icon blue">
+                            <i class="fa-solid fa-circle-plus"></i>
+                        </span>
+
+                        <span class="quick-content">
+                            <strong>Create New Invoice</strong>
+                            <small>Create and issue a customer invoice</small>
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right quick-arrow"></i>
+                    </button>
+
+                    <button class="quick-action" id="recordPaymentBtn">
+                        <span class="quick-icon green">
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                        </span>
+
+                        <span class="quick-content">
+                            <strong>Record Payment</strong>
+                            <small>Record a customer payment</small>
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right quick-arrow"></i>
+                    </button>
+
+                    <button
+                        class="quick-action"
+                        id="customerStatementBtn"
+                    >
+                        <span class="quick-icon purple">
+                            <i class="fa-solid fa-file-lines"></i>
+                        </span>
+
+                        <span class="quick-content">
+                            <strong>Customer Statement</strong>
+                            <small>View customer account statements</small>
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right quick-arrow"></i>
+                    </button>
+
+                    <button
+                        class="quick-action"
+                        id="followUpOverdueBtn"
+                    >
+                        <span class="quick-icon red">
+                            <i class="fa-solid fa-phone"></i>
+                        </span>
+
+                        <span class="quick-content">
+                            <strong>Follow Up Overdue</strong>
+                            <small>Review overdue customer invoices</small>
+                        </span>
+
+                        <span class="quick-count" id="overdueQuickCount">
+                            0
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right quick-arrow"></i>
+                    </button>
+
+                    <button
+                        class="quick-action"
+                        id="agingReportBtn"
+                    >
+                        <span class="quick-icon orange">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </span>
+
+                        <span class="quick-content">
+                            <strong>Aging Report</strong>
+                            <small>Analyze receivable aging</small>
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right quick-arrow"></i>
+                    </button>
+
+                    <button
+                        class="quick-action"
+                        id="exportBtn"
+                    >
+                        <span class="quick-icon cyan">
+                            <i class="fa-solid fa-download"></i>
+                        </span>
+
+                        <span class="quick-content">
+                            <strong>Export Receivables</strong>
+                            <small>Download receivable data</small>
+                        </span>
+
+                        <i class="fa-solid fa-chevron-right quick-arrow"></i>
+                    </button>
+
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- ALERT -->
+
+        <div class="alert-bar">
+
+            <div>
+
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <strong>
+                    Overdue Alerts
+                </strong>
+
+                <span id="overdueMessage">
+                    Loading overdue information...
+                </span>
+
+            </div>
+
+            <a href="/overdue-invoices">
+                View Overdue Invoices
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+
+        </div>
+
+
+        <footer>
+
+            <span>
+                © 2025 FinManage. All rights reserved.
+            </span>
+
+            <span>
+                Version 2.1.0
+                <i class="online-dot"></i>
+            </span>
+
+        </footer>
+
+    </main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<script src="/static/AccountsReceivable.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Expenditures | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+    <link
+        rel="stylesheet"
+        href="/static/Expenditure.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/financerdashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/BudgetManagement">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Budget Management</span>
+            </a>
+
+            <a
+                class="active"
+                href="/Expenditure"
+            >
+                <i class="fa-solid fa-circle-dollar-to-slot"></i>
+                <span>Expenditures</span>
+            </a>
+
+            <a href="/Revenue">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Revenue</span>
+            </a>
+
+            <a href="/AccountsPayable">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span>Accounts Payable</span>
+            </a>
+
+            <a href="/AccountsReceivable">
+                <i class="fa-solid fa-money-check-dollar"></i>
+                <span>Accounts Receivable</span>
+            </a>
+
+            <a href="/BankingReconciliation">
+                <i class="fa-solid fa-building-columns"></i>
+                <span>Banking & Reconciliation</span>
+            </a>
+
+            <a href="/FinancialReports">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Financial Reports</span>
+            </a>
+
+            <a href="/Compliance">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Compliance</span>
+            </a>
+
+            <a href="/FinancerApprovals">
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+                <b class="badge">5</b>
+            </a>
+
+            <a href="/FinancerNotifications">
+                <i class="fa-regular fa-bell"></i>
+                <span>Alerts & Notifications</span>
+                <b class="badge">8</b>
+            </a>
+
+            <a href="/FinancerDocument">
+                <i class="fa-regular fa-file"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/FinancerSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/FinancerHelp">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-user">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div>
+                <strong id="sidebarName">
+                    Rajesh Kumar
+                </strong>
+
+                <small>
+                    Finance Officer
+                </small>
+
+                <em>
+                    <span></span>
+                    Online
+                </em>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="header">
+
+            <div class="page-title">
+
+                <h1>Expenditures</h1>
+
+                <div class="breadcrumb">
+                    Dashboard
+                    <span><i class="fa-solid fa-chevron-right"></i></span>
+                    Expenditures
+                </div>
+
+                <p>
+                    Track and manage all organizational expenses in one place.
+                </p>
+
+            </div>
+
+
+            <div class="header-actions">
+
+                <div class="search">
+
+                    <input
+                        id="globalSearch"
+                        type="search"
+                        placeholder="Search anything..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+
+                <button class="icon-button">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span class="notification-count">
+                        3
+                    </span>
+
+                </button>
+
+
+                <div class="profile">
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerName">
+                            Rajesh Kumar
+                        </strong>
+
+                        <small>
+                            Finance Officer
+                        </small>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             FILTER
+        ================================================== -->
+
+        <div class="toolbar">
+
+            <div></div>
+
+            <div class="date-filter">
+
+                <i class="fa-regular fa-calendar"></i>
+
+                <select id="yearFilter">
+
+                    <option value="2026">
+                        2026
+                    </option>
+
+                    <option value="2025">
+                        2025
+                    </option>
+
+                    <option value="2024">
+                        2024
+                    </option>
+
+                </select>
+
+                <i class="fa-solid fa-chevron-down"></i>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card blue">
+
+                <div class="stat-icon">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+
+                <div>
+                    <span>Total Expenditure</span>
+                    <h2 id="totalExpenditure">
+                        ₹0
+                    </h2>
+
+                    <small>
+                        YTD Expenses
+                    </small>
+
+                    <p class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        Live from database
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card red">
+
+                <div class="stat-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+
+                <div>
+                    <span>This Month</span>
+
+                    <h2 id="thisMonth">
+                        ₹0
+                    </h2>
+
+                    <small id="currentMonth">
+                        Current Month
+                    </small>
+
+                    <p class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        Current period
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card green">
+
+                <div class="stat-icon">
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Avg. Monthly Expense
+                    </span>
+
+                    <h2 id="averageMonthly">
+                        ₹0
+                    </h2>
+
+                    <small>
+                        Last 6 Months
+                    </small>
+
+                    <p class="positive">
+                        Database calculated
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card orange">
+
+                <div class="stat-icon">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Transactions
+                    </span>
+
+                    <h2 id="totalTransactions">
+                        0
+                    </h2>
+
+                    <small>
+                        This Month
+                    </small>
+
+                    <p class="positive">
+                        Live count
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card purple">
+
+                <div class="stat-icon">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Budget Utilization
+                    </span>
+
+                    <h2 id="budgetUtilization">
+                        0%
+                    </h2>
+
+                    <small>
+                        Of Total Budget
+                    </small>
+
+                    <div class="progress">
+                        <span
+                            id="budgetProgress"
+                        ></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CHARTS
+        ================================================== -->
+
+        <section class="dashboard-grid">
+
+            <div class="panel trend-panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Expenditure Trend
+                    </h3>
+
+                    <select id="trendYear">
+                        <option value="selected">
+                            This Year
+                        </option>
+                    </select>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+
+            </div>
+
+
+            <div class="panel category-panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Expenditure by Category
+                    </h3>
+
+                    <span class="small-label">
+                        This Year
+                    </span>
+
+                </div>
+
+                <div class="category-layout">
+
+                    <div class="donut-wrapper">
+
+                        <canvas
+                            id="categoryChart"
+                        ></canvas>
+
+                        <div class="donut-center">
+
+                            <strong id="donutTotal">
+                                ₹0
+                            </strong>
+
+                            <span>
+                                Total Expenses
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="categoryLegend"
+                        class="category-legend"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel top-category-panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Top Expense Categories
+                    </h3>
+
+                    <span class="small-label">
+                        This Year
+                    </span>
+
+                </div>
+
+                <div id="topCategories"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             LOWER SECTION
+        ================================================== -->
+
+        <section class="lower-grid">
+
+            <div class="panel overview-panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Expenditure Overview
+                    </h3>
+
+                    <button
+                        id="addExpenseBtn"
+                        class="primary-btn"
+                    >
+                        <i class="fa-solid fa-plus"></i>
+                        Add Expense
+                    </button>
+
+                </div>
+
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Category</th>
+                                <th>Budget (₹)</th>
+                                <th>Actual (₹)</th>
+                                <th>Variance (₹)</th>
+                                <th>Variance (%)</th>
+                                <th>Status</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="overviewBody"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 RECENT
+            ================================================== -->
+
+            <div class="panel recent-panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Recent Expenditures
+                    </h3>
+
+                    <button
+                        id="viewAllBtn"
+                        class="link-btn"
+                    >
+                        View All
+                    </button>
+
+                </div>
+
+                <div id="recentList"></div>
+
+            </div>
+
+
+            <!-- =================================================
+                 QUICK ACTIONS
+            ================================================== -->
+
+            <div class="panel actions-panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Quick Actions
+                    </h3>
+
+                </div>
+
+
+                <button
+                    class="quick-action"
+                    id="quickAddExpense"
+                >
+                    <i class="fa-solid fa-circle-plus"></i>
+                    Add New Expense
+                </button>
+
+
+                <button
+                    class="quick-action"
+                    id="uploadReceipt"
+                >
+                    <i class="fa-regular fa-file-lines"></i>
+                    Upload Expense Receipt
+                </button>
+
+
+                <button
+                    class="quick-action"
+                    id="expenseReport"
+                >
+                    <i class="fa-solid fa-file-invoice"></i>
+                    Expense Report
+                </button>
+
+
+                <button
+                    class="quick-action"
+                    id="approveExpenses"
+                >
+                    <i class="fa-regular fa-square-check"></i>
+                    Approve Expenses
+
+                    <b id="approvalBadge">
+                        0
+                    </b>
+                </button>
+
+
+                <button
+                    class="quick-action"
+                    id="recurringExpenses"
+                >
+                    <i class="fa-solid fa-rotate"></i>
+                    Recurring Expenses
+                </button>
+
+
+                <button
+                    class="quick-action"
+                    id="exportExpenses"
+                >
+                    <i class="fa-solid fa-download"></i>
+                    Export Expense Data
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <footer>
+            © 2025 FinManage. All rights reserved.
+            <span>
+                Version 2.1.0
+            </span>
+        </footer>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     ADD EXPENSE MODAL
+========================================================== -->
+
+<div
+    id="expenseModal"
+    class="modal hidden"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>Add New Expense</h2>
+
+            <button id="closeModal">
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="expenseForm">
+
+            <label>
+                Expense Date
+                <input
+                    id="expenseDate"
+                    type="date"
+                    required
+                >
+            </label>
+
+
+            <label>
+                Category
+                <input
+                    id="expenseCategory"
+                    type="text"
+                    placeholder="e.g. Administration"
+                    required
+                >
+            </label>
+
+
+            <label>
+                Department
+                <input
+                    id="expenseDepartment"
+                    type="text"
+                    placeholder="Department"
+                >
+            </label>
+
+
+            <label>
+                Amount
+                <input
+                    id="expenseAmount"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    required
+                >
+            </label>
+
+
+            <label>
+                Status
+
+                <select id="expenseStatus">
+
+                    <option value="Pending">
+                        Pending
+                    </option>
+
+                    <option value="Approved">
+                        Approved
+                    </option>
+
+                </select>
+
+            </label>
+
+
+            <button
+                type="submit"
+                class="primary-btn full"
+            >
+                Save Expense
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="/static/Expenditure.js"></script>
+
+</body>
+</html>

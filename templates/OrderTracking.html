@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Order Tracking | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/OrderTracking.css"
+    >
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo-area">
+
+            <div class="logo-icon">
+                <i class="fa-solid fa-industry"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+        <nav>
+
+            <a href="/ManagerDashboard">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="/ProcurementRequests">
+                <i class="fa-solid fa-clipboard-list"></i>
+                Procurement Requests
+            </a>
+
+            <a href="/ProcurementPurchaseOrder">
+                <i class="fa-solid fa-cart-shopping"></i>
+                Purchase Orders
+            </a>
+
+            <a href="/ProcurementApprovals">
+                <i class="fa-solid fa-square-check"></i>
+                Approvals
+            </a>
+
+            <a href="/ProcurementVendors">
+                <i class="fa-solid fa-user-group"></i>
+                Vendors
+            </a>
+
+            <a
+                href="/OrderTracking"
+                class="active"
+            >
+                <i class="fa-solid fa-box"></i>
+                Order Tracking
+            </a>
+
+            <a href="/ProcurementInvoices">
+                <i class="fa-regular fa-file-lines"></i>
+                Invoices
+            </a>
+
+            <a href="/ProcurementReports">
+                <i class="fa-regular fa-chart-bar"></i>
+                Reports
+            </a>
+
+            <a href="/ProcurementAnalytics">
+                <i class="fa-solid fa-chart-line"></i>
+                Analytics
+            </a>
+
+        </nav>
+
+        <div class="menu-title">
+            COMMUNICATION
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementNotifications">
+                <i class="fa-regular fa-bell"></i>
+                Notifications
+                <b>6</b>
+            </a>
+
+            <a href="/Messages">
+                <i class="fa-regular fa-envelope"></i>
+                Messages
+                <b>3</b>
+            </a>
+
+        </nav>
+
+        <div class="menu-title">
+            SUPPORT
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementHelpSupport">
+                <i class="fa-regular fa-circle-question"></i>
+                Help & Support
+            </a>
+
+            <a href="/ProcurementSettings">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+
+        </nav>
+
+        <div class="user-card">
+
+            <div class="avatar">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <strong id="sidebarName">James Anderson</strong>
+                <span id="sidebarRole">Procurement Manager</span>
+
+                <small>
+                    <i class="fa-solid fa-circle"></i>
+                    Online
+                </small>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================================================= -->
+    <!-- MAIN -->
+    <!-- ================================================= -->
+
+    <main class="main">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Order Tracking</h1>
+
+                <div class="breadcrumb">
+                    Dashboard
+                    <span><i class="fa-solid fa-chevron-right"></i></span>
+                    Order Tracking
+                </div>
+
+            </div>
+
+            <div class="top-actions">
+
+                <div class="global-search">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        placeholder="Search anything..."
+                    >
+
+                </div>
+
+                <button class="icon-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    <sup>6</sup>
+                </button>
+
+                <button class="icon-btn">
+                    <i class="fa-regular fa-envelope"></i>
+                    <sup>3</sup>
+                </button>
+
+                <div class="profile">
+
+                    <div class="profile-avatar" onclick="openProfile()">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerName">James Anderson</strong>
+                        <span id="headerRole">Procurement Manager</span>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ACTIONS -->
+
+        <div class="page-actions">
+
+            <button
+                class="secondary-btn"
+                id="exportBtn"
+            >
+                <i class="fa-solid fa-download"></i>
+                Export
+            </button>
+
+            <button
+                class="primary-btn"
+                id="trackOrderBtn"
+            >
+                <i class="fa-solid fa-location-crosshairs"></i>
+                Track Order
+            </button>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- KPI CARDS -->
+        <!-- ================================================= -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-regular fa-file-lines"></i>
+                </div>
+
+                <div>
+                    <span>Total Orders</span>
+                    <strong id="totalOrders">
+                        0
+                    </strong>
+
+                    <small>
+                        All purchase orders
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-truck"></i>
+                </div>
+
+                <div>
+                    <span>In Transit</span>
+                    <strong id="inTransit">
+                        0
+                    </strong>
+
+                    <small>
+                        Currently moving
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-solid fa-truck-fast"></i>
+                </div>
+
+                <div>
+                    <span>Out for Delivery</span>
+                    <strong id="outForDelivery">
+                        0
+                    </strong>
+
+                    <small>
+                        Final delivery stage
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div>
+                    <span>Delivered</span>
+                    <strong id="delivered">
+                        0
+                    </strong>
+
+                    <small>
+                        Successfully delivered
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon red">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+
+                <div>
+                    <span>Delayed</span>
+                    <strong id="delayed">
+                        0
+                    </strong>
+
+                    <small>
+                        Need attention
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon violet">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+
+                <div>
+                    <span>Exceptions</span>
+                    <strong id="exceptions">
+                        0
+                    </strong>
+
+                    <small>
+                        Require action
+                    </small>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- FILTERS -->
+        <!-- ================================================= -->
+
+        <section class="filters">
+
+            <div class="search-filter">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    id="searchInput"
+                    type="text"
+                    placeholder="Search by PO number, vendor..."
+                >
+
+            </div>
+
+
+            <div class="filter-control">
+
+                <label>Status</label>
+
+                <select id="statusFilter">
+
+                    <option value="All">
+                        All
+                    </option>
+
+                    <option value="In Transit">
+                        In Transit
+                    </option>
+
+                    <option value="Out for Delivery">
+                        Out for Delivery
+                    </option>
+
+                    <option value="Delivered">
+                        Delivered
+                    </option>
+
+                    <option value="Delayed">
+                        Delayed
+                    </option>
+
+                    <option value="Exception">
+                        Exception
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-control">
+
+                <label>Vendor</label>
+
+                <select id="vendorFilter">
+
+                    <option value="All">
+                        All Vendors
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-control date-control">
+
+                <label>Date Range</label>
+
+                <div class="date-range">
+
+                    <input
+                        type="date"
+                        id="dateFrom"
+                    >
+
+                    <span>–</span>
+
+                    <input
+                        type="date"
+                        id="dateTo"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="reset-btn"
+                id="resetBtn"
+            >
+                <i class="fa-solid fa-rotate-right"></i>
+                Reset
+            </button>
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- STATUS TABS -->
+        <!-- ================================================= -->
+
+        <div class="tabs">
+
+            <button
+                class="tab active"
+                data-status="All"
+            >
+                All Orders
+            </button>
+
+            <button
+                class="tab"
+                data-status="In Transit"
+            >
+                In Transit
+            </button>
+
+            <button
+                class="tab"
+                data-status="Out for Delivery"
+            >
+                Out for Delivery
+            </button>
+
+            <button
+                class="tab"
+                data-status="Delivered"
+            >
+                Delivered
+            </button>
+
+            <button
+                class="tab"
+                data-status="Delayed"
+            >
+                Delayed
+            </button>
+
+            <button
+                class="tab"
+                data-status="Exception"
+            >
+                Exceptions
+            </button>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- CONTENT -->
+        <!-- ================================================= -->
+
+        <div class="content-grid">
+
+
+            <!-- TABLE -->
+
+            <section class="orders-panel">
+
+                <div class="table-header">
+
+                    <span>PO Number</span>
+                    <span>Vendor</span>
+                    <span>Order Date</span>
+                    <span>Expected Delivery</span>
+                    <span>Status</span>
+                    <span>Current Location</span>
+                    <span>Progress</span>
+                    <span>Actions</span>
+
+                </div>
+
+                <div
+                    id="ordersBody"
+                    class="orders-body"
+                >
+                </div>
+
+                <div class="pagination">
+
+                    <span id="paginationText">
+                        Showing 0 orders
+                    </span>
+
+                    <div class="pagination-buttons">
+
+                        <button id="prevBtn">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+
+                        <span id="pageNumber">
+                            1
+                        </span>
+
+                        <button id="nextBtn">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+                        <select id="pageSize">
+                            <option value="10">
+                                10 / page
+                            </option>
+
+                            <option value="20">
+                                20 / page
+                            </option>
+
+                            <option value="50">
+                                50 / page
+                            </option>
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- DETAIL PANEL -->
+            <!-- ================================================= -->
+
+            <aside
+                class="details-panel"
+                id="detailsPanel"
+            >
+
+                <div class="details-header">
+
+                    <div>
+                        <span>Order Details</span>
+
+                        <h2 id="detailPo">
+                            Select an order
+                        </h2>
+                    </div>
+
+                    <button
+                        id="closeDetails"
+                        class="close-btn"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div id="detailsContent">
+
+                    <div class="empty-details">
+
+                        <i class="fa-solid fa-box-open"></i>
+
+                        <p>
+                            Select an order to view details.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="/static/OrderTracking.js"></script>
+
+</body>
+</html>

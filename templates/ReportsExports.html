@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        VendorIQ - Reports & Exports
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/ReportsExports.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- ==================================================
+         SIDEBAR
+    =================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+
+                <div class="brand-name">
+                    VendorIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/AdminDashboard.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="/UserManagement" class="nav-item">
+                <i class="fa-solid fa-users"></i>
+                User Management
+            </a>
+
+            <a href="/VendorManagement" class="nav-item">
+                <i class="fa-solid fa-user-group"></i>
+                Vendor Management
+            </a>
+
+            <a href="/ProcurementOverview" class="nav-item">
+                <i class="fa-solid fa-file-invoice"></i>
+                Procurement Overview
+            </a>
+
+            <a href="/ContractCompliance" class="nav-item">
+                <i class="fa-regular fa-file-lines"></i>
+                Contracts & Compliance
+            </a>
+
+            <a href="/InvoicesPayments" class="nav-item">
+                <i class="fa-regular fa-credit-card"></i>
+                Invoices & Payments
+            </a>
+
+            <a href="/Communication" class="nav-item">
+                <i class="fa-solid fa-share-nodes"></i>
+                Communication
+            </a>
+
+            <a href="/PerformanceAnalytics" class="nav-item">
+                <i class="fa-solid fa-chart-column"></i>
+                Performance Analytics
+            </a>
+
+            <a
+                href="/ReportsExports"
+                class="nav-item active"
+            >
+
+                <i class="fa-regular fa-folder-open"></i>
+
+                Reports & Exports
+
+            </a>
+
+            <a href="/Notifications" class="nav-item">
+
+                <i class="fa-regular fa-bell"></i>
+
+                Notifications
+
+                <span class="notification-count">
+                    15
+                </span>
+
+            </a>
+
+        </nav>
+
+
+        <div class="menu-title administration">
+            ADMINISTRATION
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/RolesPermissions" class="nav-item">
+                <i class="fa-solid fa-user-shield"></i>
+                Role & Permissions
+            </a>
+
+            <a href="/SystemSettings" class="nav-item">
+                <i class="fa-solid fa-gear"></i>
+                System Settings
+            </a>
+
+            <a href="/AuditLogs" class="nav-item">
+                <i class="fa-solid fa-list"></i>
+                Audit Logs
+            </a>
+
+            <a href="/DataManagement" class="nav-item">
+                <i class="fa-solid fa-database"></i>
+                Data Management
+            </a>
+
+            <a href="/SystemHealth" class="nav-item">
+                <i class="fa-solid fa-arrows-to-circle"></i>
+                System Health
+            </a>
+
+        </nav>
+
+
+        <div class="menu-title administration">
+            SUPPORT
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/HelpSupport" class="nav-item">
+                <i class="fa-regular fa-circle-question"></i>
+                Help & Support
+            </a>
+
+            <a href="/Feedback" class="nav-item">
+                <i class="fa-regular fa-comment"></i>
+                Feedback
+            </a>
+
+            <a href="/login" class="nav-item">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <div class="admin-card">
+
+            <div class="admin-avatar">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+
+                <strong id="sidebarAdminName">
+                    Super Admin
+                </strong>
+
+                <small id="sidebarAdminEmail">
+                    admin@vendoriq.com
+                </small>
+
+                <small class="online">
+                    ● Online
+                </small>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ==================================================
+         MAIN CONTENT
+    =================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Reports & Export
+                </h1>
+
+                <div class="breadcrumb">
+
+                    <a href="/home">Home</a>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                    <strong>Reports & Export</strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search anything..."
+                    >
+
+                </div>
+
+
+                <button class="top-icon">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>12</span>
+                </button>
+
+
+                <button class="top-icon">
+                    <i class="fa-regular fa-envelope"></i>
+                    <span>7</span>
+                </button>
+
+
+                <div class="user-profile" onclick="openAdminProfile()">
+
+                    <div class="user-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+
+                        <strong id="headerAdminName">
+                            Admin User
+                        </strong>
+
+                        <small id="headerAdminRole">
+                            Super Administrator
+                        </small>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ==================================================
+             REPORT CATEGORY CARDS
+        =================================================== -->
+
+        <section
+            class="report-categories"
+            id="reportCategories"
+        >
+
+            <div
+                class="report-card"
+                data-category="vendor-performance"
+            >
+
+                <div class="report-icon green">
+                    <i class="fa-solid fa-chart-column"></i>
+                </div>
+
+                <h3>
+                    Vendor Performance
+                    Reports
+                </h3>
+
+                <p>
+                    Analyze vendor performance,
+                    reliability scores, delivery
+                    metrics and KPIs.
+                </p>
+
+                <div
+                    class="report-count"
+                    id="vendorReportCount"
+                >
+                    0
+                </div>
+
+                <small>
+                    Reports Available
+                </small>
+
+                <button
+                    class="view-link"
+                    onclick="viewReport('vendor-performance')"
+                >
+                    View Reports →
+                </button>
+
+            </div>
+
+
+            <div
+                class="report-card"
+                data-category="procurement"
+            >
+
+                <div class="report-icon blue">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+
+                <h3>
+                    Procurement
+                    Reports
+                </h3>
+
+                <p>
+                    Comprehensive procurement
+                    analysis, spending patterns
+                    and category insights.
+                </p>
+
+                <div
+                    class="report-count"
+                    id="procurementReportCount"
+                >
+                    0
+                </div>
+
+                <small>
+                    Reports Available
+                </small>
+
+                <button
+                    class="view-link"
+                    onclick="viewReport('procurement')"
+                >
+                    View Reports →
+                </button>
+
+            </div>
+
+
+            <div
+                class="report-card"
+                data-category="purchase-orders"
+            >
+
+                <div class="report-icon purple">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+
+                <h3>
+                    Purchase Order
+                    Reports
+                </h3>
+
+                <p>
+                    PO analysis, status tracking,
+                    fulfillment metrics and
+                    order history.
+                </p>
+
+                <div
+                    class="report-count"
+                    id="purchaseOrderReportCount"
+                >
+                    0
+                </div>
+
+                <small>
+                    Reports Available
+                </small>
+
+                <button
+                    class="view-link"
+                    onclick="viewReport('purchase-orders')"
+                >
+                    View Reports →
+                </button>
+
+            </div>
+
+
+            <div
+                class="report-card"
+                data-category="compliance"
+            >
+
+                <div class="report-icon orange">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+
+                <h3>
+                    Compliance
+                    Reports
+                </h3>
+
+                <p>
+                    Compliance monitoring,
+                    regulatory adherence and
+                    audit trail reports.
+                </p>
+
+                <div
+                    class="report-count"
+                    id="complianceReportCount"
+                >
+                    0
+                </div>
+
+                <small>
+                    Reports Available
+                </small>
+
+                <button
+                    class="view-link"
+                    onclick="viewReport('compliance')"
+                >
+                    View Reports →
+                </button>
+
+            </div>
+
+
+            <div
+                class="report-card"
+                data-category="contracts"
+            >
+
+                <div class="report-icon cyan">
+                    <i class="fa-solid fa-file-contract"></i>
+                </div>
+
+                <h3>
+                    Contract
+                    Reports
+                </h3>
+
+                <p>
+                    Contract performance, terms
+                    compliance, renewals and
+                    obligations tracking.
+                </p>
+
+                <div
+                    class="report-count"
+                    id="contractReportCount"
+                >
+                    0
+                </div>
+
+                <small>
+                    Reports Available
+                </small>
+
+                <button
+                    class="view-link"
+                    onclick="viewReport('contracts')"
+                >
+                    View Reports →
+                </button>
+
+            </div>
+
+
+            <div
+                class="report-card"
+                data-category="custom"
+            >
+
+                <div class="report-icon red">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+
+                <h3>
+                    Custom
+                    Reports
+                </h3>
+
+                <p>
+                    Create custom reports with
+                    advanced filters and
+                    personalized views.
+                </p>
+
+                <div
+                    class="report-count"
+                    id="customReportCount"
+                >
+                    0
+                </div>
+
+                <small>
+                    Custom Reports
+                </small>
+
+                <button
+                    class="view-link"
+                    onclick="createCustomReport()"
+                >
+                    View Reports →
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             QUICK EXPORT + STATISTICS
+        =================================================== -->
+
+        <section class="middle-grid">
+
+
+            <div class="panel quick-export">
+
+                <div class="panel-heading">
+
+                    <div>
+
+                        <h2>
+                            Quick Export
+                        </h2>
+
+                        <p>
+                            Export data in your preferred
+                            format
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="export-grid">
+
+
+                    <div class="export-card">
+
+                        <div class="export-icon pdf">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Export as PDF
+                            </h3>
+
+                            <p>
+                                Generate PDF reports with
+                                professional formatting
+                                and layout.
+                            </p>
+
+                        </div>
+
+                        <button
+                            class="export-button pdf-button"
+                            onclick="quickExport('pdf')"
+                        >
+                            Export PDF
+                        </button>
+
+                    </div>
+
+
+                    <div class="export-card">
+
+                        <div class="export-icon excel">
+                            <i class="fa-solid fa-file-excel"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Export as Excel
+                            </h3>
+
+                            <p>
+                                Export data to Excel format
+                                for further analysis and
+                                manipulation.
+                            </p>
+
+                        </div>
+
+                        <button
+                            class="export-button excel-button"
+                            onclick="quickExport('excel')"
+                        >
+                            Export Excel
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel statistics">
+
+                <div class="panel-heading">
+
+                    <h2>
+                        Report Statistics
+                    </h2>
+
+                    <p>
+                        Overview of all reports
+                    </p>
+
+                </div>
+
+
+                <div class="statistics-grid">
+
+                    <div class="stat-box">
+
+                        <small>
+                            Total Reports
+                        </small>
+
+                        <strong id="totalReports">
+                            0
+                        </strong>
+
+                        <span>
+                            <i class="fa-solid fa-file-lines"></i>
+                        </span>
+
+                    </div>
+
+
+                    <div class="stat-box">
+
+                        <small>
+                            Generated This Month
+                        </small>
+
+                        <strong id="generatedThisMonth">
+                            0
+                        </strong>
+
+                        <span>
+                            <i class="fa-regular fa-calendar-check"></i>
+                        </span>
+
+                    </div>
+
+
+                    <div class="stat-box">
+
+                        <small>
+                            Total Downloads
+                        </small>
+
+                        <strong id="totalDownloads">
+                            0
+                        </strong>
+
+                        <span>
+                            <i class="fa-solid fa-download"></i>
+                        </span>
+
+                    </div>
+
+
+                    <div class="stat-box">
+
+                        <small>
+                            Scheduled Reports
+                        </small>
+
+                        <span>
+                            <i class="fa-regular fa-clock"></i>
+                        </span>
+
+                        <strong id="scheduledReports">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             RECENT REPORTS
+        =================================================== -->
+
+        <section class="panel">
+
+            <div class="table-heading">
+
+                <div>
+
+                    <h2>
+                        Recent Reports
+                    </h2>
+
+                    <p>
+                        Recently generated and downloaded
+                        reports
+                    </p>
+
+                </div>
+
+                <button
+                    class="view-all"
+                    onclick="loadRecentReports()"
+                >
+                    View All Reports →
+                </button>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Report Name
+                            </th>
+
+                            <th>
+                                Category
+                            </th>
+
+                            <th>
+                                Generated By
+                            </th>
+
+                            <th>
+                                Generated On
+                            </th>
+
+                            <th>
+                                Format
+                            </th>
+
+                            <th>
+                                Size
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody
+                        id="recentReportsTable"
+                    >
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             SCHEDULED REPORTS
+        =================================================== -->
+
+        <section class="panel">
+
+            <div class="table-heading">
+
+                <div>
+
+                    <h2>
+                        Scheduled Reports
+                    </h2>
+
+                    <p>
+                        Automated reports scheduled
+                        for generation
+                    </p>
+
+                </div>
+
+                <button
+                    class="view-all"
+                    onclick="loadScheduledReports()"
+                >
+                    View All Schedules →
+                </button>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Report Name
+                            </th>
+
+                            <th>
+                                Schedule
+                            </th>
+
+                            <th>
+                                Next Run
+                            </th>
+
+                            <th>
+                                Recipients
+                            </th>
+
+                            <th>
+                                Format
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody
+                        id="scheduledReportsTable"
+                    >
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script src="/static/ReportsExports.js"></script>
+
+</body>
+
+</html>

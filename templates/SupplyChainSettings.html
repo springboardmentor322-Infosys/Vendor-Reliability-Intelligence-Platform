@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        VendorIQ - Settings
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/SupplyChainSettings.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div>
+
+                <div class="brand-title">
+                    VendorIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/supplychaindashboard" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="demand-planning" class="nav-item">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Demand Planning</span>
+            </a>
+
+            <a href="/supplychainprocurement" class="nav-item">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Procurement</span>
+            </a>
+
+            <a href="/suppliers" class="nav-item">
+                <i class="fa-solid fa-users"></i>
+                <span>Suppliers</span>
+            </a>
+
+            <a href="/inventory" class="nav-item">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                <span>Inventory</span>
+            </a>
+
+            <a href="/ordersshipments" class="nav-item">
+                <i class="fa-solid fa-truck"></i>
+                <span>Orders & Shipments</span>
+            </a>
+
+            <a href="/warehouses" class="nav-item">
+                <i class="fa-solid fa-warehouse"></i>
+                <span>Warehouses</span>
+            </a>
+
+            <a href="/transportation" class="nav-item">
+                <i class="fa-solid fa-route"></i>
+                <span>Transportation</span>
+            </a>
+
+            <a href="/analyticsreports" class="nav-item">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Analytics & Reports</span>
+            </a>
+
+            <a href="/alertsnotifications" class="nav-item">
+                <i class="fa-solid fa-bell"></i>
+                <span>Alerts & Notifications</span>
+            </a>
+
+            <a href="/documents" class="nav-item">
+                <i class="fa-solid fa-file-lines"></i>
+                <span>Documents</span>
+            </a>
+
+            <a
+                href="/supplychainsettings"
+                class="nav-item active"
+            >
+
+                <i class="fa-solid fa-gear"></i>
+
+                <span>
+                    Settings
+                </span>
+
+            </a>
+
+            <a href="/login" class="nav-item">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <!-- QUICK ACTIONS -->
+
+        <div class="quick-actions">
+
+            <h4>
+                Quick Actions
+            </h4>
+
+            <button onclick="window.location.href='/CreatePurchaseOrder'">
+                <i class="fa-solid fa-cart-plus"></i>
+                Create Purchase Order
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/AddSupplier'">
+                <i class="fa-solid fa-user-plus"></i>
+                Add New Supplier
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/CreateShipment'">
+                <i class="fa-solid fa-ship"></i>
+                Create Shipment
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/UploadDocument'">
+                <i class="fa-solid fa-upload"></i>
+                Upload Document
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+
+        <!-- PROFILE -->
+
+        <div class="profile-card" onclick="openSupplyChainProfile()">
+
+            <div class="profile-avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <div class="profile-details">
+
+                <strong id="sidebarName">
+                    Supply Chain Manager
+                </strong>
+
+                <span id="sidebarRole">
+                    Supply Chain Manager
+                </span>
+
+                <div class="online">
+
+                    <span></span>
+
+                    Online
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <h1>
+                    Supply Chain Manager Dashboard
+                </h1>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <div class="search-box">
+
+                    <input
+                        id="settingsSearch"
+                        type="text"
+                        placeholder="Search settings..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <button class="icon-button notification-button">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span>
+                        5
+                    </span>
+
+                </button>
+
+                <div class="date-widget">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <div>
+
+                        <strong id="currentDate">
+                            --
+                        </strong>
+
+                        <small id="currentTime">
+                            --
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+
+        <section class="content">
+
+            <div class="page-heading">
+
+                <h2>
+                    Settings
+                </h2>
+
+                <p>
+                    Manage your account, preferences,
+                    system configurations, and more.
+                </p>
+
+            </div>
+
+
+            <!-- TABS -->
+
+            <div class="tabs">
+
+                <button
+                    class="tab active"
+                    data-tab="general"
+                >
+                    <i class="fa-solid fa-gear"></i>
+                    General
+                </button>
+
+                <button
+                    class="tab"
+                    data-tab="users"
+                >
+                    <i class="fa-solid fa-users"></i>
+                    Users & Roles
+                </button>
+
+                <button
+                    class="tab"
+                    data-tab="notifications"
+                >
+                    <i class="fa-regular fa-bell"></i>
+                    Notifications
+                </button>
+
+                <button
+                    class="tab"
+                    data-tab="integrations"
+                >
+                    <i class="fa-solid fa-link"></i>
+                    Integrations
+                </button>
+
+                <button
+                    class="tab"
+                    data-tab="system"
+                >
+                    <i class="fa-solid fa-gears"></i>
+                    System
+                </button>
+
+                <button
+                    class="tab"
+                    data-tab="security"
+                >
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Security
+                </button>
+
+                <button
+                    class="tab"
+                    data-tab="audit"
+                >
+                    <i class="fa-regular fa-file-lines"></i>
+                    Audit & Logs
+                </button>
+
+            </div>
+
+
+            <!-- =================================================
+                 GENERAL TAB
+            ================================================== -->
+
+            <div
+                id="generalTab"
+                class="tab-content active"
+            >
+
+                <div class="settings-grid">
+
+
+                    <!-- =========================================
+                         LEFT COLUMN
+                    ========================================== -->
+
+                    <div class="left-column">
+
+
+                        <!-- GENERAL SETTINGS -->
+
+                        <section class="card">
+
+                            <div class="card-title">
+                                General Settings
+                            </div>
+
+
+                            <div class="two-panel">
+
+
+                                <!-- COMPANY -->
+
+                                <div class="inner-panel">
+
+                                    <h3>
+                                        Company Information
+                                    </h3>
+
+                                    <div class="form-row">
+
+                                        <label>
+                                            Company Name
+                                        </label>
+
+                                        <input
+                                            id="companyName"
+                                            type="text"
+                                        >
+
+                                    </div>
+
+                                    <div class="form-row">
+
+                                        <label>
+                                            Company ID
+                                        </label>
+
+                                        <input
+                                            id="companyId"
+                                            type="text"
+                                        >
+
+                                    </div>
+
+                                    <div class="form-row">
+
+                                        <label>
+                                            Industry
+                                        </label>
+
+                                        <select id="industry">
+
+                                            <option>
+                                                Manufacturing
+                                            </option>
+
+                                            <option>
+                                                Retail
+                                            </option>
+
+                                            <option>
+                                                Logistics
+                                            </option>
+
+                                            <option>
+                                                Distribution
+                                            </option>
+
+                                            <option>
+                                                Technology
+                                            </option>
+
+                                            <option>
+                                                Healthcare
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-row">
+
+                                        <label>
+                                            Default Language
+                                        </label>
+
+                                        <select id="defaultLanguage">
+
+                                            <option>
+                                                English (US)
+                                            </option>
+
+                                            <option>
+                                                English (UK)
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-row">
+
+                                        <label>
+                                            Base Currency
+                                        </label>
+
+                                        <select id="currency">
+
+                                            <option>
+                                                USD - US Dollar ($)
+                                            </option>
+
+                                            <option>
+                                                INR - Indian Rupee (₹)
+                                            </option>
+
+                                            <option>
+                                                EUR - Euro (€)
+                                            </option>
+
+                                            <option>
+                                                GBP - Pound (£)
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-row">
+
+                                        <label>
+                                            Time Zone
+                                        </label>
+
+                                        <select id="timezone">
+
+                                            <option>
+                                                (UTC+05:30) Asia/Kolkata
+                                            </option>
+
+                                            <option>
+                                                (UTC+00:00) UTC
+                                            </option>
+
+                                            <option>
+                                                (UTC-05:00) America/New_York
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <button
+                                        class="primary-button"
+                                        id="saveCompany"
+                                    >
+                                        Save Changes
+                                    </button>
+
+                                </div>
+
+
+                                <!-- ADDRESS -->
+
+                                <div class="inner-panel address-panel">
+
+                                    <h3>
+                                        Address
+                                    </h3>
+
+                                    <div
+                                        class="address-text"
+                                        id="companyAddressDisplay"
+                                    >
+                                        --
+                                    </div>
+
+                                    <h3>
+                                        Phone
+                                    </h3>
+
+                                    <div id="companyPhone">
+                                        --
+                                    </div>
+
+                                    <h3>
+                                        Email
+                                    </h3>
+
+                                    <div id="companyEmail">
+                                        --
+                                    </div>
+
+                                    <h3>
+                                        Website
+                                    </h3>
+
+                                    <div id="companyWebsite">
+                                        --
+                                    </div>
+
+                                    <button
+                                        class="secondary-button"
+                                        id="editCompany"
+                                    >
+                                        Edit Company Info
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+                        <!-- BUSINESS SETTINGS -->
+
+                        <section class="card">
+
+                            <div class="card-title">
+                                Business Settings
+                            </div>
+
+                            <div class="form-grid">
+
+                                <div class="form-row">
+
+                                    <label>
+                                        Financial Year Start
+                                    </label>
+
+                                    <select id="financialYear">
+
+                                        <option>
+                                            April
+                                        </option>
+
+                                        <option>
+                                            January
+                                        </option>
+
+                                        <option>
+                                            July
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <label>
+                                        Default Warehouse
+                                    </label>
+
+                                    <select id="defaultWarehouse">
+                                    </select>
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <label>
+                                        Default Supplier
+                                    </label>
+
+                                    <select id="defaultSupplier">
+                                    </select>
+
+                                </div>
+
+                                <div class="form-row">
+
+                                    <label>
+                                        Default Payment Terms
+                                    </label>
+
+                                    <select id="paymentTerms">
+
+                                        <option>
+                                            Net 15 Days
+                                        </option>
+
+                                        <option>
+                                            Net 30 Days
+                                        </option>
+
+                                        <option>
+                                            Net 45 Days
+                                        </option>
+
+                                        <option>
+                                            Net 60 Days
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="toggle-list">
+
+                                <label class="toggle-row">
+
+                                    <span>
+                                        <strong>
+                                            Tax Calculation
+                                        </strong>
+
+                                        <small>
+                                            Enable automatic tax calculation
+                                        </small>
+                                    </span>
+
+                                    <input
+                                        type="checkbox"
+                                        id="taxCalculation"
+                                    >
+
+                                    <span class="switch"></span>
+
+                                </label>
+
+
+                                <label class="toggle-row">
+
+                                    <span>
+                                        <strong>
+                                            Multi-Currency
+                                        </strong>
+
+                                        <small>
+                                            Enable multi-currency transactions
+                                        </small>
+                                    </span>
+
+                                    <input
+                                        type="checkbox"
+                                        id="multiCurrency"
+                                    >
+
+                                    <span class="switch"></span>
+
+                                </label>
+
+                            </div>
+
+
+                            <button
+                                class="primary-button"
+                                id="saveBusiness"
+                            >
+                                Save Business Settings
+                            </button>
+
+                        </section>
+
+
+                        <!-- INTEGRATIONS -->
+
+                        <section class="card">
+
+                            <div class="card-title">
+                                Integrations
+                            </div>
+
+                            <div id="integrationsContainer">
+                            </div>
+
+                            <button
+                                class="link-button"
+                                id="viewIntegrations"
+                            >
+                                View All Integrations
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+
+                        </section>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         RIGHT COLUMN
+                    ========================================== -->
+
+                    <div class="right-column">
+
+
+                        <!-- SYSTEM PREFERENCES -->
+
+                        <section class="card">
+
+                            <div class="card-title">
+                                System Preferences
+                            </div>
+
+                            <div class="form-row">
+
+                                <label>
+                                    Date Format
+                                </label>
+
+                                <select id="dateFormat">
+
+                                    <option>
+                                        MM/DD/YYYY
+                                    </option>
+
+                                    <option>
+                                        DD/MM/YYYY
+                                    </option>
+
+                                    <option>
+                                        YYYY-MM-DD
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-row">
+
+                                <label>
+                                    Time Format
+                                </label>
+
+                                <select id="timeFormat">
+
+                                    <option>
+                                        12 Hour (AM/PM)
+                                    </option>
+
+                                    <option>
+                                        24 Hour
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-row">
+
+                                <label>
+                                    Number Format
+                                </label>
+
+                                <select id="numberFormat">
+
+                                    <option>
+                                        1,234.56
+                                    </option>
+
+                                    <option>
+                                        1.234,56
+                                    </option>
+
+                                    <option>
+                                        1 234,56
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-row">
+
+                                <label>
+                                    Measurement Unit
+                                </label>
+
+                                <select id="measurementUnit">
+
+                                    <option>
+                                        Metric (kg, cm, km)
+                                    </option>
+
+                                    <option>
+                                        Imperial (lb, in, mi)
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-row">
+
+                                <label>
+                                    Default Dashboard
+                                </label>
+
+                                <select id="defaultDashboard">
+
+                                    <option>
+                                        Supply Chain Overview
+                                    </option>
+
+                                    <option>
+                                        Procurement Overview
+                                    </option>
+
+                                    <option>
+                                        Inventory Overview
+                                    </option>
+
+                                    <option>
+                                        Analytics Dashboard
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-row">
+
+                                <label>
+                                    Items Per Page
+                                </label>
+
+                                <select id="itemsPerPage">
+
+                                    <option value="10">
+                                        10
+                                    </option>
+
+                                    <option value="25">
+                                        25
+                                    </option>
+
+                                    <option value="50">
+                                        50
+                                    </option>
+
+                                    <option value="100">
+                                        100
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="theme-selector">
+
+                                <label>
+                                    Theme
+                                </label>
+
+                                <div>
+
+                                    <button
+                                        class="theme-option active"
+                                        data-theme="Light"
+                                    >
+                                        Light
+                                    </button>
+
+                                    <button
+                                        class="theme-option"
+                                        data-theme="Dark"
+                                    >
+                                        Dark
+                                    </button>
+
+                                    <button
+                                        class="theme-option"
+                                        data-theme="System"
+                                    >
+                                        System
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <button
+                                class="primary-button"
+                                id="savePreferences"
+                            >
+                                Save Preferences
+                            </button>
+
+                        </section>
+
+
+                        <!-- SECURITY -->
+
+                        <section class="card">
+
+                            <div class="card-title">
+                                Security Settings
+                            </div>
+
+                            <div class="security-item">
+
+                                <div>
+
+                                    <strong>
+                                        Two-Factor Authentication
+                                    </strong>
+
+                                    <small>
+                                        Enhance account security
+                                    </small>
+
+                                </div>
+
+                                <label class="switch-control">
+
+                                    <input
+                                        type="checkbox"
+                                        id="twoFactor"
+                                    >
+
+                                    <span></span>
+
+                                </label>
+
+                            </div>
+
+
+                            <div class="security-item">
+
+                                <div>
+
+                                    <strong>
+                                        Password Policy
+                                    </strong>
+
+                                    <small>
+                                        Enforce strong password rules
+                                    </small>
+
+                                </div>
+
+                                <button
+                                    class="secondary-button"
+                                    id="configurePassword"
+                                >
+                                    Configure
+                                </button>
+
+                            </div>
+
+
+                            <div class="security-item">
+
+                                <div>
+
+                                    <strong>
+                                        Session Timeout
+                                    </strong>
+
+                                    <small>
+                                        Auto logout after inactivity
+                                    </small>
+
+                                </div>
+
+                                <select id="sessionTimeout">
+
+                                    <option>
+                                        15 Minutes
+                                    </option>
+
+                                    <option>
+                                        30 Minutes
+                                    </option>
+
+                                    <option>
+                                        60 Minutes
+                                    </option>
+
+                                    <option>
+                                        120 Minutes
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="security-item">
+
+                                <div>
+
+                                    <strong>
+                                        Login Attempts
+                                    </strong>
+
+                                    <small>
+                                        Max login attempts before lock
+                                    </small>
+
+                                </div>
+
+                                <select id="loginAttempts">
+
+                                    <option value="3">
+                                        3 Attempts
+                                    </option>
+
+                                    <option value="5">
+                                        5 Attempts
+                                    </option>
+
+                                    <option value="10">
+                                        10 Attempts
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <button
+                                class="secondary-button"
+                                id="saveSecurity"
+                            >
+                                Save Security Settings
+                            </button>
+
+                        </section>
+
+
+                        <!-- EMAIL NOTIFICATIONS -->
+
+                        <section class="card">
+
+                            <div class="card-title">
+                                Email Notifications
+                            </div>
+
+                            <div class="notification-list">
+
+                                <label class="toggle-row compact">
+
+                                    <span>
+                                        <strong>
+                                            Order Updates
+                                        </strong>
+
+                                        <small>
+                                            Receive order status updates
+                                        </small>
+                                    </span>
+
+                                    <input
+                                        type="checkbox"
+                                        id="orderUpdates"
+                                    >
+
+                                    <span class="switch"></span>
+
+                                </label>
+
+
+                                <label class="toggle-row compact">
+
+                                    <span>
+                                        <strong>
+                                            Shipment Updates
+                                        </strong>
+
+                                        <small>
+                                            Receive shipment status updates
+                                        </small>
+                                    </span>
+
+                                    <input
+                                        type="checkbox"
+                                        id="shipmentUpdates"
+                                    >
+
+                                    <span class="switch"></span>
+
+                                </label>
+
+
+                                <label class="toggle-row compact">
+
+                                    <span>
+                                        <strong>
+                                            Inventory Alerts
+                                        </strong>
+
+                                        <small>
+                                            Receive low stock alerts
+                                        </small>
+                                    </span>
+
+                                    <input
+                                        type="checkbox"
+                                        id="inventoryAlerts"
+                                    >
+
+                                    <span class="switch"></span>
+
+                                </label>
+
+
+                                <label class="toggle-row compact">
+
+                                    <span>
+                                        <strong>
+                                            Supplier Notifications
+                                        </strong>
+
+                                        <small>
+                                            Receive supplier notifications
+                                        </small>
+                                    </span>
+
+                                    <input
+                                        type="checkbox"
+                                        id="supplierNotifications"
+                                    >
+
+                                    <span class="switch"></span>
+
+                                </label>
+
+
+                                <label class="toggle-row compact">
+
+                                    <span>
+                                        <strong>
+                                            System Alerts
+                                        </strong>
+
+                                        <small>
+                                            Receive system alerts
+                                        </small>
+                                    </span>
+
+                                    <input
+                                        type="checkbox"
+                                        id="systemAlerts"
+                                    >
+
+                                    <span class="switch"></span>
+
+                                </label>
+
+
+                                <label class="toggle-row compact">
+
+                                    <span>
+                                        <strong>
+                                            Weekly Reports
+                                        </strong>
+
+                                        <small>
+                                            Receive weekly summary reports
+                                        </small>
+                                    </span>
+
+                                    <input
+                                        type="checkbox"
+                                        id="weeklyReports"
+                                    >
+
+                                    <span class="switch"></span>
+
+                                </label>
+
+                            </div>
+
+
+                            <button
+                                class="secondary-button"
+                                id="manageNotificationTemplate"
+                            >
+                                Manage Notification Template
+                            </button>
+
+                        </section>
+
+
+                        <!-- DATA MANAGEMENT -->
+
+                        <section class="card">
+
+                            <div class="card-title">
+                                Data Management
+                            </div>
+
+                            <div class="form-row">
+
+                                <label>
+                                    Backup Frequency
+                                </label>
+
+                                <select id="backupFrequency">
+
+                                    <option>
+                                        Daily
+                                    </option>
+
+                                    <option>
+                                        Weekly
+                                    </option>
+
+                                    <option>
+                                        Monthly
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-row">
+
+                                <label>
+                                    Backup Time
+                                </label>
+
+                                <select id="backupTime">
+
+                                    <option>
+                                        02:00 AM
+                                    </option>
+
+                                    <option>
+                                        12:00 AM
+                                    </option>
+
+                                    <option>
+                                        06:00 AM
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-row">
+
+                                <label>
+                                    Data Retention
+                                </label>
+
+                                <select id="dataRetention">
+
+                                    <option>
+                                        1 Year
+                                    </option>
+
+                                    <option>
+                                        2 Years
+                                    </option>
+
+                                    <option>
+                                        5 Years
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <label class="toggle-row compact">
+
+                                <span>
+                                    <strong>
+                                        Auto Backup
+                                    </strong>
+                                </span>
+
+                                <input
+                                    type="checkbox"
+                                    id="autoBackup"
+                                >
+
+                                <span class="switch"></span>
+
+                            </label>
+
+
+                            <button
+                                class="secondary-button"
+                                id="runBackup"
+                            >
+                                Run Backup Now
+                            </button>
+
+                        </section>
+
+
+                        <!-- OTHER SETTINGS -->
+
+                        <section class="card">
+
+                            <div class="card-title">
+                                Other Settings
+                            </div>
+
+                            <label class="toggle-row compact">
+
+                                <span>
+                                    <strong>
+                                        Maintenance Mode
+                                    </strong>
+
+                                    <small>
+                                        Temporarily disable system access
+                                    </small>
+                                </span>
+
+                                <input
+                                    type="checkbox"
+                                    id="maintenanceMode"
+                                >
+
+                                <span class="switch"></span>
+
+                            </label>
+
+
+                            <label class="toggle-row compact">
+
+                                <span>
+                                    <strong>
+                                        System Updates
+                                    </strong>
+
+                                    <small>
+                                        Receive system update notifications
+                                    </small>
+                                </span>
+
+                                <input
+                                    type="checkbox"
+                                    id="systemUpdates"
+                                >
+
+                                <span class="switch"></span>
+
+                            </label>
+
+
+                            <label class="toggle-row compact">
+
+                                <span>
+                                    <strong>
+                                        Beta Features
+                                    </strong>
+
+                                    <small>
+                                        Enable access to beta features
+                                    </small>
+                                </span>
+
+                                <input
+                                    type="checkbox"
+                                    id="betaFeatures"
+                                >
+
+                                <span class="switch"></span>
+
+                            </label>
+
+
+                            <button
+                                class="secondary-button"
+                                id="saveOther"
+                            >
+                                Save Other Settings
+                            </button>
+
+                        </section>
+
+
+                        <!-- DANGER ZONE -->
+
+                        <section class="card danger-card">
+
+                            <div class="card-title danger-title">
+                                Danger Zone
+                            </div>
+
+
+                            <div class="danger-item">
+
+                                <div>
+
+                                    <strong>
+                                        Reset All Settings
+                                    </strong>
+
+                                    <small>
+                                        Restore system settings to default
+                                    </small>
+
+                                </div>
+
+                                <button
+                                    class="danger-button"
+                                    id="resetSettings"
+                                >
+                                    Reset
+                                </button>
+
+                            </div>
+
+
+                            <div class="danger-item">
+
+                                <div>
+
+                                    <strong>
+                                        Delete Account
+                                    </strong>
+
+                                    <small>
+                                        Permanently delete your account and data
+                                    </small>
+
+                                </div>
+
+                                <button
+                                    class="danger-button"
+                                    id="deleteAccount"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div
+    id="toast"
+    class="toast"
+>
+    Settings saved
+</div>
+
+
+<script src="/static/SupplyChainSettings.js"></script>
+
+</body>
+
+</html>

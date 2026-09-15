@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SCM - Upload Document</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/UploadDocument.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+        <nav class="navigation">
+
+            <a href="/supplychaindashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/demand-planning">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Demand Planning</span>
+            </a>
+
+            <a href="/supplychainprocurement">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Procurement</span>
+            </a>
+
+            <a href="/suppliers">
+                <i class="fa-solid fa-users"></i>
+                <span>Suppliers</span>
+            </a>
+
+            <a href="/inventory">
+                <i class="fa-solid fa-box"></i>
+                <span>Inventory</span>
+            </a>
+
+            <a href="/ordersshipments">
+                <i class="fa-solid fa-truck"></i>
+                <span>Orders & Shipments</span>
+            </a>
+
+            <a href="/warehouses">
+                <i class="fa-solid fa-warehouse"></i>
+                <span>Warehouses</span>
+            </a>
+
+            <a href="/transportation">
+                <i class="fa-solid fa-truck-fast"></i>
+                <span>Transportation</span>
+            </a>
+
+            <a href="/analyticsreports">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Analytics & Reports</span>
+            </a>
+
+            <a href="/alertsnotifications">
+                <i class="fa-solid fa-bell"></i>
+                <span>Alerts & Notifications</span>
+            </a>
+
+            <a
+                href="/documents"
+                class="active"
+            >
+                <i class="fa-regular fa-file-lines"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/supplychainsettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="quick-actions">
+
+            <h4>Quick Actions</h4>
+
+            <button onclick="window.location.href='/CreatePurchaseOrder'">
+                <i class="fa-solid fa-cart-plus"></i>
+                Create Purchase Order
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/AddSupplier'">
+                <i class="fa-solid fa-user-plus"></i>
+                Add New Supplier
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/CreateShipment'">
+                <i class="fa-solid fa-ship"></i>
+                Create Shipment
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/UploadDocument'">
+                <i class="fa-solid fa-upload"></i>
+                Upload Document
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+        <div class="profile-card" onclick="openSupplyChainProfile()">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <strong>Arjun Kumar</strong>
+
+            <span>Supply Chain Manager</span>
+
+            <small>
+                <i class="fa-solid fa-circle"></i>
+                Online
+            </small>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================================================= -->
+    <!-- MAIN -->
+    <!-- ================================================= -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <h1>Supply Chain Dashboard</h1>
+
+            <div class="top-actions">
+
+                <div class="search-box">
+
+                    <input
+                        type="text"
+                        placeholder="Search documents..."
+                        id="globalSearch"
+                    >
+
+                    <i class="fa-solid fa-search"></i>
+
+                </div>
+
+                <button class="icon-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notification-count">5</span>
+                </button>
+
+                <div class="date-box">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <div>
+                        <strong id="currentDate">
+                            May 23, 2025
+                        </strong>
+
+                        <small id="currentTime">
+                            10:30 AM
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================================================= -->
+        <!-- CONTENT -->
+        <!-- ================================================= -->
+
+        <section class="content">
+
+            <!-- STEPS -->
+
+            <div class="steps-card">
+
+                <div class="step active">
+                    <span>1</span>
+                    <b>Document Information</b>
+                </div>
+
+                <div class="line"></div>
+
+                <div class="step">
+                    <span>2</span>
+                    <b>Upload & Details</b>
+                </div>
+
+                <div class="line"></div>
+
+                <div class="step">
+                    <span>3</span>
+                    <b>Review & Confirm</b>
+                </div>
+
+            </div>
+
+
+            <div class="layout">
+
+                <!-- ================================================= -->
+                <!-- FORM -->
+                <!-- ================================================= -->
+
+                <section class="form-card">
+
+                    <h2>Document Information</h2>
+
+                    <form id="documentForm">
+
+                        <div class="grid-3">
+
+                            <div class="field">
+
+                                <label>
+                                    Document Category
+                                    <span>*</span>
+                                </label>
+
+                                <select
+                                    id="category"
+                                    name="category"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select category
+                                    </option>
+
+                                    <option value="Purchase Orders">
+                                        Purchase Orders
+                                    </option>
+
+                                    <option value="Contracts">
+                                        Contracts
+                                    </option>
+
+                                    <option value="Invoices">
+                                        Invoices
+                                    </option>
+
+                                    <option value="Reports">
+                                        Reports
+                                    </option>
+
+                                    <option value="Certificates">
+                                        Certificates
+                                    </option>
+
+                                    <option value="Shipping">
+                                        Shipping
+                                    </option>
+
+                                    <option value="Other">
+                                        Other
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Document Type
+                                    <span>*</span>
+                                </label>
+
+                                <select
+                                    id="documentType"
+                                    name="document_type"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select type
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Related To
+                                    <span>*</span>
+                                </label>
+
+                                <select
+                                    id="relatedTo"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="grid-2">
+
+                            <div class="field">
+
+                                <label>
+                                    Document Title
+                                    <span>*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="documentTitle"
+                                    name="document_title"
+                                    placeholder="Enter document title"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Document Description
+                                    <em>(Optional)</em>
+                                </label>
+
+                                <textarea
+                                    id="documentDescription"
+                                    name="document_description"
+                                    placeholder="Enter a short description about this document..."
+                                ></textarea>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="grid-2">
+
+                            <div class="field">
+
+                                <label>
+                                    Business Unit / Entity
+                                </label>
+
+                                <select
+                                    id="businessUnit"
+                                    name="business_unit"
+                                >
+
+                                    <option value="">
+                                        Select entity
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Tags
+                                    <em>(Optional)</em>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="tags"
+                                    name="tags"
+                                    placeholder="purchase-order, supplier, 2025"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="grid-3">
+
+                            <div class="field">
+
+                                <label>
+                                    Confidentiality Level
+                                </label>
+
+                                <select
+                                    id="confidentiality"
+                                    name="confidentiality_level"
+                                >
+
+                                    <option value="Internal">
+                                        🔒 Internal
+                                    </option>
+
+                                    <option value="Confidential">
+                                        Confidential
+                                    </option>
+
+                                    <option value="Restricted">
+                                        Restricted
+                                    </option>
+
+                                    <option value="Public">
+                                        Public
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Retention Period
+                                </label>
+
+                                <select
+                                    id="retention"
+                                    name="retention_period"
+                                >
+
+                                    <option value="1 Year">
+                                        1 Year
+                                    </option>
+
+                                    <option value="3 Years">
+                                        3 Years
+                                    </option>
+
+                                    <option
+                                        value="5 Years"
+                                    >
+                                        5 Years
+                                    </option>
+
+                                    <option
+                                        value="7 Years"
+                                        selected
+                                    >
+                                        7 Years
+                                    </option>
+
+                                    <option
+                                        value="10 Years"
+                                    >
+                                        10 Years
+                                    </option>
+
+                                    <option
+                                        value="Permanent"
+                                    >
+                                        Permanent
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label>
+                                    Document Date
+                                    <span>*</span>
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="documentDate"
+                                    name="document_date"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- UPLOAD -->
+
+                        <div class="upload-section">
+
+                            <h3>Upload Document</h3>
+
+                            <div
+                                class="drop-zone"
+                                id="dropZone"
+                            >
+
+                                <input
+                                    type="file"
+                                    id="fileInput"
+                                    hidden
+                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"
+                                >
+
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                                <strong>
+                                    Drag and drop files here
+                                </strong>
+
+                                <span>or</span>
+
+                                <button
+                                    type="button"
+                                    id="browseBtn"
+                                >
+                                    Browse Files
+                                </button>
+
+                                <small>
+                                    Supports: PDF, DOCX, XLSX,
+                                    PPTX, JPG, PNG
+                                    &nbsp; | &nbsp;
+                                    Max file size: 25MB
+                                </small>
+
+                            </div>
+
+                            <div
+                                class="selected-file"
+                                id="selectedFile"
+                            ></div>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label>
+                                Additional Information
+                                <em>(Optional)</em>
+                            </label>
+
+                            <textarea
+                                id="additionalInfo"
+                                name="additional_info"
+                                class="large-textarea"
+                                placeholder="Add any additional notes or information about this document..."
+                            ></textarea>
+
+                        </div>
+
+
+                        <!-- BUTTONS -->
+
+                        <div class="form-actions">
+
+                            <button
+                                type="button"
+                                class="btn secondary"
+                                id="cancelBtn"
+                            >
+                                Cancel
+                            </button>
+
+                            <div>
+
+                                <button
+                                    type="button"
+                                    class="btn outline"
+                                    id="draftBtn"
+                                >
+                                    Save as Draft
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    class="btn primary"
+                                    id="submitBtn"
+                                >
+                                    Next: Upload & Details
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </section>
+
+
+                <!-- ================================================= -->
+                <!-- RIGHT SIDEBAR -->
+                <!-- ================================================= -->
+
+                <aside class="right-panel">
+
+                    <!-- GUIDELINES -->
+
+                    <div class="side-card">
+
+                        <div class="side-title">
+
+                            <h2>Upload Guidelines</h2>
+
+                            <i class="fa-regular fa-circle-info"></i>
+
+                        </div>
+
+                        <ul class="guidelines">
+
+                            <li>
+                                <i class="fa-regular fa-circle-check"></i>
+                                Ensure documents are clear and legible.
+                            </li>
+
+                            <li>
+                                <i class="fa-regular fa-file"></i>
+                                Use meaningful titles for easy identification.
+                            </li>
+
+                            <li>
+                                <i class="fa-regular fa-file-lines"></i>
+                                Allowed file types: PDF, DOCX, XLSX, PPTX, JPG, PNG
+                            </li>
+
+                            <li>
+                                <i class="fa-regular fa-file"></i>
+                                Maximum file size: 25MB per file
+                            </li>
+
+                            <li>
+                                <i class="fa-solid fa-shield-halved"></i>
+                                Sensitive documents will be stored securely.
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+                    <!-- RECENT UPLOADS -->
+
+                    <div class="side-card">
+
+                        <div class="side-title">
+
+                            <h2>Recent Uploads</h2>
+
+                            <button
+                                type="button"
+                                id="viewAllBtn"
+                            >
+                                View All
+                            </button>
+
+                        </div>
+
+                        <div id="recentUploads">
+
+                            <div class="loading">
+                                Loading...
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STORAGE -->
+
+                    <div class="side-card">
+
+                        <div class="side-title">
+
+                            <h2>Storage Overview</h2>
+
+                            <button
+                                type="button"
+                                id="storageDetails"
+                            >
+                                View Details
+                            </button>
+
+                        </div>
+
+                        <div class="storage">
+
+                            <div class="storage-circle">
+
+                                <div>
+
+                                    <strong id="storageUsed">
+                                        0 GB
+                                    </strong>
+
+                                    <small>
+                                        of 10 GB Used
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                            <div class="storage-info">
+
+                                <div>
+                                    <span>
+                                        Purchase Orders
+                                    </span>
+
+                                    <b>45%</b>
+                                </div>
+
+                                <div>
+                                    <span>
+                                        Contracts
+                                    </span>
+
+                                    <b>20%</b>
+                                </div>
+
+                                <div>
+                                    <span>
+                                        Reports
+                                    </span>
+
+                                    <b>15%</b>
+                                </div>
+
+                                <div>
+                                    <span>
+                                        Certificates
+                                    </span>
+
+                                    <b>10%</b>
+                                </div>
+
+                                <div>
+                                    <span>
+                                        Others
+                                    </span>
+
+                                    <b>10%</b>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="available"
+                            id="storageAvailable"
+                        >
+                            Available: 10 GB
+                        </div>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="/static/UploadDocument.js"></script>
+
+</body>
+</html>

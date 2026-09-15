@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>VendorIQ - Notifications</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/VendorNotifications.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-cube"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+        <nav>
+
+            <a href="/VendorDashboard">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="/VendorProfile">
+                <i class="fa-regular fa-user"></i>
+                Vendor Profile
+            </a>
+
+            <a href="/PerformanceOverview">
+                <i class="fa-solid fa-chart-column"></i>
+                Performance Overview
+            </a>
+
+            <a href="/PurchaseOrders">
+                <i class="fa-solid fa-bag-shopping"></i>
+                Purchase Orders
+            </a>
+
+            <a href="/VendorContract">
+                <i class="fa-regular fa-file-lines"></i>
+                Contracts & Compliance
+            </a>
+
+            <a href="/VendorInvoices">
+                <i class="fa-regular fa-credit-card"></i>
+                Invoices & Payments
+            </a>
+
+            <a href="/VendorCommunication">
+                <i class="fa-regular fa-comment"></i>
+                Communication
+
+                <span class="badge">
+                    3
+                </span>
+            </a>
+
+            <a
+                href="/VendorDocument"
+            >
+                <i class="fa-regular fa-file"></i>
+                Documents
+            </a>
+
+            <a
+                href="/VendorNotifications"
+                class="active"
+            >
+                <i class="fa-regular fa-bell"></i>
+                Notifications
+
+                <span
+                    class="badge"
+                    id="sidebarUnread"
+                >
+                    0
+                </span>
+
+            </a>
+
+        </nav>
+
+        <div class="menu-title">
+            REPORTS
+        </div>
+
+        <nav>
+ 
+            <a href="/PerformanceReports">
+                <i class="fa-solid fa-chart-line"></i>
+                Performance Reports
+            </a>
+
+            <a href="/OrderReports">
+                <i class="fa-regular fa-clipboard"></i>
+                Order Reports
+            </a>
+
+            <a href="/ComplianceReports">
+                <i class="fa-regular fa-square-check"></i>
+                Compliance Reports
+            </a>
+
+            <a href="/ExportReports">
+                <i class="fa-solid fa-file-export"></i>
+                Export Reports
+            </a>
+
+        </nav>
+
+        <div class="menu-title">
+            ACCOUNT
+        </div>
+
+        <nav>
+
+            <a href="/VendorSettings">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <a href="/VendorHelpSupport">
+                <i class="fa-regular fa-circle-question"></i>
+                Help & Support
+            </a>
+
+            <a href="/login" onclick="logout()">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                Logout
+            </a>
+
+        </nav>
+
+        <div class="vendor-card">
+
+            <div class="vendor-avatar">
+                <i class="fa-regular fa-user"></i>
+            </div>
+
+            <div>
+
+                <strong id="vendorName">
+                    Vendor
+                </strong>
+
+                <small id="vendorID">
+                    Vendor ID:
+                    <span id="vendorId">-</span>
+                </small>
+
+                <small class="verified">
+                    <span></span>
+                    Verified Vendor
+                </small>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div>
+
+                <h1>Notifications</h1>
+
+                <div class="breadcrumb">
+                    Home
+                    <span>/</span>
+                    Notifications
+                </div>
+
+            </div>
+
+            <div class="header-right">
+
+                <div class="header-search">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        id="topSearch"
+                        type="text"
+                        placeholder="Search notifications..."
+                    >
+
+                </div>
+
+                <button class="header-icon">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>7</span>
+                </button>
+
+                <button class="header-icon">
+                    <i class="fa-regular fa-envelope"></i>
+                    <span>12</span>
+                </button>
+
+                <div class="profile">
+
+                    <div class="profile-avatar">
+                        <i class="fa-regular fa-user"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerVendorName">
+                            Vendor
+                        </strong>
+
+                        <small>Vendor</small>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <!-- ================= STAT CARDS ================= -->
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon purple">
+                        <i class="fa-regular fa-bell"></i>
+                    </div>
+
+                    <div>
+                        <span>All Notifications</span>
+                        <strong id="allCount">0</strong>
+                        <small>
+                            Unread:
+                            <b id="allUnread">0</b>
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon green">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                    </div>
+
+                    <div>
+                        <span>Procurement Alerts</span>
+                        <strong id="procurementCount">0</strong>
+                        <small>
+                            Unread:
+                            <b id="procurementUnread">0</b>
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon orange">
+                        <i class="fa-solid fa-truck"></i>
+                    </div>
+
+                    <div>
+                        <span>Delivery Delays</span>
+                        <strong id="deliveryCount">0</strong>
+                        <small>
+                            Unread:
+                            <b id="deliveryUnread">0</b>
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon purple">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+
+                    <div>
+                        <span>Vendor Approvals</span>
+                        <strong id="vendorCount">0</strong>
+                        <small>
+                            Unread:
+                            <b id="vendorUnread">0</b>
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon red">
+                        <i class="fa-regular fa-file-lines"></i>
+                    </div>
+
+                    <div>
+                        <span>Contract Expiry</span>
+                        <strong id="contractCount">0</strong>
+                        <small>
+                            Unread:
+                            <b id="contractUnread">0</b>
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon blue">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+                        <span>Compliance</span>
+                        <strong id="complianceCount">0</strong>
+                        <small>
+                            Unread:
+                            <b id="complianceUnread">0</b>
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= TWO COLUMN AREA ================= -->
+
+            <div class="page-grid">
+
+                <!-- LEFT -->
+
+                <section class="notifications-panel">
+
+                    <div class="tabs-row">
+
+                        <button
+                            class="category-tab active"
+                            data-category="All"
+                        >
+                            All
+                        </button>
+
+                        <button
+                            class="category-tab"
+                            data-category="Procurement"
+                        >
+                            Procurement Alerts
+                        </button>
+
+                        <button
+                            class="category-tab"
+                            data-category="Delivery"
+                        >
+                            Delivery Delays
+                        </button>
+
+                        <button
+                            class="category-tab"
+                            data-category="Vendor"
+                        >
+                            Vendor Approvals
+                        </button>
+
+                        <button
+                            class="category-tab"
+                            data-category="Contract"
+                        >
+                            Contract Expiry
+                        </button>
+
+                        <button
+                            class="category-tab"
+                            data-category="Compliance"
+                        >
+                            Compliance
+                        </button>
+
+                        <button
+                            class="category-tab"
+                            data-category="System"
+                        >
+                            System
+                        </button>
+
+                        <button
+                            id="markAllReadBtn"
+                            class="mark-all"
+                        >
+                            <i class="fa-regular fa-square-check"></i>
+                            Mark all as read
+                        </button>
+
+                    </div>
+
+
+                    <div class="filters">
+
+                        <div class="filter-search">
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                            <input
+                                id="notificationSearch"
+                                placeholder="Search notifications..."
+                            >
+
+                        </div>
+
+                        <select id="categoryFilter">
+                            <option value="All">
+                                All Categories
+                            </option>
+
+                            <option value="Procurement">
+                                Procurement Alerts
+                            </option>
+
+                            <option value="Delivery">
+                                Delivery Delays
+                            </option>
+
+                            <option value="Vendor">
+                                Vendor Approvals
+                            </option>
+
+                            <option value="Contract">
+                                Contract Expiry
+                            </option>
+
+                            <option value="Compliance">
+                                Compliance
+                            </option>
+                        </select>
+
+
+                        <select id="statusFilter">
+
+                            <option value="All">
+                                All Status
+                            </option>
+
+                            <option value="Unread">
+                                Unread
+                            </option>
+
+                            <option value="Read">
+                                Read
+                            </option>
+
+                        </select>
+
+                        <button
+                            class="filter-btn"
+                            id="filterBtn"
+                        >
+                            <i class="fa-solid fa-filter"></i>
+                            Filters
+                        </button>
+
+                    </div>
+
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Notification
+                                    </th>
+
+                                    <th>
+                                        Category
+                                    </th>
+
+                                    <th>
+                                        Message
+                                    </th>
+
+                                    <th>
+                                        Date & Time
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th>
+                                        Actions
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="notificationTableBody">
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <div class="table-footer">
+
+                        <span id="showingText">
+                            Showing 0 of 0 notifications
+                        </span>
+
+                        <div
+                            id="pagination"
+                            class="pagination"
+                        ></div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- RIGHT -->
+
+                <aside class="right-column">
+
+                    <section class="side-card">
+
+                        <div class="side-title">
+                            <h3>
+                                Notification Preferences
+                            </h3>
+                        </div>
+
+
+                        <label class="setting">
+
+                            <div class="setting-icon">
+                                <i class="fa-regular fa-file-lines"></i>
+                            </div>
+
+                            <div class="setting-text">
+
+                                <strong>
+                                    Procurement Alerts
+                                </strong>
+
+                                <small>
+                                    Get notified about new orders and updates
+                                </small>
+
+                            </div>
+
+                            <input
+                                type="checkbox"
+                                id="procurementAlerts"
+                            >
+
+                        </label>
+
+
+                        <label class="setting">
+
+                            <div class="setting-icon">
+                                <i class="fa-solid fa-truck"></i>
+                            </div>
+
+                            <div class="setting-text">
+
+                                <strong>
+                                    Delivery Delay Notifications
+                                </strong>
+
+                                <small>
+                                    Get alerts for delayed deliveries
+                                </small>
+
+                            </div>
+
+                            <input
+                                type="checkbox"
+                                id="deliveryDelayNotifications"
+                            >
+
+                        </label>
+
+
+                        <label class="setting">
+
+                            <div class="setting-icon">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+
+                            <div class="setting-text">
+
+                                <strong>
+                                    Vendor Approval Notifications
+                                </strong>
+
+                                <small>
+                                    Get notified about approval status
+                                </small>
+
+                            </div>
+
+                            <input
+                                type="checkbox"
+                                id="vendorApprovalNotifications"
+                            >
+
+                        </label>
+
+
+                        <label class="setting">
+
+                            <div class="setting-icon">
+                                <i class="fa-regular fa-file-lines"></i>
+                            </div>
+
+                            <div class="setting-text">
+
+                                <strong>
+                                    Contract Expiry Alerts
+                                </strong>
+
+                                <small>
+                                    Get alerts before contract expiry
+                                </small>
+
+                            </div>
+
+                            <input
+                                type="checkbox"
+                                id="contractExpiryAlerts"
+                            >
+
+                        </label>
+
+
+                        <label class="setting">
+
+                            <div class="setting-icon">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+
+                            <div class="setting-text">
+
+                                <strong>
+                                    Compliance Notifications
+                                </strong>
+
+                                <small>
+                                    Get notified about compliance & documents
+                                </small>
+
+                            </div>
+
+                            <input
+                                type="checkbox"
+                                id="complianceNotifications"
+                            >
+
+                        </label>
+
+
+                        <label class="setting">
+
+                            <div class="setting-icon">
+                                <i class="fa-regular fa-envelope"></i>
+                            </div>
+
+                            <div class="setting-text">
+
+                                <strong>
+                                    Email Notifications
+                                </strong>
+
+                                <small>
+                                    Receive notifications via email
+                                </small>
+
+                            </div>
+
+                            <input
+                                type="checkbox"
+                                id="emailNotifications"
+                            >
+
+                        </label>
+
+
+                        <label class="setting">
+
+                            <div class="setting-icon">
+                                <i class="fa-regular fa-message"></i>
+                            </div>
+
+                            <div class="setting-text">
+
+                                <strong>
+                                    SMS Notifications
+                                </strong>
+
+                                <small>
+                                    Receive notifications via SMS
+                                </small>
+
+                            </div>
+
+                            <input
+                                type="checkbox"
+                                id="smsNotifications"
+                            >
+
+                        </label>
+
+
+                        <a
+                            class="settings-link"
+                            href="/NotificationSettings"
+                        >
+                            Manage Notification Settings
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                    </section>
+
+
+                    <section class="side-card">
+
+                        <div class="side-heading">
+
+                            <h3>
+                                Recent Activity
+                            </h3>
+
+                            <button
+                                onclick="loadNotifications()"
+                            >
+                                View All
+                            </button>
+
+                        </div>
+
+                        <div id="recentActivity">
+
+                        </div>
+
+                    </section>
+
+                </aside>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="/static/VendorNotifications.js"></script>
+
+</body>
+
+</html>

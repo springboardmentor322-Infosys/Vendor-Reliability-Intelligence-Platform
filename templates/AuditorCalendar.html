@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Calendar | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/AuditorCalendar.css"
+    >
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-shield">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <div class="brand-name">VendorIQ</div>
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/AuditorDashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/AuditAssignments">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Audit Assignments</span>
+            </a>
+
+            <a href="/PlanningRisk">
+                <i class="fa-solid fa-flag"></i>
+                <span>Planning & Risk</span>
+            </a>
+
+            <a href="/AuditsInProgress">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Audits in Progress</span>
+            </a>
+
+            <a href="/EvidenceDocuments">
+                <i class="fa-solid fa-folder-open"></i>
+                <span>Evidence & Documents</span>
+            </a>
+
+            <a href="/IssuesFindings">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Issues & Findings</span>
+            </a>
+
+            <a href="/AuditorReports">
+                <i class="fa-solid fa-file-lines"></i>
+                <span>Reports</span>
+            </a>
+
+            <a href="/ComplianceTracker">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Compliance Tracker</span>
+            </a>
+
+            <a href="/Recommendations">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span>Recommendations</span>
+            </a>
+
+            <a href="/AuditorAnalytics">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Analytics</span>
+            </a>
+
+            <a
+                href="/Calendar"
+                class="active"
+            >
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Calendar</span>
+            </a>
+
+            <a href="/AuditorNotifications">
+                <i class="fa-solid fa-bell"></i>
+                <span>Notifications</span>
+                <b class="notification-badge">5</b>
+            </a>
+
+            <a href="/AuditorMessages">
+                <i class="fa-regular fa-envelope"></i>
+                <span>Messages</span>
+            </a>
+
+            <a href="/AuditorSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/AuditorHelp">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-profile">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="profile-info">
+                <strong id="sidebarName">
+                    Arjun Mehta
+                </strong>
+
+                <span id="sidebarRole">
+                    Senior Auditor
+                </span>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <h1>Calendar</h1>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        id="globalSearch"
+                        placeholder="Search audits, reports, entities..."
+                    >
+
+                </div>
+
+
+                <button class="notification-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>5</span>
+                </button>
+
+
+                <div class="user-header">
+
+                    <div class="user-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerName">
+                            Arjun Mehta
+                        </strong>
+
+                        <small id="headerRole">
+                            Senior Auditor
+                        </small>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <!-- =================================================
+                 CALENDAR TOOLBAR
+            ================================================== -->
+
+            <div class="calendar-toolbar">
+
+                <div class="calendar-navigation">
+
+                    <h2 id="weekTitle">
+                        May 25 – May 31, 2025
+                    </h2>
+
+                    <div class="nav-buttons">
+
+                        <button id="previousWeek">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+
+                        <button id="nextWeek">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+                    </div>
+
+                    <button
+                        class="today-button"
+                        id="todayButton"
+                    >
+                        Today
+                    </button>
+
+                    <select id="viewSelect">
+                        <option value="week">
+                            Week
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="toolbar-actions">
+
+                    <button
+                        class="filter-button"
+                        id="filterButton"
+                    >
+                        <i class="fa-solid fa-filter"></i>
+                        Filters
+                    </button>
+
+                    <button
+                        class="add-event-button"
+                        id="addEventButton"
+                    >
+                        <i class="fa-solid fa-plus"></i>
+                        Add Event
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 FILTER BAR
+            ================================================== -->
+
+            <div
+                class="filter-panel hidden"
+                id="filterPanel"
+            >
+
+                <select id="eventTypeFilter">
+                    <option>All Event Types</option>
+                    <option>Audit</option>
+                    <option>Meeting</option>
+                    <option>Planning</option>
+                    <option>Review</option>
+                    <option>Compliance</option>
+                    <option>Reporting</option>
+                    <option>Other</option>
+                </select>
+
+
+                <select id="auditFilter">
+                    <option value="">
+                        All Audits/Assignments
+                    </option>
+                </select>
+
+
+                <label class="checkbox-label">
+
+                    <input
+                        type="checkbox"
+                        id="completedFilter"
+                    >
+
+                    Show Completed Events
+
+                </label>
+
+            </div>
+
+
+            <!-- =================================================
+                 MAIN CALENDAR AREA
+            ================================================== -->
+
+            <div class="calendar-layout">
+
+
+                <section class="calendar-card">
+
+                    <div class="week-header">
+
+                        <div class="time-column"></div>
+
+                        <div class="day-column">
+                            <span>Sun</span>
+                            <strong data-day="0"></strong>
+                        </div>
+
+                        <div class="day-column">
+                            <span>Mon</span>
+                            <strong data-day="1"></strong>
+                        </div>
+
+                        <div class="day-column">
+                            <span>Tue</span>
+                            <strong data-day="2"></strong>
+                        </div>
+
+                        <div class="day-column">
+                            <span>Wed</span>
+                            <strong data-day="3"></strong>
+                        </div>
+
+                        <div class="day-column">
+                            <span>Thu</span>
+                            <strong data-day="4"></strong>
+                        </div>
+
+                        <div class="day-column">
+                            <span>Fri</span>
+                            <strong data-day="5"></strong>
+                        </div>
+
+                        <div class="day-column">
+                            <span>Sat</span>
+                            <strong data-day="6"></strong>
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="calendar-grid"
+                        id="calendarGrid"
+                    >
+
+                        <div
+                            class="time-column"
+                            id="timeColumn"
+                        ></div>
+
+                        <div class="calendar-days">
+                            <!-- JavaScript creates days/events -->
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================================
+                     RIGHT SIDEBAR
+                ================================================== -->
+
+                <aside class="calendar-sidebar">
+
+
+                    <!-- MINI CALENDAR -->
+
+                    <section class="side-card">
+
+                        <div class="side-card-header">
+
+                            <strong id="miniMonth">
+                                May 2025
+                            </strong>
+
+                            <div>
+                                <button id="miniPrevious">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+
+                                <button id="miniNext">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="mini-calendar"
+                            id="miniCalendar"
+                        ></div>
+
+                    </section>
+
+
+                    <!-- UPCOMING EVENTS -->
+
+                    <section class="side-card">
+
+                        <div class="side-card-header">
+
+                            <strong>
+                                Upcoming Events
+                            </strong>
+
+                            <button id="viewAllEvents">
+                                View all
+                            </button>
+
+                        </div>
+
+                        <div
+                            class="upcoming-events"
+                            id="upcomingEvents"
+                        ></div>
+
+                    </section>
+
+
+                    <!-- LEGEND -->
+
+                    <section class="side-card">
+
+                        <div class="side-title">
+                            Calendar Legend
+                        </div>
+
+                        <div class="legend">
+
+                            <span>
+                                <i class="legend-dot audit"></i>
+                                Audit
+                            </span>
+
+                            <span>
+                                <i class="legend-dot meeting"></i>
+                                Meeting
+                            </span>
+
+                            <span>
+                                <i class="legend-dot planning"></i>
+                                Planning
+                            </span>
+
+                            <span>
+                                <i class="legend-dot review"></i>
+                                Review
+                            </span>
+
+                            <span>
+                                <i class="legend-dot compliance"></i>
+                                Compliance
+                            </span>
+
+                            <span>
+                                <i class="legend-dot reporting"></i>
+                                Reporting
+                            </span>
+
+                            <span>
+                                <i class="legend-dot other"></i>
+                                Other
+                            </span>
+
+                        </div>
+
+                    </section>
+
+                </aside>
+
+            </div>
+
+
+            <!-- =================================================
+                 TODAY'S SCHEDULE
+            ================================================== -->
+
+            <section class="schedule-card">
+
+                <div class="schedule-header">
+
+                    <strong id="scheduleTitle">
+                        Today's Schedule
+                    </strong>
+
+                    <button id="fullSchedule">
+                        View full schedule
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+                <div
+                    class="schedule-items"
+                    id="scheduleItems"
+                ></div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     ADD / EDIT EVENT MODAL
+========================================================== -->
+
+<div
+    class="modal-overlay hidden"
+    id="eventModal"
+>
+
+    <div class="event-modal">
+
+        <div class="modal-header">
+
+            <div>
+                <h2 id="modalTitle">
+                    Add Event
+                </h2>
+
+                <p>
+                    Create a calendar event
+                </p>
+            </div>
+
+            <button id="closeModal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <form id="eventForm">
+
+            <input
+                type="hidden"
+                id="eventId"
+            >
+
+
+            <div class="form-group">
+
+                <label>
+                    Event Title
+                </label>
+
+                <input
+                    type="text"
+                    id="eventTitle"
+                    required
+                    placeholder="Enter event title"
+                >
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Event Type
+                    </label>
+
+                    <select id="eventType">
+
+                        <option>Audit</option>
+                        <option>Meeting</option>
+                        <option>Planning</option>
+                        <option>Review</option>
+                        <option>Compliance</option>
+                        <option>Reporting</option>
+                        <option selected>Other</option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Audit / Assignment
+                    </label>
+
+                    <select id="eventAudit">
+
+                        <option value="">
+                            No linked audit
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Start
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        id="eventStart"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        End
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        id="eventEnd"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label class="checkbox-label">
+
+                    <input
+                        type="checkbox"
+                        id="eventAllDay"
+                    >
+
+                    All day event
+
+                </label>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Location
+                </label>
+
+                <input
+                    type="text"
+                    id="eventLocation"
+                    placeholder="Meeting room / location"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Description
+                </label>
+
+                <textarea
+                    id="eventDescription"
+                    rows="4"
+                    placeholder="Event description"
+                ></textarea>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="cancel-button"
+                    id="cancelEvent"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="save-button"
+                >
+                    <i class="fa-solid fa-check"></i>
+                    Save Event
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="/static/AuditorCalendar.js"></script>
+
+</body>
+</html>

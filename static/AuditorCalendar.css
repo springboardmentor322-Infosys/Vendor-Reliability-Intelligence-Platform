@@ -1,0 +1,2820 @@
+/* ============================================================
+   VENDOrIQ AUDITOR CALENDAR
+   ADVANCED DARK MODE + GLASSMORPHISM + ANIMATIONS
+   HTML CLASSES UNCHANGED
+============================================================ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+
+    /* ========================================================
+       CORE DARK THEME
+    ======================================================== */
+
+    --navy: #071225;
+    --navy-deep: #030817;
+
+    --blue: #3b82f6;
+    --blue-bright: #2563eb;
+    --blue-light: #0d2145;
+
+    --border: rgba(148, 163, 184, 0.14);
+    --border-light: rgba(148, 163, 184, 0.08);
+
+    --text: #f1f5f9;
+    --text-bright: #ffffff;
+
+    --muted: #94a3b8;
+    --muted-dark: #64748b;
+
+    --background: #050b18;
+    --surface: #0a1426;
+    --surface-2: #0d192d;
+    --surface-3: #101e35;
+
+    --white: #ffffff;
+
+    /* ========================================================
+       EVENT COLORS
+    ======================================================== */
+
+    --audit: #22c55e;
+    --meeting: #3b82f6;
+    --planning: #f59e0b;
+    --review: #fb7185;
+    --compliance: #a855f7;
+    --reporting: #22d3ee;
+    --other: #fb923c;
+
+    /* ========================================================
+       SHADOWS
+    ======================================================== */
+
+    --shadow-sm:
+        0 4px 16px rgba(0, 0, 0, .25);
+
+    --shadow-md:
+        0 10px 30px rgba(0, 0, 0, .35);
+
+    --shadow-lg:
+        0 25px 70px rgba(0, 0, 0, .55);
+
+    --blue-glow:
+        0 0 25px rgba(59, 130, 246, .18);
+}
+
+
+/* ============================================================
+   BODY
+============================================================ */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+
+    font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 20% 10%,
+            rgba(37, 99, 235, .09),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 85% 20%,
+            rgba(124, 58, 237, .07),
+            transparent 25%
+        ),
+        linear-gradient(
+            135deg,
+            #030817,
+            #071225 55%,
+            #040a16
+        );
+
+    background-attachment: fixed;
+
+    color: var(--text);
+
+    font-size: 13px;
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+}
+
+
+/* ============================================================
+   GLOBAL FORM ELEMENTS
+============================================================ */
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: inherit;
+}
+
+input,
+select,
+textarea {
+    color: var(--text);
+}
+
+::selection {
+    background: rgba(59, 130, 246, .35);
+    color: #fff;
+}
+
+
+/* ============================================================
+   CUSTOM SCROLLBAR
+============================================================ */
+
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+::-webkit-scrollbar-track {
+    background: #050b18;
+}
+
+::-webkit-scrollbar-thumb {
+    background:
+        linear-gradient(
+            180deg,
+            #1d4ed8,
+            #2563eb
+        );
+
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #3b82f6;
+}
+
+
+/* ============================================================
+   APPLICATION
+============================================================ */
+
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* ============================================================
+   SIDEBAR
+============================================================ */
+
+.sidebar {
+
+    width: 232px;
+    min-width: 232px;
+
+    padding: 22px 12px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(10, 28, 52, .98),
+            rgba(3, 11, 25, .99)
+        );
+
+    color: #ffffff;
+
+    overflow-y: auto;
+
+    position: fixed;
+
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    z-index: 100;
+
+    border-right:
+        1px solid rgba(96, 165, 250, .10);
+
+    box-shadow:
+        12px 0 40px rgba(0, 0, 0, .25);
+
+    animation:
+        sidebarEnter .7s ease both;
+}
+
+
+/* ============================================================
+   SIDEBAR GLOW
+============================================================ */
+
+.sidebar::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 170px;
+    height: 170px;
+
+    top: 70px;
+    left: 20px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(37, 99, 235, .18),
+            transparent 70%
+        );
+
+    pointer-events: none;
+
+    animation:
+        floatingGlow 6s ease-in-out infinite;
+}
+
+
+/* ============================================================
+   BRAND
+============================================================ */
+
+.brand {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    padding-bottom: 20px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.08);
+
+    position: relative;
+
+    z-index: 2;
+}
+
+.brand-shield {
+
+    width: 34px;
+    height: 38px;
+
+    border-radius: 9px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1e40af
+        );
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 19px;
+
+    box-shadow:
+        0 0 20px rgba(37, 99, 235, .35);
+
+    animation:
+        shieldPulse 3s ease-in-out infinite;
+}
+
+.brand-name {
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    letter-spacing: -.4px;
+}
+
+.brand-subtitle {
+
+    font-size: 11px;
+
+    color: #94a3b8;
+
+    margin-top: 3px;
+}
+
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+
+.navigation {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+}
+
+.navigation a {
+
+    min-height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 0 14px;
+
+    color: #cbd5e1;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+
+    margin-bottom: 4px;
+
+    transition:
+        background .25s ease,
+        color .25s ease,
+        transform .25s ease,
+        box-shadow .25s ease;
+
+    text-decoration: none;
+}
+
+.navigation a i {
+
+    width: 17px;
+
+    font-size: 14px;
+
+    color: #94a3b8;
+
+    transition:
+        color .25s ease,
+        transform .25s ease;
+}
+
+.navigation a:hover {
+
+    background:
+        rgba(59, 130, 246, .10);
+
+    color: #ffffff;
+
+    transform:
+        translateX(4px);
+
+    box-shadow:
+        inset 3px 0 0 rgba(59, 130, 246, .4);
+}
+
+.navigation a:hover i {
+
+    color: #60a5fa;
+
+    transform:
+        scale(1.15);
+}
+
+.navigation a.active {
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(37, 99, 235, .95),
+            rgba(29, 78, 216, .72)
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 8px 22px rgba(37, 99, 235, .25),
+        inset 0 1px 0 rgba(255,255,255,.10);
+
+    animation:
+        activeNav .35s ease both;
+}
+
+.navigation a.active i {
+    color: #ffffff;
+}
+
+
+/* ============================================================
+   NOTIFICATION BADGE
+============================================================ */
+
+.notification-badge {
+
+    margin-left: auto;
+
+    width: 22px;
+    height: 22px;
+
+    min-width: 22px;
+
+    display: grid;
+
+    place-items: center;
+
+    color: #ffffff;
+
+    border-radius: 50%;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ef4444,
+            #dc2626
+        );
+
+    box-shadow:
+        0 0 14px rgba(239, 68, 68, .35);
+
+    animation:
+        notificationPulse 2s ease-in-out infinite;
+}
+
+
+/* ============================================================
+   SIDEBAR PROFILE
+============================================================ */
+
+.sidebar-profile {
+
+    position: relative;
+
+    margin-top: auto;
+
+    padding-left: 10px;
+
+    border-top:
+        1px solid rgba(255,255,255,.08);
+
+    padding-top: 18px;
+
+    display: flex;
+
+    gap: 10px;
+}
+
+.avatar,
+.user-avatar {
+
+    width: 36px;
+    height: 36px;
+
+    min-width: 36px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #334155,
+            #64748b
+        );
+
+    color: #ffffff;
+
+    display: grid;
+
+    place-items: center;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,.3);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+}
+
+.avatar:hover,
+.user-avatar:hover {
+
+    transform:
+        translateY(-3px)
+        scale(1.04);
+
+    box-shadow:
+        0 8px 25px rgba(59,130,246,.25);
+}
+
+.profile-info {
+
+    margin-left: 9px;
+
+    flex: 1;
+}
+
+.profile-info strong {
+
+    display: block;
+
+    font-size: 12px;
+}
+
+.profile-info span {
+
+    display: block;
+
+    font-size: 10px;
+
+    color: #94a3b8;
+
+    margin-top: 3px;
+}
+
+
+/* ============================================================
+   MAIN
+============================================================ */
+
+.main {
+
+    margin-left: 232px;
+
+    width: calc(100% - 232px);
+
+    min-height: 100vh;
+
+    animation:
+        contentEnter .65s ease both;
+}
+
+
+/* ============================================================
+   TOPBAR
+============================================================ */
+
+.topbar {
+
+    height: 77px;
+
+    border-bottom:
+        1px solid var(--border);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding:
+        0 24px 0 30px;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 50;
+
+    background:
+        rgba(5, 11, 24, .78);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    box-shadow:
+        0 4px 25px rgba(0,0,0,.15);
+}
+
+.topbar-left {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+.topbar h1 {
+
+    font-size: 22px;
+
+    color: #f8fafc;
+
+    letter-spacing: -.4px;
+}
+
+.topbar-right {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 22px;
+}
+
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+.search-box {
+
+    width: 328px;
+    height: 40px;
+
+    border:
+        1px solid rgba(148,163,184,.15);
+
+    border-radius: 9px;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 0 13px;
+
+    color: #64748b;
+
+    background:
+        rgba(15, 28, 48, .72);
+
+    transition:
+        border .25s ease,
+        box-shadow .25s ease,
+        background .25s ease;
+}
+
+.search-box:focus-within {
+
+    border-color:
+        rgba(59,130,246,.7);
+
+    background:
+        rgba(15, 30, 52, .95);
+
+    box-shadow:
+        0 0 0 3px rgba(59,130,246,.10),
+        0 0 25px rgba(37,99,235,.10);
+}
+
+.search-box input {
+
+    width: 100%;
+
+    border: none;
+
+    outline: none;
+
+    margin-left: 10px;
+
+    font-size: 12px;
+
+    background: transparent;
+
+    color: #e2e8f0;
+}
+
+.search-box input::placeholder {
+    color: #64748b;
+}
+
+
+/* ============================================================
+   NOTIFICATION BUTTON
+============================================================ */
+
+.notification-button {
+
+    position: relative;
+
+    color: #94a3b8;
+
+    font-size: 20px;
+
+    transition:
+        color .25s ease,
+        transform .25s ease;
+}
+
+.notification-button:hover {
+
+    color: #60a5fa;
+
+    transform:
+        translateY(-2px);
+}
+
+.notification-button span {
+
+    position: absolute;
+
+    top: -7px;
+    right: -8px;
+
+    width: 18px;
+    height: 18px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ef4444,
+            #dc2626
+        );
+
+    color: white;
+
+    font-size: 9px;
+
+    display: grid;
+
+    place-items: center;
+
+    animation:
+        notificationPulse 2s infinite;
+}
+
+
+/* ============================================================
+   USER HEADER
+============================================================ */
+
+.user-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+}
+
+.user-header strong {
+
+    display: block;
+
+    font-size: 12px;
+
+    color: #f1f5f9;
+}
+
+.user-header small {
+
+    display: block;
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    margin-top: 2px;
+}
+
+.user-header > i {
+
+    margin-left: 10px;
+
+    font-size: 10px;
+
+    color: #64748b;
+}
+
+
+/* ============================================================
+   CONTENT
+============================================================ */
+
+.content {
+
+    padding: 20px;
+
+    animation:
+        fadeUp .7s ease both;
+}
+
+
+/* ============================================================
+   CALENDAR TOOLBAR
+============================================================ */
+
+.calendar-toolbar {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 14px;
+}
+
+.calendar-navigation {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+}
+
+.calendar-navigation h2 {
+
+    font-size: 18px;
+
+    margin-right: 4px;
+
+    color: #f8fafc;
+}
+
+
+/* ============================================================
+   NAV BUTTONS
+============================================================ */
+
+.nav-buttons {
+
+    display: flex;
+
+    filter:
+        drop-shadow(0 4px 10px rgba(0,0,0,.2));
+}
+
+.nav-buttons button {
+
+    width: 39px;
+    height: 34px;
+
+    border:
+        1px solid var(--border);
+
+    background:
+        rgba(15, 28, 48, .85);
+
+    color: #94a3b8;
+
+    transition:
+        background .25s ease,
+        color .25s ease,
+        transform .2s ease;
+}
+
+.nav-buttons button:hover {
+
+    background:
+        rgba(37,99,235,.18);
+
+    color: #60a5fa;
+
+    transform:
+        translateY(-2px);
+}
+
+.nav-buttons button:first-child {
+    border-radius: 7px 0 0 7px;
+}
+
+.nav-buttons button:last-child {
+
+    border-left: none;
+
+    border-radius: 0 7px 7px 0;
+}
+
+
+/* ============================================================
+   TODAY / VIEW SELECT
+============================================================ */
+
+.today-button,
+#viewSelect {
+
+    height: 34px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 7px;
+
+    background:
+        rgba(15, 28, 48, .85);
+
+    padding: 0 18px;
+
+    color: #cbd5e1;
+
+    font-size: 12px;
+
+    transition:
+        border .25s ease,
+        background .25s ease,
+        color .25s ease,
+        box-shadow .25s ease;
+}
+
+.today-button:hover,
+#viewSelect:hover {
+
+    border-color:
+        rgba(59,130,246,.45);
+
+    background:
+        rgba(30,64,175,.18);
+
+    color: #ffffff;
+
+    box-shadow:
+        0 0 15px rgba(37,99,235,.12);
+}
+
+#viewSelect option,
+.filter-panel select option,
+.form-group select option {
+
+    background: #0b1729;
+
+    color: #e2e8f0;
+}
+
+
+/* ============================================================
+   TOOLBAR ACTIONS
+============================================================ */
+
+.toolbar-actions {
+
+    display: flex;
+
+    gap: 12px;
+}
+
+.filter-button {
+
+    height: 34px;
+
+    padding: 0 15px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 7px;
+
+    background:
+        rgba(15,28,48,.82);
+
+    color: #cbd5e1;
+
+    font-size: 12px;
+
+    transition:
+        all .25s ease;
+}
+
+.filter-button:hover {
+
+    border-color:
+        rgba(59,130,246,.45);
+
+    background:
+        rgba(37,99,235,.14);
+
+    color: #ffffff;
+
+    transform:
+        translateY(-2px);
+}
+
+.add-event-button {
+
+    height: 34px;
+
+    padding: 0 15px;
+
+    border-radius: 7px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 12px;
+
+    box-shadow:
+        0 7px 20px rgba(37,99,235,.25);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        filter .25s ease;
+}
+
+.add-event-button:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 10px 28px rgba(37,99,235,.40);
+
+    filter:
+        brightness(1.1);
+}
+
+.add-event-button:active {
+
+    transform:
+        translateY(0)
+        scale(.97);
+}
+
+.add-event-button i:last-child {
+
+    margin-left: 5px;
+
+    font-size: 9px;
+}
+
+
+/* ============================================================
+   FILTER PANEL
+============================================================ */
+
+.filter-panel {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(15,28,48,.88),
+            rgba(9,20,36,.92)
+        );
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 9px;
+
+    padding: 12px;
+
+    display: flex;
+
+    gap: 10px;
+
+    align-items: center;
+
+    margin-bottom: 12px;
+
+    box-shadow:
+        var(--shadow-sm);
+
+    animation:
+        fadeUp .5s ease both;
+}
+
+.filter-panel select {
+
+    height: 35px;
+
+    border:
+        1px solid rgba(148,163,184,.14);
+
+    border-radius: 6px;
+
+    padding: 0 12px;
+
+    min-width: 190px;
+
+    outline: none;
+
+    font-size: 12px;
+
+    background:
+        #0c192d;
+
+    color: #cbd5e1;
+
+    transition:
+        border .25s ease,
+        box-shadow .25s ease;
+}
+
+.filter-panel select:focus {
+
+    border-color:
+        rgba(59,130,246,.65);
+
+    box-shadow:
+        0 0 0 3px rgba(59,130,246,.08);
+}
+
+.checkbox-label {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 12px;
+
+    color: #94a3b8;
+}
+
+.checkbox-label input {
+
+    accent-color:
+        #3b82f6;
+}
+
+.hidden {
+    display: none !important;
+}
+
+
+/* ============================================================
+   CALENDAR LAYOUT
+============================================================ */
+
+.calendar-layout {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        320px;
+
+    gap: 12px;
+}
+
+
+/* ============================================================
+   CALENDAR CARD
+============================================================ */
+
+.calendar-card {
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(12,25,44,.95),
+            rgba(6,16,31,.96)
+        );
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    box-shadow:
+        var(--shadow-md);
+
+    position: relative;
+
+    animation:
+        cardEnter .7s ease both;
+}
+
+.calendar-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(59,130,246,.5),
+            transparent
+        );
+}
+
+
+/* ============================================================
+   WEEK HEADER
+============================================================ */
+
+.week-header {
+
+    display: grid;
+
+    grid-template-columns:
+        58px
+        repeat(7, 1fr);
+
+    min-height: 59px;
+
+    border-bottom:
+        1px solid var(--border);
+
+    background:
+        rgba(10,22,39,.90);
+}
+
+.week-header > div {
+
+    border-right:
+        1px solid rgba(148,163,184,.07);
+}
+
+.time-column {
+
+    width: 58px;
+
+    background:
+        rgba(5,13,25,.6);
+}
+
+.day-column {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 5px;
+
+    transition:
+        background .25s ease;
+}
+
+.day-column:hover {
+
+    background:
+        rgba(59,130,246,.06);
+}
+
+.day-column span {
+
+    font-size: 11px;
+
+    color: #94a3b8;
+}
+
+.day-column strong {
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    color: #e2e8f0;
+}
+
+.day-column.today strong {
+
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #3b82f6,
+            #1d4ed8
+        );
+
+    color: white;
+
+    display: grid;
+
+    place-items: center;
+
+    box-shadow:
+        0 0 20px rgba(59,130,246,.45);
+
+    animation:
+        todayPulse 2.5s ease-in-out infinite;
+}
+
+
+/* ============================================================
+   CALENDAR GRID
+============================================================ */
+
+.calendar-grid {
+
+    display: flex;
+
+    height: 675px;
+
+    overflow: hidden;
+
+    background:
+        #071121;
+}
+
+#timeColumn {
+
+    flex-shrink: 0;
+
+    border-right:
+        1px solid rgba(148,163,184,.08);
+
+    background:
+        #071121;
+}
+
+.time-label {
+
+    height: 50px;
+
+    padding:
+        14px 6px 0 12px;
+
+    color: #64748b;
+
+    font-size: 10px;
+
+    border-bottom:
+        1px solid rgba(148,163,184,.07);
+}
+
+.calendar-days {
+
+    flex: 1;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, 1fr);
+
+    min-width: 0;
+}
+
+.calendar-day {
+
+    position: relative;
+
+    border-right:
+        1px solid rgba(148,163,184,.07);
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent 49px,
+            rgba(148,163,184,.07) 50px
+        );
+
+    transition:
+        background .25s ease;
+}
+
+.calendar-day:hover {
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            rgba(59,130,246,.025) 0,
+            rgba(59,130,246,.025) 49px,
+            rgba(148,163,184,.08) 50px
+        );
+}
+
+
+/* ============================================================
+   CALENDAR EVENTS
+============================================================ */
+
+.calendar-event {
+
+    position: absolute;
+
+    left: 5px;
+    right: 5px;
+
+    min-height: 48px;
+
+    padding: 7px 7px;
+
+    border-radius: 6px;
+
+    overflow: hidden;
+
+    font-size: 10px;
+
+    cursor: pointer;
+
+    z-index: 3;
+
+    backdrop-filter:
+        blur(6px);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        filter .25s ease;
+
+    animation:
+        eventAppear .45s ease both;
+}
+
+.calendar-event:hover {
+
+    transform:
+        translateY(-3px)
+        scale(1.015);
+
+    filter:
+        brightness(1.12);
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.35);
+
+    z-index: 10;
+}
+
+.calendar-event strong {
+
+    display: block;
+
+    font-size: 10px;
+
+    margin-bottom: 3px;
+
+    color: #e2e8f0;
+}
+
+.calendar-event small {
+
+    display: block;
+
+    font-size: 9px;
+
+    color: #94a3b8;
+}
+
+
+/* ============================================================
+   EVENT TYPES
+============================================================ */
+
+.calendar-event.audit {
+
+    background:
+        rgba(34,197,94,.12);
+
+    border:
+        1px solid rgba(34,197,94,.35);
+
+    box-shadow:
+        inset 3px 0 0 var(--audit);
+}
+
+.calendar-event.meeting {
+
+    background:
+        rgba(59,130,246,.12);
+
+    border:
+        1px solid rgba(59,130,246,.35);
+
+    box-shadow:
+        inset 3px 0 0 var(--meeting);
+}
+
+.calendar-event.planning {
+
+    background:
+        rgba(245,158,11,.12);
+
+    border:
+        1px solid rgba(245,158,11,.35);
+
+    box-shadow:
+        inset 3px 0 0 var(--planning);
+}
+
+.calendar-event.review {
+
+    background:
+        rgba(251,113,133,.12);
+
+    border:
+        1px solid rgba(251,113,133,.35);
+
+    box-shadow:
+        inset 3px 0 0 var(--review);
+}
+
+.calendar-event.compliance {
+
+    background:
+        rgba(168,85,247,.12);
+
+    border:
+        1px solid rgba(168,85,247,.35);
+
+    box-shadow:
+        inset 3px 0 0 var(--compliance);
+}
+
+.calendar-event.reporting {
+
+    background:
+        rgba(34,211,238,.11);
+
+    border:
+        1px solid rgba(34,211,238,.30);
+
+    box-shadow:
+        inset 3px 0 0 var(--reporting);
+}
+
+.calendar-event.other {
+
+    background:
+        rgba(251,146,60,.12);
+
+    border:
+        1px solid rgba(251,146,60,.32);
+
+    box-shadow:
+        inset 3px 0 0 var(--other);
+}
+
+
+/* ============================================================
+   EVENT DOTS
+============================================================ */
+
+.event-dot {
+
+    display: inline-block;
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    margin-right: 4px;
+
+    box-shadow:
+        0 0 8px currentColor;
+}
+
+.event-dot.audit {
+    background: var(--audit);
+}
+
+.event-dot.meeting {
+    background: var(--meeting);
+}
+
+.event-dot.planning {
+    background: var(--planning);
+}
+
+.event-dot.review {
+    background: var(--review);
+}
+
+.event-dot.compliance {
+    background: var(--compliance);
+}
+
+.event-dot.reporting {
+    background: var(--reporting);
+}
+
+.event-dot.other {
+    background: var(--other);
+}
+
+
+/* ============================================================
+   RIGHT SIDEBAR
+============================================================ */
+
+.calendar-sidebar {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+
+/* ============================================================
+   SIDE CARDS
+============================================================ */
+
+.side-card {
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(12,25,44,.92),
+            rgba(6,16,31,.95)
+        );
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 10px;
+
+    padding: 14px;
+
+    box-shadow:
+        var(--shadow-sm);
+
+    transition:
+        transform .3s ease,
+        border .3s ease,
+        box-shadow .3s ease;
+
+    animation:
+        cardEnter .7s ease both;
+}
+
+.side-card:hover {
+
+    transform:
+        translateY(-3px);
+
+    border-color:
+        rgba(59,130,246,.18);
+
+    box-shadow:
+        var(--shadow-md);
+}
+
+.side-card-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 14px;
+}
+
+.side-card-header strong {
+
+    font-size: 13px;
+
+    color: #f1f5f9;
+}
+
+.side-card-header button {
+
+    color: #60a5fa;
+
+    font-size: 11px;
+
+    transition:
+        color .2s ease;
+}
+
+.side-card-header button:hover {
+    color: #93c5fd;
+}
+
+.side-card-header div button {
+
+    color: #64748b;
+
+    margin-left: 12px;
+}
+
+
+/* ============================================================
+   MINI CALENDAR
+============================================================ */
+
+.mini-calendar {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, 1fr);
+
+    gap: 4px;
+
+    text-align: center;
+}
+
+.mini-day-name {
+
+    font-size: 9px;
+
+    color: #64748b;
+
+    padding-bottom: 6px;
+}
+
+.mini-day {
+
+    height: 27px;
+
+    display: grid;
+
+    place-items: center;
+
+    font-size: 10px;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    color: #cbd5e1;
+
+    transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+
+.mini-day.muted {
+
+    color: #475569;
+}
+
+.mini-day.selected {
+
+    background:
+        linear-gradient(
+            135deg,
+            #3b82f6,
+            #1d4ed8
+        );
+
+    color: white;
+
+    box-shadow:
+        0 0 15px rgba(59,130,246,.35);
+}
+
+.mini-day:hover {
+
+    background:
+        rgba(59,130,246,.15);
+
+    color: #ffffff;
+
+    transform:
+        scale(1.08);
+}
+
+
+/* ============================================================
+   UPCOMING EVENTS
+============================================================ */
+
+.upcoming-events {
+
+    max-height: 330px;
+
+    overflow-y: auto;
+
+    padding-right: 3px;
+}
+
+.upcoming-item {
+
+    display: flex;
+
+    gap: 9px;
+
+    padding: 9px 0;
+
+    border-bottom:
+        1px solid rgba(148,163,184,.07);
+
+    transition:
+        transform .2s ease,
+        padding-left .2s ease;
+}
+
+.upcoming-item:hover {
+
+    transform:
+        translateX(3px);
+
+    padding-left: 4px;
+}
+
+.upcoming-item:last-child {
+    border-bottom: none;
+}
+
+.upcoming-dot {
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    margin-top: 5px;
+
+    flex-shrink: 0;
+
+    box-shadow:
+        0 0 8px currentColor;
+}
+
+.upcoming-item strong {
+
+    display: block;
+
+    font-size: 10px;
+
+    line-height: 1.35;
+
+    color: #e2e8f0;
+}
+
+.upcoming-item span {
+
+    display: block;
+
+    font-size: 9px;
+
+    color: #64748b;
+
+    margin-top: 3px;
+}
+
+
+/* ============================================================
+   LEGEND
+============================================================ */
+
+.side-title {
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    margin-bottom: 14px;
+
+    color: #f1f5f9;
+}
+
+.legend {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 12px 8px;
+}
+
+.legend span {
+
+    display: flex;
+
+    align-items: center;
+
+    font-size: 10px;
+
+    color: #94a3b8;
+
+    transition:
+        color .2s ease,
+        transform .2s ease;
+}
+
+.legend span:hover {
+
+    color: #e2e8f0;
+
+    transform:
+        translateX(3px);
+}
+
+.legend-dot {
+
+    width: 9px;
+    height: 9px;
+
+    border-radius: 2px;
+
+    margin-right: 7px;
+
+    box-shadow:
+        0 0 8px currentColor;
+}
+
+.legend-dot.audit {
+    background: var(--audit);
+}
+
+.legend-dot.meeting {
+    background: var(--meeting);
+}
+
+.legend-dot.planning {
+    background: #fbbf24;
+}
+
+.legend-dot.review {
+    background: #fb7185;
+}
+
+.legend-dot.compliance {
+    background: #a855f7;
+}
+
+.legend-dot.reporting {
+    background: #22d3ee;
+}
+
+.legend-dot.other {
+    background: #fb923c;
+}
+
+
+/* ============================================================
+   SCHEDULE
+============================================================ */
+
+.schedule-card {
+
+    margin-top: 12px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(12,25,44,.94),
+            rgba(6,16,31,.96)
+        );
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 10px;
+
+    padding: 15px;
+
+    box-shadow:
+        var(--shadow-md);
+
+    animation:
+        fadeUp .8s ease both;
+}
+
+.schedule-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 13px;
+}
+
+.schedule-header strong {
+
+    font-size: 13px;
+
+    color: #f1f5f9;
+}
+
+.schedule-header button {
+
+    color: #60a5fa;
+
+    font-size: 10px;
+
+    transition:
+        color .2s ease;
+}
+
+.schedule-header button:hover {
+    color: #93c5fd;
+}
+
+.schedule-items {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 12px;
+}
+
+.schedule-item {
+
+    min-height: 80px;
+
+    border:
+        1px solid rgba(59,130,246,.16);
+
+    border-radius: 7px;
+
+    padding: 11px;
+
+    background:
+        rgba(59,130,246,.06);
+
+    transition:
+        transform .25s ease,
+        border .25s ease,
+        box-shadow .25s ease;
+}
+
+.schedule-item:hover {
+
+    transform:
+        translateY(-4px);
+
+    border-color:
+        rgba(59,130,246,.35);
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.25);
+}
+
+.schedule-item.planning {
+
+    background:
+        rgba(245,158,11,.07);
+
+    border-color:
+        rgba(245,158,11,.20);
+}
+
+.schedule-item.compliance {
+
+    background:
+        rgba(168,85,247,.07);
+
+    border-color:
+        rgba(168,85,247,.20);
+}
+
+.schedule-time {
+
+    font-size: 10px;
+
+    color: #93c5fd;
+
+    margin-bottom: 7px;
+}
+
+.schedule-item strong {
+
+    font-size: 10px;
+
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #e2e8f0;
+}
+
+.schedule-item p {
+
+    font-size: 9px;
+
+    color: #64748b;
+
+    line-height: 1.4;
+}
+
+
+/* ============================================================
+   MODAL OVERLAY
+============================================================ */
+
+.modal-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(1, 6, 16, .78);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    z-index: 500;
+
+    backdrop-filter:
+        blur(9px);
+
+    -webkit-backdrop-filter:
+        blur(9px);
+
+    animation:
+        modalOverlayIn .3s ease both;
+}
+
+
+/* ============================================================
+   EVENT MODAL
+============================================================ */
+
+.event-modal {
+
+    width:
+        min(600px, calc(100vw - 30px));
+
+    background:
+        linear-gradient(
+            145deg,
+            #0d1b30,
+            #071121
+        );
+
+    border:
+        1px solid rgba(96,165,250,.16);
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 30px 90px rgba(0,0,0,.65),
+        0 0 40px rgba(37,99,235,.08);
+
+    overflow: hidden;
+
+    animation:
+        modalEnter .4s cubic-bezier(.2,.8,.2,1) both;
+}
+
+
+/* ============================================================
+   MODAL HEADER
+============================================================ */
+
+.modal-header {
+
+    padding: 18px 20px;
+
+    border-bottom:
+        1px solid var(--border);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    background:
+        rgba(15,30,52,.65);
+}
+
+.modal-header h2 {
+
+    font-size: 18px;
+
+    color: #f8fafc;
+}
+
+.modal-header p {
+
+    font-size: 11px;
+
+    color: #64748b;
+
+    margin-top: 4px;
+}
+
+.modal-header button {
+
+    font-size: 18px;
+
+    color: #64748b;
+
+    transition:
+        color .2s ease,
+        transform .25s ease;
+}
+
+.modal-header button:hover {
+
+    color: #ffffff;
+
+    transform:
+        rotate(90deg);
+}
+
+
+/* ============================================================
+   EVENT FORM
+============================================================ */
+
+#eventForm {
+
+    padding: 20px;
+}
+
+.form-group {
+
+    margin-bottom: 15px;
+}
+
+.form-row {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 12px;
+}
+
+.form-group label {
+
+    display: block;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    margin-bottom: 6px;
+
+    color: #cbd5e1;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+
+    width: 100%;
+
+    border:
+        1px solid rgba(148,163,184,.14);
+
+    border-radius: 7px;
+
+    padding: 9px 10px;
+
+    outline: none;
+
+    font-size: 12px;
+
+    background:
+        rgba(7,17,33,.92);
+
+    color: #e2e8f0;
+
+    transition:
+        border .25s ease,
+        box-shadow .25s ease,
+        background .25s ease;
+}
+
+.form-group textarea {
+
+    resize: vertical;
+
+    min-height: 90px;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+
+    color: #475569;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+
+    border-color:
+        rgba(59,130,246,.75);
+
+    background:
+        rgba(10,25,46,.98);
+
+    box-shadow:
+        0 0 0 3px rgba(59,130,246,.08),
+        0 0 20px rgba(37,99,235,.08);
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* ============================================================
+   MODAL ACTIONS
+============================================================ */
+
+.modal-actions {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 18px;
+}
+
+.cancel-button,
+.save-button {
+
+    height: 36px;
+
+    padding: 0 17px;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+}
+
+.cancel-button {
+
+    border:
+        1px solid var(--border);
+
+    background:
+        rgba(15,28,48,.8);
+
+    color: #cbd5e1;
+}
+
+.cancel-button:hover {
+
+    background:
+        rgba(51,65,85,.35);
+
+    color: #ffffff;
+
+    transform:
+        translateY(-2px);
+}
+
+.save-button {
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+
+    color: white;
+
+    box-shadow:
+        0 7px 20px rgba(37,99,235,.25);
+}
+
+.save-button:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 10px 28px rgba(37,99,235,.40);
+
+    filter:
+        brightness(1.08);
+}
+
+.save-button:active,
+.cancel-button:active {
+
+    transform:
+        scale(.97);
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1200px) {
+
+    .calendar-layout {
+
+        grid-template-columns:
+            1fr;
+    }
+
+    .calendar-sidebar {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .schedule-items {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 850px) {
+
+    .sidebar {
+
+        transform:
+            translateX(-100%);
+
+        transition:
+            transform .35s cubic-bezier(.2,.8,.2,1);
+
+        box-shadow:
+            15px 0 45px rgba(0,0,0,.5);
+    }
+
+    .sidebar.open {
+
+        transform:
+            translateX(0);
+    }
+
+    .main {
+
+        margin-left: 0;
+
+        width: 100%;
+    }
+
+    .search-box {
+
+        width: 200px;
+    }
+
+    .calendar-toolbar {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 12px;
+    }
+
+    .calendar-navigation {
+
+        flex-wrap: wrap;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .topbar {
+
+        padding:
+            0 12px;
+    }
+
+    .topbar-right {
+
+        gap: 10px;
+    }
+
+    .search-box {
+
+        display: none;
+    }
+
+    .calendar-navigation h2 {
+
+        font-size: 15px;
+    }
+
+    .calendar-sidebar {
+
+        grid-template-columns:
+            1fr;
+    }
+
+    .schedule-items {
+
+        grid-template-columns:
+            1fr;
+    }
+
+    .content {
+
+        padding: 10px;
+    }
+
+    .calendar-grid {
+
+        overflow-x: auto;
+    }
+
+    .calendar-days {
+
+        min-width: 700px;
+    }
+
+    .toolbar-actions {
+
+        width: 100%;
+    }
+
+    .filter-button,
+    .add-event-button {
+
+        flex: 1;
+
+        justify-content: center;
+    }
+
+    .filter-panel {
+
+        flex-wrap: wrap;
+    }
+
+    .filter-panel select {
+
+        min-width: 150px;
+
+        flex: 1;
+    }
+
+    .form-row {
+
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+
+/* ============================================================
+   ANIMATIONS
+============================================================ */
+
+@keyframes sidebarEnter {
+
+    from {
+        opacity: 0;
+        transform: translateX(-25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+@keyframes contentEnter {
+
+    from {
+        opacity: 0;
+        transform: translateX(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+@keyframes fadeUp {
+
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+@keyframes cardEnter {
+
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+@keyframes eventAppear {
+
+    from {
+        opacity: 0;
+        transform:
+            translateY(8px)
+            scale(.97);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+@keyframes activeNav {
+
+    from {
+        opacity: .5;
+        transform: translateX(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+@keyframes shieldPulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 15px rgba(37,99,235,.25);
+    }
+
+    50% {
+        box-shadow:
+            0 0 28px rgba(37,99,235,.48);
+    }
+}
+
+
+@keyframes notificationPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow:
+            0 0 8px rgba(239,68,68,.25);
+    }
+
+    50% {
+        transform: scale(1.12);
+        box-shadow:
+            0 0 18px rgba(239,68,68,.55);
+    }
+}
+
+
+@keyframes todayPulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 12px rgba(59,130,246,.30);
+    }
+
+    50% {
+        box-shadow:
+            0 0 25px rgba(59,130,246,.65);
+    }
+}
+
+
+@keyframes floatingGlow {
+
+    0%,
+    100% {
+        transform:
+            translateY(0)
+            scale(1);
+        opacity: .7;
+    }
+
+    50% {
+        transform:
+            translateY(20px)
+            scale(1.08);
+        opacity: 1;
+    }
+}
+
+
+@keyframes modalOverlayIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+@keyframes modalEnter {
+
+    from {
+        opacity: 0;
+        transform:
+            translateY(25px)
+            scale(.96);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+/* ============================================================
+   ACCESSIBILITY
+============================================================ */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+
+    outline:
+        2px solid rgba(96,165,250,.8);
+
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration: .01ms !important;
+
+        animation-iteration-count: 1 !important;
+
+        transition-duration: .01ms !important;
+
+        scroll-behavior: auto !important;
+    }
+}

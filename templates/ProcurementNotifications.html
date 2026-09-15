@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Notifications | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="/static/ProcurementNotifications.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-industry"></i>
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    VendorIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+        <nav>
+
+            <a href="/ManagerDashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/ProcurementRequests">
+                <i class="fa-regular fa-clipboard"></i>
+                <span>Procurement Requests</span>
+            </a>
+
+            <a href="/ProcurementPurchaseOrder">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Purchase Orders</span>
+            </a>
+
+            <a href="/ProcurementApprovals">
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+            </a>
+
+            <a href="/ProcurementVendors">
+                <i class="fa-solid fa-user-group"></i>
+                <span>Vendors</span>
+            </a>
+
+            <a href="/OrderTracking">
+                <i class="fa-solid fa-box"></i>
+                <span>Order Tracking</span>
+            </a>
+
+            <a href="/ProcurementInvoices">
+                <i class="fa-regular fa-file-lines"></i>
+                <span>Invoices</span>
+            </a>
+
+            <a href="/ProcurementReports">
+                <i class="fa-regular fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+
+            <a href="/ProcurementAnalytics">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Analytics</span>
+            </a>
+
+        </nav>
+
+
+        <div class="menu-divider"></div>
+
+        <div class="menu-title">
+            COMMUNICATION
+        </div>
+
+        <nav>
+
+            <a class="active" href="/ProcurementNotifications">
+
+                <i class="fa-regular fa-bell"></i>
+
+                <span>Notifications</span>
+
+                <b id="sidebarUnread">0</b>
+
+            </a>
+
+            <a href="/Messages">
+
+                <i class="fa-regular fa-envelope"></i>
+
+                <span>Messages</span>
+
+                <b class="message-count">
+                    0
+                </b>
+
+            </a>
+
+        </nav>
+
+
+        <div class="menu-divider"></div>
+
+        <div class="menu-title">
+            SUPPORT
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementHelpSupport">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/ProcurementSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <div class="profile-card">
+
+            <div class="avatar">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div class="profile-info">
+
+                <strong id="userName">
+                    James Anderson
+                </strong>
+
+                <small>
+                    Procurement Manager
+                </small>
+
+                <span>
+                    <i class="online-dot"></i>
+                    Online
+                </span>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================================================= -->
+    <!-- MAIN -->
+    <!-- ================================================= -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Notifications</h1>
+
+                <div class="breadcrumb">
+
+                    <span>Dashboard</span>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                    <b>Notifications</b>
+
+                </div>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <div class="search-global">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        placeholder="Search anything..."
+                    >
+
+                </div>
+
+                <button class="top-icon">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <b id="topUnread">0</b>
+
+                </button>
+
+                <button class="top-icon">
+
+                    <i class="fa-regular fa-envelope"></i>
+
+                </button>
+
+                <div class="user-top" onclick="openProfile()">
+
+                    <div class="avatar small">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+
+                        <strong id="topUserName">
+                            James Anderson
+                        </strong>
+
+                        <small>
+                            Procurement Manager
+                        </small>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ACTIONS -->
+
+        <div class="page-actions">
+
+            <button
+                id="markAllBtn"
+                class="btn secondary"
+            >
+                <i class="fa-solid fa-check-double"></i>
+                Mark all as read
+            </button>
+
+            <button
+                id="settingsBtn"
+                class="btn secondary"
+            >
+                <i class="fa-solid fa-gear"></i>
+                Notification Settings
+            </button>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- STAT CARDS -->
+        <!-- ================================================= -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon purple">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+
+                <div>
+                    <span>All Notifications</span>
+                    <strong id="totalCount">0</strong>
+                    <small>
+                        Unread:
+                        <b id="totalUnread">0</b>
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon orange">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+
+                <div>
+                    <span>Procurement Alerts</span>
+                    <strong id="procurementCount">0</strong>
+                    <small>
+                        Unread:
+                        <b id="procurementUnread">0</b>
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon green">
+                    <i class="fa-solid fa-truck"></i>
+                </div>
+
+                <div>
+                    <span>Delivery Updates</span>
+                    <strong id="deliveryCount">0</strong>
+                    <small>
+                        Unread:
+                        <b id="deliveryUnread">0</b>
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue">
+                    <i class="fa-regular fa-square-check"></i>
+                </div>
+
+                <div>
+                    <span>Approvals</span>
+                    <strong id="approvalCount">0</strong>
+                    <small>
+                        Unread:
+                        <b id="approvalUnread">0</b>
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon pink">
+                    <i class="fa-regular fa-file-lines"></i>
+                </div>
+
+                <div>
+                    <span>Invoices & Payments</span>
+                    <strong id="invoiceCount">0</strong>
+                    <small>
+                        Unread:
+                        <b id="invoiceUnread">0</b>
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon violet">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+
+                <div>
+                    <span>System Updates</span>
+                    <strong id="systemCount">0</strong>
+                    <small>
+                        Unread:
+                        <b id="systemUnread">0</b>
+                    </small>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================= -->
+        <!-- CONTENT -->
+        <!-- ================================================= -->
+
+        <section class="content-grid">
+
+            <div class="notification-area">
+
+                <!-- TABS -->
+
+                <div class="tabs">
+
+                    <button
+                        class="tab active"
+                        data-category="All"
+                    >
+                        All
+                    </button>
+
+                    <button
+                        class="tab"
+                        data-status="Unread"
+                    >
+                        Unread
+                        <b id="unreadTabCount">0</b>
+                    </button>
+
+                    <button
+                        class="tab"
+                        data-category="Procurement Alerts"
+                    >
+                        Procurement Alerts
+                    </button>
+
+                    <button
+                        class="tab"
+                        data-category="Delivery Updates"
+                    >
+                        Delivery Updates
+                    </button>
+
+                    <button
+                        class="tab"
+                        data-category="Approvals"
+                    >
+                        Approvals
+                    </button>
+
+                    <button
+                        class="tab"
+                        data-category="Invoices & Payments"
+                    >
+                        Invoices & Payments
+                    </button>
+
+                    <button
+                        class="tab"
+                        data-category="System Updates"
+                    >
+                        System Updates
+                    </button>
+
+                </div>
+
+
+                <!-- FILTERS -->
+
+                <div class="filters">
+
+                    <div class="notification-search">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <input
+                            id="searchInput"
+                            type="text"
+                            placeholder="Search notifications..."
+                        >
+
+                    </div>
+
+
+                    <select id="typeFilter">
+
+                        <option value="All">
+                            All Types
+                        </option>
+
+                        <option value="Procurement Alerts">
+                            Procurement Alerts
+                        </option>
+
+                        <option value="Delivery Updates">
+                            Delivery Updates
+                        </option>
+
+                        <option value="Approvals">
+                            Approvals
+                        </option>
+
+                        <option value="Invoices & Payments">
+                            Invoices & Payments
+                        </option>
+
+                        <option value="System Updates">
+                            System Updates
+                        </option>
+
+                    </select>
+
+
+                    <select id="priorityFilter">
+
+                        <option value="All">
+                            All Priorities
+                        </option>
+
+                        <option value="High">
+                            High
+                        </option>
+
+                        <option value="Medium">
+                            Medium
+                        </option>
+
+                        <option value="Low">
+                            Low
+                        </option>
+
+                    </select>
+
+
+                    <button
+                        id="filterBtn"
+                        class="filter-button"
+                    >
+                        <i class="fa-solid fa-filter"></i>
+                        Filter
+                    </button>
+
+                </div>
+
+
+                <!-- TABLE -->
+
+                <div class="notification-table">
+
+                    <div class="table-head">
+
+                        <div>
+                            <input
+                                type="checkbox"
+                                id="selectAll"
+                            >
+                        </div>
+
+                        <div>Notification</div>
+
+                        <div>Type</div>
+
+                        <div>Priority</div>
+
+                        <div>Date & Time</div>
+
+                        <div></div>
+
+                    </div>
+
+                    <div id="notificationRows"></div>
+
+                </div>
+
+
+                <!-- PAGINATION -->
+
+                <div class="pagination">
+
+                    <span id="paginationInfo">
+                        Showing 0 notifications
+                    </span>
+
+                    <div>
+
+                        <button
+                            id="previousPage"
+                            class="page-btn"
+                        >
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+
+                        <span id="pageNumbers"></span>
+
+                        <button
+                            id="nextPage"
+                            class="page-btn"
+                        >
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+                    </div>
+
+                    <select id="pageSize">
+
+                        <option value="10">
+                            10 / page
+                        </option>
+
+                        <option value="20">
+                            20 / page
+                        </option>
+
+                        <option value="50">
+                            50 / page
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- RIGHT PANEL -->
+            <!-- ================================================= -->
+
+            <aside class="right-panel">
+
+                <div class="details-card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Notification Details
+                        </h3>
+
+                        <button id="closeDetails">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+
+                    </div>
+
+
+                    <div id="detailsContent">
+
+                        <div class="empty-details">
+
+                            <i class="fa-regular fa-bell"></i>
+
+                            <p>
+                                Select a notification
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <h3>
+                        Notification Summary
+                    </h3>
+
+                    <div class="chart-wrapper">
+
+                        <canvas id="notificationChart"></canvas>
+
+                    </div>
+
+                    <div id="summaryLegend"></div>
+
+                </div>
+
+
+                <div class="preferences-card">
+
+                    <span>
+                        Do not want these notifications?
+                    </span>
+
+                    <a href="/NotificationSettings">
+                        Manage your notification preferences
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+
+                </div>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="/static/ProcurementNotifications.js"></script>
+
+</body>
+</html>

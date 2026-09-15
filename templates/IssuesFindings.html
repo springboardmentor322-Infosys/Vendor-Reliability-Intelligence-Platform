@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Issues & Findings | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/IssuesFindings.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-shield">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    VendorIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+            </div>
+
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="/AuditorDashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/AuditAssignments">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Audit Assignments</span>
+            </a>
+
+            <a href="/PlanningRisk">
+                <i class="fa-solid fa-flag"></i>
+                <span>Planning & Risk</span>
+            </a>
+
+            <a href="/AuditsInProgress">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Audits in Progress</span>
+            </a>
+
+            <a href="/EvidenceDocuments">
+                <i class="fa-solid fa-folder-open"></i>
+                <span>Evidence & Documents</span>
+            </a>
+
+            <a
+                href="/IssuesFindings"
+                class="active"
+            >
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Issues & Findings</span>
+            </a>
+
+            <a href="/AuditorReports">
+                <i class="fa-solid fa-file-lines"></i>
+                <span>Reports</span>
+            </a>
+
+            <a href="/ComplianceTracker">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Compliance Tracker</span>
+            </a>
+
+            <a href="/Recommendations">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span>Recommendations</span>
+            </a>
+
+            <a href="/AuditorAnalytics">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Analytics</span>
+            </a>
+
+            <a href="/Calendar">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Calendar</span>
+            </a>
+
+            <a href="/AuditorNotifications">
+                <i class="fa-solid fa-bell"></i>
+                <span>Notifications</span>
+                <b class="notification-count">5</b>
+            </a>
+
+            <a href="/AuditorMessages">
+                <i class="fa-regular fa-envelope"></i>
+                <span>Messages</span>
+            </a>
+
+            <a href="/AuditorSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/AuditorHelp">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-user">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="sidebar-user-info">
+
+                <strong id="sideUserName">
+                    Auditor
+                </strong>
+
+                <span id="sideUserRole">
+                    Senior Auditor
+                </span>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================================================= -->
+    <!-- MAIN -->
+    <!-- ================================================= -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+
+                <h1>
+                    Auditor Dashboard
+                </h1>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        id="globalSearch"
+                        type="text"
+                        placeholder="Search issues, audits, entities..."
+                    >
+
+                </div>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>5</span>
+                </button>
+
+                <div class="top-user">
+
+                    <div class="avatar small">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerUserName">
+                            Auditor
+                        </strong>
+
+                        <small id="headerUserRole">
+                            Senior Auditor
+                        </small>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <div class="page-heading">
+
+                <div>
+                    <h2>
+                        Issues & Findings
+                    </h2>
+
+                    <p>
+                        Track, manage and monitor audit issues and findings
+                    </p>
+                </div>
+
+                <div class="heading-actions">
+
+                    <button
+                        class="filter-button"
+                        id="filterButton"
+                    >
+                        <i class="fa-solid fa-filter"></i>
+                        Filters
+                    </button>
+
+                    <button
+                        class="primary-button"
+                        id="addIssueButton"
+                    >
+                        <i class="fa-solid fa-plus"></i>
+                        Add Issue / Finding
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- KPI CARDS -->
+            <!-- ================================================= -->
+
+            <div class="kpi-grid">
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon red">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                    </div>
+
+                    <div>
+                        <span>Total Issues / Findings</span>
+
+                        <strong id="totalIssues">
+                            0
+                        </strong>
+
+                        <small class="green">
+                            Live from database
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon red">
+                        <i class="fa-solid fa-file-shield"></i>
+                    </div>
+
+                    <div>
+                        <span>High Severity</span>
+
+                        <strong id="highIssues">
+                            0
+                        </strong>
+
+                        <small id="highPercent">
+                            0% of total
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon orange">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                    </div>
+
+                    <div>
+                        <span>Medium Severity</span>
+
+                        <strong id="mediumIssues">
+                            0
+                        </strong>
+
+                        <small id="mediumPercent">
+                            0% of total
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon orange">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+
+                    <div>
+                        <span>Low Severity</span>
+
+                        <strong id="lowIssues">
+                            0
+                        </strong>
+
+                        <small id="lowPercent">
+                            0% of total
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon green-icon">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+
+                    <div>
+                        <span>Closed</span>
+
+                        <strong id="closedIssues">
+                            0
+                        </strong>
+
+                        <small id="closedPercent">
+                            0% of total
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- CHART ROW -->
+            <!-- ================================================= -->
+
+            <div class="chart-grid">
+
+                <div class="panel">
+
+                    <div class="panel-title">
+                        <h3>Issues by Severity</h3>
+                    </div>
+
+                    <div class="donut-layout">
+
+                        <div class="chart-container">
+                            <canvas id="severityChart"></canvas>
+                        </div>
+
+                        <div
+                            class="legend"
+                            id="severityLegend"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-title">
+                        <h3>Issues by Status</h3>
+                    </div>
+
+                    <div class="status-chart">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-title">
+                        <h3>Top Issue Categories</h3>
+                    </div>
+
+                    <div class="donut-layout">
+
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+
+                        <div
+                            class="legend"
+                            id="categoryLegend"
+                        ></div>
+
+                    </div>
+
+                    <button
+                        class="link-button"
+                        id="viewCategories"
+                    >
+                        View all categories
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- TABLE + SIDE -->
+            <!-- ================================================= -->
+
+            <div class="middle-grid">
+
+                <div class="panel recent-panel">
+
+                    <div class="panel-title">
+
+                        <h3>
+                            Recent Issues / Findings
+                        </h3>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                            <tr>
+
+                                <th>Issue ID</th>
+                                <th>Issue Title</th>
+                                <th>Audit / Assignment</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th>Due Date</th>
+                                <th>Actions</th>
+
+                            </tr>
+
+                            </thead>
+
+                            <tbody id="issuesTableBody">
+
+                            <tr>
+                                <td colspan="8">
+                                    Loading...
+                                </td>
+                            </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <button
+                        class="link-button"
+                        id="viewAllIssues"
+                    >
+                        View all issues & findings
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+
+                <div class="side-column">
+
+                    <div class="panel overdue-panel">
+
+                        <div class="panel-title">
+
+                            <h3>
+                                Overdue Issues
+                            </h3>
+
+                            <span
+                                class="badge-red"
+                                id="overdueCount"
+                            >
+                                0
+                            </span>
+
+                        </div>
+
+                        <div id="overdueList"></div>
+
+                        <button
+                            class="link-button"
+                            id="viewOverdue"
+                        >
+                            View all overdue issues
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </div>
+
+
+                    <div class="panel trend-panel">
+
+                        <div class="panel-title">
+
+                            <h3>
+                                Issues Trend
+                            </h3>
+
+                            <select id="trendPeriod">
+                                <option value="6">
+                                    Last 6 Months
+                                </option>
+                            </select>
+
+                        </div>
+
+                        <canvas id="trendChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- RESOLUTION SUMMARY -->
+            <!-- ================================================= -->
+
+            <div class="panel resolution-panel">
+
+                <div class="panel-title">
+                    <h3>Issue Resolution Summary</h3>
+                </div>
+
+                <div class="resolution-grid">
+
+                    <div class="resolution-item">
+
+                        <div class="resolution-icon blue">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+
+                        <div>
+                            <span>
+                                Avg. Resolution Time
+                            </span>
+
+                            <strong>
+                                <span id="avgResolution" style="font-size: 22px;">
+                                    0
+                                </span>
+                                days
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="resolution-item">
+
+                        <div class="resolution-icon purple">
+                            <i class="fa-solid fa-rotate"></i>
+                        </div>
+
+                        <div>
+                            <span>
+                                Reopen Rate
+                            </span>
+
+                            <strong id="reopenRate">
+                                0%
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="resolution-item">
+
+                        <div class="resolution-icon green-icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+
+                        <div>
+                            <span>
+                                Closed This Month
+                            </span>
+
+                            <strong id="closedThisMonth">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <div class="resolution-item">
+
+                        <div class="resolution-icon orange">
+                            <i class="fa-regular fa-circle"></i>
+                        </div>
+
+                        <div>
+                            <span>
+                                Pending Review
+                            </span>
+
+                            <strong id="pendingReview">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- ADD / EDIT MODAL -->
+<!-- ===================================================== -->
+
+<div
+    class="modal-overlay"
+    id="issueModal"
+>
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+                <h3 id="modalTitle">
+                    Add Issue / Finding
+                </h3>
+
+                <p>
+                    Record an audit issue or finding
+                </p>
+            </div>
+
+            <button
+                class="modal-close"
+                id="closeModal"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+        <form id="issueForm">
+
+            <input
+                type="hidden"
+                id="editingFindingId"
+            >
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>
+                        Audit
+                    </label>
+
+                    <select
+                        id="auditId"
+                        required
+                    >
+
+                        <option value="">
+                            Select audit
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Issue Title
+                    </label>
+
+                    <input
+                        id="issueTitle"
+                        required
+                        maxlength="255"
+                        placeholder="Enter issue title"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Category
+                    </label>
+
+                    <select id="category">
+
+                        <option>
+                            Compliance
+                        </option>
+
+                        <option>
+                            Process
+                        </option>
+
+                        <option>
+                            Operational
+                        </option>
+
+                        <option>
+                            IT & Systems
+                        </option>
+
+                        <option>
+                            Financial
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Severity
+                    </label>
+
+                    <select id="severity">
+
+                        <option value="High">
+                            High
+                        </option>
+
+                        <option
+                            value="Medium"
+                            selected
+                        >
+                            Medium
+                        </option>
+
+                        <option value="Low">
+                            Low
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Status
+                    </label>
+
+                    <select id="status">
+
+                        <option value="Open">
+                            Open
+                        </option>
+
+                        <option value="In Progress">
+                            In Progress
+                        </option>
+
+                        <option value="Pending Review">
+                            Pending Review
+                        </option>
+
+                        <option value="Closed">
+                            Closed
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Due Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="dueDate"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    rows="4"
+                    placeholder="Describe the finding..."
+                ></textarea>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    id="cancelModal"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Save Issue
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="/static/IssuesFindings.js"></script>
+
+</body>
+</html>

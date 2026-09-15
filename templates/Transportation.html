@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Transportation | Supply Chain Manager
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/Transportation.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>
+                    Vendor Reliability Platform
+                </span>
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-menu">
+
+            <a href="/supplychaindashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/demand-planning">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Demand Planning</span>
+            </a>
+
+            <a href="/supplychainprocurement">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Procurement</span>
+            </a>
+
+            <a href="/suppliers">
+                <i class="fa-solid fa-users"></i>
+                <span>Suppliers</span>
+            </a>
+
+            <a href="/inventory">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                <span>Inventory</span>
+            </a>
+
+            <a href="/ordersshipments">
+                <i class="fa-solid fa-truck-fast"></i>
+                <span>Orders & Shipments</span>
+            </a>
+
+            <a href="/warehouses">
+                <i class="fa-solid fa-warehouse"></i>
+                <span>Warehouses</span>
+            </a>
+
+            <a
+                href="/transportation"
+                class="active"
+            >
+                <i class="fa-solid fa-truck"></i>
+                <span>Transportation</span>
+            </a>
+
+            <a href="/analyticsreports">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Analytics & Reports</span>
+            </a>
+
+            <a href="/alertsnotifications">
+                <i class="fa-solid fa-bell"></i>
+                <span>Alerts & Notifications</span>
+            </a>
+
+            <a href="/documents">
+                <i class="fa-solid fa-file"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/supplychainsettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <div class="quick-actions">
+
+            <h4>Quick Actions</h4>
+
+            <button onclick="window.location.href='/CreatePurchaseOrder'">
+                <i class="fa-solid fa-cart-plus"></i>
+                Create Purchase Order
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/AddSupplier'">
+                <i class="fa-solid fa-user-plus"></i>
+                Add New Supplier
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/CreateShipment'">
+                <i class="fa-solid fa-ship"></i>
+                Create Shipment
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/UploadDocument'">
+                <i class="fa-solid fa-upload"></i>
+                Upload Document
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+        <div class="profile-card" onclick="openSupplyChainProfile()">
+
+            <div class="profile-avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <strong>
+                Arjun Kumar
+            </strong>
+
+            <span>
+                Supply Chain Manager
+            </span>
+
+            <small>
+                <i class="fa-solid fa-circle"></i>
+                Online
+            </small>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div class="page-title">
+
+                <h1>
+                    Supply Chain Manager Dashboard
+                </h1>
+
+            </div>
+
+
+            <div class="header-actions">
+
+                <div class="search-box">
+
+                    <input
+                        id="globalSearch"
+                        type="search"
+                        placeholder="Search..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <button class="header-icon">
+                    <i class="fa-regular fa-bell"></i>
+                    <span id="notificationCount">
+                        0
+                    </span>
+                </button>
+
+                <div class="date-time">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <div>
+                        <strong id="currentDate">
+                            -
+                        </strong>
+
+                        <small id="currentTime">
+                            -
+                        </small>
+                    </div>
+
+                </div>
+                
+            </div>
+
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+
+        <section class="content">
+
+            <div class="heading-row">
+
+                <div>
+
+                    <h2>
+                        Transportation Overview
+                    </h2>
+
+                    <p>
+                        Monitor and optimize your transportation operations.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 KPI CARDS
+            ================================================== -->
+
+            <div class="kpi-grid">
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon blue">
+                        <i class="fa-solid fa-truck"></i>
+                    </div>
+
+                    <div>
+                        <span>Total Shipments</span>
+
+                        <strong id="totalShipments">
+                            0
+                        </strong>
+
+                        <small class="positive">
+                            ↑ Live database
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon green">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+
+                    <div>
+                        <span>On-Time Deliveries</span>
+
+                        <strong id="onTimeDelivery">
+                            0%
+                        </strong>
+
+                        <small class="positive">
+                            Calculated from ETA
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon purple">
+                        <i class="fa-solid fa-route"></i>
+                    </div>
+
+                    <div>
+                        <span>Total Distance</span>
+
+                        <strong id="totalDistance">
+                            0 km
+                        </strong>
+
+                        <small>
+                            Shipment distance
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon orange">
+                        <i class="fa-solid fa-dollar-sign"></i>
+                    </div>
+
+                    <div>
+                        <span>Transportation Cost</span>
+
+                        <strong id="transportCost">
+                            $0
+                        </strong>
+
+                        <small>
+                            Current period
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon yellow">
+                        <i class="fa-solid fa-gas-pump"></i>
+                    </div>
+
+                    <div>
+                        <span>Fuel Efficiency</span>
+
+                        <strong id="fuelEfficiency">
+                            0 km/l
+                        </strong>
+
+                        <small>
+                            Distance / fuel
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 CHART ROW
+            ================================================== -->
+
+            <div class="grid-three">
+
+                <section class="card large-card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Shipments Trend
+                        </h3>
+
+                        <select id="periodFilter">
+
+                            <option>
+                                This Month
+                            </option>
+
+                            <option>
+                                Last 3 Months
+                            </option>
+
+                            <option>
+                                This Year
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="chart-container">
+
+                        <canvas
+                            id="shipmentTrendChart"
+                        ></canvas>
+
+                    </div>
+
+                </section>
+
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Shipments by Status
+                        </h3>
+
+                    </div>
+
+                    <div class="donut-wrapper">
+
+                        <canvas
+                            id="statusChart"
+                        ></canvas>
+
+                        <div class="donut-center">
+
+                            <strong id="statusTotal">
+                                0
+                            </strong>
+
+                            <span>
+                                Total Shipments
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="statusLegend"
+                        class="legend"
+                    ></div>
+
+                </section>
+
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Shipments by Transport Mode
+                        </h3>
+
+                    </div>
+
+                    <div class="donut-wrapper">
+
+                        <canvas
+                            id="modeChart"
+                        ></canvas>
+
+                        <div class="donut-center">
+
+                            <strong id="modeTotal">
+                                0
+                            </strong>
+
+                            <span>
+                                Total Shipments
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="modeLegend"
+                        class="legend"
+                    ></div>
+
+                </section>
+
+            </div>
+
+
+            <!-- =================================================
+                 TABLES
+            ================================================== -->
+
+            <div class="grid-two">
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Recent Shipments
+                        </h3>
+
+                        <a href="/orders-shipments">
+                            View All
+                        </a>
+
+                    </div>
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                            <tr>
+
+                                <th>Shipment ID</th>
+                                <th>Order ID</th>
+                                <th>Origin</th>
+                                <th>Destination</th>
+                                <th>Mode</th>
+                                <th>Status</th>
+                                <th>ETA</th>
+
+                            </tr>
+
+                            </thead>
+
+                            <tbody
+                                id="recentShipments"
+                            ></tbody>
+
+                        </table>
+
+                    </div>
+
+                </section>
+
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Carrier Performance
+                        </h3>
+
+                        <a href="#">
+                            View All
+                        </a>
+
+                    </div>
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                            <tr>
+
+                                <th>Carrier</th>
+                                <th>Total Shipments</th>
+                                <th>On-Time Delivery</th>
+                                <th>Damage Rate</th>
+                                <th>Rating</th>
+
+                            </tr>
+
+                            </thead>
+
+                            <tbody
+                                id="carrierPerformance"
+                            ></tbody>
+
+                        </table>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- =================================================
+                 MAP + COST
+            ================================================== -->
+
+            <div class="grid-two">
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Shipment Tracking Map
+                        </h3>
+
+                    </div>
+
+                    <div
+                        id="trackingMap"
+                        class="tracking-map"
+                    ></div>
+
+                </section>
+
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Transportation Cost Breakdown
+                        </h3>
+
+                    </div>
+
+                    <div class="cost-layout">
+
+                        <div class="cost-chart">
+
+                            <canvas
+                                id="costChart"
+                            ></canvas>
+
+                            <div class="cost-center">
+
+                                <strong id="totalCostCenter">
+                                    $0
+                                </strong>
+
+                                <span>
+                                    Total Cost
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            id="costLegend"
+                            class="cost-legend"
+                        ></div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- =================================================
+                 UPCOMING TRANSPORTS
+            ================================================== -->
+
+            <section class="card">
+
+                <div class="card-header">
+
+                    <h3>
+                        Upcoming Transports
+                    </h3>
+
+                    <a href="#">
+                        View All
+                    </a>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                        <tr>
+
+                            <th>Shipment ID</th>
+                            <th>Order ID</th>
+                            <th>Origin</th>
+                            <th>Destination</th>
+                            <th>Carrier</th>
+                            <th>Mode</th>
+                            <th>Scheduled Date</th>
+                            <th>ETA</th>
+                            <th>Status</th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody
+                            id="upcomingTransports"
+                        ></tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+></script>
+
+<script
+    src="/static/Transportation.js"
+></script>
+
+</body>
+
+</html>

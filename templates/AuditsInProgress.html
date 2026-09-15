@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Audits in Progress | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/AuditsInProgress.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-shield">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <div class="brand-title">
+                    VendorIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+            </div>
+
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="/AuditorDashboard" class="nav-item">
+                <span><i class="fa-solid fa-house"></i></span>
+                Dashboard
+            </a>
+
+            <a href="/AuditAssignments" class="nav-item">
+                <span><i class="fa-solid fa-clipboard-list"></i></span>
+                Audit Assignments
+            </a>
+
+            <a href="/PlanningRisk" class="nav-item">
+                <span><i class="fa-solid fa-flag"></i></span>
+                Planning & Risk
+            </a>
+
+            <a
+                href="/AuditsInProgress"
+                class="nav-item active"
+            >
+                <span><i class="fa-solid fa-list-check"></i></span>
+                Audits in Progress
+            </a>
+
+            <a href="/EvidenceDocuments" class="nav-item">
+                <span><i class="fa-solid fa-folder-open"></i></span>
+                Evidence & Documents
+            </a>
+
+            <a href="/IssuesFindings" class="nav-item">
+                <span><i class="fa-solid fa-exclamation-triangle"></i></span>
+                Issues & Findings
+            </a>
+
+            <a href="/AuditorReports" class="nav-item">
+                <span><i class="fa-solid fa-file-lines"></i></span>
+                Reports
+            </a>
+
+            <a href="/ComplianceTracker" class="nav-item">
+                <span><i class="fa-solid fa-circle-check"></i></span>
+                Compliance Tracker
+            </a>
+
+            <a href="/Recommendations" class="nav-item">
+                <span><i class="fa-solid fa-lightbulb"></i></span>
+                Recommendations
+            </a>
+
+            <a href="/AuditorAnalytics" class="nav-item">
+                <span><i class="fa-solid fa-chart-column"></i></span>
+                Analytics
+            </a>
+
+            <a href="/Calendar" class="nav-item">
+                <span><i class="fa-solid fa-calendar-days"></i></span>
+                Calendar
+            </a>
+
+            <a href="/AuditorNotifications" class="nav-item">
+                <span><i class="fa-solid fa-bell"></i></span>
+                Notifications
+                <b class="notification-count">5</b>
+            </a>
+
+            <a href="/AuditorMessages" class="nav-item">
+                <span><i class="fa-regular fa-envelope"></i></span>
+                Messages
+            </a>
+
+            <a href="/AuditorSettings" class="nav-item">
+                <span><i class="fa-solid fa-gear"></i></span>
+                Settings
+            </a>
+
+            <a href="/AuditorHelp" class="nav-item">
+                <span><i class="fa-solid fa-circle-question"></i></span>
+                Help & Support
+            </a>
+
+            <a href="/login" class="nav-item">
+                <span><i class="fa-solid fa-right-from-bracket"></i></span>
+                Logout
+            </a>
+
+        </nav>
+
+        <div class="sidebar-profile">
+
+            <div class="profile-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="profile-info">
+
+                <strong id="sidebarName">
+                    Auditor
+                </strong>
+
+                <small id="sidebarRole">
+                    Auditor
+                </small>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <h1>
+                Auditor Dashboard
+            </h1>
+
+            <div class="topbar-right">
+
+                <div class="search-box">
+
+                    <span><i class="fa-solid fa-magnifying-glass"></i></span>
+
+                    <input
+                        id="globalSearch"
+                        type="search"
+                        placeholder="Search audits, entities, departments..."
+                    >
+
+                </div>
+
+                <button class="notification-btn">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>5</span>
+                </button>
+
+                <div class="top-profile">
+
+                    <div class="profile-avatar small">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerName">
+                            Auditor
+                        </strong>
+
+                        <small id="headerRole">
+                            Senior Auditor
+                        </small>
+                    </div>
+
+                    <span><i class="fa-solid fa-chevron-down"></i></span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+
+        <section class="content">
+
+            <div class="page-heading">
+
+                <div>
+
+                    <h2>
+                        Audits in Progress
+                    </h2>
+
+                    <p>
+                        Monitor and manage audits that are currently in progress
+                    </p>
+
+                </div>
+
+                <div class="heading-actions">
+
+                    <button
+                        class="btn secondary"
+                        id="filterBtn"
+                    >
+                        <i class="fa-solid fa-filter"></i>
+                        Filters
+                    </button>
+
+                    <button
+                        class="btn primary"
+                        id="exportBtn"
+                    >
+                        <i class="fa-solid fa-download"></i>
+                        Export Report
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILTER PANEL -->
+
+            <div
+                class="filter-panel"
+                id="filterPanel"
+            >
+
+                <div class="filter-field">
+
+                    <label>Status</label>
+
+                    <select id="statusFilter">
+                        <option value="All">All</option>
+                        <option value="On Track">On Track</option>
+                        <option value="At Risk">At Risk</option>
+                        <option value="Delayed">Delayed</option>
+                    </select>
+
+                </div>
+
+                <div class="filter-field">
+
+                    <label>Audit Type</label>
+
+                    <select id="auditTypeFilter">
+                        <option value="All">All</option>
+                    </select>
+
+                </div>
+
+                <div class="filter-field">
+
+                    <label>Department</label>
+
+                    <select id="departmentFilter">
+                        <option value="All">All</option>
+                    </select>
+
+                </div>
+
+                <button
+                    class="btn primary"
+                    id="applyFilterBtn"
+                >
+                    Apply
+                </button>
+
+                <button
+                    class="btn secondary"
+                    id="clearFilterBtn"
+                >
+                    Clear
+                </button>
+
+            </div>
+
+
+            <!-- KPI CARDS -->
+
+            <div class="kpi-grid">
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon blue">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+
+                    <div class="kpi-content">
+
+                        <span>
+                            Total In Progress
+                        </span>
+
+                        <strong id="totalInProgress">
+                            0
+                        </strong>
+
+                        <small class="green">
+                            Currently active
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon green">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+
+                    <div class="kpi-content">
+
+                        <span>
+                            Overall Progress
+                        </span>
+
+                        <strong>
+                            <span id="overallProgress">
+                                0
+                            </span>%
+                        </strong>
+
+                        <div class="mini-progress">
+                            <div
+                                id="overallProgressBar"
+                                style="width:0%"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon orange">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+
+                    <div class="kpi-content">
+
+                        <span>
+                            Avg. Days Elapsed
+                        </span>
+
+                        <strong>
+                            <span id="avgElapsed">
+                                0
+                            </span>
+                            <small>days</small>
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon purple">
+                        <i class="fa-solid fa-hourglass-end"></i>
+                    </div>
+
+                    <div class="kpi-content">
+
+                        <span>
+                            Avg. Days Remaining
+                        </span>
+
+                        <strong>
+                            <span id="avgRemaining">
+                                0
+                            </span>
+                            <small>days</small>
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon cyan">
+                        <i class="fa-solid fa-check-to-slot"></i>
+                    </div>
+
+                    <div class="kpi-content">
+
+                        <span>
+                            On Track
+                        </span>
+
+                        <strong id="onTrack">
+                            0
+                        </strong>
+
+                        <small
+                            class="green"
+                            id="onTrackPercent"
+                        >
+                            0% of total
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- TOP GRID -->
+
+            <div class="dashboard-grid">
+
+                <!-- AUDIT TABLE -->
+
+                <section class="card audits-card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Audits in Progress
+                        </h3>
+
+                        <span
+                            class="result-count"
+                            id="resultCount"
+                        >
+                            0 audits
+                        </span>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Audit Name</th>
+                                    <th>Audit Type</th>
+                                    <th>Department / Entity</th>
+                                    <th>Owner</th>
+                                    <th>Start Date</th>
+                                    <th>Target Date</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="auditTableBody">
+
+                                <tr>
+                                    <td
+                                        colspan="9"
+                                        class="loading"
+                                    >
+                                        Loading audits...
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <button
+                        class="view-all"
+                        id="viewAllBtn"
+                    >
+                        View all audits <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </section>
+
+
+                <!-- STATUS -->
+
+                <section class="card status-card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Progress by Status
+                        </h3>
+
+                    </div>
+
+                    <div class="donut-wrapper">
+
+                        <canvas
+                            id="statusChart"
+                        ></canvas>
+
+                        <div class="donut-center">
+
+                            <strong id="donutTotal">
+                                0
+                            </strong>
+
+                            <span>
+                                Total
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="legend">
+
+                        <div>
+                            <span class="dot green-dot"></span>
+                            <span>On Track</span>
+                            <strong id="legendOnTrack">
+                                0
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span class="dot orange-dot"></span>
+                            <span>At Risk</span>
+                            <strong id="legendAtRisk">
+                                0
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span class="dot red-dot"></span>
+                            <span>Delayed</span>
+                            <strong id="legendDelayed">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- TREND -->
+
+                <section class="card trend-card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Audit Progress Trend
+                        </h3>
+
+                    </div>
+
+                    <div class="chart-container">
+
+                        <canvas
+                            id="trendChart"
+                        ></canvas>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- BOTTOM GRID -->
+
+            <div class="bottom-grid">
+
+                <!-- MILESTONES -->
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Upcoming Key Milestones
+                        </h3>
+
+                    </div>
+
+                    <div class="milestone-table">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Audit Name</th>
+                                    <th>Milestone</th>
+                                    <th>Due Date</th>
+                                    <th>Days Left</th>
+                                    <th>Owner</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="milestoneBody">
+
+                                <tr>
+                                    <td
+                                        colspan="5"
+                                        class="loading"
+                                    >
+                                        Loading...
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <button
+                        class="view-all"
+                        id="milestoneBtn"
+                    >
+                        View all milestones <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </section>
+
+
+                <!-- ACTIVITIES -->
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Recent Activities
+                        </h3>
+
+                    </div>
+
+                    <div
+                        class="activities"
+                        id="activityList"
+                    >
+                        Loading...
+                    </div>
+
+                    <button
+                        class="view-all"
+                        id="activityBtn"
+                    >
+                        View all activities <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="/static/AuditsInProgress.js"></script>
+
+</body>
+</html>

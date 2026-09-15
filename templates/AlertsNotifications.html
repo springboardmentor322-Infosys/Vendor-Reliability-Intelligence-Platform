@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Alerts & Notifications</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/AlertsNotifications.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+        <nav>
+
+            <a href="/supplychaindashboard">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="/demand-planning">
+                <i class="fa-solid fa-chart-line"></i>
+                Demand Planning
+            </a>
+
+            <a href="/supplychainprocurement">
+                <i class="fa-solid fa-cart-shopping"></i>
+                Procurement
+            </a>
+
+            <a href="/suppliers">
+                <i class="fa-solid fa-users"></i>
+                Suppliers
+            </a>
+
+            <a href="/inventory">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                Inventory
+            </a>
+
+            <a href="/ordersshipments">
+                <i class="fa-solid fa-truck"></i>
+                Orders & Shipments
+            </a>
+
+            <a href="/warehouses">
+                <i class="fa-solid fa-warehouse"></i>
+                Warehouses
+            </a>
+
+            <a href="/transportation">
+                <i class="fa-solid fa-route"></i>
+                Transportation
+            </a>
+
+            <a href="/analyticsreports">
+                <i class="fa-solid fa-chart-column"></i>
+                Analytics & Reports
+            </a>
+
+            <a
+                href="/alertsnotifications"
+                class="active"
+            >
+                <i class="fa-solid fa-bell"></i>
+                Alerts & Notifications
+            </a>
+
+            <a href="/documents">
+                <i class="fa-solid fa-file"></i>
+                Documents
+            </a>
+
+            <a href="/supplychainsettings">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <!-- QUICK ACTIONS -->
+
+        <div class="quick-actions">
+
+            <h4>Quick Actions</h4>
+
+            <button onclick="window.location.href='/CreatePurchaseOrder'">
+                <i class="fa-solid fa-cart-plus"></i>
+                Create Purchase Order
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/AddSupplier'">
+                <i class="fa-solid fa-user-plus"></i>
+                Add New Supplier
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/CreateShipment'">
+                <i class="fa-solid fa-ship"></i>
+                Create Shipment
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/UploadDocument'">
+                <i class="fa-solid fa-upload"></i>
+                Upload Document
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+        <div class="profile-card" onclick="openSupplyChainProfile()">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <strong id="profileName">
+                Supply Chain Manager
+            </strong>
+
+            <small>
+                <span class="online-dot"></span>
+                Online
+            </small>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <h1>
+                Supply Chain Manager Dashboard
+            </h1>
+
+            <div class="top-actions">
+
+                <div class="search-box">
+
+                    <input
+                        id="globalSearch"
+                        type="text"
+                        placeholder="Search..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <button class="icon-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notification-badge">
+                        6
+                    </span>
+                </button>
+
+                <div class="date-box">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <div>
+                        <strong id="currentDate"></strong>
+                        <small id="currentTime"></small>
+                    </div>
+
+                </div>
+                
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <div class="page-header">
+
+                <div>
+                    <h2>
+                        Alerts & Notifications
+                    </h2>
+
+                    <p>
+                        Stay informed and take action on important supply chain events.
+                    </p>
+                </div>
+
+                <div class="header-actions">
+
+                    <button
+                        class="secondary-btn"
+                        id="filterBtn"
+                    >
+                        <i class="fa-solid fa-filter"></i>
+                        Filters
+                    </button>
+
+                    <button
+                        class="secondary-btn"
+                        id="markAllBtn"
+                    >
+                        <i class="fa-regular fa-circle-check"></i>
+                        Mark all as read
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 KPI CARDS
+            ================================================== -->
+
+            <div class="kpi-grid">
+
+                <div class="kpi critical">
+
+                    <div class="kpi-icon">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+
+                    <div>
+                        <span>Critical Alerts</span>
+                        <strong id="criticalCount">0</strong>
+                        <small>Needs immediate action</small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi high">
+
+                    <div class="kpi-icon">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+
+                    <div>
+                        <span>High Priority</span>
+                        <strong id="highCount">0</strong>
+                        <small>Requires attention</small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi info">
+
+                    <div class="kpi-icon">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </div>
+
+                    <div>
+                        <span>Informational</span>
+                        <strong id="infoCount">0</strong>
+                        <small>For your information</small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi resolved">
+
+                    <div class="kpi-icon">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <div>
+                        <span>Resolved Today</span>
+                        <strong id="resolvedCount">0</strong>
+                        <small>Closed alerts</small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi snoozed">
+
+                    <div class="kpi-icon">
+                        <i class="fa-regular fa-clock"></i>
+                    </div>
+
+                    <div>
+                        <span>Snoozed Alerts</span>
+                        <strong id="snoozedCount">0</strong>
+                        <small>Snoozed notifications</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 BODY GRID
+            ================================================== -->
+
+            <div class="dashboard-grid">
+
+                <section class="card alerts-card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h3>Active Alerts</h3>
+                        </div>
+
+                        <div class="table-controls">
+
+                            <div class="search-box small">
+
+                                <input
+                                    id="alertSearch"
+                                    type="text"
+                                    placeholder="Search alerts..."
+                                >
+
+                                <i class="fa-solid fa-magnifying-glass"></i>
+
+                            </div>
+
+                            <select id="categoryFilter">
+
+                                <option value="All">
+                                    All Categories
+                                </option>
+
+                            </select>
+
+                            <select id="priorityFilter">
+
+                                <option value="All">
+                                    Sort by: Newest
+                                </option>
+
+                                <option value="Critical">
+                                    Critical
+                                </option>
+
+                                <option value="High">
+                                    High
+                                </option>
+
+                                <option value="Informational">
+                                    Informational
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tabs">
+
+                        <button
+                            class="tab active"
+                            data-priority="All"
+                        >
+                            All
+                        </button>
+
+                        <button
+                            class="tab"
+                            data-priority="Critical"
+                        >
+                            Critical
+                        </button>
+
+                        <button
+                            class="tab"
+                            data-priority="High"
+                        >
+                            High
+                        </button>
+
+                        <button
+                            class="tab"
+                            data-priority="Informational"
+                        >
+                            Informational
+                        </button>
+
+                    </div>
+
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Alert</th>
+                                    <th>Category</th>
+                                    <th>Source</th>
+                                    <th>Priority</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="alertsTable">
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="table-footer">
+
+                        <button
+                            id="viewAllBtn"
+                            class="link-btn"
+                        >
+                            View All Alerts
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================================
+                     CATEGORY
+                ================================================== -->
+
+                <aside class="right-column">
+
+                    <section class="card">
+
+                        <div class="card-header">
+
+                            <h3>
+                                Alert Categories
+                            </h3>
+
+                        </div>
+
+                        <div
+                            id="categoryList"
+                            class="category-list"
+                        >
+                        </div>
+
+                        <button class="link-btn">
+                            View All Categories
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         ACTIVITY
+                    ================================================== -->
+
+                    <section class="card">
+
+                        <div class="card-header">
+
+                            <h3>
+                                Recent Activity
+                            </h3>
+
+                        </div>
+
+                        <div
+                            id="activityList"
+                            class="activity-list"
+                        >
+                        </div>
+
+                        <button class="link-btn">
+                            View All Activity
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </section>
+
+                </aside>
+
+            </div>
+
+
+            <!-- =================================================
+                 BOTTOM
+            ================================================== -->
+
+            <div class="bottom-grid">
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Active Alert Rules
+                        </h3>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Rule Name</th>
+                                    <th>Category</th>
+                                    <th>Condition</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="rulesTable">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="table-footer">
+
+                        <button class="link-btn">
+                            Manage Alert Rules
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================================
+                     NOTIFICATION PREFERENCES
+                ================================================== -->
+
+                <section class="card preferences">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Notification Preferences
+                        </h3>
+
+                    </div>
+
+                    <div class="preference-row">
+
+                        <div class="preference-icon">
+                            <i class="fa-regular fa-envelope"></i>
+                        </div>
+
+                        <div>
+                            <strong>Email Notifications</strong>
+                            <small>Receive alerts via email</small>
+                        </div>
+
+                        <label class="switch">
+                            <input
+                                type="checkbox"
+                                id="emailToggle"
+                            >
+                            <span></span>
+                        </label>
+
+                    </div>
+
+
+                    <div class="preference-row">
+
+                        <div class="preference-icon">
+                            <i class="fa-solid fa-mobile-screen"></i>
+                        </div>
+
+                        <div>
+                            <strong>SMS Notifications</strong>
+                            <small>Receive critical alerts via SMS</small>
+                        </div>
+
+                        <label class="switch">
+                            <input
+                                type="checkbox"
+                                id="smsToggle"
+                            >
+                            <span></span>
+                        </label>
+
+                    </div>
+
+
+                    <div class="preference-row">
+
+                        <div class="preference-icon">
+                            <i class="fa-regular fa-window-maximize"></i>
+                        </div>
+
+                        <div>
+                            <strong>In-App Notifications</strong>
+                            <small>Show notifications in application</small>
+                        </div>
+
+                        <label class="switch">
+                            <input
+                                type="checkbox"
+                                id="browserToggle"
+                            >
+                            <span></span>
+                        </label>
+
+                    </div>
+
+
+                    <div class="preference-row">
+
+                        <div class="preference-icon">
+                            <i class="fa-regular fa-bell"></i>
+                        </div>
+
+                        <div>
+                            <strong>Escalation Notifications</strong>
+                            <small>Notify on escalation</small>
+                        </div>
+
+                        <label class="switch">
+                            <input
+                                type="checkbox"
+                                id="soundToggle"
+                            >
+                            <span></span>
+                        </label>
+
+                    </div>
+
+                    <div class="table-footer">
+
+                        <button class="link-btn">
+                            Manage Preferences
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="/static/AlertsNotifications.js"></script>
+
+</body>
+</html>

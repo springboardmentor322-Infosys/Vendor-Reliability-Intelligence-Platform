@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Vendor Payments | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #020817;
+            --panel: #071a33;
+
+            --border:
+                rgba(59,130,246,.17);
+
+            --text: #f1f6ff;
+            --muted: #7087a5;
+
+            --blue: #3b82f6;
+            --green: #10b981;
+            --orange: #f59e0b;
+            --red: #ef4444;
+        }
+
+        body {
+            min-height: 100vh;
+
+            font-family:
+                Inter,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            color: var(--text);
+
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(37,99,235,.09),
+                    transparent 30%
+                ),
+                var(--bg);
+        }
+
+        .page {
+            max-width: 1250px;
+
+            margin: auto;
+
+            padding: 28px;
+        }
+
+        .header {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 25px;
+        }
+
+        .heading {
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+        }
+
+        .icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 13px;
+
+            color: #a78bfa;
+
+            background:
+                rgba(139,92,246,.1);
+
+            border:
+                1px solid rgba(139,92,246,.2);
+        }
+
+        h1 {
+            font-size: 25px;
+        }
+
+        .subtitle {
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+        }
+
+        .back {
+            padding: 11px 15px;
+
+            color: #9db0c9;
+
+            background: var(--panel);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 10px;
+
+            text-decoration: none;
+
+            font-size: 12px;
+        }
+
+        /* Stats */
+
+        .stats {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            padding: 18px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(7,26,51,.95),
+                    rgba(4,17,34,.95)
+                );
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 15px;
+        }
+
+        .stat span {
+            color: var(--muted);
+
+            font-size: 10px;
+
+            text-transform: uppercase;
+        }
+
+        .stat strong {
+            display: block;
+
+            margin-top: 6px;
+
+            font-size: 23px;
+        }
+
+        /* Panel */
+
+        .panel {
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(7,26,51,.98),
+                    rgba(4,17,34,.98)
+                );
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 20px 50px rgba(0,0,0,.3);
+        }
+
+        .panel-header {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            padding: 20px;
+
+            border-bottom:
+                1px solid rgba(96,165,250,.07);
+        }
+
+        .panel-header h2 {
+            font-size: 16px;
+        }
+
+        .filters {
+            display: flex;
+
+            gap: 8px;
+        }
+
+        .filters input,
+        .filters select {
+            height: 38px;
+
+            padding: 0 11px;
+
+            color: #a8bad3;
+
+            background: #06172d;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 9px;
+
+            outline: none;
+
+            font-size: 11px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+
+            min-width: 800px;
+
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 13px 17px;
+
+            color: #66809f;
+
+            background:
+                rgba(3,15,31,.55);
+
+            font-size: 10px;
+
+            text-align: left;
+
+            text-transform: uppercase;
+
+            letter-spacing: .6px;
+        }
+
+        td {
+            padding: 15px 17px;
+
+            color: #aebfd4;
+
+            font-size: 12px;
+
+            border-top:
+                1px solid rgba(96,165,250,.06);
+        }
+
+        tbody tr {
+            transition: .25s;
+        }
+
+        tbody tr:hover {
+            background:
+                rgba(37,99,235,.045);
+        }
+
+        td strong {
+            color: #dce8f8;
+        }
+
+        .status {
+            display: inline-flex;
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            font-size: 10px;
+
+            font-weight: 700;
+        }
+
+        .completed {
+            color: #34d399;
+
+            background:
+                rgba(16,185,129,.1);
+
+            border:
+                1px solid rgba(16,185,129,.18);
+        }
+
+        .processing {
+            color: #fbbf24;
+
+            background:
+                rgba(245,158,11,.1);
+
+            border:
+                1px solid rgba(245,158,11,.18);
+        }
+
+        .failed {
+            color: #f87171;
+
+            background:
+                rgba(239,68,68,.1);
+
+            border:
+                1px solid rgba(239,68,68,.18);
+        }
+
+        .empty {
+            text-align: center;
+
+            padding: 50px;
+
+            color: #607896;
+        }
+
+        @media(max-width:800px) {
+
+            .page {
+                padding: 18px 12px;
+            }
+
+            .header {
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 15px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-header {
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+            .filters {
+                width: 100%;
+            }
+
+            .filters input,
+            .filters select {
+                flex: 1;
+
+                min-width: 0;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="header">
+
+        <div class="heading">
+
+            <div class="icon">
+                <i class="fa-solid fa-building"></i>
+            </div>
+
+            <div>
+
+                <h1>Vendor Payments</h1>
+
+                <p class="subtitle">
+                    View and track vendor payment history
+                </p>
+
+            </div>
+
+        </div>
+
+        <a
+            href="/AccountsPayable"
+            class="back"
+        >
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Payables
+        </a>
+
+    </div>
+
+
+    <!-- Statistics -->
+
+    <div class="stats">
+
+        <div class="stat">
+
+            <span>Total Payments</span>
+
+            <strong>
+                ₹12,45,800
+            </strong>
+
+        </div>
+
+        <div class="stat">
+
+            <span>This Month</span>
+
+            <strong>
+                ₹3,84,500
+            </strong>
+
+        </div>
+
+        <div class="stat">
+
+            <span>Vendors Paid</span>
+
+            <strong>
+                24
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- Payment Table -->
+
+    <div class="panel">
+
+        <div class="panel-header">
+
+            <h2>Payment History</h2>
+
+            <div class="filters">
+
+                <input
+                    type="text"
+                    id="search"
+                    placeholder="Search vendor..."
+                >
+
+                <select id="status">
+
+                    <option value="all">
+                        All Status
+                    </option>
+
+                    <option value="Completed">
+                        Completed
+                    </option>
+
+                    <option value="Processing">
+                        Processing
+                    </option>
+
+                    <option value="Failed">
+                        Failed
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Vendor</th>
+                        <th>Invoice</th>
+                        <th>Date</th>
+                        <th>Method</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="paymentTable">
+
+                    <tr>
+                        <td>
+                            <strong>PAY-1001</strong>
+                        </td>
+
+                        <td>
+                            ABC Industries
+                        </td>
+
+                        <td>
+                            INV-2026-001
+                        </td>
+
+                        <td>
+                            08 Sep 2026
+                        </td>
+
+                        <td>
+                            NEFT
+                        </td>
+
+                        <td>
+                            ₹85,000
+                        </td>
+
+                        <td>
+                            <span class="status completed">
+                                Completed
+                            </span>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            <strong>PAY-1002</strong>
+                        </td>
+
+                        <td>
+                            Global Supplies Ltd
+                        </td>
+
+                        <td>
+                            INV-2026-002
+                        </td>
+
+                        <td>
+                            07 Sep 2026
+                        </td>
+
+                        <td>
+                            RTGS
+                        </td>
+
+                        <td>
+                            ₹1,25,500
+                        </td>
+
+                        <td>
+                            <span class="status completed">
+                                Completed
+                            </span>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            <strong>PAY-1003</strong>
+                        </td>
+
+                        <td>
+                            Tech Solutions Pvt Ltd
+                        </td>
+
+                        <td>
+                            INV-2026-003
+                        </td>
+
+                        <td>
+                            06 Sep 2026
+                        </td>
+
+                        <td>
+                            Bank Transfer
+                        </td>
+
+                        <td>
+                            ₹54,800
+                        </td>
+
+                        <td>
+                            <span class="status processing">
+                                Processing
+                            </span>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td>
+                            <strong>PAY-1004</strong>
+                        </td>
+
+                        <td>
+                            Prime Logistics
+                        </td>
+
+                        <td>
+                            INV-2026-004
+                        </td>
+
+                        <td>
+                            04 Sep 2026
+                        </td>
+
+                        <td>
+                            UPI
+                        </td>
+
+                        <td>
+                            ₹32,400
+                        </td>
+
+                        <td>
+                            <span class="status completed">
+                                Completed
+                            </span>
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+/* =========================================================
+   VendorIQ - Vendor Payments
+   Loads FinancePayment records from FastAPI/PostgreSQL
+   ========================================================= */
+
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+let payments = [];
+
+
+// ---------------------------------------------------------
+// JWT
+// ---------------------------------------------------------
+function getToken() {
+
+    return (
+        localStorage.getItem("access_token") ||
+        localStorage.getItem("token") ||
+        localStorage.getItem("jwt_token") ||
+        sessionStorage.getItem("access_token") ||
+        sessionStorage.getItem("token") ||
+        sessionStorage.getItem("jwt_token")
+    );
+}
+
+
+// ---------------------------------------------------------
+// API helper
+// ---------------------------------------------------------
+async function apiFetch(url, options = {}) {
+
+    const token = getToken();
+
+    const headers = {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+    };
+
+    if (token) {
+
+        headers["Authorization"] =
+            `Bearer ${token}`;
+    }
+
+
+    const response =
+        await fetch(url, {
+            ...options,
+            headers
+        });
+
+
+    let data = null;
+
+    try {
+
+        data = await response.json();
+
+    } catch {
+
+        data = null;
+    }
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data?.detail ||
+            data?.message ||
+            `Request failed (${response.status})`
+        );
+    }
+
+
+    return data;
+}
+
+
+// ---------------------------------------------------------
+// Load payments
+// ---------------------------------------------------------
+async function loadPayments() {
+
+    try {
+
+        const search =
+            document
+                .getElementById("search")
+                .value
+                .trim();
+
+
+        const status =
+            document
+                .getElementById("status")
+                .value;
+
+
+        const params =
+            new URLSearchParams();
+
+
+        if (search) {
+
+            params.append(
+                "search",
+                search
+            );
+        }
+
+
+        if (
+            status &&
+            status !== "all"
+        ) {
+
+            params.append(
+                "status",
+                status
+            );
+        }
+
+
+        params.append(
+            "page",
+            "1"
+        );
+
+
+        params.append(
+            "page_size",
+            "100"
+        );
+
+
+        const url =
+            `${API_BASE_URL}/api/finance/accounts-payable/payments?${params.toString()}`;
+
+
+        const data =
+            await apiFetch(url);
+
+
+        payments =
+            Array.isArray(data)
+                ? data
+                : (
+                    data?.items ||
+                    data?.payments ||
+                    data?.data ||
+                    []
+                );
+
+
+        console.log(
+            "Payments:",
+            payments
+        );
+
+
+        renderPayments();
+
+        updateStatistics();
+
+
+    } catch (error) {
+
+        console.error(
+            "Payment loading error:",
+            error
+        );
+
+
+        const table =
+            document.getElementById(
+                "paymentTable"
+            );
+
+
+        if (table) {
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="7" class="empty">
+                        Unable to load payment data
+                    </td>
+                </tr>
+            `;
+        }
+
+
+        alert(
+            "Unable to load payments.\n\n" +
+            error.message
+        );
+    }
+}
+
+
+// ---------------------------------------------------------
+// Render table
+// ---------------------------------------------------------
+function renderPayments() {
+
+    const table =
+        document.getElementById(
+            "paymentTable"
+        );
+
+
+    if (!table) return;
+
+
+    if (!payments.length) {
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty">
+                    No payment records found
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    table.innerHTML =
+        payments
+            .map(
+                (payment, index) => {
+
+                    const paymentId =
+                        payment.id ??
+                        `PAY-${index + 1}`;
+
+
+                    const date =
+                        formatDate(
+                            payment.payment_date
+                        );
+
+
+                    const amount =
+                        Number(
+                            payment.amount || 0
+                        );
+
+
+                    const status =
+                        payment.status ||
+                        "Completed";
+
+
+                    const statusClass =
+                        getStatusClass(
+                            status
+                        );
+
+
+                    return `
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    ${escapeHtml(
+                                        String(paymentId)
+                                    )}
+                                </strong>
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    payment.vendor || "-"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    payment.invoice_no || "-"
+                                )}
+                            </td>
+
+                            <td>
+                                ${date}
+                            </td>
+
+                            <td>
+                                -
+                            </td>
+
+                            <td>
+                                ₹${amount.toLocaleString(
+                                    "en-IN",
+                                    {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }
+                                )}
+                            </td>
+
+                            <td>
+                                <span class="status ${statusClass}">
+                                    ${escapeHtml(
+                                        status
+                                    )}
+                                </span>
+                            </td>
+
+                        </tr>
+                    `;
+                }
+            )
+            .join("");
+}
+
+
+// ---------------------------------------------------------
+// Statistics
+// ---------------------------------------------------------
+function updateStatistics() {
+
+    const total =
+        payments.reduce(
+            (sum, payment) =>
+                sum +
+                Number(
+                    payment.amount || 0
+                ),
+            0
+        );
+
+
+    const now =
+        new Date();
+
+
+    const currentMonth =
+        now.getMonth();
+
+
+    const currentYear =
+        now.getFullYear();
+
+
+    const thisMonth =
+        payments
+            .filter(payment => {
+
+                if (!payment.payment_date) {
+                    return false;
+                }
+
+                const date =
+                    new Date(
+                        payment.payment_date
+                    );
+
+                return (
+                    date.getMonth() ===
+                        currentMonth &&
+                    date.getFullYear() ===
+                        currentYear
+                );
+            })
+            .reduce(
+                (sum, payment) =>
+                    sum +
+                    Number(
+                        payment.amount || 0
+                    ),
+                0
+            );
+
+
+    const vendorsPaid =
+        new Set(
+            payments
+                .filter(payment =>
+                    String(
+                        payment.status || ""
+                    ).toLowerCase() ===
+                    "completed"
+                )
+                .map(
+                    payment =>
+                        payment.vendor
+                )
+                .filter(Boolean)
+        ).size;
+
+
+    const stats =
+        document.querySelectorAll(
+            ".stat strong"
+        );
+
+
+    if (stats[0]) {
+
+        stats[0].textContent =
+            formatCurrency(total);
+    }
+
+
+    if (stats[1]) {
+
+        stats[1].textContent =
+            formatCurrency(thisMonth);
+    }
+
+
+    if (stats[2]) {
+
+        stats[2].textContent =
+            vendorsPaid;
+    }
+}
+
+
+// ---------------------------------------------------------
+// Currency
+// ---------------------------------------------------------
+function formatCurrency(value) {
+
+    return "₹" +
+        Number(value || 0)
+            .toLocaleString(
+                "en-IN",
+                {
+                    maximumFractionDigits: 2
+                }
+            );
+}
+
+
+// ---------------------------------------------------------
+// Date
+// ---------------------------------------------------------
+function formatDate(value) {
+
+    if (!value) return "-";
+
+
+    const date =
+        new Date(value);
+
+
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+
+    return date.toLocaleDateString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }
+    );
+}
+
+
+// ---------------------------------------------------------
+// Status class
+// ---------------------------------------------------------
+function getStatusClass(status) {
+
+    const value =
+        String(status || "")
+            .toLowerCase();
+
+
+    if (value === "completed" ||
+        value === "paid") {
+
+        return "completed";
+    }
+
+
+    if (value === "processing" ||
+        value === "pending") {
+
+        return "processing";
+    }
+
+
+    if (value === "failed") {
+
+        return "failed";
+    }
+
+
+    return "processing";
+}
+
+
+// ---------------------------------------------------------
+// Prevent HTML injection
+// ---------------------------------------------------------
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+// ---------------------------------------------------------
+// Search
+// ---------------------------------------------------------
+document
+    .getElementById("search")
+    .addEventListener(
+        "input",
+        debounce(
+            loadPayments,
+            400
+        )
+    );
+
+
+// ---------------------------------------------------------
+// Status filter
+// ---------------------------------------------------------
+document
+    .getElementById("status")
+    .addEventListener(
+        "change",
+        loadPayments
+    );
+
+
+// ---------------------------------------------------------
+// Debounce
+// ---------------------------------------------------------
+function debounce(
+    callback,
+    delay
+) {
+
+    let timer;
+
+    return function () {
+
+        clearTimeout(timer);
+
+        timer =
+            setTimeout(
+                callback,
+                delay
+            );
+    };
+}
+
+
+// ---------------------------------------------------------
+// Initial load
+// ---------------------------------------------------------
+document.addEventListener(
+    "DOMContentLoaded",
+    loadPayments
+);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Purchase Orders | VendorIQ</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="stylesheet" href="/static/ProcurementPurchaseOrder.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-industry"></i>
+            </div>
+
+            <div>
+                <div class="brand-name">VendorIQ</div>
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-title">MAIN MENU</div>
+
+        <nav>
+
+            <a href="/ManagerDashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/ProcurementRequests">
+                <i class="fa-regular fa-clipboard"></i>
+                <span>Procurement Requests</span>
+            </a>
+
+            <a href="/ProcurementPurchaseOrder" class="active">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Purchase Orders</span>
+            </a>
+
+            <a href="/ProcurementApprovals">
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+            </a>
+
+            <a href="/ProcurementVendors">
+                <i class="fa-solid fa-user-group"></i>
+                <span>Vendors</span>
+            </a>
+
+            <a href="/OrderTracking">
+                <i class="fa-solid fa-box"></i>
+                <span>Order Tracking</span>
+            </a>
+
+            <a href="/ProcurementInvoices">
+                <i class="fa-regular fa-file-lines"></i>
+                <span>Invoices</span>
+            </a>
+
+            <a href="/ProcurementReports">
+                <i class="fa-regular fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+
+            <a href="/ProcurementAnalytics">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Analytics</span>
+            </a>
+
+        </nav>
+
+        <div class="menu-title communication">
+            COMMUNICATION
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementNotifications">
+                <i class="fa-regular fa-bell"></i>
+                <span>Notifications</span>
+                <b class="badge red" id="notificationCount">0</b>
+            </a>
+
+            <a href="/Messages">
+                <i class="fa-regular fa-envelope"></i>
+                <span>Messages</span>
+                <b class="badge red" id="messageCount">0</b>
+            </a>
+
+        </nav>
+
+        <div class="menu-title support">
+            SUPPORT
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementHelpSupport">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/ProcurementSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="user-card">
+
+            <div class="avatar" id="userAvatar"><i class="fa-solid fa-shield-halved"></i></div>
+
+            <div class="user-info">
+                <strong id="userName">James Anderson</strong>
+                <small id="userRole">Procurement Manager</small>
+
+                <div class="online">
+                    <span></span> Online
+                </div>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+                <h1>Purchase Orders</h1>
+
+                <div class="breadcrumb">
+                    Dashboard
+                    <i class="fa-solid fa-chevron-right"></i>
+                    Purchase Orders
+                </div>
+            </div>
+
+            <div class="top-actions">
+
+                <div class="global-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input
+                        type="text"
+                        placeholder="Search anything..."
+                        id="globalSearch">
+                </div>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>6</span>
+                </button>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-envelope"></i>
+                    <span>3</span>
+                </button>
+
+                <div class="profile" onclick="openProfile()">
+                    <div class="profile-avatar"><i class="fa-solid fa-shield-halved"></i></div>
+
+                    <div class="user-info">
+                        <strong id="profileName">James Anderson</strong>
+                        <small>Procurement Manager</small>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= PAGE ACTIONS ================= -->
+
+        <div class="page-actions">
+
+            <button class="btn secondary" id="exportBtn">
+                <i class="fa-solid fa-download"></i>
+                Export
+            </button>
+
+            <button class="btn primary" id="createPOBtn">
+                <i class="fa-solid fa-plus"></i>
+                Create PO
+            </button>
+
+        </div>
+
+
+        <!-- ================= KPI CARDS ================= -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="fa-regular fa-file-lines"></i>
+                </div>
+
+                <div>
+                    <span>Total POs</span>
+                    <strong id="totalPOs">0</strong>
+
+                    <small>
+                        <span id="totalPOChange" class="up">↑ 0%</span>
+                    </small>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+
+                <div>
+                    <span>Total Spend (MTD)</span>
+                    <strong id="totalSpend">$0</strong>
+
+                    <small>
+                        <span id="spendChange" class="up">↑ 0%</span>
+                    </small>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                </div>
+
+                <div>
+                    <span>Pending</span>
+                    <strong id="pendingPOs">0</strong>
+
+                    <small>
+                        <span id="pendingChange">0%</span>
+                    </small>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="stat-icon light-blue">
+                    <i class="fa-solid fa-truck"></i>
+                </div>
+
+                <div>
+                    <span>Ordered</span>
+                    <strong id="orderedPOs">0</strong>
+
+                    <small>
+                        <span id="orderedChange" class="up">↑ 0%</span>
+                    </small>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+
+                <div>
+                    <span>Partially Received</span>
+                    <strong id="partialPOs">0</strong>
+
+                    <small>
+                        <span id="partialChange" class="up">↑ 0%</span>
+                    </small>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="stat-icon completed">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+
+                <div>
+                    <span>Completed</span>
+                    <strong id="completedPOs">0</strong>
+
+                    <small>
+                        <span id="completedChange" class="up">↑ 0%</span>
+                    </small>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- ================= FILTERS ================= -->
+
+        <section class="filter-card">
+
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    id="poSearch"
+                    placeholder="Search purchase orders...">
+            </div>
+
+
+            <div class="filter-group">
+                <label>Status</label>
+
+                <select id="statusFilter">
+                    <option value="All">All</option>
+                    <option value="Pending Finance Approval">Pending Finance Approval</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Ordered">Ordered</option>
+                    <option value="Partially Received">
+                        Partially Received
+                    </option>
+                    <option value="Completed">Completed</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+
+
+            <div class="filter-group">
+                <label>Department</label>
+
+                <select id="departmentFilter">
+                    <option value="All">All</option>
+                </select>
+            </div>
+
+
+            <div class="filter-group">
+                <label>Vendor</label>
+
+                <select id="vendorFilter">
+                    <option value="All">All Vendors</option>
+                </select>
+            </div>
+
+
+            <!-- Category -->
+            <div class="filter-group">
+                <label>Category</label>
+
+                <select id="categoryFilter">
+                    <option value="All">
+                        All Categories
+                    </option>
+
+                    <option value="Raw Materials">
+                        Raw Materials
+                    </option>
+
+                    <option value="Equipment">
+                        Equipment
+                    </option>
+
+                    <option value="IT Equipment">
+                        IT Equipment
+                    </option>
+
+                    <option value="Maintenance">
+                        Maintenance
+                    </option>
+
+                    <option value="Service">Service</option>
+
+                    <option value="Logistics">Logistics</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group date-filter">
+                <label>Date Range</label>
+
+                <input
+                    type="date"
+                    id="fromDate">
+
+                <span>—</span>
+
+                <input
+                    type="date"
+                    id="toDate">
+            </div>
+
+
+            <button class="reset-btn" id="resetBtn">
+                <i class="fa-solid fa-rotate-right"></i>
+                Reset
+            </button>
+
+        </section>
+
+
+        <!-- ================= TABS ================= -->
+
+        <div class="tabs">
+
+            <button class="tab active" data-tab="all">
+                All Orders
+            </button>
+
+            <button class="tab" data-tab="mine">
+                My Orders
+            </button>
+
+            <button class="tab" data-tab="drafts">
+                Drafts
+            </button>
+
+        </div>
+
+
+        <!-- ================= TABLE ================= -->
+
+        <section class="table-card">
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+                        <th>PO Number</th>
+                        <th>Vendor</th>
+                        <th>Department</th>
+                        <th>Order Date</th>
+                        <th>Expected Delivery</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                        <th>Received</th>
+                        <th>Actions</th>
+                    </tr>
+
+                    </thead>
+
+                    <tbody id="poTableBody">
+
+                    <tr>
+                        <td colspan="9" class="loading">
+                            Loading purchase orders...
+                        </td>
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- ================= PAGINATION ================= -->
+
+            <div class="pagination-row">
+
+                <div id="paginationText">
+                    Showing 0 to 0 of 0 purchase orders
+                </div>
+
+                <div class="pagination">
+
+                    <button id="prevPage">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+
+                    <div id="pageNumbers"></div>
+
+                    <button id="nextPage">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                    <select id="pageSize">
+                        <option value="10">10 / page</option>
+                        <option value="20">20 / page</option>
+                        <option value="50">50 / page</option>
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     CREATE PURCHASE ORDER MODAL
+     Styled/structured similar to CreatePurchaseOrders.html
+========================================================== -->
+
+<div class="modal hidden" id="poModal">
+
+    <div class="modal-content create-po-modal">
+
+        <!-- ================= MODAL HEADER ================= -->
+
+        <div class="modal-header">
+
+            <div class="modal-title-area">
+
+                <div class="modal-icon">
+                    <i class="fa-solid fa-cart-plus"></i>
+                </div>
+
+                <div>
+                    <h2>Create Purchase Order</h2>
+                    <p>Create a new purchase order</p>
+                </div>
+
+            </div>
+
+            <button
+                type="button"
+                id="closeModal"
+                class="modal-close"
+                aria-label="Close"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <!-- ================= PROGRESS STEPS ================= -->
+
+        <div class="po-modal-stepper">
+
+            <div class="po-modal-step active">
+                <span>1</span>
+                <div>
+                    <strong>PO Details</strong>
+                    <small>Basic information</small>
+                </div>
+            </div>
+
+            <div class="po-modal-step-line"></div>
+
+            <div class="po-modal-step">
+                <span>2</span>
+                <div>
+                    <strong>Items & Pricing</strong>
+                    <small>Order details</small>
+                </div>
+            </div>
+
+            <div class="po-modal-step-line"></div>
+
+            <div class="po-modal-step">
+                <span>3</span>
+                <div>
+                    <strong>Review</strong>
+                    <small>Submit PO</small>
+                </div>
+            </div>
+
+        </div>
+
+
+        <form id="poForm">
+
+            <!-- =================================================
+                 STEP 1 — PO DETAILS
+            ================================================== -->
+
+            <div class="po-modal-section active" data-modal-step="1">
+
+                <div class="section-heading">
+
+                    <div>
+                        <h3>Purchase Order Details</h3>
+                        <p>Enter the basic information for this purchase order.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="create-po-form-grid">
+
+                    <!-- PO TYPE -->
+
+                    <div class="create-po-field">
+
+                        <label for="poType">
+                            PO Type
+                            <span>*</span>
+                        </label>
+
+                        <select id="poType">
+
+                            <option value="Standard Purchase Order">
+                                Standard Purchase Order
+                            </option>
+
+                            <option value="Blanket Purchase Order">
+                                Blanket Purchase Order
+                            </option>
+
+                            <option value="Service Purchase Order">
+                                Service Purchase Order
+                            </option>
+
+                            <option value="Emergency Purchase Order">
+                                Emergency Purchase Order
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- PO NUMBER -->
+
+                    <div class="create-po-field">
+
+                        <label for="poNumber">
+                            PO Number
+                        </label>
+
+                        <div class="po-input-action">
+
+                            <input
+                                type="text"
+                                id="poNumber"
+                                readonly
+                                placeholder="Generating..."
+                            >
+
+                            <button
+                                type="button"
+                                id="generateNumber"
+                                title="Generate PO Number"
+                            >
+                                <i class="fa-solid fa-rotate"></i>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PO DATE -->
+
+                    <div class="create-po-field">
+
+                        <label for="createOrderDate">
+                            PO Date
+                            <span>*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            id="createOrderDate"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- VENDOR -->
+
+                    <div class="create-po-field">
+
+                        <label for="createVendor">
+                            Supplier
+                            <span>*</span>
+                        </label>
+
+                        <select
+                            id="createVendor"
+                            required
+                        >
+
+                            <option value="">
+                                Select Supplier
+                            </option>
+
+                        </select>
+
+                        <button
+                            type="button"
+                            class="supplier-link"
+                            id="viewSupplier"
+                        >
+                            <i class="fa-regular fa-eye"></i>
+                            View Supplier
+                        </button>
+
+                    </div>
+
+
+                    <!-- SUPPLIER REFERENCE -->
+
+                    <div class="create-po-field">
+
+                        <label for="supplierReference">
+                            Supplier Reference
+                        </label>
+
+                        <input
+                            type="text"
+                            id="supplierReference"
+                            placeholder="SUP-REF-0098"
+                        >
+
+                    </div>
+
+
+                    <!-- DEPARTMENT -->
+
+                    <div class="create-po-field">
+
+                        <label for="createDepartment">
+                            Department
+                            <span>*</span>
+                        </label>
+
+                        <select
+                            id="createDepartment"
+                            required
+                        >
+
+                            <option value="">
+                                Select department
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- CATEGORY -->
+
+                    <div class="create-po-field">
+
+                        <label for="createCategory">
+                            Category
+                            <span>*</span>
+                        </label>
+
+                        <select
+                            id="createCategory"
+                            required
+                        >
+
+                            <option value="">
+                                Select category
+                            </option>
+
+                            <option value="Raw Materials">
+                                Raw Materials
+                            </option>
+
+                            <option value="Equipment">
+                                Equipment
+                            </option>
+
+                            <option value="IT Equipment">
+                                IT Equipment
+                            </option>
+
+                            <option value="Logistics">Logistics</option>
+
+                            <option value="Services">
+                                Services
+                            </option>
+
+                            <option value="Maintenance">
+                                Maintenance
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- AMOUNT -->
+
+                    <div class="create-po-field">
+
+                        <label for="createAmount">
+                            Amount
+                            <span>*</span>
+                        </label>
+
+                        <div class="input-with-prefix">
+
+                            <span class="input-prefix">
+                                ₹
+                            </span>
+
+                            <input
+                                type="number"
+                                id="createAmount"
+                                min="0"
+                                step="0.01"
+                                placeholder="Enter amount"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- REQUIRED DELIVERY -->
+
+                    <div class="create-po-field">
+
+                        <label for="createDeliveryDate">
+                            Required Delivery Date
+                            <span>*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            id="createDeliveryDate"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- CONTACT PERSON -->
+
+                    <div class="create-po-field">
+
+                        <label for="contactPerson">
+                            Contact Person
+                        </label>
+
+                        <input
+                            type="text"
+                            id="contactPerson"
+                            placeholder="Contact person"
+                        >
+
+                    </div>
+
+
+                    <!-- PHONE -->
+
+                    <div class="create-po-field">
+
+                        <label for="contactPhone">
+                            Phone
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="contactPhone"
+                            placeholder="+91"
+                        >
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="create-po-field">
+
+                        <label for="contactEmail">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="contactEmail"
+                            placeholder="supplier@email.com"
+                        >
+
+                    </div>
+
+
+                    <!-- PAYMENT METHOD -->
+
+                    <div class="create-po-field">
+
+                        <label for="paymentMethod">
+                            Payment Method
+                        </label>
+
+                        <select id="paymentMethod">
+
+                            <option value="Bank Transfer">
+                                Bank Transfer
+                            </option>
+
+                            <option value="Credit Card">
+                                Credit Card
+                            </option>
+
+                            <option value="Letter of Credit">
+                                Letter of Credit
+                            </option>
+
+                            <option value="Cash">
+                                Cash
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- PAYMENT TERMS -->
+
+                    <div class="create-po-field">
+
+                        <label for="paymentTerms">
+                            Payment Terms
+                        </label>
+
+                        <select id="paymentTerms">
+
+                            <option value="Net 30 Days">
+                                Net 30 Days
+                            </option>
+
+                            <option value="Net 15 Days">
+                                Net 15 Days
+                            </option>
+
+                            <option value="Net 45 Days">
+                                Net 45 Days
+                            </option>
+
+                            <option value="Net 60 Days">
+                                Net 60 Days
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- INCOTERMS -->
+
+                    <div class="create-po-field">
+
+                        <label for="incoterms">
+                            Incoterms
+                        </label>
+
+                        <select id="incoterms">
+
+                            <option value="FOB - Free on Board">
+                                FOB - Free on Board
+                            </option>
+
+                            <option value="CIF - Cost Insurance Freight">
+                                CIF - Cost Insurance Freight
+                            </option>
+
+                            <option value="EXW - Ex Works">
+                                EXW - Ex Works
+                            </option>
+
+                            <option value="DDP - Delivered Duty Paid">
+                                DDP - Delivered Duty Paid
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- CURRENCY -->
+
+                    <div class="create-po-field">
+
+                        <label for="currency">
+                            Currency
+                        </label>
+
+                        <select id="currency">
+
+                            <option value="INR">
+                                INR - Indian Rupee
+                            </option>
+
+                            <option value="USD">
+                                USD - US Dollar
+                            </option>
+
+                            <option value="EUR">
+                                EUR - Euro
+                            </option>
+
+                            <option value="GBP">
+                                GBP - British Pound
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- EXCHANGE RATE -->
+
+                    <div class="create-po-field">
+
+                        <label for="exchangeRate">
+                            Exchange Rate
+                        </label>
+
+                        <input
+                            type="number"
+                            id="exchangeRate"
+                            step="0.0001"
+                            value="1"
+                        >
+
+                    </div>
+
+
+                    <!-- WAREHOUSE -->
+
+                    <div class="create-po-field">
+
+                        <label for="warehouseId">
+                            Delivery To
+                        </label>
+
+                        <select id="warehouseId">
+
+                            <option value="">
+                                Select Warehouse
+                            </option>
+
+                            <option value="1">Canada Warehouse</option>
+
+                            <option value="2">Caribbean Warehouse</option>
+
+                            <option value="3">Central Africa Warehouse</option>
+
+                            <option value="4">Central America Warehouse</option>
+
+                            <option value="5">Central Asia Warehouse</option>
+
+                            <option value="6">East Africa Warehouse</option>
+
+                            <option value="7">East of USA Warehouse</option>
+
+                            <option value="8">Eastern Asia Warehouse</option>
+
+                            <option value="9">Eastern Europe Warehouse</option>
+
+                            <option value="10">North Africa Warehouse</option>
+
+                            <option value="11">Northern Europe Warehouse</option>
+
+                            <option value="12">Oceania Warehouse</option>
+
+                            <option value="13">South America Warehouse</option>
+
+                            <option value="14">South Asia Warehouse</option>
+
+                            <option value="15">South of USA Warehouse</option>
+
+                            <option value="16">Southeast Asia Warehouse</option>
+
+                            <option value="17">Southern Africa Warehouse</option>
+
+                            <option value="18">Southern Europe Warehouse</option>
+
+                            <option value="19">US Center Warehouse</option>
+
+                            <option value="20">West Africa Warehouse</option>
+
+                            <option value="21">West Asia Warehouse</option>
+
+                            <option value="22">West of USA Warehouse</option>
+
+                            <option value="23">Western Europe Warehouse</option>
+
+                        </select>
+
+                        <div
+                            id="warehouseInfo"
+                            class="warehouse-info"
+                        ></div>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div class="create-po-field">
+
+                        <label for="createStatus">
+                            Status
+                        </label>
+
+                        <select
+                            id="createStatus"
+                            disabled
+                        >
+
+                            <option
+                                value="Pending Finance Approval"
+                                selected
+                            >
+                                Pending Finance Approval
+                            </option>
+
+                        </select>
+
+                        <small class="finance-approval-hint">
+                            <i class="fa-solid fa-circle-info"></i>
+                            New purchase orders require Finance Officer approval
+                            before they can be ordered.
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ADDITIONAL INFORMATION -->
+
+                <div class="create-po-notes">
+
+                    <label for="notes">
+                        Additional Information
+                    </label>
+
+                    <textarea
+                        id="notes"
+                        rows="4"
+                        placeholder="Enter notes or special instructions for the supplier..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 STEP 2 — ITEMS & PRICING
+            ================================================== -->
+
+            <div
+                class="po-modal-section"
+                data-modal-step="2"
+            >
+
+                <div class="section-heading">
+
+                    <div>
+                        <h3>Items & Pricing</h3>
+                        <p>Add the products or services included in this purchase order.</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="modal-secondary-btn"
+                        id="addItem"
+                    >
+                        <i class="fa-solid fa-plus"></i>
+                        Add Item
+                    </button>
+
+                </div>
+
+
+                <div class="modal-items-wrapper">
+
+                    <table class="modal-items-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>#</th>
+                                <th>Item / Description</th>
+                                <th>Item Code</th>
+                                <th>UOM</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Tax %</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="itemsBody"></tbody>
+
+                    </table>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="add-row-btn"
+                    id="addRow"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    Add New Row
+                </button>
+
+
+                <div class="modal-bottom-grid">
+
+                    <div class="modal-notes-box">
+
+                        <label for="itemNotes">
+                            Notes
+                        </label>
+
+                        <textarea
+                            id="itemNotes"
+                            rows="4"
+                            placeholder="Enter notes or special instructions..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="modal-upload-box">
+
+                        <label>
+                            Attach Documents
+                        </label>
+
+                        <div
+                            class="modal-drop-zone"
+                            id="dropZone"
+                        >
+
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                            <span>
+                                Drag & drop files here
+                            </span>
+
+                            <button
+                                type="button"
+                                id="browseFiles"
+                            >
+                                Browse Files
+                            </button>
+
+                            <input
+                                type="file"
+                                id="fileInput"
+                                multiple
+                                hidden
+                            >
+
+                        </div>
+
+                        <small>
+                            PO terms, drawings, specifications, etc.
+                        </small>
+
+                        <div
+                            id="fileList"
+                            class="file-list"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 STEP 3 — REVIEW
+            ================================================== -->
+
+            <div
+                class="po-modal-section"
+                data-modal-step="3"
+            >
+
+                <div class="section-heading">
+
+                    <div>
+                        <h3>Review & Submit</h3>
+                        <p>Review the purchase order before submitting it.</p>
+                    </div>
+
+                </div>
+
+                <div
+                    id="reviewContent"
+                    class="modal-review-content"
+                ></div>
+
+            </div>
+
+
+            <!-- =================================================
+                 MODAL FOOTER
+            ================================================== -->
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="btn secondary"
+                    id="cancelPO"
+                >
+                    Cancel
+                </button>
+
+                <div class="modal-navigation">
+
+                    <button
+                        type="button"
+                        class="btn secondary modal-back-btn"
+                        id="modalBackBtn"
+                    >
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Back
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn primary"
+                        id="modalNextBtn"
+                    >
+                        Continue
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn primary hidden"
+                        id="modalSubmitBtn"
+                    >
+                        Submit Purchase Order
+                        <i class="fa-solid fa-check"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="/static/ProcurementPurchaseOrder.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Alerts & Notifications | VendorIQ
+    </title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/FinancerNotifications.css"
+    >
+
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    VendorIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <a href="/financerdashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/BudgetManagement">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Budget Management</span>
+            </a>
+
+            <a href="/Expenditures">
+                <i class="fa-solid fa-circle-dollar-to-slot"></i>
+                <span>Expenditures</span>
+            </a>
+
+            <a href="/Revenue">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Revenue</span>
+            </a>
+
+            <a href="/AccountsPayable">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span>Accounts Payable</span>
+            </a>
+
+            <a href="/AccountsReceivable">
+                <i class="fa-solid fa-money-check-dollar"></i>
+                <span>Accounts Receivable</span>
+            </a>
+
+            <a href="/BankingReconciliation">
+                <i class="fa-solid fa-building-columns"></i>
+                <span>Banking & Reconciliation</span>
+            </a>
+
+            <a href="/FinancialReports">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Financial Reports</span>
+            </a>
+
+            <a href="/Compliance">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Compliance</span>
+            </a>
+
+            <a href="/FinancerApprovals">
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+                <span
+                    class="nav-badge approval-count"
+                >0</span>
+            </a>
+
+            <a
+                href="/FinancerNotifications"
+                class="active"
+            >
+
+                <i class="fa-regular fa-bell"></i>
+
+                <span>
+                    Alerts & Notifications
+                </span>
+
+                <span
+                    class="nav-badge notification-count"
+                >0</span>
+
+            </a>
+
+            <a href="/FinancerDocument">
+                <i class="fa-regular fa-file"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/FinancerSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/FinancerHelp">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-user">
+
+            <div class="user-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="user-info">
+
+                <strong id="sidebarUserName">
+                    Loading...
+                </strong>
+
+                <span id="sidebarUserRole">
+                    Finance Officer
+                </span>
+
+                <small>
+                    <span class="online-dot"></span> Online
+                </small>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div class="page-heading">
+
+                <h1>
+                    Alerts & Notifications
+                </h1>
+
+                <p>
+                    Stay updated with important alerts,
+                    system notifications, and announcements.
+                </p>
+
+            </div>
+
+
+            <div class="header-actions">
+
+                <div class="search-box">
+
+                    <input
+                        id="globalSearch"
+                        type="search"
+                        placeholder="Search anything..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+
+                <button
+                    class="header-icon-button"
+                    id="notificationButton"
+                    title="Notifications"
+                >
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span
+                        class="header-alert-count"
+                        id="headerAlertCount"
+                    >0</span>
+
+                </button>
+
+
+                <div class="header-profile">
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+
+                        <strong id="headerUserName">
+                            Loading...
+                        </strong>
+
+                        <span id="headerUserRole">
+                            Finance Officer
+                        </span>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- DATE FILTER -->
+
+        <div class="toolbar">
+
+            <div></div>
+
+            <div class="date-filter">
+
+                <i class="fa-regular fa-calendar"></i>
+
+                <input
+                    type="date"
+                    id="fromDate"
+                >
+
+                <span>—</span>
+
+                <input
+                    type="date"
+                    id="toDate"
+                >
+
+                <button
+                    id="applyDateFilter"
+                    title="Apply date filter"
+                >
+                    <i class="fa-solid fa-check"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="stats-grid">
+
+            <article class="stat-card">
+
+                <div class="stat-icon red">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        High Priority Alerts
+                    </span>
+
+                    <strong id="highPriority">
+                        0
+                    </strong>
+
+                    <button
+                        data-filter="High"
+                        class="stat-link"
+                    >
+                        View alerts
+                    </button>
+
+                </div>
+
+                <div class="stat-line red-line"></div>
+
+            </article>
+
+
+            <article class="stat-card">
+
+                <div class="stat-icon orange">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Pending Notifications
+                    </span>
+
+                    <strong id="pendingNotifications">
+                        0
+                    </strong>
+
+                    <button
+                        class="stat-link"
+                        data-status="Unread"
+                    >
+                        View pending
+                    </button>
+
+                </div>
+
+                <div class="stat-line orange-line"></div>
+
+            </article>
+
+
+            <article class="stat-card">
+
+                <div class="stat-icon green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Resolved Today
+                    </span>
+
+                    <strong id="resolvedToday">
+                        0
+                    </strong>
+
+                    <button class="stat-link">
+                        View resolved
+                    </button>
+
+                </div>
+
+                <div class="stat-line green-line"></div>
+
+            </article>
+
+
+            <article class="stat-card">
+
+                <div class="stat-icon blue">
+                    <i class="fa-regular fa-envelope"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        Unread Messages
+                    </span>
+
+                    <strong id="unreadMessages">
+                        0
+                    </strong>
+
+                    <button class="stat-link">
+                        View messages
+                    </button>
+
+                </div>
+
+                <div class="stat-line blue-line"></div>
+
+            </article>
+
+
+            <article class="stat-card">
+
+                <div class="stat-icon purple">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+
+                <div class="stat-content">
+
+                    <span>
+                        System Announcements
+                    </span>
+
+                    <strong id="systemAnnouncements">
+                        0
+                    </strong>
+
+                    <button class="stat-link">
+                        View all
+                    </button>
+
+                </div>
+
+                <div class="stat-line purple-line"></div>
+
+            </article>
+
+        </section>
+
+
+        <!-- =================================================
+             MAIN CONTENT GRID
+        ================================================== -->
+
+        <section class="content-grid">
+
+
+            <!-- RECENT ALERTS -->
+
+            <div class="panel alerts-panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Recent Alerts
+                    </h2>
+
+                    <div class="panel-controls">
+
+                        <select id="categoryFilter">
+
+                            <option value="All">
+                                All Types
+                            </option>
+
+                            <option value="Budget Alerts">
+                                Budget Alerts
+                            </option>
+
+                            <option value="Payment Alerts">
+                                Payment Alerts
+                            </option>
+
+                            <option value="Approval Alerts">
+                                Approval Alerts
+                            </option>
+
+                            <option value="Compliance Alerts">
+                                Compliance Alerts
+                            </option>
+
+                            <option value="System Alerts">
+                                System Alerts
+                            </option>
+
+                        </select>
+
+
+                        <select id="priorityFilter">
+
+                            <option value="All">
+                                All Priorities
+                            </option>
+
+                            <option value="High">
+                                High
+                            </option>
+
+                            <option value="Medium">
+                                Medium
+                            </option>
+
+                            <option value="Low">
+                                Low
+                            </option>
+
+                        </select>
+
+
+                        <button
+                            class="text-button"
+                            id="markAllRead"
+                        >
+                            Mark all as read
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="alertsList"
+                    class="alerts-list"
+                >
+
+                    <div class="loading">
+                        Loading alerts...
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="view-all-button"
+                    id="viewAllAlerts"
+                >
+
+                    <i class="fa-solid fa-eye"></i>
+
+                    View All Alerts
+
+                </button>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="panel category-panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Alerts by Category
+                    </h2>
+
+                    <select id="categoryPeriod">
+
+                        <option>
+                            This Month
+                        </option>
+
+                        <option>
+                            Last Month
+                        </option>
+
+                        <option>
+                            This Year
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="chart-area">
+
+                    <canvas
+                        id="categoryChart"
+                    ></canvas>
+
+                    <div class="chart-total">
+
+                        <span>Total</span>
+
+                        <strong id="chartTotal">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="categoryLegend"
+                    class="category-legend"
+                ></div>
+
+
+                <div class="info-box">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <div>
+
+                        <strong>
+                            High priority attention
+                        </strong>
+
+                        <p id="attentionMessage">
+                            Loading...
+                        </p>
+
+                        <button
+                            id="viewHighPriority"
+                        >
+                            View High Priority Alerts
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PREFERENCES -->
+
+            <div class="panel preferences-panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Notification Preferences
+                    </h2>
+
+                    <button
+                        class="settings-button"
+                        id="settingsButton"
+                    >
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
+
+                </div>
+
+
+                <div id="preferencesList">
+
+                    <!-- JS renders -->
+
+                </div>
+
+
+                <button
+                    class="manage-settings"
+                    id="manageSettings"
+                >
+                    Manage Notification Settings
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             BOTTOM GRID
+        ================================================== -->
+
+        <section class="bottom-grid">
+
+
+            <!-- ANNOUNCEMENTS -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        System Announcements
+                    </h2>
+
+                    <button class="view-link">
+                        View All
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="announcementsList"
+                    class="simple-list"
+                >
+
+                    <div class="loading">
+                        Loading announcements...
+                    </div>
+
+                </div>
+
+
+                <button class="bottom-view-all">
+                    View All Announcements
+                </button>
+
+            </div>
+
+
+            <!-- RECENT NOTIFICATIONS -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Recent Notifications
+                    </h2>
+
+                    <button class="view-link">
+                        View All
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="recentNotifications"
+                    class="simple-list"
+                >
+
+                    <div class="loading">
+                        Loading notifications...
+                    </div>
+
+                </div>
+
+
+                <button class="bottom-view-all">
+                    View All Notifications
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <footer class="footer">
+
+            <span>
+                © 2025 FinManage. All rights reserved.
+            </span>
+
+            <span>
+                Version 2.1.0
+                <i class="fa-solid fa-circle"></i>
+            </span>
+
+        </footer>
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================
+     NOTIFICATION DETAILS MODAL
+====================================================== -->
+
+<div
+    class="modal-overlay"
+    id="notificationModal"
+>
+
+    <div class="modal">
+
+        <button
+            class="modal-close"
+            id="modalClose"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="modal-icon">
+            <i class="fa-solid fa-bell"></i>
+        </div>
+
+        <h2 id="modalTitle">
+            Notification
+        </h2>
+
+        <p id="modalMessage"></p>
+
+        <div
+            class="modal-meta"
+            id="modalMeta"
+        ></div>
+
+        <button
+            class="modal-action"
+            id="modalAction"
+        >
+            Mark as read
+        </button>
+
+    </div>
+
+</div>
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
+></script>
+
+<script
+    src="/static/FinancerNotifications.js"
+></script>
+
+</body>
+
+</html>

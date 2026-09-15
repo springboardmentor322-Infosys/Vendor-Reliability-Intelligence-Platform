@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        VendorIQ - Invoices & Payments
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/VendorInvoicesPayments.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-cube"></i>
+            </div>
+
+            <div>
+
+                <h1>VendorIQ</h1>
+
+                <span>
+                    Vendor Reliability Platform
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+
+        <nav>
+
+            <a href="/VendorDashboard">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="/VendorProfile">
+                <i class="fa-solid fa-user"></i>
+                Vendor Profile
+            </a>
+
+            <a href="/PerformanceOverview">
+                <i class="fa-solid fa-chart-column"></i>
+                Performance Overview
+            </a>
+
+            <a href="/PurchaseOrders">
+                <i class="fa-solid fa-clipboard-list"></i>
+                Purchase Orders
+            </a>
+
+            <a href="/VendorContract">
+                <i class="fa-regular fa-file-lines"></i>
+                Contracts & Compliance
+            </a>
+
+            <a
+                class="active"
+                href="/VendorInvoices"
+            >
+                <i class="fa-regular fa-credit-card"></i>
+                Invoices & Payments
+            </a>
+ 
+            <a href="/VendorCommunication">
+
+                <i class="fa-regular fa-comment"></i>
+
+                <span>Communication</span>
+
+            </a>
+
+            <a href="/VendorDocument">
+                <i class="fa-regular fa-folder"></i>
+                Documents
+            </a>
+
+            <a href="/VendorNotifications">
+                <i class="fa-regular fa-bell"></i>
+                Notifications
+                <b class="badge">5</b>
+            </a>
+
+        </nav>
+
+
+        <div class="menu-title">
+            REPORTS
+        </div>
+
+
+        <nav>
+
+            <a href="/PerformanceReports">
+                <i class="fa-solid fa-chart-line"></i>
+                Performance Reports
+            </a>
+
+            <a href="/OrderReports">
+                <i class="fa-regular fa-file"></i>
+                Order Reports
+            </a>
+
+            <a href="/ComplianceReports">
+                <i class="fa-solid fa-shield"></i>
+                Compliance Reports
+            </a>
+
+            <a href="/ExportReports">
+                <i class="fa-solid fa-download"></i>
+                Export Reports
+            </a>
+
+        </nav>
+
+
+        <div class="menu-title">
+            ACCOUNT
+        </div>
+
+
+        <nav>
+
+            <a href="/VendorSettings">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <a href="/VendorHelpSupport">
+                <i class="fa-regular fa-circle-question"></i>
+                Help & Support
+            </a>
+
+            <a
+                href="/login"
+                id="logoutBtn"
+            >
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+
+        </nav>
+
+
+        <div class="vendor-card">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div>
+
+                <strong id="vendorName">
+                    -
+                </strong>
+
+                <small id="vendorId">
+                    Vendor ID: Loading...
+                </small>
+
+                <small class="verified">
+                    ● Verified Vendor
+                </small>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="header">
+
+            <div>
+
+                <h1>
+                    Invoices & Payments
+                </h1>
+
+                <div class="breadcrumb">
+                    Home / Invoices & Payments
+                </div>
+
+            </div>
+
+
+            <div class="header-right">
+
+                <input
+                    type="search"
+                    id="searchInput"
+                    placeholder="Search anything..."
+                >
+
+                <button class="icon-btn">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+
+                <button class="icon-btn">
+                    <i class="fa-regular fa-envelope"></i>
+                </button>
+
+                <div class="profile">
+
+                    <div class="avatar-small">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div class="profile-info">
+                        <strong id="headerCompany">-</strong>
+                        <span>Vendor</span>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             STAT CARDS
+        ================================================== -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Invoices
+                    </span>
+
+                    <strong id="totalInvoices">
+                        0
+                    </strong>
+
+                    <small>
+                        This Year
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon green">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Paid
+                    </span>
+
+                    <strong id="totalPaid">
+                        $0
+                    </strong>
+
+                    <small>
+                        This Year
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon orange">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Pending Payments
+                    </span>
+
+                    <strong id="pendingPayments">
+                        $0
+                    </strong>
+
+                    <small>
+                        Pending invoices
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon red">
+                    <i class="fa-solid fa-file-circle-exclamation"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Overdue Amount
+                    </span>
+
+                    <strong id="overdueAmount">
+                        $0
+                    </strong>
+
+                    <small>
+                        Overdue invoices
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon purple">
+                    <i class="fa-solid fa-calendar-days"></i>
+                </div>
+
+                <div>
+
+                    <span>
+                        Avg. Payment Time
+                    </span>
+
+                    <strong id="avgPaymentTime">
+                        0 Days
+                    </strong>
+
+                    <small>
+                        Invoice to payment
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             CHARTS
+        ================================================== -->
+
+        <section class="dashboard-grid">
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Invoice Overview
+                    </h2>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="invoiceChart"
+                    ></canvas>
+
+                </div>
+
+                <div
+                    class="chart-link"
+                    id="viewInvoicesBtn"
+                >
+                    View All Invoices →
+                </div>
+
+            </div>
+
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Payments Overview
+                    </h2>
+
+                    <select id="yearSelect">
+
+                        <option>
+                            This Year
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="paymentChart"
+                    ></canvas>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Payment Status
+                    </h2>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="paymentStatusChart"
+                    ></canvas>
+
+                </div>
+
+                <div
+                    class="chart-link"
+                    id="viewPaymentsBtn"
+                >
+                    View Payment History →
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             RECENT INVOICES + UPCOMING
+        ================================================== -->
+
+        <section class="content-grid">
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Recent Invoices
+                    </h2>
+
+                    <button
+                        class="link-button"
+                        id="allInvoicesBtn"
+                    >
+                        View All Invoices →
+                    </button>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Invoice No.
+                                </th>
+
+                                <th>
+                                    PO Number
+                                </th>
+
+                                <th>
+                                    Invoice Date
+                                </th>
+
+                                <th>
+                                    Due Date
+                                </th>
+
+                                <th>
+                                    Amount
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="invoiceTableBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Upcoming Payments
+                    </h2>
+
+                    <button
+                        class="link-button"
+                        id="upcomingBtn"
+                    >
+                        View All →
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="upcomingPayments"
+                    class="upcoming-list"
+                >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             BOTTOM
+        ================================================== -->
+
+        <section class="bottom-grid">
+
+
+            <!-- PAYMENT METHODS -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Payment Methods
+                    </h2>
+
+                </div>
+
+                <div class="payment-method">
+
+                    <div class="method-icon">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Bank Transfer
+                        </strong>
+
+                        <span>
+                            XXXX XXXX XXXX 1234
+                        </span>
+
+                        <small>
+                            ICICI Bank • A/C Name:
+                            TechBuild Solutions
+                        </small>
+
+                    </div>
+
+                    <span class="primary">
+                        Primary
+                    </span>
+
+                </div>
+
+                <button class="manage-btn">
+                    Manage Methods →
+                </button>
+
+            </div>
+
+
+
+            <!-- PAYMENT HISTORY -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Payment History
+                        <small>
+                            (Recent)
+                        </small>
+                    </h2>
+
+                    <button
+                        class="link-button"
+                        id="historyBtn"
+                    >
+                        View All →
+                    </button>
+
+                </div>
+
+
+                <div class="history-list">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Date</th>
+
+                                <th>
+                                    Invoice No.
+                                </th>
+
+                                <th>
+                                    Payment Method
+                                </th>
+
+                                <th>
+                                    Amount
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="paymentHistoryBody">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- QUICK ACTIONS -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        Quick Actions
+                    </h2>
+
+                </div>
+
+
+                <div class="quick-actions">
+
+                    <button
+                        type="button"
+                        id="uploadInvoiceBtn"
+                    >
+                        <span>
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </span>
+
+                        <strong>
+                            Upload Invoice
+                        </strong>
+
+                        <small>
+                            Upload new invoice
+                        </small>
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="downloadStatementBtn"
+                    >
+                        <span>
+                            <i class="fa-solid fa-file-arrow-down"></i>
+                        </span>
+
+                        <strong>
+                            Download Statement
+                        </strong>
+
+                        <small>
+                            Download payments
+                        </small>
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="paymentHistoryBtn"
+                    >
+                        <span>
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </span>
+
+                        <strong>
+                            Payment History
+                        </strong>
+
+                        <small>
+                            View payment history
+                        </small>
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="helpSupportBtn"
+                    >
+                        <span>
+                            <i class="fa-solid fa-headset"></i>
+                        </span>
+
+                        <strong>
+                            Help & Support
+                        </strong>
+
+                        <small>
+                            Get assistance
+                        </small>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="/static/VendorInvoicesPayments.js"></script>
+
+</body>
+
+</html>

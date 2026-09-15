@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        SCM - Inventory Overview
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/SupplyChainInventory.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ==================================================
+         SIDEBAR
+    =================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+        <nav>
+
+            <a href="/supplychaindashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/demand-planning">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Demand Planning</span>
+            </a>
+
+            <a href="/supplychainprocurement">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Procurement</span>
+            </a>
+
+            <a href="/suppliers">
+                <i class="fa-solid fa-users"></i>
+                <span>Suppliers</span>
+            </a>
+
+            <a
+                href="/inventory"
+                class="active"
+            >
+                <i class="fa-solid fa-box"></i>
+                <span>Inventory</span>
+            </a>
+
+            <a href="/ordersshipments">
+                <i class="fa-solid fa-truck"></i>
+                <span>Orders & Shipments</span>
+            </a>
+
+            <a href="/warehouses">
+                <i class="fa-solid fa-warehouse"></i>
+                <span>Warehouses</span>
+            </a>
+
+            <a href="/transportation">
+                <i class="fa-solid fa-route"></i>
+                <span>Transportation</span>
+            </a>
+
+            <a href="/analyticsreports">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Analytics & Reports</span>
+            </a>
+
+            <a href="alertsnotifications">
+                <i class="fa-regular fa-bell"></i>
+                <span>Alerts & Notifications</span>
+            </a>
+
+            <a href="/documents">
+                <i class="fa-regular fa-file-lines"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/supplychainsettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="quick-actions">
+
+            <h4>Quick Actions</h4>
+
+            <button onclick="window.location.href='/CreatePurchaseOrder'">
+                <i class="fa-solid fa-cart-plus"></i>
+                Create Purchase Order
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/AddSupplier'">
+                <i class="fa-solid fa-user-plus"></i>
+                Add New Supplier
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/CreateShipment'">
+                <i class="fa-solid fa-ship"></i>
+                Create Shipment
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/UploadDocument'">
+                <i class="fa-solid fa-upload"></i>
+                Upload Document
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+        <div class="profile-card" onclick="openSupplyChainProfile()">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <strong id="managerName">
+                Arjun Kumar
+            </strong>
+
+            <span>
+                Supply Chain Manager
+            </span>
+
+            <small>
+                <i class="fa-solid fa-circle"></i>
+                Online
+            </small>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ==================================================
+         MAIN
+    =================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <h1>
+                Supply Chain Manager Dashboard
+            </h1>
+
+            <div class="top-actions">
+
+                <div class="search">
+
+                    <input
+                        id="searchInput"
+                        type="search"
+                        placeholder="Search..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <button>
+                    <i class="fa-regular fa-bell"></i>
+                    <b>5</b>
+                </button>
+
+                <div class="date">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <div>
+                        <strong id="currentDate">
+                            --
+                        </strong>
+
+                        <span id="currentTime">
+                            --
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <div class="page-heading">
+
+                <div>
+
+                    <h2>
+                        Inventory Overview
+                    </h2>
+
+                    <p>
+                        Real-time view of your inventory across all locations.
+                    </p>
+
+                </div>
+
+                <button
+                    class="refresh"
+                    id="refreshButton"
+                >
+                    <i class="fa-solid fa-rotate"></i>
+                    Refresh
+                </button>
+
+            </div>
+
+
+            <!-- ==================================================
+                 KPI CARDS
+            =================================================== -->
+
+            <section class="kpis">
+
+                <div class="kpi">
+
+                    <div class="kpi-icon blue">
+                        <i class="fa-solid fa-cube"></i>
+                    </div>
+
+                    <div>
+                        <span>Total Inventory Value</span>
+                        <strong id="totalInventoryValue">
+                            $0
+                        </strong>
+                        <small class="positive">
+                            <i class="fa-solid fa-arrow-up"></i>
+                            Live
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi">
+
+                    <div class="kpi-icon green">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                    </div>
+
+                    <div>
+                        <span>Total Items</span>
+                        <strong id="totalItems">
+                            0
+                        </strong>
+                        <small class="positive">
+                            Current stock
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi">
+
+                    <div class="kpi-icon purple">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                    </div>
+
+                    <div>
+                        <span>Low Stock Items</span>
+                        <strong id="lowStockItems">
+                            0
+                        </strong>
+                        <small class="negative">
+                            Requires attention
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi">
+
+                    <div class="kpi-icon orange">
+                        <i class="fa-solid fa-box-open"></i>
+                    </div>
+
+                    <div>
+                        <span>Out of Stock Items</span>
+                        <strong id="outOfStockItems">
+                            0
+                        </strong>
+                        <small class="negative">
+                            Requires replenishment
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi">
+
+                    <div class="kpi-icon cyan">
+                        <i class="fa-solid fa-rotate"></i>
+                    </div>
+
+                    <div>
+                        <span>Inventory Turnover</span>
+                        <strong id="inventoryTurnover">
+                            0x
+                        </strong>
+                        <small class="positive">
+                            Current period
+                        </small>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================================================
+                 CHARTS
+            =================================================== -->
+
+            <section class="dashboard-grid">
+
+                <div class="panel chart-panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Inventory Value Over Time
+                        </h3>
+
+                        <select id="periodSelect">
+
+                            <option value="month">
+                                This Month
+                            </option>
+
+                            <option value="week">
+                                This Week
+                            </option>
+
+                            <option value="year">
+                                This Year
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="chart-container">
+
+                        <canvas
+                            id="inventoryValueChart"
+                        ></canvas>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Inventory by Category
+                        </h3>
+
+                    </div>
+
+                    <div class="category-chart">
+
+                        <canvas
+                            id="categoryChart"
+                        ></canvas>
+
+                        <div class="category-center">
+
+                            <strong id="categoryTotal">
+                                $0
+                            </strong>
+
+                            <span>
+                                Total Value
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="categoryLegend"
+                        class="legend"
+                    ></div>
+
+                    <button class="view-link">
+                        View All Categories
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+
+                <div class="panel health-panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Inventory Health
+                        </h3>
+
+                    </div>
+
+                    <div class="gauge">
+
+                        <div class="gauge-value">
+                            <strong id="healthPercentage">
+                                0%
+                            </strong>
+
+                            <span>
+                                Healthy
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="health-list">
+
+                        <div>
+                            <span>
+                                <i class="healthy-dot"></i>
+                                Healthy
+                            </span>
+                            <strong id="healthyCount">
+                                0
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>
+                                <i class="low-dot"></i>
+                                Low Stock
+                            </span>
+                            <strong id="healthLow">
+                                0
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>
+                                <i class="risk-dot"></i>
+                                At Risk
+                            </span>
+                            <strong id="atRisk">
+                                0
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>
+                                <i class="out-dot"></i>
+                                Out of Stock
+                            </span>
+                            <strong id="healthOut">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <button class="view-link">
+                        View Inventory Alerts
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================================================
+                 TABLES
+            =================================================== -->
+
+            <section class="two-column">
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Inventory by Location
+                        </h3>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Location</th>
+                                    <th>Total Value</th>
+                                    <th>Total Items</th>
+                                    <th>Low Stock</th>
+                                    <th>Out of Stock</th>
+                                    <th>Inventory Turnover</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody
+                                id="locationTable"
+                            ></tbody>
+
+                        </table>
+
+                    </div>
+
+                    <button class="view-link">
+                        View All Locations
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Top Low Stock Items
+                        </h3>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Item</th>
+                                    <th>Category</th>
+                                    <th>Current Stock</th>
+                                    <th>Reorder Point</th>
+                                    <th>Status</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody
+                                id="lowStockTable"
+                            ></tbody>
+
+                        </table>
+
+                    </div>
+
+                    <button class="view-link">
+                        View All Low Stock Items
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================================================
+                 CATEGORY + MOVEMENTS
+            =================================================== -->
+
+            <section class="two-column">
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Inventory Summary by Category
+                        </h3>
+
+                    </div>
+
+                    <div
+                        id="categoryCards"
+                        class="category-cards"
+                    ></div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Recent Inventory Movements
+                        </h3>
+
+                        <button class="view-link">
+                            View All
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Date</th>
+                                    <th>Item</th>
+                                    <th>Type</th>
+                                    <th>Quantity</th>
+                                    <th>Location</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody
+                                id="movementTable"
+                            ></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="/static/SupplyChainInventory.js"></script>
+
+</body>
+
+</html>

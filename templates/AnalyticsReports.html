@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        VendorIQ - Analytics & Reports
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/AnalyticsReports.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div>
+
+                <strong>VendorIQ</strong>
+
+                <span>
+                    Vendor Reliability Platform
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/supplychaindashboard">
+                <span><i class="fa-solid fa-house"></i></span>
+                Dashboard
+            </a>
+
+            <a href="/demand-planning">
+                <span><i class="fa-solid fa-chart-line"></i></span>
+                Demand Planning
+            </a>
+
+            <a href="/supplychainprocurement">
+                <span><i class="fa-solid fa-cart-shopping"></i></span>
+                Procurement
+            </a>
+
+            <a href="/suppliers">
+                <span><i class="fa-solid fa-users"></i></span>
+                Suppliers
+            </a>
+
+            <a href="/inventory">
+                <span><i class="fa-solid fa-boxes-stacked"></i></span>
+                Inventory
+            </a>
+
+            <a href="/ordersshipments">
+                <span><i class="fa-solid fa-truck"></i></span>
+                Orders & Shipments
+            </a>
+
+            <a href="/warehouses">
+                <span><i class="fa-solid fa-warehouse"></i></span>
+                Warehouses
+            </a>
+
+            <a href="/transportation">
+                <span><i class="fa-solid fa-truck-fast"></i></span>
+                Transportation
+            </a>
+
+            <a
+                href="/analyticsreports"
+                class="active"
+            >
+                <span><i class="fa-solid fa-chart-column"></i></span>
+                Analytics & Reports
+            </a>
+
+            <a href="/alertsnotifications">
+                <span><i class="fa-solid fa-bell"></i></span>
+                Alerts & Notifications
+            </a>
+
+            <a href="/documents">
+                <span><i class="fa-solid fa-file-lines"></i></span>
+                Documents
+            </a>
+
+            <a href="/supplychainsettings">
+                <span><i class="fa-solid fa-gear"></i></span>
+                Settings
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+
+            <div class="quick-actions">
+
+                <h4>
+                    Quick Actions
+                </h4>
+
+                <button onclick="window.location.href='/CreatePurchaseOrder'">
+                    <i class="fa-solid fa-cart-plus"></i>
+                    Create Purchase Order
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+                <button onclick="window.location.href='/AddSupplier'">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Add New Supplier
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+                <button onclick="window.location.href='/CreateShipment'">
+                    <i class="fa-solid fa-ship"></i>
+                    Create Shipment
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+                <button onclick="window.location.href='/UploadDocument'">
+                    <i class="fa-solid fa-upload"></i>
+                    Upload Document
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+            </div>
+
+
+            <div class="manager-card" onclick="openSupplyChainProfile()">
+
+                <div class="avatar">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+
+                <div>
+
+                    <strong id="managerName">
+                        Supply Chain Manager
+                    </strong>
+
+                    <small>
+                        Supply Chain Manager
+                    </small>
+
+                    <small class="online">
+                        ● Online
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <h2>
+                Supply Chain Manager Dashboard
+            </h2>
+
+
+            <div class="top-actions">
+
+                <input
+                    id="searchInput"
+                    type="search"
+                    placeholder="Search..."
+                >
+
+                <button>
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+
+                <div class="date-time">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <div>
+
+                        <strong id="currentDate">
+                            --
+                        </strong>
+
+                        <span id="currentTime">
+                            --
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE HEADER -->
+
+        <section class="page-header">
+
+            <div>
+
+                <h1>
+                    Analytics & Reports
+                </h1>
+
+                <p>
+                    Explore key insights and generate reports
+                    to make data-driven decisions.
+                </p>
+
+            </div>
+
+
+            <div class="header-actions">
+
+                <select id="dateRange">
+
+                    <option value="30">
+                        Last 30 Days
+                    </option>
+
+                    <option value="60">
+                        Last 60 Days
+                    </option>
+
+                    <option value="90">
+                        Last 90 Days
+                    </option>
+
+                    <option value="365">
+                        Last 12 Months
+                    </option>
+
+                </select>
+
+
+                <button
+                    id="filterButton"
+                    class="outline-button"
+                >
+                    ⚱ Filters
+                </button>
+
+
+                <button
+                    id="exportButton"
+                    class="primary-outline"
+                >
+                    ↓ Export Report
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="kpi-grid">
+
+
+            <article class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    ↗
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Revenue
+                    </span>
+
+                    <strong id="totalRevenue">
+                        $0
+                    </strong>
+
+                    <small class="positive">
+                        ↑ 0% vs last month
+                    </small>
+
+                </div>
+
+            </article>
+
+
+            <article class="kpi-card">
+
+                <div class="kpi-icon green">
+                    ◔
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Orders
+                    </span>
+
+                    <strong id="totalOrders">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        ↑ 0% vs last month
+                    </small>
+
+                </div>
+
+            </article>
+
+
+            <article class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    ▣
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Shipments
+                    </span>
+
+                    <strong id="totalShipments">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        ↑ 0% vs last month
+                    </small>
+
+                </div>
+
+            </article>
+
+
+            <article class="kpi-card">
+
+                <div class="kpi-icon orange">
+                    $
+                </div>
+
+                <div>
+
+                    <span>
+                        Total Cost
+                    </span>
+
+                    <strong id="totalCost">
+                        $0
+                    </strong>
+
+                    <small class="negative">
+                        ↓ 0% vs last month
+                    </small>
+
+                </div>
+
+            </article>
+
+
+            <article class="kpi-card">
+
+                <div class="kpi-icon teal">
+                    %
+                </div>
+
+                <div>
+
+                    <span>
+                        Inventory Turnover
+                    </span>
+
+                    <strong id="inventoryTurnover">
+                        0.0x
+                    </strong>
+
+                    <small class="positive">
+                        ↑ 0% vs last month
+                    </small>
+
+                </div>
+
+            </article>
+
+        </section>
+
+
+        <!-- =================================================
+             FIRST CHART ROW
+        ================================================== -->
+
+        <section class="dashboard-grid three">
+
+
+            <!-- PERFORMANCE -->
+
+            <article class="panel performance-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h3>
+                            Supply Chain Performance Over Time
+                        </h3>
+
+                    </div>
+
+                    <select id="trendPeriod">
+                        <option>This Month</option>
+                        <option>Last 3 Months</option>
+                        <option>Last 12 Months</option>
+                    </select>
+
+                </div>
+
+
+                <div class="legend">
+
+                    <span>
+                        <i class="dot blue-dot"></i>
+                        Revenue ($)
+                    </span>
+
+                    <span>
+                        <i class="dot orange-dot"></i>
+                        Cost ($)
+                    </span>
+
+                    <span>
+                        <i class="dot green-dot"></i>
+                        Profit ($)
+                    </span>
+
+                </div>
+
+
+                <div class="line-chart">
+
+                    <svg
+                        id="performanceChart"
+                        viewBox="0 0 700 300"
+                        preserveAspectRatio="none"
+                    ></svg>
+
+                </div>
+
+            </article>
+
+
+            <!-- COST -->
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Cost Breakdown
+                    </h3>
+
+                </div>
+
+
+                <div class="donut-area">
+
+                    <div
+                        id="costDonut"
+                        class="donut"
+                    >
+
+                        <div class="donut-center">
+
+                            <strong id="costCenter">
+                                $0
+                            </strong>
+
+                            <span>
+                                Total Cost
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="costLegend"
+                        class="cost-legend"
+                    ></div>
+
+                </div>
+
+
+                <button class="link-button">
+                    View Cost Analysis →
+                </button>
+
+            </article>
+
+
+            <!-- SERVICE LEVEL -->
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Service Level
+                    </h3>
+
+                </div>
+
+
+                <div class="service-meter">
+
+                    <div
+                        id="serviceGauge"
+                        class="gauge"
+                    >
+
+                        <div class="gauge-value">
+
+                            <strong id="serviceValue">
+                                0%
+                            </strong>
+
+                            <span>
+                                Service Level
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="small-chart">
+
+                    <svg
+                        id="serviceChart"
+                        viewBox="0 0 700 150"
+                        preserveAspectRatio="none"
+                    ></svg>
+
+                </div>
+
+
+                <button class="link-button">
+                    View Service Level Details →
+                </button>
+
+            </article>
+
+        </section>
+
+
+        <!-- =================================================
+             SECOND ROW
+        ================================================== -->
+
+        <section class="dashboard-grid three">
+
+
+            <!-- PERFORMANCE TABLE -->
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        On-Time Performance
+                    </h3>
+
+                </div>
+
+                <div
+                    id="performanceTable"
+                    class="metric-list"
+                ></div>
+
+                <button class="link-button">
+                    View Performance Report →
+                </button>
+
+            </article>
+
+
+            <!-- SUPPLIERS -->
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Top Performing Suppliers
+                    </h3>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Supplier</th>
+                                <th>On-Time</th>
+                                <th>Quality</th>
+                                <th>Orders</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody
+                            id="supplierTable"
+                        ></tbody>
+
+                    </table>
+
+                </div>
+
+
+                <button class="link-button">
+                    View Supplier Performance →
+                </button>
+
+            </article>
+
+
+            <!-- DEMAND SUPPLY -->
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Demand vs Supply Analysis
+                    </h3>
+
+                </div>
+
+
+                <div class="legend">
+
+                    <span>
+                        <i class="dot blue-dot"></i>
+                        Demand
+                    </span>
+
+                    <span>
+                        <i class="dot green-dot"></i>
+                        Supply
+                    </span>
+
+                    <span>
+                        <i class="dot orange-dot"></i>
+                        Gap
+                    </span>
+
+                </div>
+
+
+                <div class="bar-chart">
+
+                    <svg
+                        id="demandSupplyChart"
+                        viewBox="0 0 700 300"
+                        preserveAspectRatio="none"
+                    ></svg>
+
+                </div>
+
+
+                <button class="link-button">
+                    View Demand Analysis →
+                </button>
+
+            </article>
+
+        </section>
+
+
+        <!-- =================================================
+             THIRD ROW
+        ================================================== -->
+
+        <section class="dashboard-grid bottom-grid">
+
+
+            <!-- INVENTORY -->
+
+            <article class="panel inventory-panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Inventory Analysis
+                    </h3>
+
+                    <select>
+                        <option>This Month</option>
+                    </select>
+
+                </div>
+
+
+                <div class="inventory-cards">
+
+                    <div>
+                        <span>
+                            Average Inventory Value
+                        </span>
+
+                        <strong id="avgInventory">
+                            $0
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <span>
+                            Stockout Value
+                        </span>
+
+                        <strong id="stockoutValue">
+                            $0
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <span>
+                            Slow Moving Items
+                        </span>
+
+                        <strong id="slowMoving">
+                            0
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <span>
+                            Excess Inventory
+                        </span>
+
+                        <strong id="excessInventory">
+                            $0
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <h4>
+                    Inventory by Category
+                </h4>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Category
+                                </th>
+
+                                <th>
+                                    Inventory Value
+                                </th>
+
+                                <th>
+                                    % of Total
+                                </th>
+
+                                <th>
+                                    Turnover Rate
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody
+                            id="inventoryTable"
+                        ></tbody>
+
+                    </table>
+
+                </div>
+
+            </article>
+
+
+            <!-- REPORT CENTER -->
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Report Center
+                    </h3>
+
+                    <button class="text-button">
+                        View All Reports →
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="reportList"
+                    class="report-list"
+                ></div>
+
+            </article>
+
+
+            <!-- INSIGHTS -->
+
+            <article class="panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Insights & Recommendations
+                    </h3>
+
+                </div>
+
+
+                <div
+                    id="insightList"
+                    class="insight-list"
+                ></div>
+
+
+                <button class="link-button">
+                    View All Insights →
+                </button>
+
+            </article>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<script
+    src="/static/AnalyticsReports.js"
+></script>
+
+</body>
+
+</html>

@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Approvals | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/FinancerApprovals.css"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+
+            <div>
+                <strong>VendorIQ</strong>
+                <small>Vendor Reliability Platform</small>
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/financerdashboard" class="nav-item">
+                <span><i class="fa-solid fa-house"></i></span>
+                Dashboard
+            </a>
+
+            <a href="/BudgetManagement" class="nav-item">
+                <span><i class="fa-solid fa-wallet"></i></span>
+                Budget Management
+            </a>
+
+            <a href="/Expenditure" class="nav-item">
+                <span><i class="fa-solid fa-circle-dollar-to-slot"></i></span>
+                Expenditures
+            </a>
+
+            <a href="/Revenue" class="nav-item">
+                <span><i class="fa-solid fa-chart-line"></i></span>
+                Revenue
+            </a>
+
+            <a href="/AccountsPayable" class="nav-item">
+                <span><i class="fa-solid fa-file-invoice-dollar"></i></span>
+                Accounts Payable
+            </a>
+
+            <a href="/AccountsReceivable" class="nav-item">
+                <span><i class="fa-solid fa-money-check-dollar"></i></span>
+                Accounts Receivable
+            </a>
+
+            <a href="/BankingReconciliation" class="nav-item">
+                <span><i class="fa-solid fa-building-columns"></i></span>
+                Banking & Reconciliation
+            </a>
+
+            <a href="/FinancialReports" class="nav-item">
+                <span><i class="fa-solid fa-chart-column"></i></span>
+                Financial Reports
+            </a>
+
+            <a href="/Compliance" class="nav-item">
+                <span><i class="fa-solid fa-shield-halved"></i></span>
+                Compliance
+            </a>
+
+            <a
+                href="/FinancerApprovals"
+                class="nav-item active"
+            >
+                <span><i class="fa-regular fa-square-check"></i></span>
+                Approvals
+                <b id="sidebarPending">0</b>
+            </a>
+
+            <a href="/FinancerNotifications" class="nav-item">
+                <span><i class="fa-regular fa-bell"></i></span>
+                Alerts & Notifications
+            </a>
+
+            <a href="/FinancerDocument" class="nav-item">
+                <span><i class="fa-regular fa-file"></i></span>
+                Documents
+            </a>
+
+            <a href="/FinancerSettings" class="nav-item">
+                <span><i class="fa-solid fa-gear"></i></span>
+                Settings
+            </a>
+
+            <a href="/FinancerHelp" class="nav-item">
+                <span><i class="fa-regular fa-circle-question"></i></span>
+                Help & Support
+            </a>
+
+            <a href="/login" class="nav-item">
+                <span><i class="fa-solid fa-right-from-bracket"></i></span>
+                Logout
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-user">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="user-info">
+
+                <strong id="sidebarUserName">
+                    Finance Officer
+                </strong>
+
+                <small>
+                    Finance Officer
+                </small>
+
+                <span class="online">
+                    <i class="fa-solid fa-circle"></i>
+                    Online
+                </span>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Approvals</h1>
+
+                <p>
+                    Review and approve financial requests,
+                    expenses, and transactions.
+                </p>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <div class="search">
+
+                    <input
+                        id="searchInput"
+                        type="text"
+                        placeholder="Search anything..."
+                    >
+
+                    <span><i class="fa-solid fa-magnifying-glass"></i></span>
+
+                </div>
+
+
+                <button
+                    class="icon-button"
+                    title="Notifications"
+                >
+                    <i class="fa-regular fa-bell"></i>
+                    <span>5</span>
+                </button>
+
+
+                <div class="profile">
+
+                    <div class="avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+
+                        <strong id="topUserName">
+                            Finance Officer
+                        </strong>
+
+                        <small>
+                            Finance Officer
+                        </small>
+
+                    </div>
+
+                    <span><i class="fa-solid fa-chevron-down"></i></span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             DATE FILTER
+        ================================================== -->
+
+        <section class="toolbar">
+
+            <div></div>
+
+            <div class="date-filter">
+
+                <label>
+                    From
+                    <input
+                        type="date"
+                        id="startDate"
+                    >
+                </label>
+
+                <label>
+                    To
+                    <input
+                        type="date"
+                        id="endDate"
+                    >
+                </label>
+
+                <button
+                    id="applyDate"
+                    class="primary-button"
+                >
+                    Apply
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                </div>
+
+                <div>
+                    <span>Pending Approvals</span>
+
+                    <strong id="pendingCount">
+                        0
+                    </strong>
+
+                    <small>
+                        Current approvals
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div>
+                    <span>Approved This Month</span>
+
+                    <strong id="approvedCount">
+                        0
+                    </strong>
+
+                    <small>
+                        Approved requests
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon red">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+
+                <div>
+                    <span>Rejected This Month</span>
+
+                    <strong id="rejectedCount">
+                        0
+                    </strong>
+
+                    <small>
+                        Rejected requests
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+
+                <div>
+                    <span>Avg. Approval Time</span>
+
+                    <strong>
+                        <span id="averageDays">0</span>
+                        Days
+                    </strong>
+
+                    <small>
+                        Average processing time
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+
+                <div>
+                    <span>Approval Rate</span>
+
+                    <strong>
+                        <span id="approvalRate">0</span>%
+                    </strong>
+
+                    <small>
+                        Approved vs rejected
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon teal">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+
+                <div>
+                    <span>Total Approvals</span>
+
+                    <strong id="totalApprovals">
+                        0
+                    </strong>
+
+                    <small>
+                        This period
+                    </small>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CHART AREA
+        ================================================== -->
+
+        <section class="content-grid">
+
+            <!-- APPROVAL SUMMARY -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <div>
+                        <h2>Approval Summary</h2>
+                        <span>This Period</span>
+                    </div>
+
+                </div>
+
+                <div class="donut-wrapper">
+
+                    <div class="donut-container">
+
+                        <canvas
+                            id="approvalSummaryChart"
+                        ></canvas>
+
+                        <div class="donut-center">
+
+                            <strong id="summaryTotal">
+                                0
+                            </strong>
+
+                            <span>
+                                Total Requests
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="summaryLegend"
+                        class="legend"
+                    ></div>
+
+                </div>
+
+
+                <div class="success-message">
+
+                    <span><i class="fa-solid fa-circle-check"></i></span>
+
+                    <p id="approvalMessage">
+                        Approval information loaded.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- REQUEST TYPE -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <div>
+                        <h2>Requests by Type</h2>
+                        <span>This Period</span>
+                    </div>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="requestTypeChart"
+                    ></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="card status-card">
+
+                <div class="card-header">
+
+                    <div>
+                        <h2>Approval Status</h2>
+                        <span>This Period</span>
+                    </div>
+
+                </div>
+
+                <div
+                    id="statusList"
+                    class="status-list"
+                ></div>
+
+                <button
+                    id="viewAllStatus"
+                    class="link-button"
+                >
+                    View all approvals
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             TABLE
+        ================================================== -->
+
+        <section class="card table-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>Pending Approvals</h2>
+
+                    <span id="tableDescription">
+                        Requests requiring your attention
+                    </span>
+
+                </div>
+
+                <button
+                    id="refreshButton"
+                    class="link-button"
+                >
+                    Refresh
+                </button>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Request ID</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Requested By</th>
+                            <th>Amount</th>
+                            <th>Request Date</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody
+                        id="approvalTableBody"
+                    ></tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="table-footer">
+
+                <span id="tableCount">
+                    Showing 0 requests
+                </span>
+
+                <div
+                    id="pagination"
+                    class="pagination"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             LOWER AREA
+        ================================================== -->
+
+        <section class="bottom-grid">
+
+            <!-- QUICK ACTIONS -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h2>Quick Actions</h2>
+
+                </div>
+
+                <div class="quick-actions">
+
+                    <button onclick="createNewRequest()">
+                        <span>
+                            <i class="fa-solid fa-plus"></i>
+                        </span>
+                        Create New Request
+                    </button>
+
+                    <button onclick="viewMyRequests()">
+                        <span>
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </span>
+                        My Approval Requests
+                    </button>
+
+                    <button onclick="openDelegation()">
+                        <span>
+                            <i class="fa-solid fa-user-shield"></i>
+                        </span>
+                        Approval Delegation
+                    </button>
+
+                    <button onclick="openWorkflow()">
+                        <span>
+                            <i class="fa-solid fa-diagram-project"></i>
+                        </span>
+                        Approval Workflow
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT ACTIVITY -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h2>Recent Activity</h2>
+
+                    <button
+                        class="link-button"
+                        onclick="viewAllActivity()"
+                    >
+                        View All
+                    </button>
+
+                </div>
+
+                <div
+                    id="recentActivity"
+                    class="activity-list"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <footer>
+
+            © 2025 FinManage. All rights reserved.
+
+            <span>
+                Version 2.1.0 ●
+            </span>
+
+        </footer>
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================
+     DECISION MODAL
+====================================================== -->
+
+<div
+    id="decisionModal"
+    class="modal hidden"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">
+                Approve Request
+            </h2>
+
+            <button
+                onclick="closeModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <p id="modalDescription"></p>
+
+        <textarea
+            id="decisionComment"
+            placeholder="Add a comment (optional)..."
+        ></textarea>
+
+        <div class="modal-actions">
+
+            <button
+                class="cancel-button"
+                onclick="closeModal()"
+            >
+                Cancel
+            </button>
+
+            <button
+                id="confirmDecision"
+                class="confirm-button"
+            >
+                Confirm
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script
+    src="/static/FinancerApprovals.js"
+></script>
+
+</body>
+
+</html>

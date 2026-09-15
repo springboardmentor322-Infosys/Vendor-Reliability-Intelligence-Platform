@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Compliance Tracker | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/ComplianceTracker.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-shield">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <div class="brand-name">VendorIQ</div>
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="/AuditorDashboard" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/AuditAssignments" class="nav-item">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Audit Assignments</span>
+            </a>
+
+            <a href="/PlanningRisk" class="nav-item">
+                <i class="fa-solid fa-flag"></i>
+                <span>Planning & Risk</span>
+            </a>
+
+            <a href="/AuditsInProgress" class="nav-item">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Audits in Progress</span>
+            </a>
+
+            <a href="/EvidenceDocuments" class="nav-item">
+                <i class="fa-solid fa-folder-open"></i>
+                <span>Evidence & Documents</span>
+            </a>
+
+            <a href="/IssuesFindings" class="nav-item">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Issues & Findings</span>
+            </a>
+
+            <a href="/AuditorReports" class="nav-item">
+                <i class="fa-solid fa-file-lines"></i>
+                <span>Reports</span>
+            </a>
+
+            <a href="/ComplianceTracker"
+               class="nav-item active">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Compliance Tracker</span>
+            </a>
+
+            <a href="/Recommendations" class="nav-item">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span>Recommendations</span>
+            </a>
+
+            <a href="/AuditorAnalytics" class="nav-item">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Analytics</span>
+            </a>
+
+            <a href="/Calendar" class="nav-item">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Calendar</span>
+            </a>
+
+            <a href="/AuditorNotifications" class="nav-item">
+                <i class="fa-solid fa-bell"></i>
+                <span>Notifications</span>
+                <b class="notification-badge">5</b>
+            </a>
+
+            <a href="/AuditorMessages" class="nav-item">
+                <i class="fa-regular fa-envelope"></i>
+                <span>Messages</span>
+            </a>
+
+            <a href="/AuditorSettings" class="nav-item">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/AuditorHelp" class="nav-item">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/login" class="nav-item">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-user">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="user-details">
+                <strong id="sidebarUserName">
+                    Arjun Mehta
+                </strong>
+
+                <span id="sidebarUserRole">
+                    Senior Auditor
+                </span>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <h1>Auditor Dashboard</h1>
+
+            <div class="topbar-right">
+
+                <div class="global-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        id="globalSearch"
+                        type="text"
+                        placeholder="Search audits, entities, frameworks..."
+                    >
+                </div>
+
+                <button class="notification-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>5</span>
+                </button>
+
+                <div class="header-user">
+
+                    <div class="header-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerUserName">
+                            Arjun Mehta
+                        </strong>
+
+                        <small id="headerUserRole">
+                            Senior Auditor
+                        </small>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <!-- PAGE HEADER -->
+
+            <div class="page-header">
+
+                <div>
+                    <h2>Compliance Overview</h2>
+
+                    <p>
+                        Monitor compliance status across frameworks,
+                        audits and entities.
+                    </p>
+                </div>
+
+                <div class="page-actions">
+
+                    <button
+                        class="btn btn-secondary"
+                        id="filterBtn"
+                    >
+                        <i class="fa-solid fa-filter"></i>
+                        Filters
+                    </button>
+
+                    <button
+                        class="btn btn-primary"
+                        id="exportBtn"
+                    >
+                        <i class="fa-solid fa-download"></i>
+                        Export Report
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 KPI CARDS
+            ================================================== -->
+
+            <div class="kpi-grid">
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon blue">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div class="kpi-info">
+                        <span>Overall Compliance Score</span>
+                        <strong id="overallScore">0%</strong>
+
+                        <small class="positive">
+                            <i class="fa-solid fa-arrow-up"></i>
+                            <span id="scoreChange">
+                                5% from last month
+                            </span>
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon green">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+
+                    <div class="kpi-info">
+                        <span>Compliant</span>
+                        <strong id="compliantCount">0</strong>
+
+                        <small
+                            id="compliantPercent"
+                            class="positive"
+                        >
+                            0% of total
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon orange">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+
+                    <div class="kpi-info">
+                        <span>Partially Compliant</span>
+                        <strong id="partialCount">0</strong>
+
+                        <small
+                            id="partialPercent"
+                            class="warning"
+                        >
+                            0% of total
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon red">
+                        <i class="fa-solid fa-exclamation"></i>
+                    </div>
+
+                    <div class="kpi-info">
+                        <span>Non-Compliant</span>
+                        <strong id="nonCompliantCount">0</strong>
+
+                        <small
+                            id="nonCompliantPercent"
+                            class="danger"
+                        >
+                            0% of total
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon purple">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+
+                    <div class="kpi-info">
+                        <span>Total Requirements</span>
+                        <strong id="totalRequirements">0</strong>
+
+                        <small>
+                            Across all frameworks
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 CHARTS
+            ================================================== -->
+
+            <div class="charts-grid">
+
+                <div class="panel framework-panel">
+
+                    <div class="panel-header">
+                        <h3>Compliance by Framework</h3>
+                    </div>
+
+                    <div class="chart-area framework-chart-area">
+
+                        <div class="donut-wrapper">
+                            <canvas id="frameworkChart"></canvas>
+
+                            <div class="donut-center">
+                                <strong id="frameworkCenter">
+                                    0%
+                                </strong>
+
+                                <span>Overall</span>
+                            </div>
+                        </div>
+
+                        <div
+                            id="frameworkLegend"
+                            class="framework-legend"
+                        ></div>
+
+                    </div>
+
+                    <button class="text-link">
+                        View framework details
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>Compliance Trend</h3>
+
+                        <select id="trendRange">
+                            <option value="6">
+                                Last 6 Months
+                            </option>
+                            <option value="12">
+                                Last 12 Months
+                            </option>
+                        </select>
+
+                    </div>
+
+                    <div class="line-chart">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <h3>Compliance by Status</h3>
+                    </div>
+
+                    <div class="chart-area">
+
+                        <div class="donut-wrapper">
+                            <canvas id="statusChart"></canvas>
+
+                            <div class="donut-center">
+                                <strong id="statusCenter">
+                                    0
+                                </strong>
+
+                                <span>Total</span>
+                            </div>
+                        </div>
+
+                        <div
+                            id="statusLegend"
+                            class="status-legend"
+                        ></div>
+
+                    </div>
+
+                    <button class="text-link">
+                        View full breakdown
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 REQUIREMENTS
+            ================================================== -->
+
+            <section class="panel requirements-panel">
+
+                <div class="requirements-toolbar">
+
+                    <div class="status-tabs">
+
+                        <button
+                            class="status-tab active"
+                            data-status="All"
+                        >
+                            All
+                            <b id="allTabCount">0</b>
+                        </button>
+
+                        <button
+                            class="status-tab"
+                            data-status="Compliant"
+                        >
+                            Compliant
+                            <b id="compliantTabCount">0</b>
+                        </button>
+
+                        <button
+                            class="status-tab"
+                            data-status="Partially Compliant"
+                        >
+                            Partial
+                            <b id="partialTabCount">0</b>
+                        </button>
+
+                        <button
+                            class="status-tab"
+                            data-status="Non-Compliant"
+                        >
+                            Non-Compliant
+                            <b id="nonCompliantTabCount">0</b>
+                        </button>
+
+                    </div>
+
+                    <div class="table-search">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <input
+                            id="requirementSearch"
+                            type="text"
+                            placeholder="Search requirements..."
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                        <tr>
+                            <th>Requirement ID</th>
+                            <th>Requirement</th>
+                            <th>Framework</th>
+                            <th>Audit / Assignment</th>
+                            <th>Entity / Department</th>
+                            <th>Status</th>
+                            <th>Compliance Score</th>
+                            <th>Last Assessed</th>
+                            <th>Next Review</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="requirementsBody">
+
+                        <tr>
+                            <td
+                                colspan="10"
+                                class="loading-row"
+                            >
+                                Loading compliance requirements...
+                            </td>
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div class="table-footer">
+
+                    <span id="paginationText">
+                        Showing 0 requirements
+                    </span>
+
+                    <div
+                        id="pagination"
+                        class="pagination"
+                    ></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 BOTTOM CARDS
+            ================================================== -->
+
+            <div class="bottom-grid">
+
+
+                <!-- UPCOMING REVIEWS -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <h3>Upcoming Compliance Reviews</h3>
+                    </div>
+
+                    <div
+                        id="upcomingReviews"
+                        class="list"
+                    ></div>
+
+                    <button class="text-link">
+                        View all upcoming reviews
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+
+                <!-- GAPS -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <h3>Compliance Gaps</h3>
+                    </div>
+
+                    <div
+                        id="gapsList"
+                        class="gap-list"
+                    ></div>
+
+                    <button class="text-link">
+                        View all gaps
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+
+                <!-- ACTIVITIES -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <h3>Recent Compliance Activities</h3>
+                    </div>
+
+                    <div
+                        id="activitiesList"
+                        class="activity-list"
+                    ></div>
+
+                    <button class="text-link">
+                        View all activities
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="/static/ComplianceTracker.js"></script>
+
+</body>
+</html>

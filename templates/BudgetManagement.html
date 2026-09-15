@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Budget Management | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link
+        rel="stylesheet"
+        href="/static/BudgetManagement.css"
+    >
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    VendorIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="/financerdashboard" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/BudgetManagement" class="nav-item active">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Budget Management</span>
+            </a>
+
+            <a href="/Expenditure" class="nav-item">
+                <i class="fa-solid fa-circle-dollar-to-slot"></i>
+                <span>Expenditures</span>
+            </a>
+
+            <a href="/Revenue" class="nav-item">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Revenue</span>
+            </a>
+
+            <a href="/AccountsPayable" class="nav-item">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span>Accounts Payable</span>
+            </a>
+
+            <a href="/AccountsReceivable" class="nav-item">
+                <i class="fa-solid fa-money-check-dollar"></i>
+                <span>Accounts Receivable</span>
+            </a>
+
+            <a href="/BankingReconciliation" class="nav-item">
+                <i class="fa-solid fa-building-columns"></i>
+                <span>Banking & Reconciliation</span>
+            </a>
+
+            <a href="/FinancialReports" class="nav-item">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Financial Reports</span>
+            </a>
+
+            <a href="/Compliance" class="nav-item">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Compliance</span>
+            </a>
+
+            <a href="FinancerApprovals" class="nav-item">
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+                <span class="badge red">5</span>
+            </a>
+
+            <a href="/FinancerNotifications" class="nav-item">
+                <i class="fa-regular fa-bell"></i>
+                <span>Alerts & Notifications</span>
+                <span class="badge red">8</span>
+            </a>
+
+            <a href="/FinancerDocument" class="nav-item">
+                <i class="fa-regular fa-file"></i>
+                <span>Documents</span>
+            </a>
+
+            <a href="/FinancerSettings" class="nav-item">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/FinancerHelp" class="nav-item">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/login" class="nav-item">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-user">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div>
+                <strong id="sidebarName">
+                    Rajesh Kumar
+                </strong>
+
+                <small id="sidebarRole">
+                    Finance Officer
+                </small>
+
+                <span class="online">
+                    <i class="fa-solid fa-circle"></i>
+                    Online
+                </span>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="page-heading">
+
+                <h1>Budget Management</h1>
+
+                <div class="breadcrumb">
+                    Dashboard
+                    <i class="fa-solid fa-chevron-right"></i>
+                    Budget Management
+                </div>
+
+                <p>
+                    Plan, allocate and track budgets across all departments.
+                </p>
+
+            </div>
+
+            <div class="top-actions">
+
+                <div class="search-box">
+                    <input
+                        type="search"
+                        placeholder="Search anything..."
+                        id="globalSearch"
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notification-dot">3</span>
+                </button>
+
+                <div class="profile">
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerName">
+                            Rajesh Kumar
+                        </strong>
+
+                        <small id="headerRole">
+                            Finance Officer
+                        </small>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             FILTER
+        ================================================== -->
+
+        <div class="toolbar">
+
+            <div></div>
+
+            <div class="toolbar-right">
+
+                <select id="yearFilter">
+                    <option value="">Current FY</option>
+                </select>
+
+                <button
+                    class="refresh-btn"
+                    id="refreshBtn"
+                    title="Refresh"
+                >
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card blue">
+
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-suitcase"></i>
+                </div>
+
+                <div>
+                    <span>Total Budget</span>
+
+                    <strong id="totalBudget">
+                        ₹ 0
+                    </strong>
+
+                    <small id="fyText">
+                        FY 2025-26
+                    </small>
+
+                    <em class="positive">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        8.5% from last year
+                    </em>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card green">
+
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div>
+
+                <div>
+                    <span>Total Allocated</span>
+
+                    <strong id="totalAllocated">
+                        ₹ 0
+                    </strong>
+
+                    <small>
+                        <span id="allocatedPercent">0</span>
+                        % of total budget
+                    </small>
+
+                    <div class="progress">
+                        <span id="allocatedProgress"></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card orange">
+
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-chart-column"></i>
+                </div>
+
+                <div>
+                    <span>Total Spent</span>
+
+                    <strong id="totalSpent">
+                        ₹ 0
+                    </strong>
+
+                    <small>
+                        <span id="spentPercent">0</span>
+                        % of total budget
+                    </small>
+
+                    <div class="progress">
+                        <span id="spentProgress"></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card purple">
+
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+
+                <div>
+                    <span>Remaining Budget</span>
+
+                    <strong id="remainingBudget">
+                        ₹ 0
+                    </strong>
+
+                    <small>
+                        <span id="remainingPercent">0</span>
+                        % of total budget
+                    </small>
+
+                    <div class="progress">
+                        <span id="remainingProgress"></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card red">
+
+                <div class="kpi-icon">
+                    <i class="fa-solid fa-exclamation"></i>
+                </div>
+
+                <div>
+                    <span>Over Budget</span>
+
+                    <strong id="overBudget">
+                        ₹ 0
+                    </strong>
+
+                    <small id="overBudgetDepartments">
+                        0 Departments
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CHARTS
+        ================================================== -->
+
+        <section class="dashboard-grid">
+
+            <div class="panel budget-chart-panel">
+
+                <div class="panel-header">
+
+                    <h2>Budget vs Actual</h2>
+
+                    <select id="chartYear">
+                        <option value="this">This Year</option>
+                    </select>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="budgetActualChart"></canvas>
+                </div>
+
+            </div>
+
+
+            <div class="panel utilization-panel">
+
+                <div class="panel-header">
+
+                    <h2>Budget Utilization</h2>
+
+                    <span class="year-label">
+                        This Year
+                    </span>
+
+                </div>
+
+                <div class="utilization-body">
+
+                    <div class="donut-wrapper">
+
+                        <canvas
+                            id="utilizationChart"
+                        ></canvas>
+
+                        <div class="donut-label">
+                            <strong id="utilizationValue">
+                                0%
+                            </strong>
+
+                            <span>
+                                Budget Utilized
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="legend">
+
+                        <div class="legend-item">
+                            <span class="dot spent"></span>
+
+                            <div>
+                                <strong>Spent</strong>
+                                <span id="legendSpent">
+                                    ₹ 0
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div class="legend-item">
+                            <span class="dot remaining"></span>
+
+                            <div>
+                                <strong>Remaining</strong>
+                                <span id="legendRemaining">
+                                    ₹ 0
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="track-message">
+                    <i class="fa-regular fa-circle-check"></i>
+                    Overall budget utilization is on track
+                </div>
+
+            </div>
+
+
+            <div class="panel summary-panel">
+
+                <div class="panel-header">
+                    <h2>Budget Summary</h2>
+                </div>
+
+                <div class="summary-list">
+
+                    <div>
+                        <i class="fa-solid fa-building"></i>
+                        <span>Total Departments</span>
+                        <strong id="totalDepartments">0</strong>
+                    </div>
+
+                    <div>
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>Active Budgets</span>
+                        <strong id="activeBudgets">0</strong>
+                    </div>
+
+                    <div>
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Completed Budgets</span>
+                        <strong id="completedBudgets">0</strong>
+                    </div>
+
+                    <div>
+                        <i class="fa-solid fa-hourglass-half"></i>
+                        <span>Pending Approval</span>
+                        <strong id="pendingApproval">0</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             BOTTOM
+        ================================================== -->
+
+        <section class="bottom-grid">
+
+            <div class="panel department-panel">
+
+                <div class="panel-header">
+
+                    <h2>Department Budget Overview</h2>
+
+                    <button
+                        class="link-button"
+                        id="viewAllDepartments"
+                    >
+                        View All
+                    </button>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Total Budget (₹)</th>
+                                <th>Allocated (₹)</th>
+                                <th>Spent (₹)</th>
+                                <th>Utilization</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="departmentTable">
+                        </tbody>
+
+                        <tfoot id="departmentTotal">
+                        </tfoot>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel activities-panel">
+
+                <div class="panel-header">
+
+                    <h2>Recent Budget Activities</h2>
+
+                    <button
+                        class="link-button"
+                        id="viewActivities"
+                    >
+                        View All
+                    </button>
+
+                </div>
+
+                <div id="activitiesList"
+                     class="activities-list">
+                </div>
+
+            </div>
+
+
+            <div class="panel quick-panel">
+
+                <div class="panel-header">
+                    <h2>Quick Actions</h2>
+                </div>
+
+                <button
+                    class="quick-action"
+                    id="createBudgetBtn"
+                >
+                    <i class="fa-solid fa-plus-circle"></i>
+                    Create New Budget
+                </button>
+
+                <button
+                    class="quick-action"
+                    id="allocateBudgetBtn"
+                >
+                    <i class="fa-solid fa-users"></i>
+                    Allocate Budget
+                </button>
+
+                <button
+                    class="quick-action"
+                    id="transferBudgetBtn"
+                >
+                    <i class="fa-solid fa-right-left"></i>
+                    Budget Transfer
+                </button>
+
+                <button
+                    class="quick-action"
+                    id="reportBtn"
+                >
+                    <i class="fa-solid fa-file-lines"></i>
+                    Budget Report
+                </button>
+
+                <button
+                    class="quick-action"
+                    id="exportBtn"
+                >
+                    <i class="fa-solid fa-download"></i>
+                    Export Data
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <footer>
+            <span>© 2025 FinManage. All rights reserved.</span>
+
+            <span>
+                Version 2.1.0
+                <i class="fa-solid fa-circle"></i>
+            </span>
+        </footer>
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================
+     CREATE BUDGET MODAL
+====================================================== -->
+
+<div class="modal" id="budgetModal">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+            <h2>Create New Budget</h2>
+
+            <button
+                class="close-modal"
+                data-close="budgetModal"
+            >
+                ×
+            </button>
+        </div>
+
+        <form id="budgetForm">
+
+            <label>
+                Department
+                <input
+                    name="department"
+                    required
+                >
+            </label>
+
+            <label>
+                Budget Amount
+                <input
+                    name="budget"
+                    type="number"
+                    min="0"
+                    required
+                >
+            </label>
+
+            <label>
+                Initial Allocation
+                <input
+                    name="allocated"
+                    type="number"
+                    min="0"
+                    value="0"
+                >
+            </label>
+
+            <label>
+                Financial Year
+                <input
+                    name="year"
+                    type="number"
+                    id="budgetYear"
+                    required
+                >
+            </label>
+
+            <label>
+                Status
+
+                <select name="status">
+                    <option value="Active">
+                        Active
+                    </option>
+
+                    <option value="Pending Approval">
+                        Pending Approval
+                    </option>
+
+                    <option value="Draft">
+                        Draft
+                    </option>
+                </select>
+
+            </label>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Create Budget
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="/static/BudgetManagement.js"></script>
+
+</body>
+</html>

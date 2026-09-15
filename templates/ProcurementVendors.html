@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>VendorIQ - Vendors</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/ProcurementVendors.css"
+    >
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+ 
+            <div class="brand-logo">
+                <i class="fa-solid fa-industry"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+        <nav>
+
+            <a href="/ManagerDashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/ProcurementRequests">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Procurement Requests</span>
+            </a>
+
+            <a href="/ProcurementPurchaseOrders">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Purchase Orders</span>
+            </a>
+
+            <a href="/ProcurementApprovals">
+                <i class="fa-solid fa-square-check"></i>
+                <span>Approvals</span>
+            </a>
+
+            <a
+                href="/ProcurementVendors"
+                class="active"
+            >
+                <i class="fa-solid fa-users"></i>
+                <span>Vendors</span>
+            </a>
+
+            <a href="/OrderTracking">
+                <i class="fa-solid fa-box"></i>
+                <span>Order Tracking</span>
+            </a>
+
+            <a href="/ProcurementInvoices">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span>Invoices</span>
+            </a>
+
+            <a href="/ProcurementReports">
+                <i class="fa-solid fa-file-lines"></i>
+                <span>Reports</span>
+            </a>
+
+            <a href="/ProcurementAnalytics">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Analytics</span>
+            </a>
+
+        </nav>
+
+        <div class="menu-title">
+            COMMUNICATION
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementNotifications">
+                <i class="fa-regular fa-bell"></i>
+                <span>Notifications</span>
+                <b class="badge">6</b>
+            </a>
+
+            <a href="/Messages">
+                <i class="fa-regular fa-envelope"></i>
+                <span>Messages</span>
+                <b class="badge">3</b>
+            </a>
+
+        </nav>
+
+        <div class="menu-title">
+            SUPPORT
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementHelpSupport">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/ProcurementSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="user-card">
+
+            <div class="avatar" id="sidebarAvatar">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div class="user-info">
+                <strong id="sidebarName">
+                    -
+                </strong>
+
+                <span>
+                    Procurement Manager
+                </span>
+
+                <small>
+                    <i></i> Online
+                </small>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+                <h1>Vendors</h1>
+
+                <div class="breadcrumb">
+                    <span>Dashboard</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <strong>Vendors</strong>
+                </div>
+            </div>
+
+            <div class="top-actions">
+
+                <div class="global-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        id="globalSearch"
+                        placeholder="Search anything..."
+                    >
+                </div>
+
+                <button class="icon-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    <b>6</b>
+                </button>
+
+                <button class="icon-btn">
+                    <i class="fa-regular fa-envelope"></i>
+                    <b>3</b>
+                </button>
+
+                <div class="profile" onclick="openProfile()">
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+                        <strong id="topUserName">
+                            -
+                        </strong>
+
+                        <span>
+                            Procurement Manager
+                        </span>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             ACTIONS
+        ================================================== -->
+
+        <div class="page-actions">
+
+            <button
+                id="exportBtn"
+                class="btn secondary"
+            >
+                <i class="fa-solid fa-download"></i>
+                Export
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon purple">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+
+                <div>
+                    <span>Total Vendors</span>
+                    <strong id="totalVendors">
+                        0
+                    </strong>
+                    <small>
+                        All registered vendors
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div>
+                    <span>Active Vendors</span>
+                    <strong id="activeVendors">
+                        0
+                    </strong>
+                    <small>
+                        Currently active
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon violet">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+
+                <div>
+                    <span>Preferred Vendors</span>
+                    <strong id="preferredVendors">
+                        0
+                    </strong>
+                    <small>
+                        Preferred suppliers
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon red">
+                    <i class="fa-solid fa-ban"></i>
+                </div>
+
+                <div>
+                    <span>Blacklisted Vendors</span>
+                    <strong id="blacklistedVendors">
+                        0
+                    </strong>
+                    <small>
+                        Restricted vendors
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+
+                <div>
+                    <span>New This Month</span>
+                    <strong id="newVendors">
+                        0
+                    </strong>
+                    <small>
+                        Added this month
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon orange">
+                    <i class="fa-solid fa-chart-column"></i>
+                </div>
+
+                <div>
+                    <span>Avg. Performance</span>
+                    <strong>
+                        <span id="averageScore" style="font-size: 20px; color: white;">
+                            0.0
+                        </span>
+                        <em>/ 5</em>
+                    </strong>
+
+                    <small>
+                        Vendor reliability score
+                    </small>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FILTERS
+        ================================================== -->
+
+        <section class="filters">
+
+            <div class="search-box">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    id="vendorSearch"
+                    placeholder="Search vendors..."
+                >
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label>Status</label>
+
+                <select id="statusFilter">
+                    <option value="All">
+                        All
+                    </option>
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label>Category</label>
+
+                <select id="categoryFilter">
+
+                    <option value="All">
+                        All
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label>Location</label>
+
+                <select id="locationFilter">
+
+                    <option value="All">
+                        All
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label>Risk Level</label>
+
+                <select id="riskFilter">
+
+                    <option value="All">
+                        All
+                    </option>
+
+                    <option value="Low">
+                        Low
+                    </option>
+
+                    <option value="Medium">
+                        Medium
+                    </option>
+
+                    <option value="High">
+                        High
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <button
+                id="resetBtn"
+                class="reset-btn"
+            >
+                <i class="fa-solid fa-rotate-right"></i>
+                Reset
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             TABS
+        ================================================== -->
+
+        <div class="tabs">
+
+            <button
+                class="tab active"
+                data-tab="all"
+            >
+                All Vendors
+            </button>
+
+            <button
+                class="tab"
+                data-tab="preferred"
+            >
+                Preferred Vendors
+            </button>
+
+            <button
+                class="tab"
+                data-tab="blacklisted"
+            >
+                Blacklisted Vendors
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
+
+        <section class="content-grid">
+
+            <div class="table-card">
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Vendor</th>
+                                <th>Category</th>
+                                <th>Contact Person</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Performance</th>
+                                <th>Risk</th>
+                                <th>Actions</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="vendorTableBody">
+
+                        </tbody>
+
+                    </table>
+
+                    <div
+                        id="tableLoading"
+                        class="loading"
+                    >
+                        Loading vendors...
+                    </div>
+
+                </div>
+
+
+                <div class="table-footer">
+
+                    <span id="paginationText">
+                        Showing 0 vendors
+                    </span>
+
+                    <div
+                        id="pagination"
+                        class="pagination"
+                    ></div>
+
+                    <select id="pageSize">
+
+                        <option value="10">
+                            10 / page
+                        </option>
+
+                        <option value="20">
+                            20 / page
+                        </option>
+
+                        <option value="50">
+                            50 / page
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 DETAILS
+            ================================================== -->
+
+            <aside
+                id="vendorDetails"
+                class="details-card"
+            >
+
+                <div class="details-header">
+
+                    <strong>
+                        Vendor Details
+                    </strong>
+
+                    <button
+                        id="closeDetails"
+                        class="close-btn"
+                    >
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="detailsContent"
+                    class="details-content"
+                >
+
+                    <div class="empty-details">
+
+                        <i class="fa-solid fa-users"></i>
+
+                        <p>
+                            Select a vendor to view details
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="/static/ProcurementVendors.js"></script>
+
+</body>
+</html>

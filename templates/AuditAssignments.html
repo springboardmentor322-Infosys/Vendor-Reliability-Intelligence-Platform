@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Audit Assignments | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/AuditAssignments.css"
+    >
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-shield">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    VendorIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    Vendor Reliability Platform
+                </div>
+            </div>
+
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="/AuditorDashboard">
+                <span class="nav-icon"><i class="fa-solid fa-home"></i></span>
+                Dashboard
+            </a>
+
+            <a
+                href="/AuditAssignments"
+                class="active"
+            >
+                <span class="nav-icon"><i class="fa-solid fa-clipboard-list"></i></span>
+                Audit Assignments
+            </a>
+
+            <a href="/PlanningRisk">
+                <span class="nav-icon"><i class="fa-solid fa-flag"></i></span>
+                Planning & Risk
+            </a>
+
+            <a href="/AuditsInProgress">
+                <span class="nav-icon"><i class="fa-solid fa-list-check"></i></span>
+                Audits in Progress
+            </a>
+
+            <a href="/EvidenceDocuments">
+                <span class="nav-icon"><i class="fa-solid fa-folder-open"></i></span>
+                Evidence & Documents
+            </a>
+
+            <a href="/IssuesFindings">
+                <span class="nav-icon"><i class="fa-solid fa-exclamation-triangle"></i></span>
+                Issues & Findings
+            </a>
+
+            <a href="/AuditorReports">
+                <span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span>
+                Reports
+            </a>
+
+            <a href="/ComplianceTracker">
+                <span class="nav-icon"><i class="fa-solid fa-circle-check"></i></span>
+                Compliance Tracker
+            </a>
+
+            <a href="/Recommendations">
+                <span class="nav-icon"><i class="fa-regular fa-lightbulb"></i></span>
+                Recommendations
+            </a>
+
+            <a href="/AuditorAnalytics">
+                <span class="nav-icon"><i class="fa-solid fa-chart-column"></i></span>
+                Analytics
+            </a>
+
+            <a href="/Calendar">
+                <span class="nav-icon"><i class="fa-solid fa-calendar-days"></i></span>
+                Calendar
+            </a>
+
+            <a href="/AuditorNotifications">
+                <span class="nav-icon"><i class="fa-solid fa-bell"></i></span>
+                Notifications
+
+                <span class="notification-count">
+                    5
+                </span>
+            </a>
+
+            <a href="/AuditorMessages">
+                <span class="nav-icon"><i class="fa-regular fa-envelope"></i></span>
+                Messages
+            </a>
+
+            <a href="/AuditorSettings">
+                <span class="nav-icon"><i class="fa-solid fa-gear"></i></span>
+                Settings
+            </a>
+
+            <a href="/AuditorHelp">
+                <span class="nav-icon"><i class="fa-solid fa-circle-question"></i></span>
+                Help & Support
+            </a>
+
+            <a href="/login">
+                <span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+                Logout
+            </a>
+
+        </nav>
+
+        <div class="sidebar-user">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="sidebar-user-info">
+
+                <strong id="sidebarUserName">
+                    Arjun Mehta
+                </strong>
+
+                <span id="sidebarUserRole">
+                    Senior Auditor
+                </span>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <h1>
+                Auditor Dashboard
+            </h1>
+
+            <div class="topbar-right">
+
+                <div class="global-search">
+                    <span><i class="fa-solid fa-magnifying-glass"></i></span>
+
+                    <input
+                        type="text"
+                        placeholder="Search audits, entities, departments..."
+                    >
+                </div>
+
+                <button class="notification-button">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>5</span>
+                </button>
+
+                <div class="profile">
+
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div class="profile-info">
+                        <strong id="headerUserName">
+                            Arjun Mehta
+                        </strong>
+
+                        <span id="headerUserRole">
+                            Senior Auditor
+                        </span>
+                    </div>
+
+                    <span><i class="fa-solid fa-chevron-down"></i></span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+
+        <section class="content">
+
+            <div class="page-heading">
+
+                <div>
+
+                    <h2>
+                        Audit Assignments
+                    </h2>
+
+                    <p>
+                        Manage and track all assigned audits
+                    </p>
+
+                </div>
+
+                <button
+                    class="primary-button"
+                    id="newAssignmentButton"
+                >
+                    <span><i class="fa-solid fa-plus"></i></span>
+                    New Audit Assignment
+                </button>
+
+            </div>
+
+
+            <!-- =================================================
+                 KPI CARDS
+            ================================================== -->
+
+            <div class="kpi-grid">
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon blue">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                    </div>
+
+                    <div>
+                        <span>Total Assignments</span>
+
+                        <strong id="totalAssignments">
+                            0
+                        </strong>
+
+                        <small class="green">
+                            All assignments
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon green">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+
+                    <div>
+                        <span>In Progress</span>
+
+                        <strong id="inProgress">
+                            0
+                        </strong>
+
+                        <small class="green">
+                            Active audits
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon orange">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+
+                    <div>
+                        <span>Pending Review</span>
+
+                        <strong id="pendingReview">
+                            0
+                        </strong>
+
+                        <small class="orange-text">
+                            Awaiting review
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon purple">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <div>
+                        <span>Completed</span>
+
+                        <strong id="completed">
+                            0
+                        </strong>
+
+                        <small class="green">
+                            Finished audits
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 TABLE CARD
+            ================================================== -->
+
+            <div class="table-card">
+
+                <!-- FILTERS -->
+
+                <div class="filters">
+
+                    <div class="search-box">
+
+                        <span><i class="fa-solid fa-magnifying-glass"></i></span>
+
+                        <input
+                            id="assignmentSearch"
+                            type="text"
+                            placeholder="Search audits..."
+                        >
+
+                    </div>
+
+
+                    <select id="statusFilter">
+
+                        <option value="">
+                            All Statuses
+                        </option>
+
+                        <option value="Not Started">
+                            Not Started
+                        </option>
+
+                        <option value="In Progress">
+                            In Progress
+                        </option>
+
+                        <option value="Pending Review">
+                            Pending Review
+                        </option>
+
+                        <option value="Completed">
+                            Completed
+                        </option>
+
+                    </select>
+
+
+                    <select id="priorityFilter">
+
+                        <option value="">
+                            All Priorities
+                        </option>
+
+                        <option value="High">
+                            High
+                        </option>
+
+                        <option value="Medium">
+                            Medium
+                        </option>
+
+                        <option value="Low">
+                            Low
+                        </option>
+
+                    </select>
+
+
+                    <select id="auditorFilter">
+
+                        <option value="">
+                            All Auditors
+                        </option>
+
+                    </select>
+
+
+                    <div class="date-filter">
+
+                        <span><i class="fa-solid fa-calendar-days"></i></span>
+
+                        <input
+                            type="date"
+                            id="dateFrom"
+                        >
+
+                        <span><i class="fa-solid fa-arrow-right"></i></span>
+
+                        <input
+                            type="date"
+                            id="dateTo"
+                        >
+
+                    </div>
+
+                    <button
+                        class="filter-button"
+                        id="clearFilters"
+                    >
+                        <i class="fa-solid fa-filter"></i>
+                        Filters
+                    </button>
+
+                </div>
+
+
+                <!-- TABLE -->
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                        <tr>
+
+                            <th>
+                                Audit Name
+                                <span><i class="fa-solid fa-sort"></i></span>
+                            </th>
+
+                            <th>
+                                Audit Type
+                            </th>
+
+                            <th>
+                                Assigned To
+                            </th>
+
+                            <th>
+                                Department / Entity
+                            </th>
+
+                            <th>
+                                Due Date
+                                <span><i class="fa-solid fa-sort"></i></span>
+                            </th>
+
+                            <th>
+                                Priority
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody id="assignmentTableBody">
+
+                        <tr>
+                            <td
+                                colspan="8"
+                                class="loading"
+                            >
+                                Loading assignments...
+                            </td>
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- PAGINATION -->
+
+                <div class="pagination-row">
+
+                    <div
+                        id="paginationInfo"
+                        class="pagination-info"
+                    >
+                        Showing 0 entries
+                    </div>
+
+                    <div
+                        class="pagination"
+                        id="pagination"
+                    ></div>
+
+                    <select id="pageSize">
+
+                        <option value="10">
+                            10 / page
+                        </option>
+
+                        <option value="20">
+                            20 / page
+                        </option>
+
+                        <option value="50">
+                            50 / page
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     NEW ASSIGNMENT MODAL
+========================================================== -->
+
+<div
+    class="modal-overlay"
+    id="assignmentModal"
+>
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h3>
+                    New Audit Assignment
+                </h3>
+
+                <p>
+                    Create an audit and assign it to an auditor.
+                </p>
+
+            </div>
+
+            <button
+                class="modal-close"
+                id="closeModal"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <form id="assignmentForm">
+
+            <div class="form-grid">
+
+                <div class="form-group full">
+
+                    <label>
+                        Audit Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="auditTitle"
+                        required
+                        placeholder="Enter audit name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Audit Type *
+                    </label>
+
+                    <select
+                        id="auditType"
+                        required
+                    >
+
+                        <option value="">
+                            Select audit type
+                        </option>
+
+                        <option value="Operational Audit">
+                            Operational Audit
+                        </option>
+
+                        <option value="Financial Audit">
+                            Financial Audit
+                        </option>
+
+                        <option value="Compliance Audit">
+                            Compliance Audit
+                        </option>
+
+                        <option value="IT Audit">
+                            IT Audit
+                        </option>
+
+                        <option value="Vendor Audit">
+                            Vendor Audit
+                        </option>
+
+                        <option value="Environmental Audit">
+                            Environmental Audit
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Assigned To *
+                    </label>
+
+                    <select
+                        id="auditorId"
+                        required
+                    >
+
+                        <option value="">
+                            Select auditor
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Entity / Department
+                    </label>
+
+                    <input
+                        type="text"
+                        id="entityName"
+                        placeholder="e.g. Finance Department"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Entity Type
+                    </label>
+
+                    <input
+                        type="text"
+                        id="entityType"
+                        placeholder="e.g. Department"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Due Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="dueDate"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Priority
+                    </label>
+
+                    <select id="priority">
+
+                        <option value="High">
+                            High
+                        </option>
+
+                        <option
+                            value="Medium"
+                            selected
+                        >
+                            Medium
+                        </option>
+
+                        <option value="Low">
+                            Low
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Scheduled Date
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        id="scheduledDate"
+                    >
+
+                </div>
+
+
+                <div class="form-group full">
+
+                    <label>
+                        Description
+                    </label>
+
+                    <textarea
+                        id="description"
+                        rows="4"
+                        placeholder="Enter audit description"
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    id="cancelAssignment"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    Create Assignment
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     VIEW MODAL
+========================================================== -->
+
+<div
+    class="modal-overlay"
+    id="viewModal"
+>
+
+    <div class="modal view-modal">
+
+        <div class="modal-header">
+
+            <div>
+
+                <h3 id="viewTitle">
+                    Audit Details
+                </h3>
+
+                <p id="viewNumber"></p>
+
+            </div>
+
+            <button
+                class="modal-close"
+                id="closeViewModal"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+        <div
+            id="viewContent"
+            class="view-content"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<script src="/static/AuditAssignments.js"></script>
+
+</body>
+
+</html>

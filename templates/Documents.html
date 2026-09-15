@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        VendorIQ - Documents
+    </title>
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/Documents.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================================
+     SIDEBAR
+====================================================== -->
+
+<aside class="sidebar">
+
+    <div class="brand">
+
+        <div class="brand-logo">
+            <i class="fa-solid fa-truck-fast"></i>
+        </div>
+
+        <div>
+            <h2>VendorIQ</h2>
+            <span>
+                Vendor Reliability Platform
+            </span>
+        </div>
+
+    </div>
+
+
+    <nav class="navigation">
+
+        <a href="/supplychaindashboard">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="/demand-planning">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Demand Planning</span>
+        </a>
+
+        <a href="/supplychainprocurement">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>Procurement</span>
+        </a>
+
+        <a href="/suppliers">
+            <i class="fa-solid fa-users"></i>
+            <span>Suppliers</span>
+        </a>
+
+        <a href="/inventory">
+            <i class="fa-solid fa-boxes-stacked"></i>
+            <span>Inventory</span>
+        </a>
+
+        <a href="/ordersshipments">
+            <i class="fa-solid fa-truck"></i>
+            <span>Orders & Shipments</span>
+        </a>
+
+        <a href="/warehouses">
+            <i class="fa-solid fa-warehouse"></i>
+            <span>Warehouses</span>
+        </a>
+
+        <a href="/transportation">
+            <i class="fa-solid fa-route"></i>
+            <span>Transportation</span>
+        </a>
+
+        <a href="/analyticsreports">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Analytics & Reports</span>
+        </a>
+
+        <a href="/alertsnotifications">
+            <i class="fa-solid fa-bell"></i>
+            <span>Alerts & Notifications</span>
+        </a>
+
+        <a
+            href="/documents"
+            class="active"
+        >
+            <i class="fa-solid fa-file-lines"></i>
+            <span>Documents</span>
+        </a>
+
+        <a href="/supplychainsettings">
+            <i class="fa-solid fa-gear"></i>
+            <span>Settings</span>
+        </a>
+
+        <a href="/login">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+
+    </nav>
+
+
+    <div class="quick-actions">
+
+        <h4>
+            Quick Actions
+        </h4>
+
+        <button onclick="window.location.href='/CreatePurchaseOrder'">
+            <i class="fa-solid fa-cart-plus"></i>
+            Create Purchase Order
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <button onclick="window.location.href='/AddSupplier'">
+            <i class="fa-solid fa-user-plus"></i>
+            Add New Supplier
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <button onclick="window.location.href='/CreateShipment'">
+            <i class="fa-solid fa-ship"></i>
+            Create Shipment
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <button onclick="window.location.href='/UploadDocument'">
+            <i class="fa-solid fa-upload"></i>
+            Upload Document
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+    </div>
+
+    <div class="profile-card" onclick="openSupplyChainProfile()">
+
+        <div class="avatar">
+            <i class="fa-solid fa-user-tie"></i>
+        </div>
+
+        <strong id="profileName">
+            Arjun Kumar
+        </strong>
+
+        <span>
+            Supply Chain Manager
+        </span>
+
+        <small>
+            <i class="fa-solid fa-circle"></i>
+            Online
+        </small>
+
+    </div>
+
+</aside>
+
+
+<!-- ======================================================
+     MAIN
+====================================================== -->
+
+<main class="main">
+
+    <header class="topbar">
+
+        <h1>
+            Supply Chain Manager Dashboard
+        </h1>
+
+
+        <div class="top-actions">
+
+            <div class="global-search">
+
+                <input
+                    id="globalSearch"
+                    type="text"
+                    placeholder="Search documents..."
+                >
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+            </div>
+
+            <button class="icon-button">
+                <i class="fa-regular fa-bell"></i>
+                <b>5</b>
+            </button>
+
+            <div class="date-time">
+
+                <i class="fa-regular fa-calendar"></i>
+
+                <div>
+                    <strong id="currentDate">
+                        May 23, 2025
+                    </strong>
+
+                    <span id="currentTime">
+                        10:30 AM
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <section class="content">
+
+        <div class="page-heading">
+
+            <h2>
+                Documents
+            </h2>
+
+            <p>
+                Centralize, manage, and secure all your supply chain documents.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue">
+                    <i class="fa-regular fa-file-lines"></i>
+                </div>
+
+                <div>
+                    <span>Total Documents</span>
+                    <strong id="totalDocuments">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        ↑ 12.5% vs last month
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon green">
+                    <i class="fa-regular fa-folder"></i>
+                </div>
+
+                <div>
+                    <span>Folders</span>
+                    <strong id="totalFolders">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        ↑ 8.3% vs last month
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon purple">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+
+                <div>
+                    <span>Recently Added</span>
+                    <strong id="recentlyAdded">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        ↑ 15.4% vs last month
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon orange">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+
+                <div>
+                    <span>Pending Approvals</span>
+                    <strong id="pendingApprovals">
+                        0
+                    </strong>
+
+                    <small class="negative">
+                        ↓ 4.2% vs last month
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon teal">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+
+                <div>
+                    <span>Expiring Soon</span>
+                    <strong id="expiringSoon">
+                        0
+                    </strong>
+
+                    <small class="negative">
+                        ↓ 6.7% vs last month
+                    </small>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             MAIN GRID
+        ================================================== -->
+
+        <section class="dashboard-grid">
+
+
+            <!-- =================================================
+                 DOCUMENT LIBRARY
+            ================================================== -->
+
+            <div class="panel library-panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>
+                            Documents Library
+                        </h3>
+                    </div>
+
+                    <div class="library-tools">
+
+                        <div class="search-box">
+
+                            <input
+                                id="documentSearch"
+                                type="text"
+                                placeholder="Search documents..."
+                            >
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                        </div>
+
+                        <select id="categoryFilter">
+                            <option value="All">
+                                All Categories
+                            </option>
+                        </select>
+
+                        <select id="statusFilter">
+
+                            <option value="All">
+                                All Status
+                            </option>
+
+                            <option value="Approved">
+                                Approved
+                            </option>
+
+                            <option value="Pending Review">
+                                Pending Review
+                            </option>
+
+                            <option value="Expired">
+                                Expired
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Document Name
+                                </th>
+
+                                <th>
+                                    Category
+                                </th>
+
+                                <th>
+                                    Related To
+                                </th>
+
+                                <th>
+                                    Uploaded By
+                                </th>
+
+                                <th>
+                                    Uploaded On
+                                </th>
+
+                                <th>
+                                    Size
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="documentsTable">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div class="view-all">
+
+                    <button
+                        onclick="showAllDocuments()"
+                    >
+                        View All Documents
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 RIGHT COLUMN
+            ================================================== -->
+
+            <aside class="right-column">
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Document Categories
+                        </h3>
+
+                        <button>
+                            View All
+                        </button>
+
+                    </div>
+
+                    <div
+                        id="categoriesList"
+                        class="categories-list"
+                    >
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Expiring Documents
+                        </h3>
+
+                        <button>
+                            View All
+                        </button>
+
+                    </div>
+
+                    <div
+                        id="expiringList"
+                        class="expiring-list"
+                    >
+                    </div>
+
+                </div>
+
+
+                <div class="panel storage-panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Storage Overview
+                        </h3>
+
+                        <button>
+                            View Details
+                        </button>
+
+                    </div>
+
+
+                    <div class="storage-chart">
+
+                        <div
+                            class="storage-ring"
+                            id="storageRing"
+                        >
+
+                            <div>
+
+                                <strong
+                                    id="storageUsed"
+                                >
+                                    0 GB
+                                </strong>
+
+                                <span>
+                                    of 10 GB Used
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="storageLegend"
+                        class="storage-legend"
+                    >
+                    </div>
+
+
+                    <div class="available">
+
+                        Available:
+                        <strong id="storageAvailable">
+                            0 GB
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </section>
+
+
+        <!-- =================================================
+             BOTTOM
+        ================================================== -->
+
+        <section class="bottom-grid">
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Recent Activity
+                    </h3>
+
+                    <button>
+                        View All
+                    </button>
+
+                </div>
+
+                <div
+                    id="recentActivity"
+                    class="activity-list"
+                >
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        My Pending Approvals
+                    </h3>
+
+                    <button>
+                        View All
+                    </button>
+
+                </div>
+
+                <div
+                    id="pendingList"
+                    class="pending-list"
+                >
+                </div>
+
+            </div>
+
+        </section>
+
+    </section>
+
+</main>
+
+
+<!-- ======================================================
+     UPLOAD MODAL
+====================================================== -->
+
+<div
+    id="uploadModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h3>
+                Upload Document
+            </h3>
+
+            <button onclick="closeUploadModal()">
+                ×
+            </button>
+
+        </div>
+
+        <form id="uploadForm">
+
+            <label>
+                Document
+            </label>
+
+            <input
+                type="file"
+                id="uploadFile"
+                required
+            >
+
+
+            <label>
+                Category
+            </label>
+
+            <select
+                id="uploadCategory"
+                required
+            >
+
+                <option value="">
+                    Select category
+                </option>
+
+                <option>
+                    Orders & Shipments
+                </option>
+
+                <option>
+                    Inventory
+                </option>
+
+                <option>
+                    Suppliers
+                </option>
+
+                <option>
+                    Transportation
+                </option>
+
+                <option>
+                    Warehouses
+                </option>
+
+                <option>
+                    Procurement
+                </option>
+
+                <option>
+                    Contracts
+                </option>
+
+                <option>
+                    Compliance
+                </option>
+
+                <option>
+                    Reports
+                </option>
+
+                <option>
+                    Other
+                </option>
+
+            </select>
+
+
+            <label>
+                Related ID
+            </label>
+
+            <input
+                type="text"
+                id="relatedId"
+                placeholder="PO-1255 / WH-001 / SUP-0098"
+            >
+
+
+            <label>
+                Expiry Date
+            </label>
+
+            <input
+                type="date"
+                id="expiryDate"
+            >
+
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Upload Document
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     FOLDER MODAL
+====================================================== -->
+
+<div
+    id="folderModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h3>
+                Create Folder
+            </h3>
+
+            <button onclick="closeFolderModal()">
+                ×
+            </button>
+
+        </div>
+
+        <form id="folderForm">
+
+            <label>
+                Folder Name
+            </label>
+
+            <input
+                type="text"
+                id="folderName"
+                required
+            >
+
+
+            <label>
+                Category
+            </label>
+
+            <input
+                type="text"
+                id="folderCategory"
+            >
+
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Create Folder
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script
+    src="/static/Documents.js"
+></script>
+
+</body>
+
+</html>

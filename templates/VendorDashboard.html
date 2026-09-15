@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>VendorIQ Dashboard</title>
+
+<!-- Vendor Dashboard CSS -->
+<link rel="stylesheet"
+      href="/static/vendor-dashboard.css">
+
+<!-- Google Font -->
+<link rel="preconnect"
+      href="https://fonts.googleapis.com">
+
+<link rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Font Awesome -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+</head>
+
+<body>
+
+<div class="app">
+
+
+<!-- =====================================================
+     SIDEBAR
+====================================================== -->
+
+<aside class="sidebar">
+
+    <!-- BRAND -->
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            <i class="fa-solid fa-cube"></i>
+        </div>
+
+        <div>
+
+            <h1>VendorIQ</h1>
+
+            <span>
+                Vendor Reliability Platform
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- MAIN MENU -->
+
+    <div class="menu-title">
+        MAIN MENU
+    </div>
+
+
+    <nav>
+
+        <a href="/VendorDashboard"
+           class="menu-item active">
+
+            <i class="fa-solid fa-house"></i>
+
+            <span>Dashboard</span>
+
+        </a>
+
+
+        <a href="/VendorProfile"
+           class="menu-item">
+
+            <i class="fa-solid fa-user"></i>
+
+            <span>Vendor Profile</span>
+
+        </a>
+
+
+        <a href="/PerformanceOverview"
+           class="menu-item">
+
+            <i class="fa-solid fa-chart-column"></i>
+
+            <span>Performance Overview</span>
+
+        </a>
+
+
+        <a href="/PurchaseOrders"
+           class="menu-item">
+
+            <i class="fa-solid fa-clipboard-list"></i>
+
+            <span>Purchase Orders</span>
+
+        </a>
+
+
+        <a href="/VendorContract"
+           class="menu-item">
+
+            <i class="fa-regular fa-file-lines"></i>
+
+            <span>Contracts & Compliance</span>
+
+        </a>
+
+
+        <a href="/VendorInvoices"
+           class="menu-item">
+
+            <i class="fa-regular fa-credit-card"></i>
+
+            <span>Invoices & Payments</span>
+
+        </a>
+ 
+
+        <a href="/VendorCommunication"
+           class="menu-item">
+
+            <i class="fa-regular fa-comment"></i>
+
+            <span>Communication</span>
+
+        </a>
+
+
+        <a href="/VendorDocument"
+           class="menu-item">
+
+            <i class="fa-regular fa-folder"></i>
+
+            <span>Documents</span>
+
+        </a>
+
+
+        <a href="/VendorNotifications"
+           class="menu-item">
+
+            <i class="fa-regular fa-bell"></i>
+
+            <span>Notifications</span>
+
+            <b class="notification-count"
+               id="notificationCount">
+                0
+            </b>
+
+        </a>
+
+    </nav>
+
+
+    <!-- REPORTS -->
+
+    <div class="menu-title report-title">
+        REPORTS
+    </div>
+
+
+    <nav>
+
+        <a href="/PerformanceReports"
+           class="menu-item">
+
+            <i class="fa-solid fa-chart-line"></i>
+
+            <span>Performance Reports</span>
+
+        </a>
+
+
+        <a href="/OrderReports"
+           class="menu-item">
+
+            <i class="fa-regular fa-file"></i>
+
+            <span>Order Reports</span>
+
+        </a>
+
+
+        <a href="/ComplianceReports"
+           class="menu-item">
+
+            <i class="fa-solid fa-shield"></i>
+
+            <span>
+                Compliance Reports
+            </span>
+
+        </a>
+
+
+        <a href="/ExportReports"
+           class="menu-item">
+
+            <i class="fa-solid fa-download"></i>
+
+            <span>
+                Export Reports
+            </span>
+
+        </a>
+
+    </nav>
+
+
+    <!-- ACCOUNT -->
+
+    <div class="menu-title account-title">
+        ACCOUNT
+    </div>
+
+
+    <nav>
+
+        <a href="/VendorSettings"
+           class="menu-item">
+
+            <i class="fa-solid fa-gear"></i>
+
+            <span>
+                Settings
+            </span>
+
+        </a>
+
+
+        <a href="/VendorHelpSupport"
+           class="menu-item">
+
+            <i class="fa-regular fa-circle-question"></i>
+
+            <span>
+                Help & Support
+            </span>
+
+        </a>
+
+
+        <a href="/login"
+           class="menu-item">
+
+            <i class="fa-solid fa-right-from-bracket"></i>
+
+            <span>
+                Logout
+            </span>
+
+        </a>
+
+    </nav>
+
+
+    <!-- VENDOR CARD -->
+
+    <div class="vendor-card">
+
+        <div class="vendor-avatar">
+
+            <i class="fa-solid fa-user"></i>
+
+        </div>
+
+
+        <div>
+
+            <strong id="sidebarCompany">
+                Loading...
+            </strong>
+
+            <small>
+
+                Vendor ID:
+
+                <span id="sidebarVendorId">
+                    Loading...
+                </span>
+
+            </small>
+
+
+            <small class="verified"
+                   id="sidebarStatus">
+
+                <i class="fa-solid fa-circle"></i>
+
+                Online
+
+            </small>
+
+        </div>
+
+    </div>
+
+</aside>
+
+
+<!-- =====================================================
+     MAIN CONTENT
+====================================================== -->
+
+<main class="main">
+
+    <!-- HEADER -->
+
+    <div class="top-bar">
+
+        <!-- LEFT -->
+        <div class="top-left">
+            <h1>Vendor Dashboard</h1>
+
+            <div class="breadcrumb">
+                <span>Home</span>
+                <span>/</span>
+                <span>Vendor Dashboard</span>
+            </div>
+        </div>
+
+
+        <!-- CENTER -->
+        <div class="top-search">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input
+                    type="text"
+                    placeholder="Search anything..."
+                >
+            </div>
+        </div>
+
+
+        <!-- RIGHT -->
+        <div class="top-right">
+
+            <button class="top-icon">
+                <i class="fa-regular fa-bell"></i>
+                <span class="notification-count">0</span>
+            </button>
+
+            <button class="top-icon">
+                <i class="fa-regular fa-envelope"></i>
+                <span class="notification-count">0</span>
+            </button>
+
+            <div class="profile-menu">
+
+                <div class="profile-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div class="profile-info">
+                    <strong id="headerCompany">-</strong>
+                    <span>Vendor</span>
+                </div>
+
+                <i class="fa-solid fa-chevron-down"></i>
+                
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         KPI STAT CARDS
+    ====================================================== -->
+
+    <section class="stats-grid"
+             id="dashboard">
+
+
+        <!-- RELIABILITY -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon green">
+
+                <i class="fa-solid fa-shield"></i>
+
+            </div>
+
+
+            <div class="stat-content">
+
+                <label>
+                    Reliability Score
+                </label>
+
+
+                <div class="stat-number">
+
+                    <strong id="reliability">
+                        0
+                    </strong>
+
+                    <span>
+                        /100
+                    </span>
+
+                </div>
+
+
+                <small
+                    id="reliabilityLabel"
+                    class="green-text">
+
+                    Loading...
+
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- PURCHASE ORDERS -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon blue">
+
+                <i class="fa-solid fa-file-lines"></i>
+
+            </div>
+
+
+            <div class="stat-content">
+
+                <label>
+                    Total Purchase Orders
+                </label>
+
+
+                <div class="stat-number">
+
+                    <strong id="totalOrders">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <small id="ordersPeriod">
+                    This Year
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- DELIVERY -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon green">
+
+                <i class="fa-solid fa-truck"></i>
+
+            </div>
+
+
+            <div class="stat-content">
+
+                <label>
+                    On-Time Delivery
+                </label>
+
+
+                <div class="stat-number">
+
+                    <strong id="deliveryRate">
+                        0%
+                    </strong>
+
+                </div>
+
+
+                <small>
+
+                    vs last 90 days
+
+                    <span
+                        id="deliveryTrend"
+                        class="up">
+                        -
+                    </span>
+
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- QUALITY -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon purple">
+
+                <i class="fa-regular fa-star"></i>
+
+            </div>
+
+
+            <div class="stat-content">
+
+                <label>
+                    Quality Rating
+                </label>
+
+
+                <div class="stat-number">
+
+                    <strong id="qualityRating">
+                        0
+                    </strong>
+
+                    <span>
+                        /5
+                    </span>
+
+                </div>
+
+
+                <small>
+
+                    vs last 90 days
+
+                    <span
+                        id="qualityTrend"
+                        class="up">
+                        -
+                    </span>
+
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- INVOICED -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon orange">
+
+                <i class="fa-regular fa-file-invoice"></i>
+
+            </div>
+
+
+            <div class="stat-content">
+
+                <label>
+                    Total Invoiced
+                </label>
+
+
+                <div class="stat-number">
+
+                    <strong id="totalInvoiced">
+                        $0
+                    </strong>
+
+                </div>
+
+
+                <small>
+                    This Year
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- PENDING PAYMENTS -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon red">
+
+                <i class="fa-regular fa-file-invoice"></i>
+
+            </div>
+
+
+            <div class="stat-content">
+
+                <label>
+                    Pending Payments
+                </label>
+
+
+                <div class="stat-number">
+
+                    <strong id="pendingPayments">
+                        $0
+                    </strong>
+
+                </div>
+
+
+                <small id="pendingInvoiceCount">
+                    0 Invoices
+                </small>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MIDDLE SECTION
+    ====================================================== -->
+
+    <section class="dashboard-grid">
+
+
+        <!-- RELIABILITY -->
+
+        <div class="panel reliability-panel">
+
+            <div class="panel-title">
+
+                <h3>
+                    Overall Reliability Score
+                </h3>
+
+                <span>
+                    •
+                </span>
+
+            </div>
+
+
+            <div class="reliability-gauge">
+
+                <svg
+                    viewBox="0 0 300 180"
+                    class="gauge-svg">
+
+
+                    <!-- RED -->
+
+                    <path
+                        class="gauge-red"
+                        d="M 35 145 A 115 115 0 0 1 150 30">
+                    </path>
+
+
+                    <!-- YELLOW -->
+
+                    <path
+                        class="gauge-yellow"
+                        d="M 150 30 A 115 115 0 0 1 247 83">
+                    </path>
+
+
+                    <!-- GREEN -->
+
+                    <path
+                        class="gauge-green"
+                        d="M 247 83 A 115 115 0 0 1 265 145">
+                    </path>
+
+
+                    <!-- NEEDLE -->
+
+                    <line
+                        id="gaugeNeedle"
+                        x1="150"
+                        y1="145"
+                        x2="150"
+                        y2="55"
+                        class="gauge-needle">
+                    </line>
+
+
+                    <!-- CENTER -->
+
+                    <circle
+                        cx="150"
+                        cy="145"
+                        r="7"
+                        class="gauge-center">
+                    </circle>
+
+                </svg>
+
+
+                <div class="gauge-value">
+
+                    <div>
+
+                        <strong id="gaugeScore">
+                            0
+                        </strong>
+
+                        <span>
+                            /100
+                        </span>
+
+                    </div>
+
+
+                    <b id="gaugeLabel">
+                        Loading...
+                    </b>
+
+                </div>
+
+            </div>
+
+
+            <p class="reliability-description">
+
+                Your reliability score is based on
+                delivery performance, quality,
+                communication, compliance and service.
+
+            </p>
+
+        </div>
+
+
+        <!-- PERFORMANCE -->
+
+        <div
+            class="panel performance-panel"
+            id="performance">
+
+            <div class="panel-title">
+
+                <h3>
+
+                    Performance Summary
+
+                    <span class="muted">
+                        (Last 90 Days)
+                    </span>
+
+                </h3>
+
+                <i
+                    class="fa-regular fa-circle-question">
+                </i>
+
+            </div>
+
+
+            <!-- ON TIME -->
+
+            <div class="performance-row">
+
+                <div class="performance-name">
+
+                    <span class="mini-icon purple-bg">
+
+                        <i class="fa-solid fa-user-check"></i>
+
+                    </span>
+
+                    On-Time Deliveries
+
+                </div>
+
+
+                <strong
+                    id="onTimeDeliveries"
+                    class="green-text">
+
+                    0
+
+                </strong>
+
+
+                <div class="bar">
+
+                    <div
+                        id="onTimeDeliveryBar"
+                        style="width:0%">
+                    </div>
+
+                </div>
+
+
+                <span id="onTimeDeliveryRate">
+                    0%
+                </span>
+
+            </div>
+
+
+            <!-- DELAYED -->
+
+            <div class="performance-row">
+
+                <div class="performance-name">
+
+                    <span class="mini-icon red-bg">
+
+                        <i class="fa-regular fa-clock"></i>
+
+                    </span>
+
+                    Delayed Deliveries
+
+                </div>
+
+
+                <strong
+                    id="delayedDeliveries"
+                    class="red-text">
+
+                    0
+
+                </strong>
+
+
+                <div class="bar orange-bar">
+
+                    <div
+                        id="delayedDeliveryBar"
+                        style="width:0%">
+                    </div>
+
+                </div>
+
+
+                <span id="delayedDeliveryRate">
+                    0%
+                </span>
+
+            </div>
+
+
+            <!-- QUALITY -->
+
+            <div class="performance-row">
+
+                <div class="performance-name">
+
+                    <span class="mini-icon purple-bg">
+
+                        <i class="fa-regular fa-star"></i>
+
+                    </span>
+
+                    Quality Score
+
+                </div>
+
+
+                <strong
+                    id="qualityPerformance"
+                    class="green-text">
+
+                    0 / 5
+
+                </strong>
+
+
+                <div class="bar">
+
+                    <div
+                        id="qualityPerformanceBar"
+                        style="width:0%">
+                    </div>
+
+                </div>
+
+
+                <span id="qualityPerformanceRate">
+                    0%
+                </span>
+
+            </div>
+
+
+            <!-- RESPONSE TIME -->
+
+            <div class="performance-row">
+
+                <div class="performance-name">
+
+                    <span class="mini-icon blue-bg">
+
+                        <i class="fa-regular fa-clock"></i>
+
+                    </span>
+
+                    Response Time (Avg.)
+
+                </div>
+
+
+                <strong
+                    id="responseTime"
+                    class="green-text">
+
+                    0 hrs
+
+                </strong>
+
+
+                <div class="bar blue-bar">
+
+                    <div
+                        id="responseTimeBar"
+                        style="width:0%">
+                    </div>
+
+                </div>
+
+
+                <span id="responseTimeRate">
+                    0%
+                </span>
+
+            </div>
+
+
+            <!-- ISSUE RESOLUTION -->
+
+            <div class="performance-row">
+
+                <div class="performance-name">
+
+                    <span class="mini-icon cyan-bg">
+
+                        <i class="fa-solid fa-stopwatch"></i>
+
+                    </span>
+
+                    Issue Resolution Time (Avg.)
+
+                </div>
+
+
+                <strong
+                    id="issueResolutionTime"
+                    class="green-text">
+
+                    0 days
+
+                </strong>
+
+
+                <div class="bar cyan-bar">
+
+                    <div
+                        id="issueResolutionBar"
+                        style="width:0%">
+                    </div>
+
+                </div>
+
+
+                <span id="issueResolutionRate">
+                    0%
+                </span>
+
+            </div>
+
+
+            <!-- ORDER COMPLETION -->
+
+            <div class="performance-row">
+
+                <div class="performance-name">
+
+                    <span class="mini-icon green-bg">
+
+                        <i class="fa-regular fa-circle-check"></i>
+
+                    </span>
+
+                    Order Completion Rate
+
+                </div>
+
+
+                <strong
+                    id="orderCompletionRate"
+                    class="green-text">
+
+                    0%
+
+                </strong>
+
+
+                <div class="bar">
+
+                    <div
+                        id="orderCompletionBar"
+                        style="width:0%">
+                    </div>
+
+                </div>
+
+
+                <span></span>
+
+            </div>
+
+        </div>
+
+
+        <!-- PURCHASE ORDERS -->
+
+        <div
+            class="panel orders-panel"
+            id="purchase-orders">
+
+            <div class="panel-title">
+
+                <h3>
+                    Recent Purchase Orders
+                </h3>
+
+                <a href="#">
+                    View All
+                </a>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>
+                            PO Number
+                        </th>
+
+                        <th>
+                            Item/Service
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Order Date
+                        </th>
+
+                        <th>
+                            Delivery Date
+                        </th>
+
+                    </tr>
+
+                    </thead>
+
+
+                    <tbody id="ordersTable">
+
+                        <tr>
+
+                            <td colspan="5"
+                                style="text-align:center">
+
+                                Loading purchase orders...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         LOWER CARDS
+    ====================================================== -->
+
+    <section class="lower-grid">
+
+
+        <!-- CONTRACT ALERTS -->
+
+        <div
+            class="panel"
+            id="contracts">
+
+            <div class="panel-title">
+
+                <h3>
+                    Contract Alerts
+                </h3>
+
+                <a href="#" class="view-all">
+
+                    View All Alerts →
+
+                </a>
+
+            </div>
+
+
+            <div id="alertsContainer">
+
+                <div class="empty-state" style="font-size:12px;">
+
+                    Loading alerts...
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- NOTIFICATIONS -->
+
+        <div
+            class="panel"
+            id="notifications">
+
+            <div class="panel-title">
+
+                <h3>
+                    Notifications
+                </h3>
+
+                <a href="#">
+                    View All
+                </a>
+
+            </div>
+
+
+            <div id="notificationsContainer">
+
+                <div class="empty-state" style="font-size:12px;">
+
+                    Loading notifications...
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACCOUNT SUMMARY -->
+
+        <div
+            class="panel"
+            id="profile">
+
+            <div class="panel-title">
+
+                <h3>
+                    Account Summary
+                </h3>
+
+            </div>
+
+
+            <!-- VENDOR ID -->
+
+            <div class="account-row">
+
+                <span>
+
+                    <i class="fa-regular fa-id-card"></i>
+
+                    Vendor ID
+
+                </span>
+
+
+                <strong id="vendorId">
+                    Loading...
+                </strong>
+
+            </div>
+
+
+            <!-- CONTACT -->
+
+            <div class="account-row">
+
+                <span>
+
+                    <i class="fa-regular fa-user"></i>
+
+                    Primary Contact
+
+                </span>
+
+
+                <strong id="primaryContact">
+                    —
+                </strong>
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="account-row">
+
+                <span>
+
+                    <i class="fa-regular fa-envelope"></i>
+
+                    Contact Email
+
+                </span>
+
+
+                <strong id="contactEmail">
+                    —
+                </strong>
+
+            </div>
+
+
+            <!-- PHONE -->
+
+            <div class="account-row">
+
+                <span>
+
+                    <i class="fa-solid fa-phone"></i>
+
+                    Contact Phone
+
+                </span>
+
+
+                <strong id="contactPhone">
+                    —
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         BOTTOM SECTION
+    ====================================================== -->
+
+    <section class="bottom-grid">
+
+
+        <!-- PERFORMANCE TREND -->
+
+        <div
+            class="panel chart-panel"
+            id="performance-reports">
+
+            <div class="panel-title">
+
+                <h3>
+                    Performance Trend
+                </h3>
+
+
+                <select id="performancePeriod">
+
+                    <option value="6">
+                        Last 6 Months
+                    </option>
+
+                    <option value="12">
+                        Last 12 Months
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="chart-container">
+
+                <canvas
+                    id="performanceChart">
+                </canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- CONTRACT STATUS -->
+
+        <div
+            class="panel contract-panel"
+            id="contracts-status">
+
+            <div class="panel-title">
+
+                <h3>
+                    Contract Status
+                </h3>
+
+            </div>
+
+
+            <div class="contract-content">
+
+
+                <div class="donut-container">
+
+                    <canvas
+                        id="contractChart">
+                    </canvas>
+
+
+                    <div class="donut-center">
+
+                        <strong id="totalContracts">
+                            0
+                        </strong>
+
+                        <span>
+                            Total Contracts
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="contract-legend">
+
+
+                    <!-- ACTIVE -->
+
+                    <div>
+
+                        <span
+                            class="dot green-dot">
+                        </span>
+
+                        Active
+
+                        <strong id="activeContracts">
+                            0
+                        </strong>
+
+                        <small id="activeContractPercent">
+                            (0%)
+                        </small>
+
+                    </div>
+
+
+                    <!-- EXPIRING -->
+
+                    <div>
+
+                        <span
+                            class="dot yellow-dot">
+                        </span>
+
+                        Expiring Soon
+
+                        <strong id="expiringContracts">
+                            0
+                        </strong>
+
+                        <small id="expiringContractPercent">
+                            (0%)
+                        </small>
+
+                    </div>
+
+
+                    <!-- EXPIRED -->
+
+                    <div>
+
+                        <span
+                            class="dot red-dot">
+                        </span>
+
+                        Expired
+
+                        <strong id="expiredContracts">
+                            0
+                        </strong>
+
+                        <small id="expiredContractPercent">
+                            (0%)
+                        </small>
+
+                    </div>
+
+
+                    <!-- DRAFT -->
+
+                    <div>
+
+                        <span
+                            class="dot gray-dot">
+                        </span>
+
+                        Draft
+
+                        <strong id="draftContracts">
+                            0
+                        </strong>
+
+                        <small id="draftContractPercent">
+                            (0%)
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <a
+                href="#"
+                class="view-all">
+
+                View All Contracts →
+
+            </a>
+
+        </div>
+
+
+        <!-- DOCUMENTS -->
+
+        <div
+            class="panel"
+            id="documents">
+
+            <div class="panel-title">
+
+                <h3>
+                    Important Documents
+                </h3>
+
+                <a href="#">
+                    View All
+                </a>
+
+            </div>
+
+
+            <div id="documentsContainer">
+
+                <div class="empty-state" style="font-size:12px;">
+
+                    Loading documents...
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+</div>
+
+<!-- =========================================================
+     VENDOR DASHBOARD JAVASCRIPT
+========================================================= -->
+
+<script src="/static/vendor-dashboard.js"></script>
+
+</body>
+
+</html>

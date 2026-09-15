@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Procurement Requests | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/ProcurementRequests.css"
+    >
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-industry"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+        <nav>
+
+            <a href="/ManagerDashboard">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a
+                class="active"
+                href="/ProcurementRequests"
+            >
+                <i class="fa-regular fa-clipboard"></i>
+                <span>Procurement Requests</span>
+            </a>
+
+            <a href="/ProcurementPurchaseOrder">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Purchase Orders</span>
+            </a>
+
+            <a href="/ProcurementApprovals">
+                <i class="fa-regular fa-square-check"></i>
+                <span>Approvals</span>
+            </a>
+
+            <a href="/ProcurementVendors">
+                <i class="fa-solid fa-user-group"></i>
+                <span>Vendors</span>
+            </a>
+
+            <a href="/OrderTracking">
+                <i class="fa-solid fa-box"></i>
+                <span>Order Tracking</span>
+            </a>
+
+            <a href="/ProcurementInvoices">
+                <i class="fa-regular fa-file-lines"></i>
+                <span>Invoices</span>
+            </a>
+
+            <a href="/ProcurementReports">
+                <i class="fa-regular fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+
+            <a href="/ProcurementAnalytics">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Analytics</span>
+            </a>
+
+        </nav>
+
+        <div class="menu-title communication-title">
+            COMMUNICATION
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementNotifications">
+                <i class="fa-regular fa-bell"></i>
+                <span>Notifications</span>
+                <b class="notification-count">6</b>
+            </a>
+
+            <a href="/Messages">
+                <i class="fa-regular fa-envelope"></i>
+                <span>Messages</span>
+                <b class="notification-count">3</b>
+            </a>
+
+        </nav>
+
+        <div class="menu-title support-title">
+            SUPPORT
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementHelpSupport">
+                <i class="fa-regular fa-circle-question"></i>
+                <span>Help & Support</span>
+            </a>
+
+            <a href="/ProcurementSettings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-profile">
+
+            <div
+                class="profile-avatar"
+                id="sidebarAvatar"
+            >
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div class="profile-info">
+
+                <strong id="sidebarName">
+                    -
+                </strong>
+
+                <span id="sidebarRole">
+                    Procurement Manager
+                </span>
+
+                <small>
+                    <i></i>
+                    Online
+                </small>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>
+                    Procurement Requests
+                </h1>
+
+                <div class="breadcrumb">
+                    <span>Dashboard</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <strong>Procurement Requests</strong>
+                </div>
+
+            </div>
+
+            <div class="header-actions">
+
+                <div class="global-search">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        placeholder="Search anything..."
+                    >
+
+                </div>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>6</span>
+                </button>
+
+                <button class="icon-button">
+                    <i class="fa-regular fa-envelope"></i>
+                    <span>3</span>
+                </button>
+
+                <div class="header-user" onclick="openProfile()">
+
+                    <div
+                        class="header-avatar"
+                        id="headerAvatar"
+                    >
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+                        <strong id="headerName">
+                            -
+                        </strong>
+
+                        <small id="headerRole">
+                            Procurement Manager
+                        </small>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down"></i>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ACTIONS -->
+
+        <section class="page-actions">
+
+            <div></div>
+
+            <div>
+
+                <button
+                    class="btn export-btn"
+                    id="exportBtn"
+                >
+                    <i class="fa-solid fa-download"></i>
+                    Export
+                </button>
+
+                <button
+                    class="btn primary-btn"
+                    id="newRequestBtn"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    New Request
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             KPI CARDS
+        ================================================== -->
+
+        <section class="kpi-grid">
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon purple">
+                    <i class="fa-regular fa-file-lines"></i>
+                </div>
+
+                <div>
+                    <span>Total Requests</span>
+                    <strong id="totalRequests">
+                        0
+                    </strong>
+
+                    <small class="positive">
+                        Current requests
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon blue">
+                    <i class="fa-regular fa-file"></i>
+                </div>
+
+                <div>
+                    <span>Draft</span>
+                    <strong id="draftRequests">
+                        0
+                    </strong>
+
+                    <small>
+                        Not submitted
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon orange">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+
+                <div>
+                    <span>Pending Approval</span>
+                    <strong id="pendingRequests">
+                        0
+                    </strong>
+
+                    <small>
+                        Awaiting approval
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-box"></i>
+                </div>
+
+                <div>
+                    <span>Approved</span>
+                    <strong id="approvedRequests">
+                        0
+                    </strong>
+
+                    <small>
+                        Approved requests
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon red">
+                    <i class="fa-regular fa-circle-xmark"></i>
+                </div>
+
+                <div>
+                    <span>Rejected</span>
+                    <strong id="rejectedRequests">
+                        0
+                    </strong>
+
+                    <small>
+                        Rejected requests
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="kpi-card">
+
+                <div class="kpi-icon cyan">
+                    <i class="fa-regular fa-folder-open"></i>
+                </div>
+
+                <div>
+                    <span>Completed</span>
+                    <strong id="completedRequests">
+                        0
+                    </strong>
+
+                    <small>
+                        Completed requests
+                    </small>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FILTER BAR
+        ================================================== -->
+
+        <section class="filter-panel">
+
+            <div class="search-box">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    id="requestSearch"
+                    placeholder="Search requests..."
+                >
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label>Status</label>
+
+                <select id="statusFilter">
+
+                    <option value="All">
+                        All
+                    </option>
+
+                    <option value="Draft">
+                        Draft
+                    </option>
+
+                    <option value="Pending Approval">
+                        Pending Approval
+                    </option>
+
+                    <option value="Approved">
+                        Approved
+                    </option>
+
+                    <option value="Rejected">
+                        Rejected
+                    </option>
+
+                    <option value="Completed">
+                        Completed
+                    </option>
+
+                    <option value="Cancelled">
+                        Cancelled
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label>Department</label>
+
+                <select id="departmentFilter">
+
+                    <option value="All">
+                        All
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label>Priority</label>
+
+                <select id="priorityFilter">
+
+                    <option value="All">
+                        All
+                    </option>
+
+                    <option value="High">
+                        High
+                    </option>
+
+                    <option value="Medium">
+                        Medium
+                    </option>
+
+                    <option value="Low">
+                        Low
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group date-filter">
+
+                <label>Request Date</label>
+
+                <div class="date-range">
+
+                    <input
+                        type="date"
+                        id="startDate"
+                    >
+
+                    <span>to</span>
+
+                    <input
+                        type="date"
+                        id="endDate"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="reset-button"
+                id="resetBtn"
+            >
+                <i class="fa-solid fa-rotate-right"></i>
+                Reset
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             TABS
+        ================================================== -->
+
+        <section class="requests-panel">
+
+            <div class="tabs">
+
+                <button
+                    class="tab active"
+                    data-tab="all"
+                >
+                    All Requests
+                </button>
+
+                <button
+                    class="tab"
+                    data-tab="mine"
+                >
+                    My Requests
+                </button>
+
+                <button
+                    class="tab"
+                    data-tab="pending"
+                >
+                    Pending My Approval
+                </button>
+
+            </div>
+
+
+            <!-- TABLE -->
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                    <tr>
+
+                        <th>Request ID</th>
+
+                        <th>Request Title</th>
+
+                        <th>Department</th>
+
+                        <th>Requested By</th>
+
+                        <th>Priority</th>
+
+                        <th>Status</th>
+
+                        <th>Request Date</th>
+
+                        <th>Required By</th>
+
+                        <th>Estimated Cost</th>
+
+                        <th>Actions</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody id="requestsBody">
+
+                    <tr>
+
+                        <td
+                            colspan="10"
+                            class="loading"
+                        >
+                            Loading requests...
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="table-footer">
+
+                <div id="resultCount">
+                    Showing 0 requests
+                </div>
+
+                <div class="pagination">
+
+                    <button
+                        id="previousPage"
+                        class="page-arrow"
+                    >
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+
+                    <div id="pageNumbers"></div>
+
+                    <button
+                        id="nextPage"
+                        class="page-arrow"
+                    >
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                    <select id="pageSize">
+
+                        <option value="10">
+                            10 / page
+                        </option>
+
+                        <option value="20">
+                            20 / page
+                        </option>
+
+                        <option value="50">
+                            50 / page
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ========================================================
+     NEW REQUEST MODAL
+========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="requestModal"
+>
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <h2>
+                New Procurement Request
+            </h2>
+
+            <button
+                class="modal-close"
+                id="closeModal"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <form id="requestForm">
+
+            <div class="form-grid">
+
+                <div class="form-field full">
+
+                    <label>
+                        Request Title *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="requestTitle"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label>
+                        Department
+                    </label>
+
+                    <input
+                        type="text"
+                        id="requestDepartment"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label>
+                        Category
+                    </label>
+
+                    <input
+                        type="text"
+                        id="requestCategory"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label>
+                        Priority
+                    </label>
+
+                    <select id="requestPriority">
+
+                        <option>
+                            Low
+                        </option>
+
+                        <option selected>
+                            Medium
+                        </option>
+
+                        <option>
+                            High
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label>
+                        Estimated Cost
+                    </label>
+
+                    <input
+                        type="number"
+                        id="requestAmount"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                    >
+
+                </div>
+
+
+                <div class="form-field">
+
+                    <label>
+                        Required By
+                    </label>
+
+                    <input
+                        type="date"
+                        id="requestRequiredDate"
+                    >
+
+                </div>
+
+
+                <div class="form-field full">
+
+                    <label>
+                        Description
+                    </label>
+
+                    <textarea
+                        id="requestDescription"
+                        rows="4"
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn cancel-btn"
+                    id="cancelModal"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn primary-btn"
+                >
+                    Create Request
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="/static/ProcurementRequests.js"></script>
+
+</body>
+
+</html>

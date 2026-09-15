@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Approvals | VendorIQ</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/Approvals.css"
+    >
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon"><i class="fa-solid fa-industry"></i></div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+        </div>
+
+        <div class="menu-title">
+            MAIN MENU
+        </div>
+
+        <nav>
+
+            <a href="/ManagerDashboard">
+                <span><i class="fa-solid fa-house"></i></span>
+                Dashboard
+            </a>
+
+            <a href="/ProcurementRequests">
+                <span><i class="fa-regular fa-clipboard"></i></span>
+                Procurement Requests
+            </a>
+
+            <a href="/ProcurementPurchaseOrder">
+                <span><i class="fa-regular fa-calendar"></i></span>
+                Purchase Orders
+            </a>
+
+            <a
+                href="/ProcurementApprovals"
+                class="active"
+            >
+                <span><i class="fa-regular fa-square-check"></i></span>
+                Approvals
+            </a>
+
+            <a href="/ProcurementVendors">
+                <span><i class="fa-solid fa-users"></i></span>
+                Vendors
+            </a>
+
+            <a href="/OrderTracking">
+                <span><i class="fa-solid fa-layer-group"></i></span>
+                Order Tracking
+            </a>
+
+            <a href="/ProcurementInvoices">
+                <span><i class="fa-regular fa-file-lines"></i></span>
+                Invoices
+            </a>
+
+            <a href="/ProcurementReports">
+                <span><i class="fa-regular fa-file"></i></span>
+                Reports
+            </a>
+
+            <a href="/ProcurementAnalytics">
+                <span><i class="fa-solid fa-chart-line"></i></span>
+                Analytics
+            </a>
+
+        </nav>
+
+        <div class="menu-title">
+            COMMUNICATION
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementNotifications">
+                <span><i class="fa-regular fa-bell"></i></span>
+                Notifications
+
+                <b class="notification">
+                    6
+                </b>
+            </a>
+
+            <a href="/Messages">
+                <span><i class="fa-regular fa-envelope"></i></span>
+                Messages
+
+                <b class="notification">
+                    3
+                </b>
+            </a>
+
+        </nav>
+
+        <div class="menu-title">
+            SUPPORT
+        </div>
+
+        <nav>
+
+            <a href="/ProcurementHelpSupport">
+                <span><i class="fa-regular fa-circle-question"></i></span>
+                Help & Support
+            </a>
+
+            <a href="/ProcurementSettings">
+                <span><i class="fa-solid fa-gear"></i></span>
+                Settings
+            </a>
+
+            <a href="/login">
+                <span> <i class="fa-solid fa-right-from-bracket"></i> </span>
+                Logout
+            </a>
+
+        </nav>
+
+        <div class="profile">
+
+            <div class="avatar">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <strong id="sidebarUser">
+                    James Anderson
+                </strong>
+
+                <small>
+                    Procurement Manager
+                </small>
+
+                <small class="online">
+                    ● Online
+                </small>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+                <h1>Approvals</h1>
+
+                <div class="breadcrumb">
+                    Dashboard
+                    <span><i class="fa-solid fa-chevron-right"></i></span>
+                    Approvals
+                </div>
+            </div>
+
+            <div class="top-actions">
+
+                <div class="global-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input
+                        placeholder="Search anything..."
+                    >
+                </div>
+
+                <button class="top-icon">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>6</span>
+                </button>
+
+                <button class="top-icon">
+                    <i class="fa-regular fa-envelope"></i>
+                    <span>3</span>
+                </button>
+
+                <div class="user-menu" onclick="openProfile()">
+                    <div class="avatar"><i class="fa-solid fa-shield-halved"></i></div>
+
+                    <div>
+                        <strong id="topUser">
+                            James Anderson
+                        </strong>
+
+                        <small>
+                            Procurement Manager
+                        </small>
+                    </div>
+
+                    <span><i class="fa-solid fa-chevron-down"></i></span>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- KPI CARDS -->
+
+        <section class="kpis">
+
+            <div class="kpi">
+                <div class="kpi-icon orange">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                </div>
+
+                <div>
+                    <span>Pending My Approval</span>
+                    <strong id="pendingCount">0</strong>
+                    <small>Current approvals</small>
+                </div>
+            </div>
+
+            <div class="kpi">
+                <div class="kpi-icon blue">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+
+                <div>
+                    <span>Requested</span>
+                    <strong id="requestedCount">0</strong>
+                    <small>Total requests</small>
+                </div>
+            </div>
+
+            <div class="kpi">
+                <div class="kpi-icon green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div>
+                    <span>Approved</span>
+                    <strong id="approvedCount">0</strong>
+                    <small>Approved workflows</small>
+                </div>
+            </div>
+
+            <div class="kpi">
+                <div class="kpi-icon red">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+
+                <div>
+                    <span>Rejected</span>
+                    <strong id="rejectedCount">0</strong>
+                    <small>Rejected workflows</small>
+                </div>
+            </div>
+
+            <div class="kpi">
+                <div class="kpi-icon purple">
+                    <i class="fa-solid fa-arrow-up"></i>
+                </div>
+
+                <div>
+                    <span>Escalated</span>
+                    <strong id="escalatedCount">0</strong>
+                    <small>Escalated approvals</small>
+                </div>
+            </div>
+
+            <div class="kpi">
+                <div class="kpi-icon cyan">
+                    <i class="fa-solid fa-square-check"></i>
+                </div>
+
+                <div>
+                    <span>Completed</span>
+                    <strong id="completedCount">0</strong>
+                    <small>Completed workflows</small>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FILTERS
+        ================================================== -->
+
+        <section class="filters">
+
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input
+                    id="searchInput"
+                    placeholder="Search approvals..."
+                >
+            </div>
+
+            <label>
+                Type
+
+                <select id="typeFilter">
+                    <option value="All">All</option>
+                    <option value="PR">Procurement Request</option>
+                    <option value="PO">Purchase Order</option>
+                </select>
+            </label>
+
+            <label>
+                Department
+
+                <select id="departmentFilter">
+                    <option value="All">All</option>
+                </select>
+            </label>
+
+            <label>
+                Priority
+
+                <select id="priorityFilter">
+                    <option value="All">All</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+            </label>
+
+            <label>
+                Status
+
+                <select id="statusFilter">
+                    <option value="All">All</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="Escalated">Escalated</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </label>
+
+            <label class="date-label">
+                Date Range
+
+                <input
+                    id="startDate"
+                    type="date"
+                >
+            </label>
+
+            <label class="date-label">
+                &nbsp;
+
+                <input
+                    id="endDate"
+                    type="date"
+                >
+            </label>
+
+            <button
+                class="reset-btn"
+                id="resetBtn"
+            >
+                <i class="fa-solid fa-rotate-right"></i> Reset
+            </button>
+
+        </section>
+
+
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
+
+        <section class="content-grid">
+
+            <div class="approvals-panel">
+
+                <div class="tabs">
+
+                    <button
+                        class="tab active"
+                        data-tab="mine"
+                    >
+                        Pending My Approval
+                    </button>
+
+                    <button
+                        class="tab"
+                        data-tab="all"
+                    >
+                        All Approvals
+                    </button>
+
+                    <button
+                        class="tab"
+                        data-tab="history"
+                    >
+                        Approval History
+                    </button>
+
+                    <button
+                        class="workflow-btn"
+                        id="workflowBtn"
+                    >
+                        <i class="fa-solid fa-diagram-project"></i> Workflow View
+                    </button>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input
+                                        type="checkbox"
+                                        id="selectAll"
+                                    >
+                                </th>
+
+                                <th>Request / PO</th>
+                                <th>Type</th>
+                                <th>Title</th>
+                                <th>Requested By</th>
+                                <th>Amount</th>
+                                <th>Priority</th>
+                                <th>Requested On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="approvalTableBody">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="table-footer">
+
+                    <span id="resultInfo">
+                        Showing 0 approvals
+                    </span>
+
+                    <div class="pagination">
+
+                        <button id="prevPage">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+
+                        <button class="page active">
+                            1
+                        </button>
+
+                        <button id="nextPage">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+                    </div>
+
+                    <select id="pageSize">
+                        <option value="10">
+                            10 / page
+                        </option>
+
+                        <option value="20">
+                            20 / page
+                        </option>
+
+                        <option value="50">
+                            50 / page
+                        </option>
+                    </select>
+
+                </div>
+
+                <div class="bulk-actions">
+
+                    <button
+                        class="approve"
+                        id="bulkApprove"
+                    >
+                        <i class="fa-solid fa-check"></i> Approve
+                    </button>
+
+                    <button
+                        class="reject"
+                        id="bulkReject"
+                    >
+                        <i class="fa-solid fa-xmark"></i> Reject
+                    </button>
+
+                    <button>
+                        More Actions <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 WORKFLOW
+            ================================================== -->
+
+            <aside class="workflow-panel">
+
+                <div class="workflow-header">
+
+                    <h2>
+                        Approval Workflow
+                    </h2>
+
+                    <button id="detailsBtn">
+                        View Details <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </button>
+
+                </div>
+
+                <div id="workflowContent">
+
+                    <div class="empty-workflow">
+                        <div><i class="fa-solid fa-diagram-project"></i></div>
+
+                        <p style="font-size: 9px;">
+                            Select an approval to view
+                            its workflow.
+                        </p>
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="/static/Approvals.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Supply Chain Manager - Warehouses
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/Warehouses.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div>
+                <h2>VendorIQ</h2>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+
+        <nav class="navigation">
+
+            <a href="/supplychaindashboard">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="/demand-planning">
+                <i class="fa-solid fa-chart-line"></i>
+                Demand Planning
+            </a>
+
+            <a href="/supplychainprocurement">
+                <i class="fa-solid fa-cart-shopping"></i>
+                Procurement
+            </a>
+
+            <a href="/suppliers">
+                <i class="fa-solid fa-users"></i>
+                Suppliers
+            </a>
+
+            <a href="/inventory">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                Inventory
+            </a>
+
+            <a href="/ordersshipments">
+                <i class="fa-solid fa-truck"></i>
+                Orders & Shipments
+            </a>
+
+            <a
+                href="/warehouses"
+                class="active"
+            >
+                <i class="fa-solid fa-warehouse"></i>
+                Warehouses
+            </a>
+
+            <a href="/transportation">
+                <i class="fa-solid fa-truck-fast"></i>
+                Transportation
+            </a>
+
+            <a href="/analyticsreports">
+                <i class="fa-solid fa-chart-column"></i>
+                Analytics & Reports
+            </a>
+
+            <a href="/alertsnotifications">
+                <i class="fa-solid fa-bell"></i>
+                Alerts & Notifications
+            </a>
+
+            <a href="/documents">
+                <i class="fa-solid fa-file"></i>
+                Documents
+            </a>
+
+            <a href="/supplychainsettings">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <a href="/login">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+
+        </nav>
+
+
+        <div class="quick-actions">
+
+            <h4>Quick Actions</h4>
+
+            <button onclick="window.location.href='/CreatePurchaseOrder'">
+                <i class="fa-solid fa-cart-plus"></i>
+                Create Purchase Order
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/AddSupplier'">
+                <i class="fa-solid fa-user-plus"></i>
+                Add New Supplier
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/CreateShipment'">
+                <i class="fa-solid fa-ship"></i>
+                Create Shipment
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <button onclick="window.location.href='/UploadDocument'">
+                <i class="fa-solid fa-upload"></i>
+                Upload Document
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+        <div class="profile-card" onclick="openSupplyChainProfile()">
+
+            <div class="avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+
+            <strong>Arjun Kumar</strong>
+
+            <span>
+                Supply Chain Manager
+            </span>
+
+            <small>
+                <i class="fa-solid fa-circle"></i>
+                Online
+            </small>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="page-title">
+
+                <h1>
+                    Supply Chain Manager Dashboard
+                </h1>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <div class="search">
+
+                    <input
+                        id="searchInput"
+                        type="text"
+                        placeholder="Search..."
+                    >
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                </div>
+
+                <i class="fa-regular fa-bell notification-icon"></i>
+
+                <div class="date-box">
+                    <strong id="currentDate">
+                        -
+                    </strong>
+
+                    <span id="currentTime">
+                        -
+                    </span>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="content">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>
+                        Warehouses Overview
+                    </h2>
+
+                    <p>
+                        Monitor and manage all your warehouses and their performance.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 KPI CARDS
+            ================================================== -->
+
+            <div class="kpi-grid">
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon blue">
+                        <i class="fa-solid fa-warehouse"></i>
+                    </div>
+
+                    <div>
+                        <span>Total Warehouses</span>
+                        <strong id="totalWarehouses">
+                            0
+                        </strong>
+                        <small>
+                            Active warehouses
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon green">
+                        <i class="fa-solid fa-cubes"></i>
+                    </div>
+
+                    <div>
+                        <span>Total Capacity</span>
+                        <strong id="totalCapacity">
+                            0
+                        </strong>
+                        <small>
+                            Warehouse capacity
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon purple">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+
+                    <div>
+                        <span>Utilization Rate</span>
+                        <strong id="utilizationRate">
+                            0%
+                        </strong>
+                        <small>
+                            Current average
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon orange">
+                        <i class="fa-solid fa-box"></i>
+                    </div>
+
+                    <div>
+                        <span>Total Inventory Value</span>
+                        <strong id="inventoryValue">
+                            $0
+                        </strong>
+                        <small>
+                            Current value
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="kpi-card">
+
+                    <div class="kpi-icon red">
+                        <i class="fa-solid fa-gauge-high"></i>
+                    </div>
+
+                    <div>
+                        <span>Avg. Inventory Turnover</span>
+                        <strong id="turnoverRate">
+                            0x
+                        </strong>
+                        <small>
+                            Current average
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 FIRST ROW
+            ================================================== -->
+
+            <div class="dashboard-grid three">
+
+                <section class="card map-card">
+
+                    <div class="card-header">
+                        <h3>Warehouse Locations</h3>
+                    </div>
+
+                    <div
+                        id="warehouseMap"
+                        class="warehouse-map"
+                    >
+                    </div>
+
+                </section>
+
+
+                <section class="card">
+
+                    <div class="card-header">
+                        <h3>Warehouse Utilization</h3>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="utilizationChart"></canvas>
+                    </div>
+
+                </section>
+
+
+                <section class="card health-card">
+
+                    <div class="card-header">
+                        <h3>Warehouse Health</h3>
+                    </div>
+
+                    <div class="health-gauge">
+
+                        <div
+                            class="gauge"
+                            id="healthGauge"
+                        >
+                            <div class="gauge-center">
+                                <strong id="healthScore">
+                                    0%
+                                </strong>
+
+                                <span>
+                                    Healthy
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="health-list">
+
+                        <div>
+                            <span>
+                                <i class="dot green-dot"></i>
+                                Healthy
+                            </span>
+
+                            <strong id="healthyCount">
+                                0
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>
+                                <i class="dot orange-dot"></i>
+                                At Risk
+                            </span>
+
+                            <strong id="riskCount">
+                                0
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>
+                                <i class="dot red-dot"></i>
+                                Critical
+                            </span>
+
+                            <strong id="criticalCount">
+                                0
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- =================================================
+                 SECOND ROW
+            ================================================== -->
+
+            <div class="dashboard-grid two">
+
+                <section class="card performance-card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Warehouse Performance
+                        </h3>
+
+                        <select id="periodSelect">
+                            <option>This Month</option>
+                            <option>Last Month</option>
+                        </select>
+
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Warehouse</th>
+                                    <th>Location</th>
+                                    <th>Capacity</th>
+                                    <th>Utilization</th>
+                                    <th>Inventory Value</th>
+                                    <th>Turnover</th>
+                                    <th>Health</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="warehouseTableBody">
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <button
+                        class="view-link"
+                        onclick="viewAllWarehouses()"
+                    >
+                        View All Warehouses
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                </section>
+
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Warehouse Alerts
+                        </h3>
+
+                        <button
+                            class="text-button"
+                            onclick="viewAllAlerts()"
+                        >
+                            View All
+                        </button>
+
+                    </div>
+
+                    <div
+                        id="alertsList"
+                        class="alerts-list"
+                    >
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- =================================================
+                 THIRD ROW
+            ================================================== -->
+
+            <div class="dashboard-grid two">
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Inventory Value by Warehouse
+                        </h3>
+
+                        <select>
+                            <option>This Month</option>
+                            <option>Last Month</option>
+                        </select>
+
+                    </div>
+
+                    <div class="chart-container bar-chart">
+                        <canvas id="inventoryChart"></canvas>
+                    </div>
+
+                </section>
+
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <h3>
+                            Recent Warehouse Activities
+                        </h3>
+
+                        <button
+                            class="text-button"
+                            onclick="viewAllActivities()"
+                        >
+                            View All
+                        </button>
+
+                    </div>
+
+                    <div
+                        id="activitiesList"
+                        class="activities-list"
+                    >
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<div
+    id="toast"
+    class="toast"
+>
+    Dashboard updated
+</div>
+
+
+<script src="/static/Warehouses.js"></script>
+
+</body>
+</html>

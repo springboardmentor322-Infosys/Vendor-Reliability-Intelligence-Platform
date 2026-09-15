@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Notification Logs | VendorIQ</title>
+
+    <link rel="stylesheet"
+          href="/static/NotificationLogs.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <h1>VendorIQ</h1>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+
+        <!-- =========================================================
+            NOTIFICATIONS MENU
+        ========================================================= -->
+
+        <div class="sidebar-menu-item notification-menu">
+
+            <!-- Notifications link -->
+            <div class="notification-main">
+
+                <a href="/Notifications" class="notification-link">
+
+                    <span class="menu-left">
+
+                        <i class="fa-solid fa-bell"></i>
+
+                        <span>Notifications</span>
+
+                    </span>
+
+                </a>
+
+
+                <!-- Dropdown arrow -->
+                <button
+                    type="button"
+                    class="notification-toggle"
+                    onclick="toggleNotificationMenu(event)"
+                >
+
+                    <i
+                        class="fa-solid fa-chevron-down notification-arrow"
+                    ></i>
+
+                </button>
+
+            </div>
+
+
+            <!-- Dropdown -->
+            <div
+                class="notification-submenu"
+                id="notificationSubmenu"
+            >
+
+                <a
+                    href="/NotificationSettings"
+                    class="notification-submenu-item"
+                >
+
+                    <i class="fa-solid fa-gear"></i>
+
+                    <span>
+                        Notification Settings
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/EmailTemplates"
+                    class="notification-submenu-item"
+                >
+
+                    <i class="fa-solid fa-envelope"></i>
+
+                    <span>
+                        Email Templates
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/SMSTemplates"
+                    class="notification-submenu-item"
+                >
+
+                    <i class="fa-solid fa-comment-sms"></i>
+
+                    <span>
+                        SMS Templates
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/NotificationLogs"
+                    class="notification-submenu-item"
+                >
+
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+
+                    <span>
+                        Notification Logs
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <main class="content">
+
+        <header>
+
+            <div>
+                <h1>Notification Logs</h1>
+                <p>View the history of all notification activity.</p>
+            </div>
+
+            <button class="refresh"
+                    onclick="loadLogs()">
+
+                <i class="fa-solid fa-rotate"></i>
+                Refresh
+
+            </button>
+
+        </header>
+
+
+        <!-- STATISTICS -->
+
+        <section class="stats">
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+
+                <div>
+                    <span>Total Sent</span>
+                    <strong id="totalSent">0</strong>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
+                <div>
+                    <span>Successful</span>
+                    <strong id="successful">0</strong>
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon red">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+
+                <div>
+                    <span>Failed</span>
+                    <strong id="failed">0</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- FILTER -->
+
+        <div class="filters">
+
+            <input type="text"
+                   id="searchInput"
+                   placeholder="Search notifications..."
+                   oninput="filterLogs()">
+
+
+            <select
+                id="typeFilter"
+                onchange="filterLogs()"
+            >
+
+                <option value="All">
+                    All Types
+                </option>
+
+                <option value="email">
+                    Email
+                </option>
+
+                <option value="sms">
+                    SMS
+                </option>
+
+                <option value="System">
+                    System
+                </option>
+
+            </select>
+
+
+            <select
+                id="statusFilter"
+                onchange="filterLogs()"
+            >
+
+                <option value="All">
+                    All Status
+                </option>
+
+                <option value="Sent">
+                    Sent
+                </option>
+
+                <option value="Failed">
+                    Failed
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- TABLE -->
+
+        <div class="table-card">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Recipient</th>
+                        <th>Type</th>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="logsTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script src="/static/NotificationLogs.js"></script>
+
+</body>
+</html>

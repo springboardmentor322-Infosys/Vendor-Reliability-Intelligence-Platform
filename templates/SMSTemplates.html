@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SMS Templates | VendorIQ</title>
+
+    <link rel="stylesheet"
+          href="/static/SMSTemplates.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div>
+                <h1>VendorIQ</h1>
+                <span>Vendor Reliability Platform</span>
+            </div>
+
+        </div>
+
+
+        <!-- =========================================================
+            NOTIFICATIONS MENU
+        ========================================================= -->
+
+        <div class="sidebar-menu-item notification-menu">
+
+            <!-- Notifications link -->
+            <div class="notification-main">
+
+                <a href="/Notifications" class="notification-link">
+
+                    <span class="menu-left">
+
+                        <i class="fa-solid fa-bell"></i>
+
+                        <span>Notifications</span>
+
+                    </span>
+
+                </a>
+
+
+                <!-- Dropdown arrow -->
+                <button
+                    type="button"
+                    class="notification-toggle"
+                    onclick="toggleNotificationMenu(event)"
+                >
+
+                    <i
+                        class="fa-solid fa-chevron-down notification-arrow"
+                    ></i>
+
+                </button>
+
+            </div>
+
+
+            <!-- Dropdown -->
+            <div
+                class="notification-submenu"
+                id="notificationSubmenu"
+            >
+
+                <a
+                    href="/NotificationSettings"
+                    class="notification-submenu-item"
+                >
+
+                    <i class="fa-solid fa-gear"></i>
+
+                    <span>
+                        Notification Settings
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/EmailTemplates"
+                    class="notification-submenu-item"
+                >
+
+                    <i class="fa-solid fa-envelope"></i>
+
+                    <span>
+                        Email Templates
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/SMSTemplates"
+                    class="notification-submenu-item"
+                >
+
+                    <i class="fa-solid fa-comment-sms"></i>
+
+                    <span>
+                        SMS Templates
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="/NotificationLogs"
+                    class="notification-submenu-item"
+                >
+
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+
+                    <span>
+                        Notification Logs
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <main class="content">
+
+        <header>
+
+            <div>
+                <h1>SMS Templates</h1>
+                <p>Manage SMS notification templates.</p>
+            </div>
+
+            <button class="primary"
+                    onclick="openSMSModal()">
+
+                <i class="fa-solid fa-plus"></i>
+                New SMS Template
+
+            </button>
+
+        </header>
+
+
+        <div class="table-card">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Template Name</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="smsTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     CREATE / EDIT SMS TEMPLATE MODAL
+========================================================= -->
+
+<div id="templateModal" class="modal">
+
+    <div class="modal-content">
+
+        <!-- Header -->
+        <div class="modal-header">
+
+            <div>
+                <h2 id="modalTitle">
+                    Create SMS Template
+                </h2>
+
+                <p>
+                    Create or update an SMS notification template
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="close-btn"
+                id="closeModalBtn"
+                onclick="closeSMSModal()"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+
+        <!-- Form -->
+        <form id="templateForm">
+
+            <!-- Template Name -->
+            <div class="form-group">
+
+                <label for="templateName">
+                    Template Name
+                    <span>*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="templateName"
+                    name="template_name"
+                    placeholder="Enter template name"
+                    required
+                >
+
+            </div>
+
+
+            <!-- SMS Message -->
+            <div class="form-group">
+
+                <label for="templateBody">
+                    SMS Message
+                    <span>*</span>
+                </label>
+
+                <textarea
+                    id="templateBody"
+                    name="message"
+                    rows="6"
+                    maxlength="160"
+                    placeholder="Enter SMS message"
+                    required
+                ></textarea>
+
+                <small>
+                    Maximum 160 characters
+                </small>
+
+            </div>
+
+
+            <!-- Status -->
+            <div class="form-group">
+
+                <label for="templateStatus">
+                    Status
+                </label>
+
+                <select
+                    id="templateStatus"
+                    name="status"
+                >
+
+                    <option value="Active">
+                        Active
+                    </option>
+
+                    <option value="Inactive">
+                        Inactive
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Footer -->
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    id="cancelBtn"
+                    onclick="closeSMSModal()"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn-primary"
+                    id="saveBtn"
+                >
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Save Template
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="/static/SMSTemplates.js"></script>
+
+</body>
+</html>
