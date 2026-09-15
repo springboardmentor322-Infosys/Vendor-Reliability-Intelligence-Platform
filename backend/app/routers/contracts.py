@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app import models
 
+from datetime import datetime
+
 router = APIRouter(
     prefix="/contracts",
     tags=["Contracts"]
@@ -23,7 +25,7 @@ def get_contracts(db: Session = Depends(get_db)):
 @router.post("/")
 def create_contract(contract_data: dict, db: Session = Depends(get_db)):
     new_contract = models.Contract(
-        contract_id=contract_data.get("contractId", f"CON{Date.now()}"),
+        contract_id=contract_data.get("contractId", f"CON-{int(datetime.now().timestamp())}"),
         vendor=contract_data.get("vendor", ""),
         contract_name=contract_data.get("contractName", ""),
         start_date=contract_data.get("startDate", ""),

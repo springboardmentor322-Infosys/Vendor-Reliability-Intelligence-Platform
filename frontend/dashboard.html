@@ -3,174 +3,787 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendor Intelligence | Admin Dashboard</title>
+    <title>VendorIQ | Enterprise Role-Based Intelligence Platform</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        :root {
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: rgba(255, 255, 255, 0.08);
+            --sidebar-border: #1e293b;
+            --content-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --text-white: #0f172a;
+            --text-sub: #64748b;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Top Role Switcher Header Bar */
+        .role-switch-bar {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 10px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            overflow-x: auto;
+            position: sticky;
+            top: 0;
+            z-index: 1100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .role-switch-label {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .role-switch-btns {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .role-tab-btn {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: auto !important;
+        }
+
+        .role-tab-btn:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .role-tab-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 2px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 270px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px 24px;
+            border-bottom: 1px solid var(--sidebar-border);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-menu-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin: 16px 12px 8px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li a {
+            color: #94a3b8;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .sidebar ul li a:hover {
+            color: #ffffff;
+            background: var(--sidebar-hover);
+        }
+
+        .sidebar ul li a.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+        }
+
+        .sidebar-user-footer {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--sidebar-border);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .sidebar-user-footer .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        /* Topbar & Search Bar */
+        .topbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-wrapper {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 16px;
+            width: 380px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-wrapper input {
+            background: transparent;
+            border: none;
+            color: #0f172a;
+            font-size: 13px;
+            margin-bottom: 0;
+            padding: 0;
+        }
+
+        .search-wrapper input::placeholder {
+            color: #94a3b8;
+        }
+
+        .top-date-pill {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 6 KPI Cards Layout */
+        .cards-row-6 {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .kpi-card-dark {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 18px 16px;
+            transition: all 0.25s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .kpi-card-dark:hover {
+            transform: translateY(-3px);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .kpi-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .kpi-card-title {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .kpi-card-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .kpi-card-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .kpi-card-trend {
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #64748b;
+        }
+
+        .kpi-card-trend.up { color: #10b981; }
+        .kpi-card-trend.down { color: #ef4444; }
+
+        /* Multi-Widget Grid Layout */
+        .dashboard-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-grid-2 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .widget-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .widget-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .widget-link {
+            font-size: 12px;
+            color: #2563eb;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .widget-link:hover { text-decoration: underline; }
+
+        /* Half Donut Gauge */
+        .gauge-wrapper {
+            position: relative;
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-center-text {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .gauge-score {
+            font-size: 34px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
+        }
+
+        .gauge-label {
+            font-size: 12px;
+            color: #10b981;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* Progress List Bars */
+        .progress-list-item {
+            margin-bottom: 14px;
+        }
+
+        .progress-item-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .progress-item-name { color: #475569; font-weight: 600; }
+        .progress-item-val { color: #0f172a; font-weight: 700; }
+
+        .progress-bar-track {
+            height: 7px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        /* Interactive Tables in Cards */
+        .dark-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .dark-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .dark-table th {
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 12px 14px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .dark-table td {
+            padding: 12px 14px;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .dark-table tbody tr:hover {
+            background: #f8fafc;
+            cursor: pointer;
+        }
+
+        .role-view-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .role-view-section.active {
+            display: block;
+        }
+
+        @media (max-width: 1200px) {
+            .cards-row-6 { grid-template-columns: repeat(3, 1fr); }
+            .dashboard-grid-3 { grid-template-columns: 1fr; }
+            .dashboard-grid-2 { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .cards-row-6 { grid-template-columns: repeat(2, 1fr); }
+            .dashboard { flex-direction: column; }
+            .sidebar { width: 100%; }
+        }
+    </style>
 </head>
 <body>
 
+<!-- Role Switcher Top Header Bar -->
+<div class="role-switch-bar">
+    <div class="role-switch-label">⚡ 1-Click Role View Switcher:</div>
+    <div class="role-switch-btns">
+        <button class="role-tab-btn" data-role="Administrator" onclick="switchDashboardRole('Administrator')">⚙️ Administrator</button>
+        <button class="role-tab-btn" data-role="Procurement Manager" onclick="switchDashboardRole('Procurement Manager')">📦 Procurement Manager</button>
+        <button class="role-tab-btn" data-role="Supply Chain Manager" onclick="switchDashboardRole('Supply Chain Manager')">🚚 Supply Chain Manager</button>
+        <button class="role-tab-btn" data-role="Vendor" onclick="switchDashboardRole('Vendor')">🏢 Vendor Portal</button>
+        <button class="role-tab-btn" data-role="Finance Officer" onclick="switchDashboardRole('Finance Officer')">💳 Finance Manager</button>
+        <button class="role-tab-btn" data-role="Auditor" onclick="switchDashboardRole('Auditor')">🔍 Auditor</button>
+    </div>
+</div>
+
 <div class="dashboard">
 
-    <!-- Sidebar -->
+    <!-- Sidebar Menu (Interactive with all modules) -->
     <div class="sidebar">
-        <div class="sidebar-brand">
-            <span class="brand-icon">V</span>
-            <h2>Vendor IQ</h2>
-        </div>
-
-        <ul>
-            <li><a href="dashboard.html" class="active">📊 Dashboard</a></li>
-            <li><a href="vendors.html">🏢 Vendors</a></li>
-            <li><a href="procurement.html">📋 Procurement</a></li>
-            <li><a href="purchase-orders.html">📦 Purchase Orders</a></li>
-            <li><a href="contracts.html">📄 Contracts</a></li>
-            <li><a href="communication.html">💬 Communication</a></li>
-            <li><a href="performance.html">⭐ Performance</a></li>
-            <li><a href="analytics.html">📈 Analytics</a></li>
-            <li><a href="reports.html">📑 Reports</a></li>
-            <li><a href="notifications.html">🔔 Notifications</a></li>
-        </ul>
-    </div>
-
-    <!-- Main Content -->
-    <div class="content">
-
-        <!-- Top Bar -->
-        <div class="topbar">
-            <div class="search-wrapper">
-                <span class="search-icon">🔍</span>
-                <input type="text" class="search-box" placeholder="Search vendors, POs, procurements...">
+        <div>
+            <div class="sidebar-brand">
+                <span class="brand-icon">V</span>
+                <div>
+                    <h2 style="font-size: 18px; margin: 0; color: white;">VendorIQ</h2>
+                    <span style="font-size: 10px; color: #60a5fa; font-weight: 700;">Reliability & Risk Platform</span>
+                </div>
             </div>
 
-            <div class="top-icons">
-                <div class="icon-btn">🔔<span class="badge-count">3</span></div>
-                <div class="icon-btn">📧<span class="badge-count">5</span></div>
-                <a href="profile.html" class="profile-chip">
+            <div class="sidebar-menu-title">Main Menu</div>
+            <ul id="sidebarNav">
+                <li><a href="#dashboard" class="active" onclick="navigateToModule('dashboard')">📊 Dashboard</a></li>
+                <li><a href="#vendors" onclick="navigateToModule('vendors')">🏢 Vendors </a></li>
+                <li><a href="#procurement" onclick="navigateToModule('procurement')">📋 Procurement</a></li>
+                <li><a href="#purchase-orders" onclick="navigateToModule('purchase-orders')">📦 Purchase Orders</a></li>
+                <li><a href="#contracts" onclick="navigateToModule('contracts')">📄 Contracts </a></li>
+                <li><a href="#performance" onclick="navigateToModule('performance')">⭐ Performance </a></li>
+                <li><a href="#analytics" onclick="navigateToModule('analytics')">📈 Analytics</a></li>
+                <li><a href="#reports" onclick="navigateToModule('reports')">📑 Reports</a></li>
+                <li><a href="#notifications" onclick="navigateToModule('notifications')">🔔 Notifications</a></li>
+                
+            </ul>
+        </div>
+
+        <div class="sidebar-user-footer">
+            <div class="user-avatar" id="sidebarAvatar">A</div>
+            <div style="overflow: hidden;">
+                <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap;" id="sidebarUserName">Admin User</div>
+                <div style="font-size: 10px; color: #60a5fa; font-weight: 800; text-transform: uppercase;" id="sidebarUserRole">Administrator</div>
+            </div>
+            <a href="login.html" title="Logout" style="margin-left: auto; color: #94a3b8; text-decoration: none;" onclick="localStorage.clear();">🚪</a>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Area -->
+    <div style="flex: 1; display: flex; flex-direction: column;">
+
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="search-wrapper">
+                <span>🔍</span>
+                <input type="text" id="globalDashboardSearch" placeholder="Search vendors, POs, contracts, invoices..." onkeyup="handleGlobalSearch(this.value)">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="top-date-pill">📅 May 21, 2026</div>
+                <div class="icon-btn" onclick="navigateToModule('notifications')">🔔<span class="badge-count" id="notifTopBadge">3</span></div>
+                <a href="profile.html" class="profile-chip" id="topProfileChip">
                     <span class="avatar">👤</span>
-                    <span class="user-name">Admin</span>
+                    <span class="user-name">Loading...</span>
                 </a>
             </div>
         </div>
 
-        <div class="dashboard-header">
-            <div>
-                <h1>Admin Dashboard</h1>
-                <p class="subtitle">Real-time vendor reliability metrics and procurement oversight</p>
+        <!-- Dashboard Content Body -->
+        <div class="content" style="background: #f8fafc; padding: 30px 35px;">
+
+            <div class="dashboard-header" style="margin-bottom: 25px;">
+                <div>
+                    <h1 id="dashRoleTitle" style="color: #0f172a; font-size: 26px; font-weight: 800;">Welcome back, Admin! 👋</h1>
+                    <p class="subtitle" id="dashRoleSubtitle" style="color: #64748b; font-size: 13px;">Here is the overall platform overview and system statistics.</p>
+                </div>
+                <div class="system-status" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">
+                    <span class="pulse-green"></span> PostgreSQL Connected & Syncing
+                </div>
             </div>
-            <div class="system-status">
-                <span class="pulse-green"></span> PostgreSQL Live
+
+            <!-- ===================================================================
+                 1. VENDOR DASHBOARD VIEW (MATCHING PAGE 1 SCREENSHOT)
+                 =================================================================== -->
+            <div id="view-Vendor" class="role-view-section">
+                <!-- 6 KPI Row -->
+                <div class="cards-row-6">
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Reliability Score</span><div class="kpi-card-icon" style="background: #dcfce7; color: #15803d;">🛡️</div></div><div class="kpi-card-value" id="vScoreVal">89 <small style="font-size: 12px; color: #64748b;">/100</small></div><div class="kpi-card-trend up">High Reliability</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Total Purchase Orders</span><div class="kpi-card-icon" style="background: #eff6ff; color: #3b82f6;">📦</div></div><div class="kpi-card-value" id="vPOCountVal">28</div><div class="kpi-card-trend">This Year</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">On-Time Delivery</span><div class="kpi-card-icon" style="background: #ecfeff; color: #06b6d4;">🚚</div></div><div class="kpi-card-value" id="vOnTimeVal">92.6%</div><div class="kpi-card-trend up">↑ vs last 90 days</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Quality Rating</span><div class="kpi-card-icon" style="background: #fef3c7; color: #b45309;">⭐</div></div><div class="kpi-card-value" id="vQualityVal">4.6 <small style="font-size: 12px; color: #64748b;">/5.0</small></div><div class="kpi-card-trend up">Excellent</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Total Invoiced</span><div class="kpi-card-icon" style="background: #f0fdfa; color: #0d9488;">💰</div></div><div class="kpi-card-value" id="vInvoicedVal">$248,760</div><div class="kpi-card-trend">This Year</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Pending Payments</span><div class="kpi-card-icon" style="background: #fff7ed; color: #c2410c;">💳</div></div><div class="kpi-card-value" id="vPendingPayVal">$32,450</div><div class="kpi-card-trend down">2 Invoices</div></div>
+                </div>
+
+                <!-- Widgets Grid 3 Column -->
+                <div class="dashboard-grid-3">
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Overall Reliability Score</span></div>
+                        <div class="gauge-wrapper">
+                            <canvas id="vendorGaugeChart"></canvas>
+                            <div class="gauge-center-text"><div class="gauge-score" id="vGaugeScoreVal">89 <small style="font-size: 14px;">/100</small></div><div class="gauge-label">High Reliability</div></div>
+                        </div>
+                    </div>
+
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Performance Summary</span><span class="widget-link">Last 90 Days ▼</span></div>
+                        <div class="progress-list-item"><div class="progress-item-header"><span class="progress-item-name">On-Time Deliveries</span><span class="progress-item-val">92.6%</span></div><div class="progress-bar-track"><div class="progress-bar-fill" style="width: 92.6%; background: #10b981;"></div></div></div>
+                        <div class="progress-list-item"><div class="progress-item-header"><span class="progress-item-name">Delayed Deliveries</span><span class="progress-item-val">7.4%</span></div><div class="progress-bar-track"><div class="progress-bar-fill" style="width: 7.4%; background: #ef4444;"></div></div></div>
+                        <div class="progress-list-item"><div class="progress-item-header"><span class="progress-item-name">Quality Score</span><span class="progress-item-val">4.6 / 5</span></div><div class="progress-bar-track"><div class="progress-bar-fill" style="width: 92%; background: #3b82f6;"></div></div></div>
+                        <div class="progress-list-item"><div class="progress-item-header"><span class="progress-item-name">Response Time (Avg)</span><span class="progress-item-val">1.2 hrs</span></div><div class="progress-bar-track"><div class="progress-bar-fill" style="width: 85%; background: #8b5cf6;"></div></div></div>
+                        <div class="progress-list-item"><div class="progress-item-header"><span class="progress-item-name">Order Completion Rate</span><span class="progress-item-val">96.3%</span></div><div class="progress-bar-track"><div class="progress-bar-fill" style="width: 96.3%; background: #06b6d4;"></div></div></div>
+                    </div>
+
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Recent Purchase Orders</span><a class="widget-link" onclick="navigateToModule('purchase-orders')">View All</a></div>
+                        <div class="dark-table-wrapper">
+                            <table class="dark-table">
+                                <thead><tr><th>PO Number</th><th>Item/Service</th><th>Status</th><th>Delivery</th></tr></thead>
+                                <tbody>
+                                    <tr><td>PO-2024-1029</td><td>Steel Rods</td><td><span class="badge-status approved">Delivered</span></td><td>22 May 2024</td></tr>
+                                    <tr><td>PO-2024-0987</td><td>Cement 50kg</td><td><span class="badge-status pending">In Transit</span></td><td>18 May 2024</td></tr>
+                                    <tr><td>PO-2024-0943</td><td>Electrical Panels</td><td><span class="badge-status approved">Delivered</span></td><td>05 May 2024</td></tr>
+                                    <tr><td>PO-2024-0912</td><td>Safety Helmets</td><td><span class="badge-status approved">Delivered</span></td><td>03 May 2024</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- ===================================================================
+                 2. ADMIN DASHBOARD VIEW (MATCHING PAGE 2 & 4 SCREENSHOTS)
+                 =================================================================== -->
+            <div id="view-Administrator" class="role-view-section">
+                <!-- 6 KPI Row -->
+                <div class="cards-row-6">
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Total Users</span><div class="kpi-card-icon" style="background: #eff6ff; color: #3b82f6;">👥</div></div><div class="kpi-card-value" id="adminUserCount">1,248</div><div class="kpi-card-trend up">↑ 18.2% vs last month</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Total Vendors</span><div class="kpi-card-icon" style="background: #f0fdf4; color: #16a34a;">🏢</div></div><div class="kpi-card-value" id="adminVendorCount">842</div><div class="kpi-card-trend up">↑ 12.4% vs last month</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Total Purchase Orders</span><div class="kpi-card-icon" style="background: #faf5ff; color: #9333ea;">📦</div></div><div class="kpi-card-value" id="adminPOCount">2,156</div><div class="kpi-card-trend up">↑ 8.6% vs last month</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Total Spend (YTD)</span><div class="kpi-card-icon" style="background: #fff7ed; color: #ea580c;">💰</div></div><div class="kpi-card-value" id="adminSpendCount">₹24,80,500</div><div class="kpi-card-trend up">↑ 16.7% vs last year</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Active Contracts</span><div class="kpi-card-icon" style="background: #eef2ff; color: #4f46e5;">📄</div></div><div class="kpi-card-value" id="adminContractCount">532</div><div class="kpi-card-trend up">↑ 5.1% vs last month</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">System Health</span><div class="kpi-card-icon" style="background: #dcfce7; color: #15803d;">🛡️</div></div><div class="kpi-card-value">98.6%</div><div class="kpi-card-trend up">Operational</div></div>
+                </div>
+
+                <!-- 3 Columns Donut Charts & Spend Analysis -->
+                <div class="dashboard-grid-3">
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Platform Overview</span></div>
+                        <div class="canvas-wrapper"><canvas id="adminPlatformOverviewChart"></canvas></div>
+                    </div>
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Vendor Status Overview</span></div>
+                        <div class="canvas-wrapper"><canvas id="adminVendorStatusChart"></canvas></div>
+                    </div>
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Procurement Status Overview</span></div>
+                        <div class="canvas-wrapper"><canvas id="adminProcurementStatusChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================================================================
+                 3. AUDITOR DASHBOARD VIEW (MATCHING PAGE 3 SCREENSHOT)
+                 =================================================================== -->
+            <div id="view-Auditor" class="role-view-section">
+                <div class="cards-row-6">
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Audits Conducted</span><div class="kpi-card-icon" style="background: #eff6ff; color: #3b82f6;">🔍</div></div><div class="kpi-card-value" id="auditConductedVal">36</div><div class="kpi-card-trend up">↑ 3 vs last month</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Compliance Score</span><div class="kpi-card-icon" style="background: #f0fdf4; color: #16a34a;">🛡️</div></div><div class="kpi-card-value" id="auditComplianceVal">86.5%</div><div class="kpi-card-trend up">↑ 2.1% vs last quarter</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Open Audit Findings</span><div class="kpi-card-icon" style="background: #fef3c7; color: #b45309;">⚠️</div></div><div class="kpi-card-value" id="auditFindingsVal">14</div><div class="kpi-card-trend down">Requires Action</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">High-Risk Findings</span><div class="kpi-card-icon" style="background: #fee2e2; color: #b91c1c;">🚨</div></div><div class="kpi-card-value" id="auditRiskVal">8</div><div class="kpi-card-trend down">Critical Priority</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Pending Approvals</span><div class="kpi-card-icon" style="background: #fff7ed; color: #ea580c;">⏳</div></div><div class="kpi-card-value" id="auditPendingVal">19</div><div class="kpi-card-trend">Review Queue</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Overdue Actions</span><div class="kpi-card-icon" style="background: #fdf2f8; color: #db2777;">⌛</div></div><div class="kpi-card-value" id="auditOverdueVal">7</div><div class="kpi-card-trend down">Past Target Date</div></div>
+                </div>
+
+                <div class="dashboard-grid-3">
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Audit Compliance Overview</span></div>
+                        <div class="canvas-wrapper"><canvas id="auditorComplianceChart"></canvas></div>
+                    </div>
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Audit Findings Summary</span></div>
+                        <div class="canvas-wrapper"><canvas id="auditorFindingsChart"></canvas></div>
+                    </div>
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Risk Assessment Overview</span></div>
+                        <div class="canvas-wrapper"><canvas id="auditorRiskChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================================================================
+                 4. FINANCE MANAGER DASHBOARD VIEW (MATCHING PAGE 5 SCREENSHOT)
+                 =================================================================== -->
+            <div id="view-Finance Officer" class="role-view-section">
+                <div class="cards-row-6">
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Total Spend (YTD)</span><div class="kpi-card-icon" style="background: #f0fdfa; color: #0d9488;">💰</div></div><div class="kpi-card-value" id="finSpendVal">₹24,80,500</div><div class="kpi-card-trend up">↑ 16.7% vs last year</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Total Savings (YTD)</span><div class="kpi-card-icon" style="background: #f0fdf4; color: #16a34a;">📈</div></div><div class="kpi-card-value" id="finSavingsVal">₹2,45,200</div><div class="kpi-card-trend up">↑ 12.5% vs budget</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Total Payments (YTD)</span><div class="kpi-card-icon" style="background: #eff6ff; color: #3b82f6;">💳</div></div><div class="kpi-card-value" id="finPaymentsVal">₹21,50,300</div><div class="kpi-card-trend">86.7% Processed</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Budget Utilization</span><div class="kpi-card-icon" style="background: #fef3c7; color: #b45309;">📊</div></div><div class="kpi-card-value" id="finBudgetUtilVal">82.6%</div><div class="kpi-card-trend">On Target</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Pending Payments</span><div class="kpi-card-icon" style="background: #fff7ed; color: #c2410c;">⌛</div></div><div class="kpi-card-value" id="finPendingPayVal">₹3,20,800</div><div class="kpi-card-trend down">3 Invoices</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Cash Flow (This Month)</span><div class="kpi-card-icon" style="background: #eef2ff; color: #4f46e5;">💵</div></div><div class="kpi-card-value" id="finCashFlowVal">₹8,75,600</div><div class="kpi-card-trend up">Positive Flow</div></div>
+                </div>
+
+                <div class="dashboard-grid-3">
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Spend by Category (YTD)</span></div>
+                        <div class="canvas-wrapper"><canvas id="finSpendCategoryChart"></canvas></div>
+                    </div>
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Monthly Spend Trend</span></div>
+                        <div class="canvas-wrapper"><canvas id="finSpendTrendChart"></canvas></div>
+                    </div>
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Budget vs Actual (YTD)</span></div>
+                        <div class="canvas-wrapper"><canvas id="finBudgetVsActualChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================================================================
+                 5. PROCUREMENT MANAGER DASHBOARD VIEW
+                 =================================================================== -->
+            <div id="view-Procurement Manager" class="role-view-section">
+                <div class="cards-row-6">
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Active POs</span><div class="kpi-card-icon" style="background: #eff6ff; color: #3b82f6;">📦</div></div><div class="kpi-card-value" id="pmPOCountVal">18</div><div class="kpi-card-trend">In Execution</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Pending Approvals</span><div class="kpi-card-icon" style="background: #fef3c7; color: #b45309;">⏳</div></div><div class="kpi-card-value" id="pmPendingApprovalVal">5</div><div class="kpi-card-trend">Awaiting Review</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Procurement Spend</span><div class="kpi-card-icon" style="background: #f0fdfa; color: #0d9488;">💰</div></div><div class="kpi-card-value" id="pmProcurementSpendVal">₹12,40,000</div><div class="kpi-card-trend">YTD Budget</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Vendor Selection Pool</span><div class="kpi-card-icon" style="background: #f0fdf4; color: #16a34a;">🏢</div></div><div class="kpi-card-value" id="pmVendorPoolVal">42</div><div class="kpi-card-trend">Approved Vendors</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Delivery On-Time %</span><div class="kpi-card-icon" style="background: #ecfeff; color: #06b6d4;">🚚</div></div><div class="kpi-card-value" id="pmDeliveryOnTimeVal">94.2%</div><div class="kpi-card-trend up">High Compliance</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Requisitions</span><div class="kpi-card-icon" style="background: #faf5ff; color: #9333ea;">📋</div></div><div class="kpi-card-value" id="pmRequisitionsVal">24</div><div class="kpi-card-trend">Total Requests</div></div>
+                </div>
+
+                <div class="dashboard-grid-2">
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Purchase Order Status Volume</span><a class="widget-link" onclick="navigateToModule('purchase-orders')">View Orders</a></div>
+                        <div class="canvas-wrapper"><canvas id="procurementBarChart"></canvas></div>
+                    </div>
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Spend Distribution by Department</span></div>
+                        <div class="canvas-wrapper"><canvas id="procurementDeptPieChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================================================================
+                 6. SUPPLY CHAIN MANAGER DASHBOARD VIEW
+                 =================================================================== -->
+            <div id="view-Supply Chain Manager" class="role-view-section">
+                <div class="cards-row-6">
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">High-Risk Vendors</span><div class="kpi-card-icon" style="background: #fee2e2; color: #b91c1c;">🚨</div></div><div class="kpi-card-value" id="scmRiskVendorsVal">4</div><div class="kpi-card-trend down">Requires Audit</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Delayed Shipments</span><div class="kpi-card-icon" style="background: #fff7ed; color: #ea580c;">🚚</div></div><div class="kpi-card-value" id="scmDelayedVal">3</div><div class="kpi-card-trend down">Action Needed</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">On-Time Delivery %</span><div class="kpi-card-icon" style="background: #dcfce7; color: #15803d;">⏱️</div></div><div class="kpi-card-value" id="scmOnTimeVal">91.8%</div><div class="kpi-card-trend up">↑ 2.4%</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Avg Response Time</span><div class="kpi-card-icon" style="background: #eff6ff; color: #3b82f6;">⚡</div></div><div class="kpi-card-value" id="scmRespTimeVal">1.4 hrs</div><div class="kpi-card-trend up">Fast Response</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Order Completion</span><div class="kpi-card-icon" style="background: #f0fdf4; color: #16a34a;">✅</div></div><div class="kpi-card-value" id="scmOrderCompVal">97.5%</div><div class="kpi-card-trend up">Optimal</div></div>
+                    <div class="kpi-card-dark"><div class="kpi-card-top"><span class="kpi-card-title">Avg Reliability Score</span><div class="kpi-card-icon" style="background: #fef3c7; color: #b45309;">⭐</div></div><div class="kpi-card-value" id="scmAvgScoreVal">86.2</div><div class="kpi-card-trend">Good Score</div></div>
+                </div>
+
+                <div class="dashboard-grid-2">
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Supply Chain Risk Matrix & Vendor Scores</span></div>
+                        <div class="canvas-wrapper"><canvas id="scmRiskMatrixChart"></canvas></div>
+                    </div>
+                    <div class="widget-card">
+                        <div class="widget-header"><span class="widget-title">Delivery Trend Analysis</span></div>
+                        <div class="canvas-wrapper"><canvas id="scmTrendLineChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-
-        <!-- Dashboard Cards -->
-        <div class="cards">
-
-            <div class="card card1">
-                <div class="card-icon-wrapper blue">👥</div>
-                <div class="card-info">
-                    <h3>Total Vendors</h3>
-                    <p id="totalVendors">0</p>
-                </div>
-            </div>
-
-            <div class="card card2">
-                <div class="card-icon-wrapper green">📦</div>
-                <div class="card-info">
-                    <h3>Purchase Orders</h3>
-                    <p id="totalOrders">0</p>
-                </div>
-            </div>
-
-            <div class="card card3">
-                <div class="card-icon-wrapper purple">⭐</div>
-                <div class="card-info">
-                    <h3>Vendor Score</h3>
-                    <p id="averageVendorScore">0%</p>
-                </div>
-            </div>
-
-            <div class="card card4">
-                <div class="card-icon-wrapper orange">⏳</div>
-                <div class="card-info">
-                    <h3>Pending Orders</h3>
-                    <p id="pendingOrders">0</p>
-                </div>
-            </div>
-
-            <div class="card card1">
-                <div class="card-icon-wrapper teal">💰</div>
-                <div class="card-info">
-                    <h3>Total Spend</h3>
-                    <p id="totalSpend">₹0</p>
-                </div>
-            </div>
-
-            <div class="card card2">
-                <div class="card-icon-wrapper indigo">✅</div>
-                <div class="card-info">
-                    <h3>Active Contracts</h3>
-                    <p id="activeContracts">0</p>
-                </div>
-            </div>
-
-            <div class="card card3">
-                <div class="card-icon-wrapper pink">📋</div>
-                <div class="card-info">
-                    <h3>Procurements</h3>
-                    <p id="totalProcurements">0</p>
-                </div>
-            </div>
-
-            <div class="card card4">
-                <div class="card-icon-wrapper cyan">🚚</div>
-                <div class="card-info">
-                    <h3>On-Time Delivery</h3>
-                    <p id="onTimeDelivery">0%</p>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="section-title-wrapper">
-            <h2>Analytics Dashboard</h2>
-            <span class="live-indicator">Live Charts</span>
-        </div>
-
-        <div class="chart-container">
-
-            <div class="chart-box">
-                <div class="chart-header">
-                    <h3>📊 Vendor Rating Distribution</h3>
-                    <small>Breakdown by Performance Categories</small>
-                </div>
-                <div class="canvas-wrapper">
-                    <canvas id="vendorPieChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-box">
-                <div class="chart-header">
-                    <h3>📈 Purchase Orders Status</h3>
-                    <small>Real-time Orders Volume</small>
-                </div>
-                <div class="canvas-wrapper">
-                    <canvas id="purchaseBarChart"></canvas>
-                </div>
-            </div>
-
-        </div>
-
     </div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="js/script.js"></script>
+<script>
+    function navigateToModule(moduleKey) {
+        // Highlight sidebar active link
+        document.querySelectorAll("#sidebarNav a").forEach(a => a.classList.remove("active"));
+        const targetLink = document.querySelector(`#sidebarNav a[href="#${moduleKey}"]`);
+        if (targetLink) targetLink.classList.add("active");
+
+        // Map hash to view or open module route
+        if (moduleKey === "vendors") window.location.href = "vendors.html";
+        else if (moduleKey === "procurement") window.location.href = "procurement.html";
+        else if (moduleKey === "purchase-orders") window.location.href = "purchase-orders.html";
+        else if (moduleKey === "contracts") window.location.href = "contracts.html";
+        else if (moduleKey === "performance") window.location.href = "performance.html";
+        else if (moduleKey === "analytics") window.location.href = "analytics.html";
+        else if (moduleKey === "reports") window.location.href = "reports.html";
+        else if (moduleKey === "notifications") window.location.href = "notifications.html";
+    }
+
+    function switchDashboardRole(roleName) {
+        localStorage.setItem("userRole", roleName);
+        
+        document.querySelectorAll(".role-tab-btn").forEach(btn => {
+            if (btn.getAttribute("data-role") === roleName) btn.classList.add("active");
+            else btn.classList.remove("active");
+        });
+
+        document.querySelectorAll(".role-view-section").forEach(sec => sec.classList.remove("active"));
+        
+        const targetView = document.getElementById("view-" + roleName);
+        if (targetView) targetView.classList.add("active");
+
+        if (typeof initRoleSession === "function") initRoleSession();
+    }
+
+    function handleGlobalSearch(query) {
+        console.log("Global search query:", query);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const savedRole = localStorage.getItem("userRole") || "Administrator";
+        switchDashboardRole(savedRole);
+    });
+</script>
 
 </body>
 </html>

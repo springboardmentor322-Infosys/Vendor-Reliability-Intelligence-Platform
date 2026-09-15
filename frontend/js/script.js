@@ -329,20 +329,226 @@ document.getElementById("saveVendorBtn")?.addEventListener("click", function () 
 
 });
 
-// Update Profile
-document.getElementById("updateProfileBtn")?.addEventListener("click", function () {
+// Role-Isolated Multi-User Profile Engine
+const defaultRoleProfiles = {
+    "Administrator": {
+        full_name: "Admin User",
+        email: "admin@vendoriq.com",
+        mobile: "+91 98765 43210",
+        department: "IT & System Administration",
+        role: "Administrator"
+    },
+    "Procurement Manager": {
+        full_name: "Sarah Jenkins",
+        email: "sarah.procurement@vendoriq.com",
+        mobile: "+91 98123 45678",
+        department: "Procurement & Strategic Sourcing",
+        role: "Procurement Manager"
+    },
+    "Supply Chain Manager": {
+        full_name: "Robert Vance",
+        email: "robert.supply@vendoriq.com",
+        mobile: "+91 98234 56789",
+        department: "Supply Chain & Logistics",
+        role: "Supply Chain Manager"
+    },
+    "Vendor": {
+        full_name: "TechSupply Operations",
+        email: "contact@techsupply.com",
+        mobile: "+91 98345 67890",
+        department: "Supplier Sales & Operations",
+        role: "Vendor"
+    },
+    "Finance Officer": {
+        full_name: "Michael Chang",
+        email: "michael.finance@vendoriq.com",
+        mobile: "+91 98456 78901",
+        department: "Finance & Accounting",
+        role: "Finance Officer"
+    },
+    "Auditor": {
+        full_name: "Elena Rostova",
+        email: "elena.audit@vendoriq.com",
+        mobile: "+91 98567 89012",
+        department: "Internal Audit & Compliance",
+        role: "Auditor"
+    }
+};
 
-    const name = document.getElementById("profileName").value;
-    const email = document.getElementById("profileEmail").value;
-    const mobile = document.getElementById("profileMobile").value;
+function getRoleProfile(roleName) {
+    const role = roleName || localStorage.getItem("userRole") || "Administrator";
+    const key = `profile_${role}`;
+    let stored = localStorage.getItem(key);
+    if (stored) {
+        try {
+            let parsed = JSON.parse(stored);
+            if (parsed && parsed.full_name) return parsed;
+        } catch(e) {}
+    }
+    const def = defaultRoleProfiles[role] || defaultRoleProfiles["Administrator"];
+    localStorage.setItem(key, JSON.stringify(def));
+    return def;
+}
 
-    if (name === "" || email === "" || mobile === "") {
-        alert("Please fill all fields");
+function saveRoleProfile(roleName, data) {
+    const role = roleName || localStorage.getItem("userRole") || "Administrator";
+    const key = `profile_${role}`;
+    localStorage.setItem(key, JSON.stringify(data));
+    
+    // Set active session pointers
+    localStorage.setItem("userRole", role);
+    localStorage.setItem("userName", data.full_name);
+    localStorage.setItem("userEmail", data.email);
+    localStorage.setItem("userMobile", data.mobile);
+    localStorage.setItem("userDepartment", data.department);
+}
+
+function renderProfileUI(name, role, email, mobile, dept) {
+    const nameInput = document.getElementById("profileName");
+    const emailInput = document.getElementById("profileEmail");
+    const mobileInput = document.getElementById("profileMobile");
+    const deptInput = document.getElementById("profileDepartment");
+    const roleSelect = document.getElementById("profileRole");
+
+    if (nameInput) nameInput.value = name;
+    if (emailInput) emailInput.value = email;
+    if (mobileInput) mobileInput.value = mobile;
+    if (deptInput) deptInput.value = dept;
+    if (roleSelect) roleSelect.value = role;
+
+    const dispName = document.getElementById("displayFullName");
+    const dispRole = document.getElementById("displayRoleTitle");
+    const dispEmail = document.getElementById("displayEmailText");
+    const dispMobile = document.getElementById("displayMobileText");
+    const dispDept = document.getElementById("displayDeptTag");
+    const kpiRole = document.getElementById("kpiUserRole");
+    const avatarLarge = document.getElementById("profileAvatarLarge");
+
+    if (dispName) dispName.innerText = name;
+    if (dispRole) dispRole.innerText = role;
+    if (dispEmail) dispEmail.innerText = email;
+    if (dispMobile) dispMobile.innerText = mobile;
+    if (dispDept) dispDept.innerText = dept;
+    if (kpiRole) kpiRole.innerText = role;
+    if (avatarLarge) avatarLarge.innerText = name.charAt(0).toUpperCase();
+
+    if (typeof initRoleSession === 'function') {
+        initRoleSession();
+    }
+}
+
+function loadProfilePage() {
+    if (!document.getElementById("profileName")) return;
+
+    let role = localStorage.getItem("userRole") || "Administrator";
+    let prof = getRoleProfile(role);
+
+    renderProfileUI(
+        prof.full_name,
+        role,
+        prof.email,
+        prof.mobile,
+        prof.department
+    );
+}
+
+function saveUserProfile() {
+    const nameInput = document.getElementById("profileName");
+    const emailInput = document.getElementById("profileEmail");
+    const mobileInput = document.getElementById("profileMobile");
+    const deptInput = document.getElementById("profileDepartment");
+    const roleSelect = document.getElementById("profileRole");
+
+    const name = nameInput ? nameInput.value.trim() : "";
+    const email = emailInput ? emailInput.value.trim() : "";
+    const mobile = mobileInput ? mobileInput.value.trim() : "";
+    const dept = deptInput ? deptInput.value.trim() : "";
+    const selectedRole = roleSelect ? roleSelect.value : (localStorage.getItem("userRole") || "Administrator");
+
+    if (!name || !email) {
+        if (typeof showNotificationToast === 'function') showNotificationToast("Please enter full name and email.", "error");
+        else alert("Please enter full name and email.");
         return;
     }
 
-    alert("Profile Updated Successfully!");
+    const updatedProfile = {
+        full_name: name,
+        email: email,
+        mobile: mobile,
+        department: dept,
+        role: selectedRole
+    };
+
+    saveRoleProfile(selectedRole, updatedProfile);
+
+    fetch("http://127.0.0.1:8000/auth/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedProfile)
+    }).catch(() => {});
+
+    renderProfileUI(name, selectedRole, email, mobile, dept);
+
+    if (typeof addNotification === 'function') {
+        addNotification(`User profile updated for ${name} (${selectedRole})`, 'Low', 'System Audit', 'Profile Update');
+    }
+
+    if (typeof showNotificationToast === 'function') {
+        showNotificationToast(`Profile updated for ${selectedRole} (${name})!`, "success");
+    } else {
+        alert("Profile Updated Successfully!");
+    }
+}
+
+// Attach role switch listener on profile page
+document.getElementById("profileRole")?.addEventListener("change", function() {
+    const newRole = this.value;
+    localStorage.setItem("userRole", newRole);
+    const prof = getRoleProfile(newRole);
+    renderProfileUI(prof.full_name, newRole, prof.email, prof.mobile, prof.department);
 });
+
+document.getElementById("updateProfileBtn")?.addEventListener("click", saveUserProfile);
+document.getElementById("headerSaveProfileBtn")?.addEventListener("click", saveUserProfile);
+
+document.getElementById("updatePasswordBtn")?.addEventListener("click", function() {
+    const newPwd = document.getElementById("newPassword")?.value;
+    const confirmPwd = document.getElementById("confirmPassword")?.value;
+
+    if (!newPwd || newPwd.length < 4) {
+        if (typeof showNotificationToast === 'function') showNotificationToast("Password must be at least 4 characters long.", "error");
+        else alert("Password must be at least 4 characters long.");
+        return;
+    }
+
+    if (newPwd !== confirmPwd) {
+        if (typeof showNotificationToast === 'function') showNotificationToast("New passwords do not match.", "error");
+        else alert("New passwords do not match.");
+        return;
+    }
+
+    fetch("http://127.0.0.1:8000/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ new_password: newPwd })
+    }).catch(() => {});
+
+    if (document.getElementById("currentPassword")) document.getElementById("currentPassword").value = "";
+    if (document.getElementById("newPassword")) document.getElementById("newPassword").value = "";
+    if (document.getElementById("confirmPassword")) document.getElementById("confirmPassword").value = "";
+
+    if (typeof showNotificationToast === 'function') {
+        showNotificationToast("Password updated successfully!", "success");
+    } else {
+        alert("Password updated successfully!");
+    }
+});
+
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    loadProfilePage();
+} else {
+    document.addEventListener("DOMContentLoaded", loadProfilePage);
+}
 // Dashboard Data
 function loadDashboard() {
 
@@ -2692,7 +2898,7 @@ function updateReportCharts() {
         window.reportVolumeChartInstance = new Chart(volumeCtx, {
             type: "bar",
             data: {
-                labels: ["May 2026", "Jun 2026", "Jul 2026", "Aug 2026", "Sep 2026"],
+                labels: getPastMonthLabels(5),
                 datasets: [{
                     label: "Reports Generated",
                     data: [2, 4, 6, 3, reportsData.length],
@@ -2775,11 +2981,11 @@ document.getElementById("generateReportBtn")?.addEventListener("click", function
 });
 
 document.getElementById("downloadPdfBtn")?.addEventListener("click", function() {
-    alert("Downloading batch PDF report package...");
+    window.open("http://127.0.0.1:8000/reports/export/vendors.csv", "_blank");
 });
 
 document.getElementById("downloadExcelBtn")?.addEventListener("click", function() {
-    alert("Exporting batch Excel summary report...");
+    window.open("http://127.0.0.1:8000/reports/export/purchase-orders.csv", "_blank");
 });
 
 // Live Search for Reports
@@ -2798,11 +3004,21 @@ document.getElementById("searchReports")?.addEventListener("input", function() {
 });
 
 function downloadReportPdf(id) {
-    alert(`Downloading PDF for report: ${id}`);
+    const report = (typeof reportsData !== 'undefined' && Array.isArray(reportsData)) ? reportsData.find(r => r.id === id) : null;
+    const cat = report ? report.category : "";
+    if (cat.includes("Vendor")) {
+        window.open("http://127.0.0.1:8000/reports/export/vendors.csv", "_blank");
+    } else if (cat.includes("Order")) {
+        window.open("http://127.0.0.1:8000/reports/export/purchase-orders.csv", "_blank");
+    } else if (cat.includes("Contract")) {
+        window.open("http://127.0.0.1:8000/reports/export/contracts.csv", "_blank");
+    } else {
+        window.open("http://127.0.0.1:8000/reports/export/procurements.csv", "_blank");
+    }
 }
 
 function downloadReportExcel(id) {
-    alert(`Exporting Excel file for report: ${id}`);
+    downloadReportPdf(id);
 }
 
 function deleteReport(id) {
@@ -2815,18 +3031,74 @@ function deleteReport(id) {
 // Initializer
 loadReports();
 
+// Dynamic Date Helper Utilities
+function getPastMonthLabels(count = 5) {
+    const labels = [];
+    const now = new Date();
+    for (let i = count - 1; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const m = d.toLocaleDateString('en-US', { month: 'short' });
+        const y = d.getFullYear();
+        labels.push(`${m} ${y}`);
+    }
+    return labels;
+}
+
+function updateDynamicDates() {
+    const today = new Date();
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    const dateFormatted = today.toLocaleDateString('en-US', options);
+    const pillText = `📅 ${dateFormatted}`;
+
+    document.querySelectorAll('.top-date-pill').forEach(el => {
+        el.innerText = pillText;
+    });
+
+    document.querySelectorAll('.top-icons').forEach(topIcons => {
+        if (!topIcons.querySelector('.top-date-pill')) {
+            const datePill = document.createElement('div');
+            datePill.className = 'top-date-pill';
+            datePill.style.cssText = 'background: #f1f5f9; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #475569; border: 1px solid #cbd5e1; display: inline-flex; align-items: center; margin-right: 8px;';
+            datePill.innerText = pillText;
+            topIcons.insertBefore(datePill, topIcons.firstChild);
+        }
+    });
+
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const curYear = today.getFullYear();
+    const curMonthName = monthNames[today.getMonth()];
+
+    document.querySelectorAll('.member-since-tag').forEach(el => {
+        el.innerText = `Member since ${curMonthName} ${curYear}`;
+    });
+}
+
 // ===============================
 // Unified Notifications & Alerts Dashboard Logic
 // ===============================
 
-const defaultSeedNotifications = [
-    { id: "N001", date: "27/07/2026, 10:30:00 AM", category: "Vendor Alert", title: "New Vendor Onboarded", message: "Acme Logistics registered on the portal and is pending compliance document verification.", priority: "Medium", status: "Unread" },
-    { id: "N002", date: "27/07/2026, 11:15:00 AM", category: "Purchase Order", title: "PO #PO1002 Fully Delivered", message: "Supplier Apex Industrial confirmed delivery of all server hardware equipment with 100% QA pass.", priority: "Low", status: "Read" },
-    { id: "N003", date: "15/08/2026, 09:00:00 AM", category: "Contract Warning", title: "Contract Expiration Notice", message: "Global Supplies Master Services Agreement notice window closes in 15 days. Renewal review recommended.", priority: "High", status: "Unread" },
-    { id: "N004", date: "01/09/2026, 02:45:00 PM", category: "System Audit", title: "Reliability Sync Completed", message: "Automated reliability scoring sync executed across all active vendors with zero schema anomalies.", priority: "Low", status: "Read" },
-    { id: "N005", date: "05/09/2026, 04:20:00 PM", category: "Vendor Alert", title: "Performance Score Drop Alert", message: "TechCorp Inc overall reliability score dropped below critical 60% threshold due to consecutive delivery delays.", priority: "High", status: "Unread" },
-    { id: "N006", date: "06/09/2026, 08:10:00 AM", category: "Purchase Order", title: "PO #PO1009 Approval Required", message: "Purchase order exceeding $50,000 threshold requires senior procurement manager signature.", priority: "Medium", status: "Unread" }
-];
+function getDynamicSeedNotifications() {
+    const now = new Date();
+    const fmt = (d) => d.toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+
+    const t10 = new Date(now); t10.setHours(10, 30, 0);
+    const t11 = new Date(now); t11.setHours(11, 15, 0);
+    const yest = new Date(now); yest.setDate(now.getDate() - 1); yest.setHours(9, 0, 0);
+    const d3 = new Date(now); d3.setDate(now.getDate() - 3); d3.setHours(14, 45, 0);
+    const d5 = new Date(now); d5.setDate(now.getDate() - 5); d5.setHours(16, 20, 0);
+    const d7 = new Date(now); d7.setDate(now.getDate() - 7); d7.setHours(8, 10, 0);
+
+    return [
+        { id: "N001", date: fmt(t10), category: "Vendor Alert", title: "New Vendor Onboarded", message: "Acme Logistics registered on the portal and is pending compliance document verification.", priority: "Medium", status: "Unread" },
+        { id: "N002", date: fmt(t11), category: "Purchase Order", title: "PO #PO1002 Fully Delivered", message: "Supplier Apex Industrial confirmed delivery of all server hardware equipment with 100% QA pass.", priority: "Low", status: "Read" },
+        { id: "N003", date: fmt(yest), category: "Contract Warning", title: "Contract Expiration Notice", message: "Global Supplies Master Services Agreement notice window closes in 15 days. Renewal review recommended.", priority: "High", status: "Unread" },
+        { id: "N004", date: fmt(d3), category: "System Audit", title: "Reliability Sync Completed", message: "Automated reliability scoring sync executed across all active vendors with zero schema anomalies.", priority: "Low", status: "Read" },
+        { id: "N005", date: fmt(d5), category: "Vendor Alert", title: "Performance Score Drop Alert", message: "TechCorp Inc overall reliability score dropped below critical 60% threshold due to consecutive delivery delays.", priority: "High", status: "Unread" },
+        { id: "N006", date: fmt(d7), category: "Purchase Order", title: "PO #PO1009 Approval Required", message: "Purchase order exceeding $50,000 threshold requires senior procurement manager signature.", priority: "Medium", status: "Unread" }
+    ];
+}
+
+const defaultSeedNotifications = getDynamicSeedNotifications();
 
 let activeNotificationFilter = "all";
 let currentNotificationView = "feed";
@@ -2835,27 +3107,207 @@ let currentDetailId = null;
 function getStoredNotifications() {
     let stored = localStorage.getItem("notifications");
     if (!stored) {
-        localStorage.setItem("notifications", JSON.stringify(defaultSeedNotifications));
-        return [...defaultSeedNotifications];
+        const seeds = getDynamicSeedNotifications();
+        localStorage.setItem("notifications", JSON.stringify(seeds));
+        return seeds;
     }
     try {
         let parsed = JSON.parse(stored);
         if (!Array.isArray(parsed) || parsed.length === 0) {
-            localStorage.setItem("notifications", JSON.stringify(defaultSeedNotifications));
-            return [...defaultSeedNotifications];
+            const seeds = getDynamicSeedNotifications();
+            localStorage.setItem("notifications", JSON.stringify(seeds));
+            return seeds;
         }
         return parsed;
     } catch (e) {
-        localStorage.setItem("notifications", JSON.stringify(defaultSeedNotifications));
-        return [...defaultSeedNotifications];
+        const seeds = getDynamicSeedNotifications();
+        localStorage.setItem("notifications", JSON.stringify(seeds));
+        return seeds;
     }
 }
 
 function updateTopbarUnreadBadge() {
     const notifications = getStoredNotifications();
-    const unreadCount = notifications.filter(n => n.status === "Unread").length;
-    const topbarBadge = document.getElementById("topbarUnreadBadge");
-    if (topbarBadge) topbarBadge.innerText = unreadCount;
+    const unreadCount = notifications.filter(n => n.status === "Unread" || n.is_read === false).length;
+    
+    ['topbarUnreadBadge', 'notifTopBadge'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = unreadCount;
+    });
+
+    document.querySelectorAll('.icon-btn .badge-count').forEach(badge => {
+        if (badge.parentElement && badge.parentElement.innerText.includes('🔔')) {
+            badge.innerText = unreadCount;
+        }
+    });
+}
+
+function toggleNotificationQuickDropdown(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    let dropdown = document.getElementById("notificationQuickDropdown");
+    
+    if (dropdown && dropdown.style.display === "block") {
+        dropdown.style.display = "none";
+        return;
+    }
+
+    if (!dropdown) {
+        dropdown = document.createElement("div");
+        dropdown.id = "notificationQuickDropdown";
+        document.body.appendChild(dropdown);
+    }
+
+    const target = (e && e.currentTarget) ? e.currentTarget : document.querySelector('.icon-btn');
+    if (!target) return;
+
+    const rect = target.getBoundingClientRect();
+    const top = rect.bottom + window.scrollY + 8;
+    const right = window.innerWidth - rect.right - window.scrollX;
+
+    dropdown.style.cssText = `
+        position: absolute;
+        top: ${top}px;
+        right: ${Math.max(10, right)}px;
+        width: 380px;
+        max-width: 92vw;
+        max-height: 500px;
+        background: #ffffff;
+        border-radius: 14px;
+        box-shadow: 0 12px 36px rgba(15, 23, 42, 0.18);
+        border: 1px solid #e2e8f0;
+        z-index: 99999;
+        display: block;
+        padding: 0;
+        overflow: hidden;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    `;
+
+    renderQuickDropdownContent(dropdown);
+}
+
+function renderQuickDropdownContent(dropdown) {
+    const notifications = getStoredNotifications();
+    const unread = notifications.filter(n => n.status === "Unread" || n.is_read === false);
+
+    let listHtml = "";
+    if (notifications.length === 0) {
+        listHtml = `
+            <div style="padding: 30px; text-align: center; color: #64748b;">
+                <div style="font-size: 28px; margin-bottom: 6px;">🔔</div>
+                <div style="font-size: 13px; font-weight: 600;">No notifications available</div>
+            </div>
+        `;
+    } else {
+        const displayList = notifications.slice(0, 5);
+        listHtml = displayList.map(n => {
+            const isUnread = n.status === "Unread" || n.is_read === false;
+            let priorityBadge = n.priority === "High" 
+                ? '<span style="background:#fef2f2; color:#ef4444; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700;">🚨 High</span>' 
+                : (n.priority === "Medium" ? '<span style="background:#fffbe6; color:#d97706; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700;">⚠️ Medium</span>' : '<span style="background:#f0fdf4; color:#16a34a; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700;">ℹ️ Info</span>');
+
+            return `
+                <div style="padding: 12px 16px; border-bottom: 1px solid #f1f5f9; background: ${isUnread ? '#f8fafc' : '#ffffff'}; transition: background 0.15s; display: flex; gap: 12px; align-items: flex-start;">
+                    <div style="font-size: 18px; line-height: 1; margin-top: 2px;">🔔</div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                            <span style="font-size: 11px; font-weight: 700; color: #64748b;">${n.category || 'Alert'}</span>
+                            ${priorityBadge}
+                        </div>
+                        <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title}</div>
+                        <div style="font-size: 12px; color: #475569; margin-bottom: 6px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${n.message}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; color: #94a3b8;">🕒 ${n.date}</span>
+                            ${isUnread ? `<button type="button" style="background:#10b981; color:#fff; border:none; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:600; cursor:pointer;" onclick="markQuickNotifRead('${n.id}', event)">✓ Mark Read</button>` : '<span style="font-size:11px; color:#10b981; font-weight:600;">✓ Read</span>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    }
+
+    dropdown.innerHTML = `
+        <div style="padding: 14px 16px; background: #0f172a; color: white; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 16px;">🔔</span>
+                <span style="font-weight: 700; font-size: 14px;">Live Notifications</span>
+                <span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 800;">${unread.length} Unread</span>
+            </div>
+            <span style="cursor: pointer; opacity: 0.8; font-weight: bold; font-size: 16px;" onclick="document.getElementById('notificationQuickDropdown').style.display='none'">✕</span>
+        </div>
+        <div style="max-height: 360px; overflow-y: auto;">
+            ${listHtml}
+        </div>
+        <div style="padding: 12px 16px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" style="background: none; border: none; color: #3b82f6; font-size: 12px; font-weight: 700; cursor: pointer; padding: 0;" onclick="markAllQuickNotifRead(event)">✓ Mark All Read</button>
+            <a href="notifications.html" style="color: #2563eb; font-size: 12px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 4px;">View All Alerts →</a>
+        </div>
+    `;
+}
+
+function markQuickNotifRead(notifId, e) {
+    if (e) e.stopPropagation();
+    let notifications = getStoredNotifications();
+    const item = notifications.find(n => n.id === notifId);
+    if (item) {
+        item.status = "Read";
+        item.is_read = true;
+        localStorage.setItem("notifications", JSON.stringify(notifications));
+        
+        if (item.rawId) {
+            fetch(`http://127.0.0.1:8000/notifications/${item.rawId}/read`, { method: "PUT" }).catch(() => {});
+        }
+
+        updateTopbarUnreadBadge();
+        const dropdown = document.getElementById("notificationQuickDropdown");
+        if (dropdown) renderQuickDropdownContent(dropdown);
+
+        if (typeof loadNotifications === "function" && (document.getElementById("notificationStreamFeed") || document.getElementById("notificationTableBody"))) {
+            loadNotifications();
+        }
+    }
+}
+
+function markAllQuickNotifRead(e) {
+    if (e) e.stopPropagation();
+    let notifications = getStoredNotifications();
+    notifications.forEach(n => {
+        n.status = "Read";
+        n.is_read = true;
+    });
+    localStorage.setItem("notifications", JSON.stringify(notifications));
+
+    fetch("http://127.0.0.1:8000/notifications/mark-all-read", { method: "POST" }).catch(() => {});
+
+    updateTopbarUnreadBadge();
+    const dropdown = document.getElementById("notificationQuickDropdown");
+    if (dropdown) renderQuickDropdownContent(dropdown);
+
+    if (typeof loadNotifications === "function" && (document.getElementById("notificationStreamFeed") || document.getElementById("notificationTableBody"))) {
+        loadNotifications();
+    }
+}
+
+function initNotificationDropdown() {
+    document.querySelectorAll('.icon-btn').forEach(btn => {
+        if (btn.innerText.includes('🔔')) {
+            btn.style.cursor = 'pointer';
+            btn.onclick = (e) => toggleNotificationQuickDropdown(e);
+        }
+    });
+
+    document.addEventListener("click", function(e) {
+        const dropdown = document.getElementById("notificationQuickDropdown");
+        if (dropdown && dropdown.style.display === "block") {
+            const isClickInsideBell = Array.from(document.querySelectorAll('.icon-btn')).some(btn => btn.contains(e.target));
+            if (!dropdown.contains(e.target) && !isClickInsideBell) {
+                dropdown.style.display = "none";
+            }
+        }
+    });
 }
 
 function showNotificationToast(message, type = 'info') {
@@ -2942,10 +3394,9 @@ function updateFilterPillCounts(notifications) {
     setBadge("countPillSystem", counts["System Audit"]);
 }
 
-function loadNotifications() {
+function renderNotifications(notifications) {
     const feedContainer = document.getElementById("notificationStreamFeed");
     const tableBody = document.getElementById("notificationTableBody");
-    const notifications = getStoredNotifications();
 
     updateTopbarUnreadBadge();
 
@@ -2955,10 +3406,7 @@ function loadNotifications() {
     let highCount = 0;
     let systemCount = 0;
 
-    let searchInput = document.getElementById("searchNotifications");
-    let searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
-
-    const filteredItems = notifications.filter(item => {
+    notifications.forEach(item => {
         const itemStatus = item.status || "Unread";
         const itemPriority = item.priority || "Medium";
         const itemCategory = item.category || "System Audit";
@@ -2966,6 +3414,15 @@ function loadNotifications() {
         if (itemStatus === "Unread") unreadCount++;
         if (itemPriority === "High") highCount++;
         if (itemCategory === "System Audit" || itemCategory === "Purchase Order") systemCount++;
+    });
+
+    let searchInput = document.getElementById("searchNotifications");
+    let searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
+
+    const filteredItems = notifications.filter(item => {
+        const itemStatus = item.status || "Unread";
+        const itemPriority = item.priority || "Medium";
+        const itemCategory = item.category || "System Audit";
 
         // Filter tabs condition
         if (activeNotificationFilter === "Unread" && itemStatus !== "Unread") return false;
@@ -3078,7 +3535,7 @@ function loadNotifications() {
                     <td><span class="badge-status under-review">${item.category}</span></td>
                     <td>
                         <strong>${item.title}</strong>
-                        <div style="font-size: 12px; color: #64748b; margin-top: 3px;">${item.message}</div>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 4px;">${item.message}</div>
                     </td>
                     <td>${priorityBadge}</td>
                     <td>${statusBadge}</td>
@@ -3093,6 +3550,36 @@ function loadNotifications() {
     }
 
     updateNotificationCharts(notifications);
+}
+
+function loadNotifications() {
+    const feedContainer = document.getElementById("notificationStreamFeed");
+    const tableBody = document.getElementById("notificationTableBody");
+    if (!feedContainer && !tableBody && !document.getElementById("topbarUnreadBadge")) return;
+
+    fetch("http://127.0.0.1:8000/notifications")
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+                let mapped = data.map(n => ({
+                    id: "N" + String(n.id).padStart(3, '0'),
+                    rawId: n.id,
+                    date: n.created_at ? new Date(n.created_at).toLocaleString() : new Date().toLocaleString(),
+                    category: n.category || "System Audit",
+                    title: n.title,
+                    message: n.message,
+                    priority: n.type === "danger" ? "High" : (n.type === "warning" ? "Medium" : "Low"),
+                    status: n.is_read ? "Read" : "Unread"
+                }));
+                localStorage.setItem("notifications", JSON.stringify(mapped));
+                renderNotifications(mapped);
+            } else {
+                renderNotifications(getStoredNotifications());
+            }
+        })
+        .catch(err => {
+            renderNotifications(getStoredNotifications());
+        });
 }
 
 function updateNotificationCharts(notifications) {
@@ -3310,6 +3797,7 @@ document.getElementById("clearReadBtn")?.addEventListener("click", function() {
 
     notifications = notifications.filter(n => n.status === "Unread");
     localStorage.setItem("notifications", JSON.stringify(notifications));
+    fetch("http://127.0.0.1:8000/notifications/clear-read", { method: "DELETE" }).catch(() => {});
     loadNotifications();
     showNotificationToast(`Cleared ${readCount} read notification(s).`, "success");
 });
@@ -3318,19 +3806,28 @@ function markAllNotificationsRead() {
     let notifications = getStoredNotifications();
     notifications.forEach(item => item.status = "Read");
     localStorage.setItem("notifications", JSON.stringify(notifications));
+    fetch("http://127.0.0.1:8000/notifications/mark-all-read", { method: "POST" }).catch(() => {});
     loadNotifications();
     showNotificationToast("All notifications marked as read.", "success");
 }
 
 function markNotificationRead(idOrIndex) {
     let notifications = getStoredNotifications();
-    let notif = notifications.find(n => String(n.id) === String(idOrIndex));
+    let notif = notifications.find(n => String(n.id) === String(idOrIndex) || String(n.rawId) === String(idOrIndex));
     if (!notif && typeof idOrIndex === 'number' && notifications[idOrIndex]) {
         notif = notifications[idOrIndex];
     }
     if (notif) {
         notif.status = "Read";
         localStorage.setItem("notifications", JSON.stringify(notifications));
+        if (notif.rawId) {
+            fetch(`http://127.0.0.1:8000/notifications/${notif.rawId}/read`, { method: "PUT" }).catch(() => {});
+        } else {
+            const num = parseInt(String(idOrIndex).replace(/\D/g, ''));
+            if (!isNaN(num)) {
+                fetch(`http://127.0.0.1:8000/notifications/${num}/read`, { method: "PUT" }).catch(() => {});
+            }
+        }
         loadNotifications();
         showNotificationToast(`Alert ${notif.id || ''} marked as read.`, "success");
     }
@@ -3342,12 +3839,20 @@ function markNotificationAsRead(idOrIndex) {
 
 function deleteNotification(idOrIndex) {
     let notifications = getStoredNotifications();
-    let index = notifications.findIndex(n => String(n.id) === String(idOrIndex));
+    let index = notifications.findIndex(n => String(n.id) === String(idOrIndex) || String(n.rawId) === String(idOrIndex));
     if (index === -1 && typeof idOrIndex === 'number') index = idOrIndex;
     
     if (index !== -1) {
         const item = notifications[index];
         if (confirm(`Are you sure you want to delete notification alert ${item.id || ''}?`)) {
+            if (item.rawId) {
+                fetch(`http://127.0.0.1:8000/notifications/${item.rawId}`, { method: "DELETE" }).catch(() => {});
+            } else {
+                const num = parseInt(String(idOrIndex).replace(/\D/g, ''));
+                if (!isNaN(num)) {
+                    fetch(`http://127.0.0.1:8000/notifications/${num}`, { method: "DELETE" }).catch(() => {});
+                }
+            }
             notifications.splice(index, 1);
             localStorage.setItem("notifications", JSON.stringify(notifications));
             loadNotifications();
@@ -3377,6 +3882,412 @@ if (document.getElementById("notificationStreamFeed") || document.getElementById
 } else {
     updateTopbarUnreadBadge();
 }
+
+// ==========================================================================
+// ROLE-BASED ACCESS CONTROL & SEPARATE DASHBOARD ENGINE (ALL 6 ROLES)
+// ==========================================================================
+
+const rolePermissions = {
+    "Administrator": ["dashboard.html", "vendors.html", "procurement.html", "purchase-orders.html", "contracts.html", "communication.html", "performance.html", "analytics.html", "reports.html", "notifications.html"],
+    "Procurement Manager": ["dashboard.html", "procurement.html", "purchase-orders.html", "vendors.html", "contracts.html", "reports.html"],
+    "Supply Chain Manager": ["dashboard.html", "vendors.html", "performance.html", "analytics.html", "notifications.html"],
+    "Vendor": ["dashboard.html", "purchase-orders.html", "contracts.html", "communication.html"],
+    "Finance Officer": ["dashboard.html", "purchase-orders.html", "procurement.html", "reports.html"],
+    "Auditor": ["dashboard.html", "contracts.html", "reports.html", "notifications.html"]
+};
+
+let activeRoleChartInstances = {};
+
+function destroyRoleCharts() {
+    Object.keys(activeRoleChartInstances).forEach(key => {
+        if (activeRoleChartInstances[key]) {
+            activeRoleChartInstances[key].destroy();
+        }
+    });
+    activeRoleChartInstances = {};
+}
+
+function initRoleSession() {
+    const currentRole = localStorage.getItem("userRole") || "Administrator";
+    const currentUserName = localStorage.getItem("userName") || currentRole + " User";
+
+    // 1. Topbar Profile Display
+    const profileChips = document.querySelectorAll(".profile-chip");
+    profileChips.forEach(chip => {
+        chip.innerHTML = `
+            <span class="avatar">👤</span>
+            <div style="display: flex; flex-direction: column; text-align: left; line-height: 1.2;">
+                <span class="user-name" style="font-weight: 700; font-size: 13px;">${currentUserName}</span>
+                <span class="role-badge-text" style="font-size: 10px; color: #3b82f6; font-weight: 800; text-transform: uppercase;">${currentRole}</span>
+            </div>
+            <a href="login.html" title="Switch Role / Sign Out" style="margin-left: 8px; color: #94a3b8; font-size: 12px; text-decoration: none;" onclick="localStorage.clear();">🚪</a>
+        `;
+    });
+
+    // 2. Sidebar Footer User Display
+    const sidebarAvatar = document.getElementById("sidebarAvatar");
+    const sidebarUserName = document.getElementById("sidebarUserName");
+    const sidebarUserRole = document.getElementById("sidebarUserRole");
+    if (sidebarAvatar) sidebarAvatar.innerText = currentUserName.charAt(0).toUpperCase();
+    if (sidebarUserName) sidebarUserName.innerText = currentUserName;
+    if (sidebarUserRole) sidebarUserRole.innerText = currentRole;
+
+    // 3. Update Dashboard Header Title and Description
+    const dashHeaderTitle = document.getElementById("dashRoleTitle");
+    const dashHeaderSub = document.getElementById("dashRoleSubtitle");
+    
+    if (dashHeaderTitle) dashHeaderTitle.innerText = `Welcome back, ${currentUserName.split(' ')[0]}! 👋`;
+
+    if (dashHeaderSub) {
+        const roleDescriptions = {
+            "Administrator": "Here is the overall platform overview and system statistics.",
+            "Procurement Manager": "Here is your procurement overview, active purchase orders, and cost metrics.",
+            "Supply Chain Manager": "Here is your supply chain overview, delivery performance, and supplier risk metrics.",
+            "Vendor": "Here is your vendor reliability score, order history, and active performance status.",
+            "Finance Officer": "Here is your financial summary, spend analysis, and payment performance overview.",
+            "Auditor": "Here is your audit overview, compliance ratings, and historical activity logs."
+        };
+        dashHeaderSub.textContent = roleDescriptions[currentRole] || "Real-time vendor reliability intelligence and risk management platform.";
+    }
+
+    // 4. Highlight active role tab in Top Switcher
+    document.querySelectorAll(".role-tab-btn").forEach(btn => {
+        if (btn.getAttribute("data-role") === currentRole) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    });
+
+    // 5. Render charts & KPIs for current role
+    renderRoleDashboardCharts(currentRole);
+
+    // 6. Dynamic System Dates & Live Notification Bell Dropdown
+    updateDynamicDates();
+    updateTopbarUnreadBadge();
+    initNotificationDropdown();
+}
+
+function renderRoleDashboardCharts(roleName) {
+    destroyRoleCharts();
+
+    fetch("http://127.0.0.1:8000/dashboard/stats")
+        .then(res => res.json())
+        .then(stats => {
+            // Helper text setter for KPI cards
+            const setTxt = (id, val) => {
+                const el = document.getElementById(id);
+                if (el && val !== undefined && val !== null) el.innerHTML = val;
+            };
+
+            // 1. Vendor View Cards
+            const scoreVal = stats.average_vendor_score || 89;
+            setTxt("vScoreVal", `${scoreVal} <small style="font-size: 12px; color: #64748b;">/100</small>`);
+            setTxt("vGaugeScoreVal", `${scoreVal} <small style="font-size: 14px;">/100</small>`);
+            setTxt("vPOCountVal", (stats.total_orders || 0).toLocaleString());
+            setTxt("vOnTimeVal", `${stats.on_time_delivery_pct || 92.6}%`);
+            setTxt("vQualityVal", `${stats.avg_quality || 4.6} <small style="font-size: 12px; color: #64748b;">/5.0</small>`);
+            setTxt("vInvoicedVal", stats.formatted_completed_spend || stats.formatted_spend || "₹0");
+            setTxt("vPendingPayVal", stats.formatted_pending_spend || "₹0");
+
+            // 2. Administrator View Cards
+            setTxt("adminUserCount", (stats.total_users || 0).toLocaleString());
+            setTxt("adminVendorCount", (stats.total_vendors || 0).toLocaleString());
+            setTxt("adminPOCount", (stats.total_orders || 0).toLocaleString());
+            setTxt("adminSpendCount", stats.formatted_spend || "₹0");
+            setTxt("adminContractCount", (stats.active_contracts || 0).toLocaleString());
+
+            // 3. Auditor View Cards
+            setTxt("auditConductedVal", (stats.audits_conducted || 0).toLocaleString());
+            setTxt("auditComplianceVal", `${stats.avg_compliance_score || 86.5}%`);
+            setTxt("auditFindingsVal", (stats.open_findings || 0).toLocaleString());
+            setTxt("auditRiskVal", (stats.risk_vendors || 0).toLocaleString());
+            setTxt("auditPendingVal", ((stats.pending_orders || 0) + (stats.total_procurements || 0)).toLocaleString());
+            setTxt("auditOverdueVal", (stats.expiring_contracts || 0).toLocaleString());
+
+            // 4. Finance Officer View Cards
+            setTxt("finSpendVal", stats.formatted_spend || "₹0");
+            setTxt("finSavingsVal", stats.formatted_savings || "₹0");
+            setTxt("finPaymentsVal", stats.formatted_completed_spend || "₹0");
+            setTxt("finBudgetUtilVal", `${Math.min(100, Math.round(((stats.completed_spend || 0) / (stats.total_spend || 1)) * 1000) / 10)}%`);
+            setTxt("finPendingPayVal", stats.formatted_pending_spend || "₹0");
+            setTxt("finCashFlowVal", stats.formatted_completed_spend || "₹0");
+
+            // 5. Procurement Manager View Cards
+            setTxt("pmPOCountVal", (stats.total_orders || 0).toLocaleString());
+            setTxt("pmPendingApprovalVal", (stats.pending_orders || 0).toLocaleString());
+            setTxt("pmProcurementSpendVal", stats.formatted_spend || "₹0");
+            setTxt("pmVendorPoolVal", (stats.total_vendors || 0).toLocaleString());
+            setTxt("pmDeliveryOnTimeVal", `${stats.on_time_delivery_pct || 94.2}%`);
+            setTxt("pmRequisitionsVal", (stats.total_procurements || 0).toLocaleString());
+
+            // 6. Supply Chain Manager View Cards
+            setTxt("scmRiskVendorsVal", (stats.risk_vendors || 0).toLocaleString());
+            setTxt("scmDelayedVal", (stats.delayed_shipments || 0).toLocaleString());
+            setTxt("scmOnTimeVal", `${stats.on_time_delivery_pct || 91.8}%`);
+            setTxt("scmRespTimeVal", `${stats.avg_response_time || 1.4} hrs`);
+            setTxt("scmOrderCompVal", `${stats.avg_order_completion || 97.5}%`);
+            setTxt("scmAvgScoreVal", (stats.average_vendor_score || 86.2).toString());
+
+            if (roleName === "Vendor") {
+                // Half-Donut Gauge Chart for Vendor Reliability Score (89/100)
+                const ctxGauge = document.getElementById("vendorGaugeChart");
+                if (ctxGauge) {
+                    const score = stats.average_vendor_score || 89;
+                    activeRoleChartInstances.vendorGauge = new Chart(ctxGauge, {
+                        type: "doughnut",
+                        data: {
+                            labels: ["Reliability Score", "Remaining"],
+                            datasets: [{
+                                data: [score, Math.max(0, 100 - score)],
+                                backgroundColor: ["#10b981", "#e2e8f0"],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            rotation: -90,
+                            circumference: 180,
+                            cutout: "80%",
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                        }
+                    });
+                }
+            } else if (roleName === "Administrator") {
+                // 1. Platform Overview (Line Chart)
+                const ctxOverview = document.getElementById("adminPlatformOverviewChart");
+                if (ctxOverview && stats.platform_overview) {
+                    const poData = stats.platform_overview;
+                    activeRoleChartInstances.adminOverview = new Chart(ctxOverview, {
+                        type: "line",
+                        data: {
+                            labels: poData.labels || ["Jan", "Feb", "Mar", "Apr", "May"],
+                            datasets: [
+                                { label: "Departments", data: poData.departments, borderColor: "#3b82f6", tension: 0.3, fill: false },
+                                { label: "Requisitions", data: poData.requisitions, borderColor: "#10b981", tension: 0.3, fill: false },
+                                { label: "Workflows (POs)", data: poData.workflows, borderColor: "#8b5cf6", tension: 0.3, fill: false }
+                            ]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+
+                // 2. Vendor Status Overview (Doughnut Chart)
+                const ctxStatus = document.getElementById("adminVendorStatusChart");
+                if (ctxStatus && stats.vendor_status_overview) {
+                    const vObj = stats.vendor_status_overview;
+                    const vLabels = Object.keys(vObj).map(k => `${k} (${vObj[k]})`);
+                    const vValues = Object.values(vObj);
+
+                    activeRoleChartInstances.adminStatus = new Chart(ctxStatus, {
+                        type: "doughnut",
+                        data: {
+                            labels: vLabels,
+                            datasets: [{
+                                data: vValues,
+                                backgroundColor: ["#10b981", "#f59e0b", "#3b82f6", "#ef4444", "#64748b"]
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, cutout: "65%" }
+                    });
+                }
+
+                // 3. Procurement Status Overview (Doughnut Chart)
+                const ctxPO = document.getElementById("adminProcurementStatusChart");
+                if (ctxPO && stats.procurement_status_overview) {
+                    const pObj = stats.procurement_status_overview;
+                    const pLabels = Object.keys(pObj).map(k => `${k} (${pObj[k]})`);
+                    const pValues = Object.values(pObj);
+
+                    activeRoleChartInstances.adminPO = new Chart(ctxPO, {
+                        type: "doughnut",
+                        data: {
+                            labels: pLabels,
+                            datasets: [{
+                                data: pValues,
+                                backgroundColor: ["#f59e0b", "#3b82f6", "#8b5cf6", "#10b981", "#ef4444"]
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, cutout: "65%" }
+                    });
+                }
+            } else if (roleName === "Auditor") {
+                const ctxComp = document.getElementById("auditorComplianceChart");
+                if (ctxComp && stats.auditor_compliance_overview) {
+                    const compData = stats.auditor_compliance_overview;
+                    const compLabels = Object.keys(compData).map(k => `${k} (${compData[k]})`);
+                    activeRoleChartInstances.auditComp = new Chart(ctxComp, {
+                        type: "doughnut",
+                        data: {
+                            labels: compLabels,
+                            datasets: [{ data: Object.values(compData), backgroundColor: ["#10b981", "#f59e0b", "#ef4444"] }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, cutout: "65%" }
+                    });
+                }
+                const ctxFind = document.getElementById("auditorFindingsChart");
+                if (ctxFind && stats.auditor_findings_summary) {
+                    const findData = stats.auditor_findings_summary;
+                    activeRoleChartInstances.auditFind = new Chart(ctxFind, {
+                        type: "bar",
+                        data: {
+                            labels: Object.keys(findData),
+                            datasets: [{ label: "Audit Findings", data: Object.values(findData), backgroundColor: ["#ef4444", "#f59e0b", "#3b82f6"], borderRadius: 6 }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+                const ctxRisk = document.getElementById("auditorRiskChart");
+                if (ctxRisk && stats.auditor_risk_overview) {
+                    const riskData = stats.auditor_risk_overview;
+                    const riskLabels = Object.keys(riskData).map(k => `${k} (${riskData[k]})`);
+                    activeRoleChartInstances.auditRisk = new Chart(ctxRisk, {
+                        type: "doughnut",
+                        data: {
+                            labels: riskLabels,
+                            datasets: [{ data: Object.values(riskData), backgroundColor: ["#ef4444", "#f59e0b", "#10b981"] }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, cutout: "65%" }
+                    });
+                }
+            } else if (roleName === "Finance Officer") {
+                const ctxCat = document.getElementById("finSpendCategoryChart");
+                if (ctxCat && stats.fin_spend_category) {
+                    const catData = stats.fin_spend_category;
+                    activeRoleChartInstances.finCat = new Chart(ctxCat, {
+                        type: "doughnut",
+                        data: {
+                            labels: Object.keys(catData),
+                            datasets: [{ data: Object.values(catData), backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#06b6d4"] }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, cutout: "65%" }
+                    });
+                }
+                const ctxTrend = document.getElementById("finSpendTrendChart");
+                if (ctxTrend && stats.fin_spend_trend) {
+                    const trend = stats.fin_spend_trend;
+                    activeRoleChartInstances.finTrend = new Chart(ctxTrend, {
+                        type: "line",
+                        data: {
+                            labels: trend.labels || ["Dec 24", "Jan 25", "Feb 25", "Mar 25", "Apr 25", "May 25"],
+                            datasets: [{ label: "Spend (₹)", data: trend.spend || [], borderColor: "#3b82f6", tension: 0.3, fill: true, backgroundColor: "rgba(59,130,246,0.1)" }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+                const ctxBva = document.getElementById("finBudgetVsActualChart");
+                if (ctxBva && stats.fin_budget_vs_actual) {
+                    const bva = stats.fin_budget_vs_actual;
+                    activeRoleChartInstances.finBva = new Chart(ctxBva, {
+                        type: "bar",
+                        data: {
+                            labels: bva.categories || ["Raw Materials", "Equipment", "Services", "IT & Software", "Logistics"],
+                            datasets: [
+                                { label: "Budget (₹)", data: bva.budget || [], backgroundColor: "#3b82f6", borderRadius: 6 },
+                                { label: "Actual (₹)", data: bva.actual || [], backgroundColor: "#10b981", borderRadius: 6 }
+                            ]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+            // Update Procurement Manager KPI Cards dynamically
+            const pmPOEl = document.getElementById("pmPOCountVal");
+            const pmPendingEl = document.getElementById("pmPendingApprovalVal");
+            const pmSpendEl = document.getElementById("pmProcurementSpendVal");
+            const pmVendorEl = document.getElementById("pmVendorPoolVal");
+            const pmDeliveryEl = document.getElementById("pmDeliveryOnTimeVal");
+            const pmReqEl = document.getElementById("pmRequisitionsVal");
+
+            if (pmPOEl && stats.total_orders !== undefined) pmPOEl.innerText = stats.total_orders.toLocaleString();
+            if (pmPendingEl && stats.pending_orders !== undefined) pmPendingEl.innerText = (stats.pending_orders + (stats.procurement_status_overview ? stats.procurement_status_overview.Pending : 0)).toLocaleString();
+            if (pmSpendEl && stats.formatted_spend !== undefined) pmSpendEl.innerText = stats.formatted_spend;
+            if (pmVendorEl && stats.total_vendors !== undefined) pmVendorEl.innerText = stats.total_vendors.toLocaleString();
+            if (pmDeliveryEl && stats.on_time_delivery_pct !== undefined) pmDeliveryEl.innerText = `${stats.on_time_delivery_pct}%`;
+            if (pmReqEl && stats.total_procurements !== undefined) pmReqEl.innerText = stats.total_procurements.toLocaleString();
+
+            } else if (roleName === "Procurement Manager") {
+                const ctxPoBar = document.getElementById("procurementBarChart");
+                if (ctxPoBar && stats.po_status_volume) {
+                    const poVol = stats.po_status_volume;
+                    activeRoleChartInstances.procPoBar = new Chart(ctxPoBar, {
+                        type: "bar",
+                        data: {
+                            labels: Object.keys(poVol),
+                            datasets: [{
+                                label: "Orders Count",
+                                data: Object.values(poVol),
+                                backgroundColor: ["#f59e0b", "#3b82f6", "#8b5cf6", "#10b981", "#ef4444"],
+                                borderRadius: 6
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+                const ctxDeptPie = document.getElementById("procurementDeptPieChart");
+                if (ctxDeptPie && stats.department_spend_distribution) {
+                    const dSpend = stats.department_spend_distribution;
+                    activeRoleChartInstances.procDeptPie = new Chart(ctxDeptPie, {
+                        type: "doughnut",
+                        data: {
+                            labels: Object.keys(dSpend),
+                            datasets: [{
+                                data: Object.values(dSpend),
+                                backgroundColor: ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#06b6d4"]
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, cutout: "65%" }
+                    });
+                }
+            } else if (roleName === "Supply Chain Manager") {
+                const ctxMatrix = document.getElementById("scmRiskMatrixChart");
+                if (ctxMatrix && stats.scm_risk_matrix) {
+                    const matrixData = stats.scm_risk_matrix;
+                    activeRoleChartInstances.scmMatrix = new Chart(ctxMatrix, {
+                        type: "bar",
+                        data: {
+                            labels: Object.keys(matrixData),
+                            datasets: [{ label: "Suppliers Count", data: Object.values(matrixData), backgroundColor: ["#ef4444", "#f59e0b", "#3b82f6", "#10b981"], borderRadius: 6 }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+                const ctxScmLine = document.getElementById("scmTrendLineChart");
+                if (ctxScmLine && stats.scm_delivery_trend) {
+                    const trend = stats.scm_delivery_trend;
+                    activeRoleChartInstances.scmTrendLine = new Chart(ctxScmLine, {
+                        type: "line",
+                        data: {
+                            labels: trend.labels || ["Week 1", "Week 2", "Week 3", "Week 4"],
+                            datasets: [
+                                { label: "On-Time Shipments (%)", data: trend.on_time || [], borderColor: "#10b981", tension: 0.3 },
+                                { label: "Delayed Shipments (%)", data: trend.delayed || [], borderColor: "#ef4444", tension: 0.3 }
+                            ]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+            }
+        })
+        .catch(err => console.log("Dashboard stats error:", err));
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    initRoleSession();
+});
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    initRoleSession();
+}
+
+window.addEventListener("focus", function() {
+    const currentRole = localStorage.getItem("userRole") || "Administrator";
+    if (typeof renderRoleDashboardCharts === "function") {
+        renderRoleDashboardCharts(currentRole);
+    }
+});
+
+
+
 
 
 

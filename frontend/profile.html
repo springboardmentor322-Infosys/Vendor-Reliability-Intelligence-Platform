@@ -3,54 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
+    <title>My Profile & Settings | Vendor Intelligence Platform</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div class="dashboard">
 
+    <!-- Sidebar Menu -->
     <div class="sidebar">
-        <h2>Vendor IQ</h2>
+        <div>
+            <div class="sidebar-brand">
+                <span class="brand-icon">V</span>
+                <div>
+                    <h2 style="font-size: 18px; margin: 0; color: white;">VendorIQ</h2>
+                    <span style="font-size: 10px; color: #60a5fa; font-weight: 700;">Reliability & Risk Platform</span>
+                </div>
+            </div>
 
-        <ul>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="vendors.html">Vendors</a></li>
-            <li><a href="purchase-orders.html">Purchase Orders</a></li>
-            <li><a href="performance.html">Performance</a></li>
-            <li><a href="analytics.html">Analytics</a></li>
-            <li><a href="reports.html">Reports</a></li>
-            <li><a href="notifications.html">Notifications</a></li>
-            <li><a href="profile.html">Profile</a></li>
-        </ul>
-    </div>
-
-    <div class="content">
-
-        <div class="topbar">
-            <h1>My Profile</h1>
-            <a href="profile.html" class="profile-icon">👤</a>
+            <div class="sidebar-menu-title">Main Menu</div>
+            <ul id="sidebarNav">
+                <li><a href="dashboard.html">📊 Dashboard</a></li>
+                <li><a href="vendors.html">🏢 Vendors</a></li>
+                <li><a href="procurement.html">📋 Procurement</a></li>
+                <li><a href="purchase-orders.html">📦 Purchase Orders</a></li>
+                <li><a href="contracts.html">📄 Contracts</a></li>
+                <li><a href="communication.html">💬 Communication</a></li>
+                <li><a href="performance.html">⭐ Performance</a></li>
+                <li><a href="analytics.html">📈 Analytics</a></li>
+                <li><a href="reports.html">📑 Reports</a></li>
+                <li><a href="notifications.html">🔔 Notifications</a></li>
+                <li><a href="profile.html" class="active">👤 Profile</a></li>
+            </ul>
         </div>
 
-        <div class="profile-card">
+        <div class="sidebar-user-footer">
+            <div class="user-avatar" id="sidebarAvatar">A</div>
+            <div style="overflow: hidden;">
+                <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap;" id="sidebarUserName">Admin User</div>
+                <div style="font-size: 10px; color: #60a5fa; font-weight: 800; text-transform: uppercase;" id="sidebarUserRole">Administrator</div>
+            </div>
+            <a href="login.html" title="Logout" style="margin-left: auto; color: #94a3b8; text-decoration: none;" onclick="localStorage.clear();">🚪</a>
+        </div>
+    </div>
 
-            <div class="profile-image">👤</div>
+    <!-- Main Content Body -->
+    <div class="content">
 
-            <h2>Prajota Shrimanwar</h2>
-            <p>Admin</p>
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="globalProfileSearch" class="search-box" placeholder="Search account settings, security preferences, or activity logs...">
+            </div>
 
-            <hr><br>
+            <div class="top-icons">
+                <div class="top-date-pill">📅 May 21, 2026</div>
+                <div class="icon-btn" onclick="window.location.href='notifications.html'" title="Notifications">🔔<span class="badge-count" id="notifTopBadge">3</span></div>
+                <a href="profile.html" class="profile-chip" id="topProfileChip">
+                    <span class="avatar">👤</span>
+                    <span class="user-name">Loading...</span>
+                </a>
+            </div>
+        </div>
 
-            <label>Full Name</label><br>
-            <input type="text" id="profileName" placeholder="Enter Full Name"><br><br>
+        <!-- Header -->
+        <div class="dashboard-header" style="align-items: center; margin-bottom: 25px;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
+                    <h1 style="margin: 0;" id="profileHeaderTitle">My Account & User Profile</h1>
+                    <span class="badge-status approved" id="profileAccountBadge">Active Session</span>
+                </div>
+                <p class="subtitle">Manage personal information, role privileges, account security, and alert preferences</p>
+            </div>
 
-            <label>Email</label><br>
-            <input type="email" id="profileEmail" placeholder="Enter Email"><br><br>
+            <div style="display: flex; gap: 10px;">
+                <button class="action-header-btn" id="headerSaveProfileBtn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important; color: white !important;">
+                    <span>💾</span> Save Changes
+                </button>
+            </div>
+        </div>
 
-            <label>Mobile Number</label><br>
-            <input type="text" id="profileMobile" placeholder="Enter Mobile Number"><br><br>
+        <!-- Metric KPI Cards -->
+        <div class="cards" style="margin-bottom: 25px;">
+            <div class="card card1">
+                <div class="card-icon-wrapper blue">👤</div>
+                <div class="card-info">
+                    <h3>Current Role</h3>
+                    <p id="kpiUserRole">Administrator</p>
+                </div>
+            </div>
 
-            <button id="updateProfileBtn">Update Profile</button>
+            <div class="card card2">
+                <div class="card-icon-wrapper green">🛡️</div>
+                <div class="card-info">
+                    <h3>Security Status</h3>
+                    <p id="kpiSecurityStatus">Protected (2FA)</p>
+                </div>
+            </div>
+
+            <div class="card card3">
+                <div class="card-icon-wrapper purple">⏱️</div>
+                <div class="card-info">
+                    <h3>Last Active</h3>
+                    <p id="kpiLastActive">Just now</p>
+                </div>
+            </div>
+
+            <div class="card card4">
+                <div class="card-icon-wrapper orange">🔑</div>
+                <div class="card-info">
+                    <h3>Access Privilege</h3>
+                    <p id="kpiAccessScope">Full System Access</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Profile Grid -->
+        <div class="dashboard-grid-2" style="grid-template-columns: 320px 1fr; gap: 25px;">
+            
+            <!-- Left Profile Card -->
+            <div class="widget-card" style="text-align: center; padding: 30px 20px;">
+                <div style="position: relative; display: inline-block; margin-bottom: 15px;">
+                    <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 800; margin: 0 auto; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);" id="profileAvatarLarge">A</div>
+                    <span style="position: absolute; bottom: 4px; right: 4px; background: #10b981; border: 3px solid white; width: 18px; height: 18px; border-radius: 50%;" title="Online"></span>
+                </div>
+
+                <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 5px 0;" id="displayFullName">Admin User</h2>
+                <p style="color: #3b82f6; font-size: 13px; font-weight: 700; margin: 0 0 15px 0;" id="displayRoleTitle">Administrator</p>
+                
+                <span class="badge-status approved" style="padding: 6px 14px; font-size: 12px; font-weight: 700;" id="displayDeptTag">Operations & Security</span>
+
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 25px 0;">
+
+                <div style="text-align: left; display: flex; flex-direction: column; gap: 12px; font-size: 13px; color: #475569;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>📧</span> <span style="font-weight: 600; overflow: hidden; text-overflow: ellipsis;" id="displayEmailText">admin@vendoriq.com</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>📱</span> <span style="font-weight: 600;" id="displayMobileText">+91 98765 43210</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>🏢</span> <span style="font-weight: 600;" id="displayOrgText">VendorIQ Enterprise</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>📅</span> <span style="font-weight: 600;">Member since Jan 2026</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <button type="button" class="cancel-btn" style="width: 100%; border: 1px solid #cbd5e1;" onclick="localStorage.clear(); window.location.href='login.html';">🚪 Sign Out</button>
+                </div>
+            </div>
+
+            <!-- Right Settings Tabs Card -->
+            <div class="widget-card" style="padding: 25px 30px;">
+                
+                <!-- Section Header -->
+                <div class="widget-header" style="margin-bottom: 25px;">
+                    <span class="widget-title">Account Settings & Configuration</span>
+                </div>
+
+                <!-- Personal Information Form -->
+                <form id="profileDetailsForm">
+                    <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                        <span>📝</span> Personal Information
+                    </h3>
+                    
+                    <div class="form-grid" style="margin-bottom: 25px;">
+                        <div class="form-group">
+                            <label for="profileName">Full Name</label>
+                            <input type="text" id="profileName" placeholder="Enter Full Name" value="Admin User">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profileEmail">Email Address</label>
+                            <input type="email" id="profileEmail" placeholder="Enter Email Address" value="admin@vendoriq.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profileMobile">Mobile Number</label>
+                            <input type="text" id="profileMobile" placeholder="Enter Mobile Number" value="+91 98765 43210">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profileDepartment">Department</label>
+                            <input type="text" id="profileDepartment" placeholder="Enter Department" value="Procurement & Operations">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="profileRole">Platform Role Level</label>
+                            <select id="profileRole" style="padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; width: 100%;">
+                                <option value="Administrator">⚙️ Administrator (Full Platform Access)</option>
+                                <option value="Procurement Manager">📦 Procurement Manager</option>
+                                <option value="Supply Chain Manager">🚚 Supply Chain Manager</option>
+                                <option value="Vendor">🏢 Vendor Portal</option>
+                                <option value="Finance Officer">💳 Finance Manager</option>
+                                <option value="Auditor">🔍 Auditor</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 30px;">
+                        <button type="button" class="save-btn" id="updateProfileBtn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;">
+                            <span>✓</span> Update Profile
+                        </button>
+                    </div>
+                </form>
+
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
+
+                <!-- Password & Security Form -->
+                <form id="passwordForm">
+                    <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                        <span>🔒</span> Password & Security
+                    </h3>
+
+                    <div class="form-grid" style="margin-bottom: 25px;">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" placeholder="••••••••">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" id="newPassword" placeholder="Minimum 6 characters">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" placeholder="Re-enter new password">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end;">
+                        <button type="button" class="action-header-btn" id="updatePasswordBtn" style="background: #0f172a !important; color: white !important;">
+                            <span>🔑</span> Change Password
+                        </button>
+                    </div>
+                </form>
+
+            </div>
 
         </div>
 
@@ -58,7 +257,9 @@
 
 </div>
 
-<script src="js/script.js"></script>
+<!-- FLOATING TOAST NOTIFICATION CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
 
+<script src="js/script.js"></script>
 </body>
 </html>
