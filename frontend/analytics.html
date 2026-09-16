@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Analytics Dashboard - VRIP</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+
+        .analytics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .analytics-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .analytics-card h3 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        .analytics-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2864e6;
+            margin-top: 15px;
+        }
+
+        .performance-section {
+            background: white;
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .progress {
+            width: 100%;
+            height: 22px;
+            background: #ddd;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+            margin-bottom: 25px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #2864e6;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="sidebar">
+
+    <h2>VRIP</h2>
+
+    <a href="dashboard.html">Dashboard</a>
+
+    <a href="vendors.html">Vendors</a>
+
+    <a href="procurement.html">Procurement</a>
+
+    <a href="purchase-orders.html">Purchase Orders</a>
+
+    <a href="performance.html">Performance</a>
+
+    <a href="analytics.html">Analytics</a>
+
+    <a href="reports.html">Reports</a>
+
+    <a href="notifications.html">Notifications</a>
+
+</div>
+
+
+
+<div class="main">
+
+    <h1>Analytics Dashboard</h1>
+
+    <p>
+        Monitor vendor statistics, performance and procurement analytics.
+    </p>
+
+
+    <h2>Vendor Analytics</h2>
+
+
+    <div class="analytics-container">
+
+        <div class="analytics-card">
+
+            <h3>Total Vendors</h3>
+
+            <div class="analytics-value" id="totalVendors">
+                0
+            </div>
+
+        </div>
+
+
+        <div class="analytics-card">
+
+            <h3>Approved Vendors</h3>
+
+            <div class="analytics-value" id="approvedVendors">
+                0
+            </div>
+
+        </div>
+
+
+        <div class="analytics-card">
+
+            <h3>Rejected Vendors</h3>
+
+            <div class="analytics-value" id="rejectedVendors">
+                0
+            </div>
+
+        </div>
+
+
+        <div class="analytics-card">
+
+            <h3>Under Review</h3>
+
+            <div class="analytics-value" id="underReview">
+                0
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="performance-section">
+
+        <h2>Vendor Performance Analytics</h2>
+
+
+        <p>Average Reliability</p>
+
+        <h3 id="averageReliability">
+            0%
+        </h3>
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                id="reliabilityBar">
+            </div>
+
+        </div>
+
+
+
+        <p>Average Quality</p>
+
+        <h3 id="averageQuality">
+            0%
+        </h3>
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                id="qualityBar">
+            </div>
+
+        </div>
+
+
+
+        <p>Average On-Time Delivery</p>
+
+        <h3 id="averageDelivery">
+            0%
+        </h3>
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                id="deliveryBar">
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="performance-section">
+
+        <h2>Procurement Analytics</h2>
+
+
+        <div class="analytics-container">
+
+            <div class="analytics-card">
+
+                <h3>Total Purchase Orders</h3>
+
+                <div
+                    class="analytics-value"
+                    id="totalOrders">
+
+                    0
+
+                </div>
+
+            </div>
+
+
+
+            <div class="analytics-card">
+
+                <h3>Delivered Orders</h3>
+
+                <div
+                    class="analytics-value"
+                    id="deliveredOrders">
+
+                    0
+
+                </div>
+
+            </div>
+
+
+
+            <div class="analytics-card">
+
+                <h3>Pending Orders</h3>
+
+                <div
+                    class="analytics-value"
+                    id="pendingOrders">
+
+                    0
+
+                </div>
+
+            </div>
+
+
+
+            <div class="analytics-card">
+
+                <h3>Partial Delivery</h3>
+
+                <div
+                    class="analytics-value"
+                    id="partialDeliveryOrders">
+
+                    0
+
+                </div>
+
+            </div>
+
+
+
+            <div class="analytics-card">
+
+                <h3>Total Procurement Cost</h3>
+
+                <div
+                    class="analytics-value"
+                    id="totalProcurementCost">
+
+                    ₹0
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+const API_URL = "http://127.0.0.1:8000";
+
+
+async function loadAnalytics() {
+
+    try {
+
+        const response = await fetch(
+            API_URL + "/analytics"
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load analytics"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Analytics Data:",
+            data
+        );
+
+
+        document.getElementById(
+            "totalVendors"
+        ).textContent =
+            data.total_vendors || 0;
+
+
+        document.getElementById(
+            "approvedVendors"
+        ).textContent =
+            data.approved_vendors || 0;
+
+
+        document.getElementById(
+            "rejectedVendors"
+        ).textContent =
+            data.rejected_vendors || 0;
+
+
+        document.getElementById(
+            "underReview"
+        ).textContent =
+            data.under_review_vendors || 0;
+
+
+
+        const reliability =
+            Number(
+                data.average_reliability
+            ) || 0;
+
+
+        const quality =
+            Number(
+                data.average_quality
+            ) || 0;
+
+
+        const delivery =
+            Number(
+                data.average_delivery
+            ) || 0;
+
+
+
+        document.getElementById(
+            "averageReliability"
+        ).textContent =
+            reliability.toFixed(2) + "%";
+
+
+        document.getElementById(
+            "averageQuality"
+        ).textContent =
+            quality.toFixed(2) + "%";
+
+
+        document.getElementById(
+            "averageDelivery"
+        ).textContent =
+            delivery.toFixed(2) + "%";
+
+
+
+        document.getElementById(
+            "reliabilityBar"
+        ).style.width =
+            reliability + "%";
+
+
+        document.getElementById(
+            "qualityBar"
+        ).style.width =
+            quality + "%";
+
+
+        document.getElementById(
+            "deliveryBar"
+        ).style.width =
+            delivery + "%";
+
+
+
+        document.getElementById(
+            "totalOrders"
+        ).textContent =
+            data.total_orders || 0;
+
+
+        document.getElementById(
+            "deliveredOrders"
+        ).textContent =
+            data.delivered_orders || 0;
+
+
+        document.getElementById(
+            "pendingOrders"
+        ).textContent =
+            data.pending_orders || 0;
+
+
+        document.getElementById(
+            "partialDeliveryOrders"
+        ).textContent =
+            data.partial_delivery_orders || 0;
+
+
+        document.getElementById(
+            "totalProcurementCost"
+        ).textContent =
+            "₹" +
+            Number(
+                data.total_procurement_cost || 0
+            ).toLocaleString("en-IN");
+
+
+    } catch (error) {
+
+        console.error(
+            "Analytics Error:",
+            error
+        );
+
+        alert(
+            "Failed to load analytics data"
+        );
+
+    }
+
+}
+
+
+loadAnalytics();
+
+</script>
+
+
+</body>
+
+</html>

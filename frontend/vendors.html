@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Vendor Management - VRIP</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+
+        .logout-btn {
+            margin: 20px;
+            padding: 10px;
+            width: calc(100% - 40px);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #dc3545;
+            color: white;
+        }
+
+        .logout-btn:hover {
+            background: #b02a37;
+        }
+
+        .card {
+            margin-bottom: 25px;
+            padding: 20px;
+        }
+
+        input,
+        select {
+            padding: 10px;
+            margin: 5px;
+            min-width: 200px;
+        }
+
+        button {
+            padding: 9px 14px;
+            margin: 3px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .add-btn {
+            background: #2864e8;
+            color: white;
+        }
+
+        .approve-btn {
+            background: #198754;
+            color: white;
+        }
+
+        .reject-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .view-btn {
+            background: #ffc107;
+            color: black;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #2864e8;
+            color: white;
+        }
+
+        .status-pending {
+            color: #856404;
+            font-weight: bold;
+        }
+
+        .status-approved {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .status-rejected {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .status-review {
+            color: #856404;
+            font-weight: bold;
+        }
+
+        .filter-row {
+            margin-bottom: 15px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- LOGIN CHECK -->
+
+<script>
+
+    if (localStorage.getItem("logged_in") !== "true") {
+
+        window.location.href = "login.html";
+
+    }
+
+</script>
+
+
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <h2>VRIP</h2>
+
+    <a href="dashboard.html">
+        Dashboard
+    </a>
+
+    <a href="vendors.html">
+        Vendors
+    </a>
+
+    <a href="procurement.html">
+        Procurement
+    </a>
+
+    <a href="purchase-orders.html">
+        Purchase Orders
+    </a>
+
+    <a href="performance.html">
+        Performance
+    </a>
+
+    <a href="reports.html">
+        Reports
+    </a>
+
+    <a href="notifications.html">
+        Notifications
+    </a>
+
+
+    <button
+        class="logout-btn"
+        onclick="logout()"
+    >
+        Logout
+    </button>
+
+</div>
+
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+    <h1>Vendor Management</h1>
+
+
+    <!-- ADD VENDOR -->
+
+    <div class="card">
+
+        <h2>Add New Vendor</h2>
+
+
+        <input
+            type="text"
+            id="name"
+            placeholder="Vendor Name"
+        >
+
+
+        <input
+            type="email"
+            id="email"
+            placeholder="Vendor Email"
+        >
+
+
+        <input
+            type="text"
+            id="phone"
+            placeholder="Phone"
+        >
+
+
+        <select id="category">
+
+            <option value="">
+                Select Category
+            </option>
+
+        </select>
+
+
+        <br>
+
+
+        <button
+            class="add-btn"
+            onclick="addVendor()"
+        >
+            Add Vendor
+        </button>
+
+    </div>
+
+
+
+    <!-- SEARCH AND FILTER -->
+
+    <div class="card">
+
+        <h2>Search & Filter</h2>
+
+
+        <div class="filter-row">
+
+
+            <input
+                type="text"
+                id="search"
+                placeholder="Search vendor name/email"
+                oninput="loadVendors()"
+            >
+
+
+            <select
+                id="categoryFilter"
+                onchange="loadVendors()"
+            >
+
+                <option value="">
+                    All Categories
+                </option>
+
+            </select>
+
+
+            <select
+                id="statusFilter"
+                onchange="loadVendors()"
+            >
+
+                <option value="">
+                    All Status
+                </option>
+
+                <option value="Pending">
+                    Pending
+                </option>
+
+                <option value="Under Review">
+                    Under Review
+                </option>
+
+                <option value="Approved">
+                    Approved
+                </option>
+
+                <option value="Rejected">
+                    Rejected
+                </option>
+
+            </select>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- VENDOR LIST -->
+
+    <div class="card">
+
+        <h2>Vendor List</h2>
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Vendor Name</th>
+
+                    <th>Email</th>
+
+                    <th>Phone</th>
+
+                    <th>Category</th>
+
+                    <th>Status</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="vendorTable">
+
+                <tr>
+
+                    <td colspan="7">
+                        Loading vendors...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+
+const API_URL =
+    "http://127.0.0.1:8000";
+
+
+
+/* =========================
+   GET TOKEN
+========================= */
+
+function getToken() {
+
+    const token =
+        localStorage.getItem(
+            "access_token"
+        );
+
+
+    if (!token) {
+
+        window.location.href =
+            "login.html";
+
+        return null;
+
+    }
+
+
+    return token;
+
+}
+
+
+
+/* =========================
+   LOAD CATEGORIES
+========================= */
+
+async function loadCategories() {
+
+    const token =
+        getToken();
+
+    if (!token) return;
+
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL +
+                "/vendor-categories",
+                {
+                    method: "GET",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + token,
+
+                        "Accept":
+                            "application/json"
+                    }
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (response.status === 401) {
+
+            logout();
+
+            return;
+
+        }
+
+
+        if (!response.ok) {
+
+            console.error(data);
+
+            return;
+
+        }
+
+
+        const categorySelect =
+            document.getElementById(
+                "category"
+            );
+
+
+        const categoryFilter =
+            document.getElementById(
+                "categoryFilter"
+            );
+
+
+        categorySelect.innerHTML =
+            '<option value="">Select Category</option>';
+
+
+        categoryFilter.innerHTML =
+            '<option value="">All Categories</option>';
+
+
+        data.forEach(
+            function(category) {
+
+
+                categorySelect.innerHTML += `
+
+                    <option value="${category.id}">
+                        ${category.name}
+                    </option>
+
+                `;
+
+
+                categoryFilter.innerHTML += `
+
+                    <option value="${category.id}">
+                        ${category.name}
+                    </option>
+
+                `;
+
+            }
+        );
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Category Error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+/* =========================
+   LOAD VENDORS
+========================= */
+
+async function loadVendors() {
+
+
+    const token =
+        getToken();
+
+    if (!token) return;
+
+
+    const search =
+        document
+            .getElementById("search")
+            .value
+            .trim();
+
+
+    const categoryId =
+        document
+            .getElementById(
+                "categoryFilter"
+            )
+            .value;
+
+
+    const status =
+        document
+            .getElementById(
+                "statusFilter"
+            )
+            .value;
+
+
+
+    let url =
+        API_URL +
+        "/vendors?";
+
+
+
+    if (search) {
+
+        url +=
+            "search=" +
+            encodeURIComponent(search) +
+            "&";
+
+    }
+
+
+    if (categoryId) {
+
+        url +=
+            "category_id=" +
+            categoryId +
+            "&";
+
+    }
+
+
+    if (status) {
+
+        url +=
+            "approval_status=" +
+            encodeURIComponent(status) +
+            "&";
+
+    }
+
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token,
+
+                        "Accept":
+                            "application/json"
+
+                    }
+
+                }
+            );
+
+
+
+        const data =
+            await response.json();
+
+
+
+        if (response.status === 401) {
+
+            logout();
+
+            return;
+
+        }
+
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                "Unable to load vendors"
+            );
+
+        }
+
+
+
+        const table =
+            document.getElementById(
+                "vendorTable"
+            );
+
+
+        table.innerHTML = "";
+
+
+
+        if (data.length === 0) {
+
+            table.innerHTML = `
+
+                <tr>
+
+                    <td colspan="7">
+                        No vendors available
+                    </td>
+
+                </tr>
+
+            `;
+
+            return;
+
+        }
+
+
+
+        data.forEach(
+            function(vendor) {
+
+
+                let statusClass =
+                    "status-pending";
+
+
+                if (
+                    vendor.approval_status
+                    === "Approved"
+                ) {
+
+                    statusClass =
+                        "status-approved";
+
+                }
+
+
+                if (
+                    vendor.approval_status
+                    === "Rejected"
+                ) {
+
+                    statusClass =
+                        "status-rejected";
+
+                }
+
+
+                if (
+                    vendor.approval_status
+                    === "Under Review"
+                ) {
+
+                    statusClass =
+                        "status-review";
+
+                }
+
+
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${vendor.id}
+                    </td>
+
+
+                    <td>
+                        ${vendor.name}
+                    </td>
+
+
+                    <td>
+                        ${vendor.email}
+                    </td>
+
+
+                    <td>
+                        ${vendor.phone}
+                    </td>
+
+
+                    <td>
+                        ${
+                            vendor.category_name
+                            ||
+                            "Not Assigned"
+                        }
+                    </td>
+
+
+                    <td class="${statusClass}">
+                        ${vendor.approval_status}
+                    </td>
+
+
+                    <td>
+
+                        <button
+                            class="view-btn"
+                            onclick='viewVendorDetails(${JSON.stringify(vendor)})'
+                        >
+                            View Details
+                        </button>
+
+
+                        <button
+                            class="approve-btn"
+                            onclick="approveVendor(${vendor.id})"
+                        >
+                            Approve
+                        </button>
+
+
+                        <button
+                            class="reject-btn"
+                            onclick="rejectVendor(${vendor.id})"
+                        >
+                            Reject
+                        </button>
+
+
+                        <button
+                            class="delete-btn"
+                            onclick="deleteVendor(${vendor.id})"
+                        >
+                            Delete
+                        </button>
+
+                    </td>
+
+                `;
+
+
+                table.appendChild(row);
+
+
+            }
+        );
+
+
+    }
+    catch (error) {
+
+
+        console.error(
+            "Vendor Error:",
+            error
+        );
+
+
+        document.getElementById(
+            "vendorTable"
+        ).innerHTML = `
+
+            <tr>
+
+                <td colspan="7">
+                    Unable to load vendors
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+
+/* =========================
+   ADD VENDOR
+========================= */
+
+async function addVendor() {
+
+
+    const token =
+        getToken();
+
+    if (!token) return;
+
+
+
+    const name =
+        document
+            .getElementById("name")
+            .value
+            .trim();
+
+
+    const email =
+        document
+            .getElementById("email")
+            .value
+            .trim();
+
+
+    const phone =
+        document
+            .getElementById("phone")
+            .value
+            .trim();
+
+
+    const categoryId =
+        document
+            .getElementById("category")
+            .value;
+
+
+
+    if (
+        name === "" ||
+        email === "" ||
+        phone === ""
+    ) {
+
+        alert(
+            "Please enter all vendor details"
+        );
+
+        return;
+
+    }
+
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                API_URL + "/vendors",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " + token
+
+                    },
+
+
+                    body:
+                        JSON.stringify({
+
+                            name:
+                                name,
+
+                            email:
+                                email,
+
+                            phone:
+                                phone,
+
+                            category_id:
+                                categoryId
+                                    ? Number(categoryId)
+                                    : null
+
+                        })
+
+                }
+            );
+
+
+
+        const data =
+            await response.json();
+
+
+
+        if (response.status === 401) {
+
+            logout();
+
+            return;
+
+        }
+
+
+
+        if (!response.ok) {
+
+            alert(
+                data.detail ||
+                "Unable to add vendor"
+            );
+
+            return;
+
+        }
+
+
+
+        alert(
+            data.message ||
+            "Vendor added successfully"
+        );
+
+
+
+        document.getElementById(
+            "name"
+        ).value = "";
+
+
+        document.getElementById(
+            "email"
+        ).value = "";
+
+
+        document.getElementById(
+            "phone"
+        ).value = "";
+
+
+        document.getElementById(
+            "category"
+        ).value = "";
+
+
+
+        loadVendors();
+
+
+    }
+    catch (error) {
+
+
+        console.error(
+            "Add Vendor Error:",
+            error
+        );
+
+
+        alert(
+            "Backend connection failed"
+        );
+
+    }
+
+}
+
+
+
+/* =========================
+   APPROVE VENDOR
+========================= */
+
+async function approveVendor(id) {
+
+
+    const token =
+        getToken();
+
+    if (!token) return;
+
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                API_URL +
+                "/vendors/" +
+                id +
+                "/approve",
+                {
+
+                    method: "PUT",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token
+
+                    }
+
+                }
+            );
+
+
+
+        const data =
+            await response.json();
+
+
+
+        if (response.status === 401) {
+
+            logout();
+
+            return;
+
+        }
+
+
+
+        if (!response.ok) {
+
+            alert(
+                data.detail ||
+                "Unable to approve vendor"
+            );
+
+            return;
+
+        }
+
+
+
+        alert(
+            data.message ||
+            "Vendor approved successfully"
+        );
+
+
+        loadVendors();
+
+
+    }
+    catch (error) {
+
+
+        console.error(error);
+
+
+        alert(
+            "Backend connection failed"
+        );
+
+    }
+
+}
+
+
+
+/* =========================
+   REJECT VENDOR
+========================= */
+
+async function rejectVendor(id) {
+
+
+    const token =
+        getToken();
+
+    if (!token) return;
+
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                API_URL +
+                "/vendors/" +
+                id +
+                "/reject",
+                {
+
+                    method: "PUT",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token
+
+                    }
+
+                }
+            );
+
+
+
+        const data =
+            await response.json();
+
+
+
+        if (response.status === 401) {
+
+            logout();
+
+            return;
+
+        }
+
+
+
+        if (!response.ok) {
+
+            alert(
+                data.detail ||
+                "Unable to reject vendor"
+            );
+
+            return;
+
+        }
+
+
+
+        alert(
+            data.message ||
+            "Vendor rejected successfully"
+        );
+
+
+        loadVendors();
+
+
+    }
+    catch (error) {
+
+
+        console.error(error);
+
+
+        alert(
+            "Backend connection failed"
+        );
+
+    }
+
+}
+
+
+
+/* =========================
+   DELETE VENDOR
+========================= */
+
+async function deleteVendor(id) {
+
+
+    const token =
+        getToken();
+
+    if (!token) return;
+
+
+
+    const confirmDelete =
+        confirm(
+            "Are you sure you want to delete this vendor?"
+        );
+
+
+    if (!confirmDelete) return;
+
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                API_URL +
+                "/vendors/" +
+                id,
+                {
+
+                    method: "DELETE",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token
+
+                    }
+
+                }
+            );
+
+
+
+        const data =
+            await response.json();
+
+
+
+        if (response.status === 401) {
+
+            logout();
+
+            return;
+
+        }
+
+
+
+        if (!response.ok) {
+
+            alert(
+                data.detail ||
+                "Unable to delete vendor"
+            );
+
+            return;
+
+        }
+
+
+
+        alert(
+            data.message ||
+            "Vendor deleted successfully"
+        );
+
+
+        loadVendors();
+
+
+    }
+    catch (error) {
+
+
+        console.error(error);
+
+
+        alert(
+            "Backend connection failed"
+        );
+
+    }
+
+}
+
+
+
+/* =========================
+   VIEW VENDOR DETAILS
+========================= */
+
+function viewVendorDetails(vendor) {
+
+
+    alert(
+
+        "Vendor Details\n\n" +
+
+        "ID: " +
+        vendor.id +
+        "\n" +
+
+        "Name: " +
+        vendor.name +
+        "\n" +
+
+        "Email: " +
+        vendor.email +
+        "\n" +
+
+        "Phone: " +
+        vendor.phone +
+        "\n" +
+
+        "Category: " +
+        (
+            vendor.category_name ||
+            "Not Assigned"
+        ) +
+        "\n" +
+
+        "Status: " +
+        vendor.approval_status
+
+    );
+
+}
+
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logout() {
+
+
+    localStorage.removeItem(
+        "access_token"
+    );
+
+
+    localStorage.removeItem(
+        "logged_in"
+    );
+
+
+    localStorage.removeItem(
+        "user_email"
+    );
+
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
+loadCategories();
+
+loadVendors();
+
+
+</script>
+
+
+</body>
+
+</html>

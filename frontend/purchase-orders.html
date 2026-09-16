@@ -1,0 +1,826 @@
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Purchase Orders - VRIP</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <h2>VRIP</h2>
+
+    <a href="dashboard.html">Dashboard</a>
+    <a href="vendors.html">Vendors</a>
+    <a href="procurement.html">Procurement</a>
+    <a href="purchase-orders.html">Purchase Orders</a>
+    <a href="performance.html">Performance</a>
+    <a href="reports.html">Reports</a>
+    <a href="notifications.html">Notifications</a>
+
+    <br>
+    <br>
+
+    <button onclick="logout()">Logout</button>
+
+</div>
+
+
+<div class="main">
+
+    <h1>Purchase Orders</h1>
+
+        <!-- FILE UPLOAD -->
+    <div class="card">
+
+        <h2>Upload Invoice / Receipt / Proof of Delivery</h2>
+
+        <input
+            type="file"
+            id="uploadFile"
+        >
+
+        <br><br>
+
+        <button onclick="uploadFile()">
+            Upload File
+        </button>
+
+        <p id="uploadMessage"></p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>All Purchase Orders</h2>
+
+
+    <!-- =========================
+         CREATE PURCHASE ORDER
+    ========================== -->
+
+    <div class="card">
+
+        <h2>Create Purchase Order</h2>
+
+        <input
+            type="text"
+            id="vendor_name"
+            placeholder="Vendor Name"
+        >
+
+        <br><br>
+
+        <input
+            type="text"
+            id="item_service"
+            placeholder="Item / Service"
+        >
+
+        <br><br>
+
+        <input
+            type="number"
+            id="total_cost"
+            placeholder="Total Cost"
+        >
+
+        <br><br>
+
+        <select id="status">
+
+            <option value="Pending">
+                Pending
+            </option>
+
+            <option value="Approved">
+                Approved
+            </option>
+
+        </select>
+
+        <br><br>
+
+        <button onclick="createOrder()">
+            Create Purchase Order
+        </button>
+
+    </div>
+
+
+    <!-- =========================
+         ALL PURCHASE ORDERS
+    ========================== -->
+
+    <div class="card">
+
+        <h2>All Purchase Orders</h2>
+
+        <table border="1" width="100%">
+
+            <thead>
+
+                <tr>
+
+                    <th>Order ID</th>
+                    <th>Vendor Name</th>
+                    <th>Item / Service</th>
+                    <th>Total Cost</th>
+                    <th>Status</th>
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="orderTable">
+
+                <tr>
+
+                    <td colspan="6">
+                        Loading...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const API_URL =
+    "http://127.0.0.1:8000";
+
+
+    // =========================
+// UPLOAD FILE
+// =========================
+
+async function uploadFile() {
+
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+        alert("Please login first");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const fileInput =
+        document.getElementById("uploadFile");
+
+    const message =
+        document.getElementById("uploadMessage");
+
+    if (!fileInput.files.length) {
+        alert("Please select a file");
+        return;
+    }
+
+    const file =
+        fileInput.files[0];
+
+    const formData =
+        new FormData();
+
+    formData.append("file", file);
+
+    try {
+
+        const response = await fetch(
+            API_URL + "/upload-file",
+            {
+                method: "POST",
+
+                headers: {
+                    "Authorization":
+                        "Bearer " + token
+                },
+
+                body: formData
+            }
+        );
+
+        const data =
+            await response.json();
+
+        console.log(
+            "Upload Response:",
+            data
+        );
+
+        if (!response.ok) {
+
+            alert(
+                data.detail ||
+                "File upload failed"
+            );
+
+            return;
+        }
+
+        message.innerText =
+            "File uploaded successfully: " +
+            file.name;
+
+        fileInput.value = "";
+
+        alert(
+            "File uploaded successfully"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Upload Error:",
+            error
+        );
+
+        alert(
+            "Backend connection failed"
+        );
+    }
+}
+
+// =========================
+// LOAD ORDERS
+// =========================
+
+async function loadOrders() {
+
+    const token =
+        localStorage.getItem(
+            "access_token"
+        );
+
+
+    if (!token) {
+
+        alert(
+            "Please login first"
+        );
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL +
+                "/purchase-orders",
+                {
+
+                    method: "GET",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token,
+
+                        "Accept":
+                            "application/json"
+
+                    }
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                "Unable to load purchase orders"
+            );
+
+        }
+
+
+        const table =
+            document.getElementById(
+                "orderTable"
+            );
+
+
+        table.innerHTML = "";
+
+
+        if (
+            !Array.isArray(data) ||
+            data.length === 0
+        ) {
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        No purchase orders available
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        data.forEach(
+            order => {
+
+                let actionButtons = "";
+
+
+                // PENDING / APPROVED
+                if (
+                    order.status === "Pending" ||
+                    order.status === "Approved"
+                ) {
+
+                    actionButtons = `
+
+                        <button
+                            onclick="markShipped(${order.id})">
+                            Shipped
+                        </button>
+
+                    `;
+
+                }
+
+
+                // SHIPPED
+                else if (
+                    order.status === "Shipped"
+                ) {
+
+                    actionButtons = `
+
+                        <button
+                            onclick="markPartialDelivery(${order.id})">
+                            Partial Delivery
+                        </button>
+
+                        <button
+                            onclick="markDelivered(${order.id})">
+                            Delivered
+                        </button>
+
+                    `;
+
+                }
+
+
+                // PARTIAL DELIVERY
+                else if (
+                    order.status === "Partial Delivery"
+                ) {
+
+                    actionButtons = `
+
+                        <button
+                            onclick="markDelivered(${order.id})">
+                            Delivered
+                        </button>
+
+                    `;
+
+                }
+
+
+                // DELIVERED
+                else if (
+                    order.status === "Delivered"
+                ) {
+
+                    actionButtons = `
+                        <span>Completed</span>
+                    `;
+
+                }
+
+
+                table.innerHTML += `
+
+                    <tr>
+
+                        <td>
+                            ${order.id}
+                        </td>
+
+                        <td>
+                            ${order.vendor_name}
+                        </td>
+
+                        <td>
+                            ${order.item_service}
+                        </td>
+
+                        <td>
+                            ₹${order.total_cost}
+                        </td>
+
+                        <td>
+                            ${order.status}
+                        </td>
+
+                        <td>
+                            ${actionButtons}
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Purchase Orders Error:",
+            error
+        );
+
+
+        document.getElementById(
+            "orderTable"
+        ).innerHTML = `
+
+            <tr>
+
+                <td colspan="6">
+                    Unable to load purchase orders
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+// =========================
+// CREATE ORDER
+// =========================
+
+async function createOrder() {
+
+    const token =
+        localStorage.getItem(
+            "access_token"
+        );
+
+
+    if (!token) {
+
+        alert(
+            "Please login first"
+        );
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+
+    const vendor_name =
+        document.getElementById(
+            "vendor_name"
+        ).value.trim();
+
+
+    const item_service =
+        document.getElementById(
+            "item_service"
+        ).value.trim();
+
+
+    const total_cost =
+        document.getElementById(
+            "total_cost"
+        ).value;
+
+
+    const status =
+        document.getElementById(
+            "status"
+        ).value;
+
+
+    if (
+        vendor_name === "" ||
+        item_service === "" ||
+        total_cost === ""
+    ) {
+
+        alert(
+            "Please enter all details"
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL +
+                "/purchase-orders",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " + token,
+
+                        "Accept":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            vendor_name:
+                                vendor_name,
+
+                            item_service:
+                                item_service,
+
+                            total_cost:
+                                Number(total_cost),
+
+                            status:
+                                status
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                data.detail ||
+                data.message ||
+                "Unable to create order"
+            );
+
+            return;
+        }
+
+
+        alert(
+            data.message ||
+            "Purchase Order Created Successfully"
+        );
+
+
+        document.getElementById(
+            "vendor_name"
+        ).value = "";
+
+
+        document.getElementById(
+            "item_service"
+        ).value = "";
+
+
+        document.getElementById(
+            "total_cost"
+        ).value = "";
+
+
+        loadOrders();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Create Order Error:",
+            error
+        );
+
+        alert(
+            "Backend connection failed"
+        );
+
+    }
+
+}
+
+
+// =========================
+// MARK SHIPPED
+// =========================
+
+async function markShipped(
+    poId
+) {
+
+    await updateDeliveryStatus(
+        poId,
+        "/shipped",
+        "Purchase Order marked as Shipped"
+    );
+
+}
+
+
+// =========================
+// MARK PARTIAL DELIVERY
+// =========================
+
+async function markPartialDelivery(
+    poId
+) {
+
+    await updateDeliveryStatus(
+        poId,
+        "/partial-delivery",
+        "Purchase Order marked as Partial Delivery"
+    );
+
+}
+
+
+// =========================
+// MARK DELIVERED
+// =========================
+
+async function markDelivered(
+    poId
+) {
+
+    await updateDeliveryStatus(
+        poId,
+        "/delivered",
+        "Purchase Order marked as Delivered"
+    );
+
+}
+
+
+// =========================
+// UPDATE DELIVERY STATUS
+// =========================
+
+async function updateDeliveryStatus(
+    poId,
+    endpoint,
+    successMessage
+) {
+
+    const token =
+        localStorage.getItem(
+            "access_token"
+        );
+
+
+    if (!token) {
+
+        alert(
+            "Please login first"
+        );
+
+        window.location.href =
+            "login.html";
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL +
+                "/purchase-orders/" +
+                poId +
+                endpoint,
+                {
+
+                    method: "PUT",
+
+                    headers: {
+
+                        "Authorization":
+                            "Bearer " + token,
+
+                        "Accept":
+                            "application/json"
+
+                    }
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                data.detail ||
+                "Unable to update status"
+            );
+
+            return;
+        }
+
+
+        alert(
+            data.message ||
+            successMessage
+        );
+
+
+        loadOrders();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Delivery Status Error:",
+            error
+        );
+
+        alert(
+            "Backend connection failed"
+        );
+
+    }
+
+}
+
+
+// =========================
+// LOGOUT
+// =========================
+
+function logout() {
+
+    localStorage.removeItem(
+        "access_token"
+    );
+
+    localStorage.removeItem(
+        "logged_in"
+    );
+
+    localStorage.removeItem(
+        "user_email"
+    );
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+// =========================
+// PAGE LOAD
+// =========================
+
+loadOrders();
+
+</script>
+
+</body>
+</html>
+```
