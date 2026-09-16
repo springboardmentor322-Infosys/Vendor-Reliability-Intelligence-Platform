@@ -1,0 +1,1973 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Vendor Dashboard - VRIP</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <style>
+
+        /* =========================
+           DASHBOARD
+        ========================= */
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-header h1 {
+            margin: 0 0 6px;
+            font-size: 30px;
+        }
+
+        .dashboard-header p {
+            margin: 0;
+            color: #777;
+        }
+
+
+        /* =========================
+           STAT CARDS
+        ========================= */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #eee;
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+            background: #eef4ff;
+        }
+
+        .stat-card h3 {
+            margin: 15px 0 5px;
+            font-size: 14px;
+            color: #777;
+            font-weight: 500;
+        }
+
+        .stat-card h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .stat-small {
+            font-size: 12px;
+            color: #777;
+            margin-top: 6px;
+        }
+
+
+        /* =========================
+           MAIN GRID
+        ========================= */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-grid-three {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+
+        /* =========================
+           DASHBOARD CARD
+        ========================= */
+
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #eee;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .view-all {
+            font-size: 12px;
+            color: #2864e8;
+            cursor: pointer;
+        }
+
+
+        /* =========================
+           RELIABILITY SCORE
+        ========================= */
+
+        .reliability-box {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .score-circle {
+            width: 145px;
+            height: 145px;
+            margin: 10px auto 15px;
+            border-radius: 50%;
+            border: 15px solid #2864e8;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .score-circle h1 {
+            margin: 0;
+            font-size: 35px;
+        }
+
+        .score-circle span {
+            color: #777;
+            font-size: 12px;
+        }
+
+        .reliability-status {
+            color: #2e9d57;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+
+        /* =========================
+           PERFORMANCE
+        ========================= */
+
+        .performance-item {
+            margin-bottom: 18px;
+        }
+
+        .performance-title {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 7px;
+            font-size: 13px;
+        }
+
+        .progress {
+            height: 9px;
+            background: #e8e8e8;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: #2864e8;
+            transition: width 0.5s;
+        }
+
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .po-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .po-table th {
+            background: #f5f7fb;
+            color: #555;
+            font-size: 12px;
+            text-align: left;
+            padding: 11px;
+        }
+
+        .po-table td {
+            padding: 11px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .approved {
+            background: #e4f7eb;
+            color: #21874b;
+        }
+
+        .pending {
+            background: #fff4d6;
+            color: #a16b00;
+        }
+
+        .delivered {
+            background: #e4f7eb;
+            color: #21874b;
+        }
+
+        .partial {
+            background: #fff4d6;
+            color: #a16b00;
+        }
+
+
+        /* =========================
+           ALERTS
+        ========================= */
+
+        .alert-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert-icon {
+            font-size: 20px;
+        }
+
+        .alert-item strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .alert-item span {
+            font-size: 11px;
+            color: #777;
+        }
+
+
+        /* =========================
+           NOTIFICATIONS
+        ========================= */
+
+        .notification-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+
+        /* =========================
+           SUMMARY
+        ========================= */
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 11px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-value {
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           ORDER STATUS
+        ========================= */
+
+        .order-status {
+            text-align: center;
+        }
+
+        .status-number {
+            font-size: 40px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .status-text {
+            color: #777;
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           LOGOUT
+        ========================= */
+
+        .logout-btn {
+            margin: 20px;
+            padding: 10px;
+            width: calc(100% - 40px);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #dc3545;
+            color: white;
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1100px) {
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-grid,
+            .dashboard-grid-three {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     LOGIN CHECK
+========================= -->
+
+<script>
+
+    if (
+        localStorage.getItem("logged_in")
+        !== "true"
+    ) {
+
+        window.location.href =
+            "login.html";
+
+    }
+
+</script>
+
+
+<!-- =========================
+     SIDEBAR
+========================= -->
+
+<div class="sidebar">
+
+    <h2>VRIP</h2>
+
+    <a href="dashboard.html">
+        Dashboard
+    </a>
+
+    <a href="vendors.html">
+        Vendors
+    </a>
+
+    <a href="procurement.html">
+        Procurement
+    </a>
+
+    <a href="purchase-orders.html">
+        Purchase Orders
+    </a>
+
+    <a href="performance.html">
+        Performance
+    </a>
+
+    <a href="analytics.html">
+        Analytics
+    </a>
+
+    <a href="reports.html">
+        Reports
+    </a>
+
+    <a href="notifications.html">
+        Notifications
+    </a>
+
+    <button
+        class="logout-btn"
+        onclick="logout()"
+    >
+        Logout
+    </button>
+
+</div>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<div class="main">
+
+
+    <!-- HEADER -->
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h1>
+                Vendor Dashboard
+            </h1>
+
+            <p>
+                Overall Vendor Reliability &
+                Procurement Overview
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         STATISTICS
+    ========================= -->
+
+    <div class="stats-grid">
+
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+
+                <div>
+
+                    <h3>
+                        Total Vendors
+                    </h3>
+
+                    <h2 id="totalVendors">
+                        0
+                    </h2>
+
+                    <div class="stat-small">
+                        Registered vendors
+                    </div>
+
+                </div>
+
+                <div class="stat-icon">
+                    🏢
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+
+                <div>
+
+                    <h3>
+                        Total Purchase Orders
+                    </h3>
+
+                    <h2 id="totalOrders">
+                        0
+                    </h2>
+
+                    <div class="stat-small">
+                        All purchase orders
+                    </div>
+
+                </div>
+
+                <div class="stat-icon">
+                    📦
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+
+                <div>
+
+                    <h3>
+                        Delivered Orders
+                    </h3>
+
+                    <h2 id="deliveredOrders">
+                        0
+                    </h2>
+
+                    <div class="stat-small">
+                        Successfully delivered
+                    </div>
+
+                </div>
+
+                <div class="stat-icon">
+                    ✅
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+
+                <div>
+
+                    <h3>
+                        Pending Orders
+                    </h3>
+
+                    <h2 id="pendingOrders">
+                        0
+                    </h2>
+
+                    <div class="stat-small">
+                        Awaiting processing
+                    </div>
+
+                </div>
+
+                <div class="stat-icon">
+                    ⏳
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         RELIABILITY + PERFORMANCE
+    ========================= -->
+
+    <div class="dashboard-grid">
+
+
+        <!-- RELIABILITY -->
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h2>
+                    Overall Reliability Score
+                </h2>
+
+            </div>
+
+
+            <div class="reliability-box">
+
+                <div class="score-circle">
+
+                    <h1 id="reliabilityScore">
+                        0
+                    </h1>
+
+                    <span>
+                        /100
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="reliability-status"
+                    id="reliabilityStatus"
+                >
+                    Loading...
+                </div>
+
+                <p
+                    style="
+                        font-size:12px;
+                        color:#777;
+                    "
+                >
+                    Based on overall vendor performance.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- PERFORMANCE -->
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h2>
+                    Performance Summary
+                </h2>
+
+            </div>
+
+
+            <!-- DELIVERY -->
+
+            <div class="performance-item">
+
+                <div class="performance-title">
+
+                    <span>
+                        On-Time Delivery
+                    </span>
+
+                    <strong
+                        id="deliveryPercentage"
+                    >
+                        0%
+                    </strong>
+
+                </div>
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        id="deliveryBar"
+                        style="width:0%"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- QUALITY -->
+
+            <div class="performance-item">
+
+                <div class="performance-title">
+
+                    <span>
+                        Quality Score
+                    </span>
+
+                    <strong
+                        id="qualityPercentage"
+                    >
+                        0%
+                    </strong>
+
+                </div>
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        id="qualityBar"
+                        style="width:0%"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RELIABILITY -->
+
+            <div class="performance-item">
+
+                <div class="performance-title">
+
+                    <span>
+                        Vendor Reliability
+                    </span>
+
+                    <strong
+                        id="vendorReliabilityPercentage"
+                    >
+                        0%
+                    </strong>
+
+                </div>
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        id="vendorReliabilityBar"
+                        style="width:0%"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FULFILLMENT -->
+
+            <div class="performance-item">
+
+                <div class="performance-title">
+
+                    <span>
+                        Order Fulfillment
+                    </span>
+
+                    <strong
+                        id="fulfillmentRate"
+                    >
+                        0%
+                    </strong>
+
+                </div>
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        id="fulfillmentBar"
+                        style="width:0%"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         RECENT ORDERS + ALERTS
+    ========================= -->
+
+    <div class="dashboard-grid">
+
+
+        <!-- RECENT ORDERS -->
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h2>
+                    Recent Purchase Orders
+                </h2>
+
+                <span
+                    class="view-all"
+                    onclick="
+                        window.location.href =
+                        'purchase-orders.html'
+                    "
+                >
+                    View All
+                </span>
+
+            </div>
+
+
+            <table class="po-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Vendor</th>
+                        <th>Item</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="orderTable">
+
+                    <tr>
+
+                        <td colspan="5">
+                            Loading...
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ALERTS -->
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h2>
+                    Current Alerts
+                </h2>
+
+            </div>
+
+
+            <div
+                id="alertsContainer"
+            >
+
+                <div class="alert-item">
+
+                    <div class="alert-icon">
+                        ⏳
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Loading alerts...
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         THREE CARDS
+    ========================= -->
+
+    <div class="dashboard-grid-three">
+
+
+        <!-- NOTIFICATIONS -->
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h2>
+                    Notifications
+                </h2>
+
+                <span
+                    class="view-all"
+                    onclick="
+                        window.location.href =
+                        'notifications.html'
+                    "
+                >
+                    View All
+                </span>
+
+            </div>
+
+
+            <div
+                id="dashboardNotifications"
+            >
+
+                <div class="notification-item">
+
+                    🔔
+                    <span>
+                        Loading notifications...
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ORDER STATUS -->
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h2>
+                    Order Status
+                </h2>
+
+            </div>
+
+
+            <div class="order-status">
+
+                <div
+                    class="status-number"
+                    id="approvalRate"
+                >
+                    0%
+                </div>
+
+                <div class="status-text">
+                    Delivery Rate
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PROCUREMENT SUMMARY -->
+
+        <div class="dashboard-card">
+
+            <div class="card-header">
+
+                <h2>
+                    Amount Summary
+                </h2>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span>
+                    Total Orders
+                </span>
+
+                <span
+                    class="summary-value"
+                    id="summaryOrders"
+                >
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span>
+                    Delivered Orders
+                </span>
+
+                <span
+                    class="summary-value"
+                    id="summaryDelivered"
+                >
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span>
+                    Pending Orders
+                </span>
+
+                <span
+                    class="summary-value"
+                    id="summaryPending"
+                >
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span>
+                    Total Value
+                </span>
+
+                <span
+                    class="summary-value"
+                    id="totalValue"
+                >
+                    ₹0
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
+<script>
+
+
+const API_URL =
+    "http://127.0.0.1:8000";
+
+
+/* =========================
+   LOAD DASHBOARD
+========================= */
+
+async function loadDashboard() {
+
+
+    try {
+
+
+        const token =
+            localStorage.getItem(
+                "access_token"
+            );
+
+
+        /* =========================
+           GET ANALYTICS
+        ========================= */
+
+        const analyticsResponse =
+            await fetch(
+                API_URL + "/analytics"
+            );
+
+
+        if (!analyticsResponse.ok) {
+
+            throw new Error(
+                "Failed to load analytics"
+            );
+
+        }
+
+
+        const analytics =
+            await analyticsResponse.json();
+
+
+        console.log(
+            "Analytics:",
+            analytics
+        );
+
+
+        /* =========================
+           UPDATE TOTAL VENDORS
+        ========================= */
+
+        document.getElementById(
+            "totalVendors"
+        ).innerText =
+            analytics.total_vendors || 0;
+
+
+        /* =========================
+           PERFORMANCE VALUES
+        ========================= */
+
+        const reliability =
+            Number(
+                analytics.average_reliability
+            ) || 0;
+
+
+        const quality =
+            Number(
+                analytics.average_quality
+            ) || 0;
+
+
+        const delivery =
+            Number(
+                analytics.average_delivery
+            ) || 0;
+
+
+        document.getElementById(
+            "reliabilityScore"
+        ).innerText =
+            reliability.toFixed(1);
+
+
+        document.getElementById(
+            "deliveryPercentage"
+        ).innerText =
+            delivery.toFixed(1) + "%";
+
+
+        document.getElementById(
+            "qualityPercentage"
+        ).innerText =
+            quality.toFixed(1) + "%";
+
+
+        document.getElementById(
+            "vendorReliabilityPercentage"
+        ).innerText =
+            reliability.toFixed(1) + "%";
+
+
+        document.getElementById(
+            "deliveryBar"
+        ).style.width =
+            delivery + "%";
+
+
+        document.getElementById(
+            "qualityBar"
+        ).style.width =
+            quality + "%";
+
+
+        document.getElementById(
+            "vendorReliabilityBar"
+        ).style.width =
+            reliability + "%";
+
+
+        /* =========================
+           RELIABILITY STATUS
+        ========================= */
+
+        let reliabilityStatus =
+            "Needs Improvement";
+
+
+        if (reliability >= 90) {
+
+            reliabilityStatus =
+                "Excellent Reliability";
+
+        }
+
+        else if (reliability >= 75) {
+
+            reliabilityStatus =
+                "High Reliability";
+
+        }
+
+        else if (reliability >= 60) {
+
+            reliabilityStatus =
+                "Moderate Reliability";
+
+        }
+
+
+        document.getElementById(
+            "reliabilityStatus"
+        ).innerText =
+            reliabilityStatus;
+
+
+        /* =========================
+           GET PURCHASE ORDERS
+        ========================= */
+
+        const orderResponse =
+            await fetch(
+                API_URL +
+                "/purchase-orders"
+            );
+
+
+        if (!orderResponse.ok) {
+
+            throw new Error(
+                "Failed to load purchase orders"
+            );
+
+        }
+
+
+        const orders =
+            await orderResponse.json();
+
+
+        console.log(
+            "Orders:",
+            orders
+        );
+
+
+        /* =========================
+           TOTAL ORDERS
+        ========================= */
+
+        const totalOrders =
+            orders.length;
+
+
+        /* =========================
+           DELIVERED ORDERS
+        ========================= */
+
+        const deliveredOrders =
+            orders.filter(order => {
+
+                const status =
+                    (
+                        order.status ||
+                        order.order_status ||
+                        ""
+                    )
+                    .toLowerCase();
+
+
+                return status ===
+                    "delivered";
+
+            });
+
+
+        /* =========================
+           PENDING ORDERS
+        ========================= */
+
+        const pendingOrders =
+            orders.filter(order => {
+
+                const status =
+                    (
+                        order.status ||
+                        order.order_status ||
+                        ""
+                    )
+                    .toLowerCase();
+
+
+                return status ===
+                    "pending";
+
+            });
+
+
+        /* =========================
+           PARTIAL DELIVERY
+        ========================= */
+
+        const partialOrders =
+            orders.filter(order => {
+
+                const status =
+                    (
+                        order.status ||
+                        order.order_status ||
+                        ""
+                    )
+                    .toLowerCase();
+
+
+                return status ===
+                    "partial delivery";
+
+            });
+
+
+        /* =========================
+           UPDATE STAT CARDS
+        ========================= */
+
+        document.getElementById(
+            "totalOrders"
+        ).innerText =
+            totalOrders;
+
+
+        document.getElementById(
+            "deliveredOrders"
+        ).innerText =
+            deliveredOrders.length;
+
+
+        document.getElementById(
+            "pendingOrders"
+        ).innerText =
+            pendingOrders.length;
+
+
+        /* =========================
+           SUMMARY
+        ========================= */
+
+        document.getElementById(
+            "summaryOrders"
+        ).innerText =
+            totalOrders;
+
+
+        document.getElementById(
+            "summaryDelivered"
+        ).innerText =
+            deliveredOrders.length;
+
+
+        document.getElementById(
+            "summaryPending"
+        ).innerText =
+            pendingOrders.length;
+
+
+        /* =========================
+           DELIVERY RATE
+        ========================= */
+
+        let deliveryRate = 0;
+
+
+        if (totalOrders > 0) {
+
+            deliveryRate =
+                Math.round(
+                    (
+                        deliveredOrders.length /
+                        totalOrders
+                    )
+                    * 100
+                );
+
+        }
+
+
+        document.getElementById(
+            "approvalRate"
+        ).innerText =
+            deliveryRate + "%";
+
+
+        /* =========================
+           FULFILLMENT RATE
+        ========================= */
+
+        const fulfilledCount =
+            deliveredOrders.length +
+            partialOrders.length;
+
+
+        let fulfillmentRate = 0;
+
+
+        if (totalOrders > 0) {
+
+            fulfillmentRate =
+                Math.round(
+                    (
+                        fulfilledCount /
+                        totalOrders
+                    )
+                    * 100
+                );
+
+        }
+
+
+        document.getElementById(
+            "fulfillmentRate"
+        ).innerText =
+            fulfillmentRate + "%";
+
+
+        document.getElementById(
+            "fulfillmentBar"
+        ).style.width =
+            fulfillmentRate + "%";
+
+
+        /* =========================
+           TOTAL PROCUREMENT VALUE
+        ========================= */
+
+        let totalValue = 0;
+
+
+        orders.forEach(order => {
+
+
+            let amount =
+                order.total_amount ??
+                order.total_cost ??
+                0;
+
+
+            amount =
+                parseFloat(
+                    String(amount)
+                    .replace(/,/g, "")
+                ) || 0;
+
+
+            totalValue += amount;
+
+
+        });
+
+
+        document.getElementById(
+            "totalValue"
+        ).innerText =
+            "₹" +
+            totalValue.toLocaleString(
+                "en-IN"
+            );
+
+
+        /* =========================
+           RECENT PURCHASE ORDERS
+        ========================= */
+
+        const table =
+            document.getElementById(
+                "orderTable"
+            );
+
+
+        table.innerHTML = "";
+
+
+        if (orders.length === 0) {
+
+
+            table.innerHTML = `
+
+                <tr>
+
+                    <td colspan="5">
+
+                        No purchase orders available
+
+                    </td>
+
+                </tr>
+
+            `;
+
+
+        }
+
+        else {
+
+
+            const recentOrders =
+                orders
+                .slice(-5)
+                .reverse();
+
+
+            recentOrders.forEach(order => {
+
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                const status =
+                    order.status ||
+                    order.order_status ||
+                    "Pending";
+
+
+                const statusLower =
+                    status.toLowerCase();
+
+
+                let statusClass =
+                    "pending";
+
+
+                if (
+                    statusLower ===
+                    "delivered"
+                ) {
+
+                    statusClass =
+                        "delivered";
+
+                }
+
+                else if (
+                    statusLower ===
+                    "partial delivery"
+                ) {
+
+                    statusClass =
+                        "partial";
+
+                }
+
+
+                const amount =
+                    order.total_amount ??
+                    order.total_cost ??
+                    0;
+
+
+                row.innerHTML = `
+
+                    <td>
+                        #${order.id}
+                    </td>
+
+                    <td>
+                        ${order.vendor_name || "-"}
+                    </td>
+
+                    <td>
+                        ${order.item_service || "-"}
+                    </td>
+
+                    <td>
+                        ₹${Number(
+                            amount
+                        ).toLocaleString(
+                            "en-IN"
+                        )}
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="
+                                status
+                                ${statusClass}
+                            "
+                        >
+
+                            ${status}
+
+                        </span>
+
+                    </td>
+
+                `;
+
+
+                table.appendChild(
+                    row
+                );
+
+
+            });
+
+
+        }
+
+
+        /* =========================
+           CURRENT ALERTS
+        ========================= */
+
+        const alerts =
+            document.getElementById(
+                "alertsContainer"
+            );
+
+
+        alerts.innerHTML = "";
+
+
+        if (
+            pendingOrders.length > 0
+        ) {
+
+            alerts.innerHTML += `
+
+                <div class="alert-item">
+
+                    <div class="alert-icon">
+                        ⚠️
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Pending Purchase Orders
+                        </strong>
+
+                        <span>
+
+                            ${pendingOrders.length}
+                            orders are pending
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+
+        if (
+            partialOrders.length > 0
+        ) {
+
+            alerts.innerHTML += `
+
+                <div class="alert-item">
+
+                    <div class="alert-icon">
+                        📦
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Partial Deliveries
+                        </strong>
+
+                        <span>
+
+                            ${partialOrders.length}
+                            orders partially delivered
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+
+        if (
+            alerts.innerHTML === ""
+        ) {
+
+            alerts.innerHTML = `
+
+                <div class="alert-item">
+
+                    <div class="alert-icon">
+                        ✅
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            No Critical Alerts
+                        </strong>
+
+                        <span>
+
+                            All orders are progressing normally
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+
+    }
+
+    catch (error) {
+
+
+        console.error(
+            "Dashboard Error:",
+            error
+        );
+
+
+        alert(
+            "Failed to load dashboard data"
+        );
+
+
+    }
+
+
+}
+
+
+/* =========================
+   LOAD NOTIFICATIONS
+========================= */
+
+async function loadDashboardNotifications() {
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                API_URL +
+                "/notifications"
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load notifications"
+            );
+
+        }
+
+
+        const notifications =
+            await response.json();
+
+
+        const container =
+            document.getElementById(
+                "dashboardNotifications"
+            );
+
+
+        container.innerHTML = "";
+
+
+        if (
+            notifications.length === 0
+        ) {
+
+            container.innerHTML = `
+
+                <div
+                    class="notification-item"
+                >
+
+                    🔔
+
+                    <span>
+                        No notifications available
+                    </span>
+
+                </div>
+
+            `;
+
+
+            return;
+
+
+        }
+
+
+        const recentNotifications =
+            notifications
+            .slice(-3)
+            .reverse();
+
+
+        recentNotifications.forEach(
+            notification => {
+
+
+                container.innerHTML += `
+
+                    <div
+                        class="
+                            notification-item
+                        "
+                    >
+
+                        🔔
+
+                        <span>
+
+                            ${
+                                notification.message ||
+                                "New notification"
+                            }
+
+                        </span>
+
+                    </div>
+
+                `;
+
+
+            }
+        );
+
+
+    }
+
+    catch (error) {
+
+
+        console.error(
+            "Notification Error:",
+            error
+        );
+
+
+        document.getElementById(
+            "dashboardNotifications"
+        ).innerHTML = `
+
+            <div
+                class="notification-item"
+            >
+
+                🔔
+
+                <span>
+                    Unable to load notifications
+                </span>
+
+            </div>
+
+        `;
+
+
+    }
+
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logout() {
+
+
+    localStorage.removeItem(
+        "logged_in"
+    );
+
+
+    localStorage.removeItem(
+        "access_token"
+    );
+
+
+    window.location.href =
+        "login.html";
+
+
+}
+
+
+/* =========================
+   LOAD PAGE DATA
+========================= */
+
+loadDashboard();
+
+loadDashboardNotifications();
+
+
+</script>
+
+
+</body>
+
+</html>
+```

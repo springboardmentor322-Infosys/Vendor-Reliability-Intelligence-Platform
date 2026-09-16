@@ -1,0 +1,923 @@
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Reports - Vendor Reliability Platform</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+
+        .report-card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.10);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-box {
+            background: #f5f7fb;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .stat-box h3 {
+            margin-bottom: 10px;
+        }
+
+        .number {
+            font-size: 30px;
+            font-weight: bold;
+            color: #2864e6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #2864e6;
+            color: white;
+            padding: 14px;
+            text-align: left;
+        }
+
+        td {
+            padding: 14px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #2864e6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .status-message {
+            color: #666;
+            margin-top: 10px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ========================= -->
+<!-- SIDEBAR -->
+<!-- ========================= -->
+
+<div class="sidebar">
+
+    <h2>VRIP</h2>
+
+    <a href="dashboard.html">Dashboard</a>
+
+    <a href="vendors.html">Vendors</a>
+
+    <a href="procurement.html">Procurement</a>
+
+    <a href="purchase-orders.html">Purchase Orders</a>
+
+    <a href="performance.html">Performance</a>
+
+    <a href="reports.html">Reports</a>
+
+    <a href="notifications.html">Notifications</a>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- MAIN CONTENT -->
+<!-- ========================= -->
+
+<div class="main">
+
+    <h1>Reports Dashboard</h1>
+
+    <p>
+        Vendor, procurement and purchase order reports.
+    </p>
+
+
+    <!-- ========================= -->
+    <!-- PROCUREMENT STATISTICS -->
+    <!-- ========================= -->
+
+    <div class="report-card">
+
+        <h2>Procurement Statistics</h2>
+
+        <div class="stats">
+
+
+            <div class="stat-box">
+
+                <h3>Total Vendors</h3>
+
+                <div
+                    class="number"
+                    id="vendorCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <h3>Total Purchase Orders</h3>
+
+                <div
+                    class="number"
+                    id="orderCount"
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <h3>Total Procurement Cost</h3>
+
+                <div
+                    class="number"
+                    id="totalCost"
+                >
+                    ₹0
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- GENERATED REPORTS -->
+    <!-- ========================= -->
+
+    <div class="report-card">
+
+        <h2>Generated Reports</h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Report ID</th>
+
+                    <th>Report Name</th>
+
+                    <th>Date</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                <tr>
+
+                    <td>R001</td>
+
+                    <td>
+                        Monthly Procurement Report
+                    </td>
+
+                    <td>
+                        02-08-2026
+                    </td>
+
+                    <td>
+                        Generated
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>R002</td>
+
+                    <td>
+                        Vendor Performance Report
+                    </td>
+
+                    <td>
+                        02-08-2026
+                    </td>
+
+                    <td>
+                        Generated
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>R003</td>
+
+                    <td>
+                        Purchase Order Report
+                    </td>
+
+                    <td>
+                        02-08-2026
+                    </td>
+
+                    <td>
+                        Generated
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- VENDOR RELIABILITY REPORT -->
+    <!-- ========================= -->
+
+    <div class="report-card">
+
+        <h2>Vendor Reliability Report</h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Vendor</th>
+
+                    <th>On-Time Delivery</th>
+
+                    <th>Quality Score</th>
+
+                    <th>Reliability Score</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="vendorReportBody">
+
+                <tr>
+
+                    <td colspan="4">
+
+                        Loading vendor data...
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+
+        <p
+            id="vendorStatus"
+            class="status-message"
+        ></p>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- GENERATE REPORT -->
+    <!-- ========================= -->
+
+    <div class="report-card">
+
+        <h2>Generate New Report</h2>
+
+        <p>
+            Generate the latest monthly procurement report.
+        </p>
+
+        <button onclick="generateReport()">
+
+            Generate Report
+
+        </button>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+
+// =========================
+// API URL
+// =========================
+
+const API_URL =
+    "http://127.0.0.1:8000";
+
+
+
+// =========================
+// GET LOGIN TOKEN
+// =========================
+
+function getToken() {
+
+
+    const accessToken =
+        localStorage.getItem(
+            "access_token"
+        );
+
+
+    const token =
+        localStorage.getItem(
+            "token"
+        );
+
+
+    return accessToken || token;
+
+
+}
+
+
+
+// =========================
+// CREATE HEADERS
+// =========================
+
+function getHeaders() {
+
+
+    const token =
+        getToken();
+
+
+    const headers = {
+
+        "Accept":
+            "application/json"
+
+    };
+
+
+    if (token) {
+
+
+        headers[
+            "Authorization"
+        ] =
+            "Bearer " + token;
+
+
+    }
+
+
+    return headers;
+
+
+}
+
+
+
+// =========================
+// LOAD VENDORS
+// =========================
+
+async function loadVendors() {
+
+
+    const vendorReportBody =
+        document.getElementById(
+            "vendorReportBody"
+        );
+
+
+    const vendorStatus =
+        document.getElementById(
+            "vendorStatus"
+        );
+
+
+    try {
+
+
+        const token =
+            getToken();
+
+
+        // Check login token
+
+        if (!token) {
+
+
+            vendorStatus.innerText =
+                "Login token not found. Please login again.";
+
+
+            vendorReportBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="4">
+
+                        Login required
+
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            return;
+
+
+        }
+
+
+        // Get vendors
+
+        const response =
+            await fetch(
+
+                API_URL + "/vendors",
+
+                {
+
+                    method:
+                        "GET",
+
+                    headers:
+                        getHeaders()
+
+                }
+
+            );
+
+
+        console.log(
+            "VENDOR API STATUS:",
+            response.status
+        );
+
+
+        // If API failed
+
+        if (!response.ok) {
+
+
+            const errorText =
+                await response.text();
+
+
+            console.error(
+                "VENDOR API ERROR:",
+                errorText
+            );
+
+
+            vendorStatus.innerText =
+                "Vendor API error. Status: " +
+                response.status;
+
+
+            vendorReportBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="4">
+
+                        Unable to load vendor data
+
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            return;
+
+
+        }
+
+
+        // Convert response
+
+        const vendors =
+            await response.json();
+
+
+        console.log(
+            "VENDOR DATA:",
+            vendors
+        );
+
+
+        // Update vendor count
+
+        document.getElementById(
+            "vendorCount"
+        ).innerText =
+            vendors.length;
+
+
+        // Clear old rows
+
+        vendorReportBody.innerHTML =
+            "";
+
+
+        // No vendors
+
+        if (
+            !vendors ||
+            vendors.length === 0
+        ) {
+
+
+            vendorReportBody.innerHTML = `
+
+                <tr>
+
+                    <td colspan="4">
+
+                        No vendor data available
+
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            vendorStatus.innerText =
+                "";
+
+
+            return;
+
+
+        }
+
+
+        // Add vendors
+
+        vendors.forEach(
+            function(vendor) {
+
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                row.innerHTML = `
+
+                    <td>
+                        ${vendor.name || "-"}
+                    </td>
+
+                    <td>
+                        ${vendor.on_time_delivery ?? 0}%
+                    </td>
+
+                    <td>
+                        ${vendor.quality_score ?? 0}%
+                    </td>
+
+                    <td>
+                        ${vendor.reliability_score ?? 0}%
+                    </td>
+
+                `;
+
+
+                vendorReportBody.appendChild(
+                    row
+                );
+
+
+            }
+        );
+
+
+        vendorStatus.innerText =
+            "";
+
+
+    }
+
+
+    catch (error) {
+
+
+        console.error(
+            "VENDOR LOAD ERROR:",
+            error
+        );
+
+
+        document.getElementById(
+            "vendorCount"
+        ).innerText =
+            "0";
+
+
+        vendorStatus.innerText =
+            "Unable to connect to Vendor API.";
+
+
+        vendorReportBody.innerHTML = `
+
+            <tr>
+
+                <td colspan="4">
+
+                    Unable to load vendor data
+
+                </td>
+
+            </tr>
+
+        `;
+
+
+    }
+
+
+}
+
+
+
+// =========================
+// LOAD PURCHASE ORDERS
+// =========================
+
+async function loadPurchaseOrders() {
+
+
+    try {
+
+
+        const token =
+            getToken();
+
+
+        // Check token
+
+        if (!token) {
+
+
+            document.getElementById(
+                "orderCount"
+            ).innerText =
+                "0";
+
+
+            document.getElementById(
+                "totalCost"
+            ).innerText =
+                "₹0";
+
+
+            return;
+
+
+        }
+
+
+        // Get orders
+
+        const response =
+            await fetch(
+
+                API_URL +
+                "/purchase-orders",
+
+                {
+
+                    method:
+                        "GET",
+
+                    headers:
+                        getHeaders()
+
+                }
+
+            );
+
+
+        console.log(
+            "ORDER API STATUS:",
+            response.status
+        );
+
+
+        // API failed
+
+        if (!response.ok) {
+
+
+            const errorText =
+                await response.text();
+
+
+            console.error(
+                "ORDER API ERROR:",
+                errorText
+            );
+
+
+            document.getElementById(
+                "orderCount"
+            ).innerText =
+                "0";
+
+
+            document.getElementById(
+                "totalCost"
+            ).innerText =
+                "₹0";
+
+
+            return;
+
+
+        }
+
+
+        // Convert response
+
+        const orders =
+            await response.json();
+
+
+        console.log(
+            "ORDER DATA:",
+            orders
+        );
+
+
+        // Total orders
+
+        document.getElementById(
+            "orderCount"
+        ).innerText =
+            orders.length;
+
+
+        // Calculate total cost
+
+        let total = 0;
+
+
+        orders.forEach(
+            function(order) {
+
+
+                total += Number(
+                    order.total_cost || 0
+                );
+
+
+            }
+        );
+
+
+        document.getElementById(
+            "totalCost"
+        ).innerText =
+            "₹" +
+            total.toLocaleString();
+
+
+    }
+
+
+    catch (error) {
+
+
+        console.error(
+            "ORDER LOAD ERROR:",
+            error
+        );
+
+
+        document.getElementById(
+            "orderCount"
+        ).innerText =
+            "0";
+
+
+        document.getElementById(
+            "totalCost"
+        ).innerText =
+            "₹0";
+
+
+    }
+
+
+}
+
+
+
+// =========================
+// LOAD ALL REPORT DATA
+// =========================
+
+async function loadReportData() {
+
+
+    // Vendors and orders
+    // load separately
+
+    await loadVendors();
+
+
+    await loadPurchaseOrders();
+
+
+}
+
+
+
+// =========================
+// GENERATE REPORT
+// =========================
+
+function generateReport() {
+
+
+    alert(
+        "Monthly Procurement Report Generated Successfully!"
+    );
+
+
+}
+
+
+
+// =========================
+// PAGE LOAD
+// =========================
+
+loadReportData();
+
+
+</script>
+
+
+</body>
+
+</html>
+```
