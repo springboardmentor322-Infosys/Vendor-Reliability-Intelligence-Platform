@@ -8,10 +8,14 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from decimal import Decimal
 from collections import defaultdict
+from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
 import time
 import psutil
 import Tables as db
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # ==========================================================
@@ -35,40 +39,116 @@ def normalize_mobile( mobile: str, ) -> str:
     return mobile
 
 
-# ==========================================================
-# SMS FUNCTION
-# ==========================================================
+# ============================================================
+# TWILIO CONFIGURATION
+# ============================================================
 
-def send_sms( mobile: str, otp: str, ):
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
+
+
+if not TWILIO_ACCOUNT_SID:
+    raise RuntimeError("TWILIO_ACCOUNT_SID is not configured")
+
+if not TWILIO_AUTH_TOKEN:
+    raise RuntimeError("TWILIO_AUTH_TOKEN is not configured")
+
+if not TWILIO_PHONE_NUMBER:
+    raise RuntimeError("TWILIO_PHONE_NUMBER is not configured")
+
+
+twilio_client = Client(
+    TWILIO_ACCOUNT_SID,
+    TWILIO_AUTH_TOKEN
+)
+
+
+# ============================================================
+# SEND SMS
+# ============================================================
+
+def send_sms(mobile: str, otp: str):
     """
-    Replace this function with your SMS provider.
-
-    For development, OTP is printed to the terminal.
+    Send VendorIQ password-reset OTP using Twilio SMS.
     """
 
-    message = (
+    message_body = (
         f"Your VendorIQ password reset OTP is "
         f"{otp}. This OTP is valid for 5 minutes."
     )
 
-    print("=" * 60)
-    print("SMS OTP")
-    print("Mobile:", mobile)
-    print("Message:", message)
-    print("=" * 60)
+    try:
 
-    # ======================================================
-    # REAL SMS PROVIDER GOES HERE
-    # ======================================================
-    #
-    # Example:
-    #
-    # sms_client.send(
-    #     mobile,
-    #     message
-    # )
-    #
-    # ======================================================
+        # ----------------------------------------------------
+        # Convert Indian mobile number to E.164 format
+        # ----------------------------------------------------
+
+        mobile = mobile.strip()
+
+        if mobile.startswith("0"):
+            mobile = "+91" + mobile[1:]
+
+        elif mobile.startswith("91") and not mobile.startswith("+"):
+            mobile = "+" + mobile
+
+        elif not mobile.startswith("+"):
+            mobile = "+91" + mobile
+
+
+        # ----------------------------------------------------
+        # Send SMS through Twilio
+        # ----------------------------------------------------
+
+        message = twilio_client.messages.create(
+            body=message_body,
+            from_=TWILIO_PHONE_NUMBER,
+            to=mobile
+        )
+
+
+        # ----------------------------------------------------
+        # Development logging
+        # ----------------------------------------------------
+
+        print("=" * 60)
+        print("TWILIO SMS SENT")
+        print("Mobile:", mobile)
+        print("Message SID:", message.sid)
+        print("Status:", message.status)
+        print("=" * 60)
+
+
+        return {
+            "success": True,
+            "message_sid": message.sid,
+            "status": message.status
+        }
+
+
+    except TwilioRestException as exc:
+
+        print("=" * 60)
+        print("TWILIO SMS ERROR")
+        print("Error Code:", exc.code)
+        print("Error Message:", exc.msg)
+        print("=" * 60)
+
+        raise RuntimeError(
+            f"Failed to send OTP SMS: {exc.msg}"
+        ) from exc
+
+
+    except Exception as exc:
+
+        print("=" * 60)
+        print("SMS ERROR")
+        print("Error:", str(exc))
+        print("=" * 60)
+
+        raise RuntimeError(
+            "Failed to send OTP SMS"
+        ) from exc
 
 
 # ============================================================================
