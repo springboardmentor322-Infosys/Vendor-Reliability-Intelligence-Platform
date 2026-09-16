@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invoices &amp; Payments | VendorIQ</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+  <div class="app-shell d-lg-flex">
+    <aside id="appSidebar" class="app-sidebar"></aside>
+    <main class="app-content">
+      <header class="app-topbar d-flex align-items-center gap-3 px-3 px-md-4">
+        <button id="menuToggle" class="btn btn-light d-lg-none" type="button" aria-label="Open navigation">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="me-auto">
+          <p id="topRole" class="top-role mb-0"></p>
+          <h1 class="h4 mb-0">Invoices &amp; Payments</h1>
+        </div>
+        <strong id="topUser" class="d-none d-sm-block"></strong>
+        <button id="logoutButton" class="btn btn-outline-secondary btn-sm" type="button">Log out</button>
+      </header>
+
+      <section class="p-3 p-md-4">
+        <div id="pageError" class="alert alert-danger d-none" role="alert"></div>
+        <div class="module-card">
+          <div class="module-toolbar">
+            <div class="search-wrap">
+              <label class="visually-hidden" for="searchInput">Search invoices</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input id="searchInput" class="form-control" placeholder="Search invoice, vendor, or PO number">
+              </div>
+            </div>
+            <div class="filter-wrap">
+              <label class="visually-hidden" for="statusFilter">Filter by status</label>
+              <select id="statusFilter" class="form-select">
+                <option value="">All statuses</option>
+                <option value="Draft">Draft</option>
+                <option value="Submitted">Submitted</option>
+                <option value="Under Review">Under Review</option>
+                <option value="Approved">Approved</option>
+                <option value="Payment Pending">Payment Pending</option>
+                <option value="Paid">Paid</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Overdue">Overdue</option>
+              </select>
+            </div>
+            <button id="addInvoice" class="btn btn-primary d-none" type="button">
+              <i class="bi bi-plus-lg me-1"></i>Create invoice
+            </button>
+          </div>
+
+          <div id="loadingState" class="p-5 text-center">
+            <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading invoices</span></div>
+            <p class="text-muted mb-0 mt-3">Loading invoice records...</p>
+          </div>
+          <div id="invoiceTableWrap" class="table-responsive d-none">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Invoice</th>
+                  <th>Vendor</th>
+                  <th>Purchase order</th>
+                  <th>Invoice / due date</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Payment</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="invoiceRows"></tbody>
+            </table>
+          </div>
+          <div id="emptyState" class="empty-state d-none m-3">
+            <i class="bi bi-receipt"></i>
+            <h2 class="h5 mb-0">No invoices found</h2>
+            <p id="emptyMessage" class="mb-0">No invoices have been submitted yet.</p>
+          </div>
+          <div id="tableFooter" class="table-footer d-none">
+            <span id="pageInfo"></span>
+            <div class="btn-group" role="group" aria-label="Invoice pagination">
+              <button id="previousPage" class="btn btn-outline-secondary btn-sm" type="button">Previous</button>
+              <button id="nextPage" class="btn btn-outline-secondary btn-sm" type="button">Next</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <form id="invoiceForm" class="modal-content" novalidate>
+        <div class="modal-header">
+          <div>
+            <p class="top-role mb-1">VENDOR INVOICE</p>
+            <h2 class="h5 modal-title mb-0">Create invoice</h2>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="invoiceFormError" class="alert alert-danger d-none"></div>
+          <p class="small text-muted">Only completed purchase orders with receiving and quality evidence can be submitted for Finance review.</p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="poSelect">Completed purchase order</label>
+              <select name="purchase_order_id" id="poSelect" class="form-select" required></select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="invoiceNumber">Invoice number</label>
+              <input name="invoice_number" id="invoiceNumber" class="form-control" maxlength="100" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="invoiceDate">Invoice date</label>
+              <input name="invoice_date" id="invoiceDate" type="date" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="dueDate">Due date</label>
+              <input name="due_date" id="dueDate" type="date" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="subtotal">Subtotal</label>
+              <input name="subtotal" id="subtotal" type="number" min="0.01" step="0.01" class="form-control" required>
+              <div id="poAmountHint" class="form-text"></div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="taxAmount">Tax amount</label>
+              <input name="tax_amount" id="taxAmount" type="number" min="0" step="0.01" value="0" class="form-control">
+            </div>
+            <div class="col-md-8">
+              <label class="form-label" for="invoiceDocument">Invoice document <span class="text-muted">(optional)</span></label>
+              <input id="invoiceDocument" type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" class="form-control">
+              <div class="form-text">PDF, PNG, or JPG; uploaded securely after the draft is saved.</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="invoiceNotes">Notes <span class="text-muted">(optional)</span></label>
+              <textarea name="notes" id="invoiceNotes" class="form-control" rows="3" maxlength="4000"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="saveDraftButton" class="btn btn-outline-primary" type="submit">Save draft</button>
+          <button id="submitAfterSave" type="button" class="btn btn-primary">Save &amp; submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <p class="top-role mb-1">INVOICE REVIEW</p>
+            <h2 id="detailTitle" class="h5 modal-title mb-0">Invoice details</h2>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div id="detailBody" class="modal-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="paymentForm" class="modal-content" novalidate>
+        <div class="modal-header">
+          <div>
+            <p class="top-role mb-1">FINANCE PAYMENT</p>
+            <h2 class="h5 modal-title mb-0">Process payment</h2>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="paymentFormError" class="alert alert-danger d-none"></div>
+          <p id="paymentInvoiceSummary" class="small text-muted"></p>
+          <div class="mb-3">
+            <label class="form-label" for="paymentDate">Payment date</label>
+            <input id="paymentDate" name="payment_date" type="date" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="paymentAmount">Approved amount</label>
+            <input id="paymentAmount" name="amount" type="number" step="0.01" class="form-control" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="paymentMethod">Payment method</label>
+            <select id="paymentMethod" name="payment_method" class="form-select" required>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="NEFT">NEFT</option>
+              <option value="RTGS">RTGS</option>
+              <option value="Cheque">Cheque</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="paymentReference">Payment reference</label>
+            <input id="paymentReference" name="reference_number" class="form-control" maxlength="150" required>
+          </div>
+          <div>
+            <label class="form-label" for="paymentNotes">Notes <span class="text-muted">(optional)</span></label>
+            <textarea id="paymentNotes" name="notes" class="form-control" rows="2" maxlength="2000"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-success" type="submit"><i class="bi bi-credit-card me-1"></i>Process payment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true">
+      <div class="d-flex"><div id="toastText" class="toast-body"></div><button class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/api.js"></script><script src="assets/js/auth.js"></script><script src="assets/js/navigation.js"></script><script src="assets/js/notifications.js"></script><script src="assets/js/invoices.js"></script></body></html>

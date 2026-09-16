@@ -1,0 +1,15 @@
+"""Add connected invoice and payment records.
+
+Revision ID: 20260827_0007
+Revises: 20260826_0006
+"""
+from alembic import op
+import sqlalchemy as sa
+revision="20260827_0007"; down_revision="20260826_0006"; branch_labels=None; depends_on=None
+def upgrade():
+    op.create_table("invoices", sa.Column("id",sa.Integer(),primary_key=True), sa.Column("invoice_number",sa.String(100),nullable=False), sa.Column("vendor_id",sa.Integer(),sa.ForeignKey("vendors.id",ondelete="RESTRICT"),nullable=False), sa.Column("purchase_order_id",sa.Integer(),sa.ForeignKey("purchase_orders.id",ondelete="RESTRICT"),nullable=False), sa.Column("invoice_date",sa.Date(),nullable=False), sa.Column("due_date",sa.Date(),nullable=False), sa.Column("subtotal",sa.Numeric(14,2),nullable=False), sa.Column("tax_amount",sa.Numeric(14,2),nullable=False,server_default="0"), sa.Column("total_amount",sa.Numeric(14,2),nullable=False), sa.Column("currency",sa.String(3),nullable=False,server_default="INR"), sa.Column("status",sa.String(30),nullable=False,server_default="Draft"), sa.Column("document_path",sa.String(500)), sa.Column("notes",sa.Text()), sa.Column("reviewed_by",sa.Integer(),sa.ForeignKey("users.id",ondelete="SET NULL")), sa.Column("reviewed_at",sa.DateTime(timezone=True)), sa.Column("review_comment",sa.Text()), sa.Column("created_by",sa.Integer(),sa.ForeignKey("users.id",ondelete="RESTRICT"),nullable=False), sa.Column("created_at",sa.DateTime(timezone=True),server_default=sa.text("now()"),nullable=False), sa.Column("updated_at",sa.DateTime(timezone=True),server_default=sa.text("now()"),nullable=False), sa.UniqueConstraint("vendor_id","invoice_number",name="uq_invoices_vendor_number"))
+    op.create_index("ix_invoices_vendor_id","invoices",["vendor_id"]); op.create_index("ix_invoices_purchase_order_id","invoices",["purchase_order_id"]); op.create_index("ix_invoices_status","invoices",["status"])
+    op.create_table("payments",sa.Column("id",sa.Integer(),primary_key=True),sa.Column("invoice_id",sa.Integer(),sa.ForeignKey("invoices.id",ondelete="CASCADE"),nullable=False),sa.Column("vendor_id",sa.Integer(),sa.ForeignKey("vendors.id",ondelete="RESTRICT"),nullable=False),sa.Column("payment_date",sa.Date(),nullable=False),sa.Column("amount",sa.Numeric(14,2),nullable=False),sa.Column("payment_method",sa.String(80),nullable=False),sa.Column("reference_number",sa.String(150),nullable=False,unique=True),sa.Column("status",sa.String(30),nullable=False,server_default="Processed"),sa.Column("notes",sa.Text()),sa.Column("created_by",sa.Integer(),sa.ForeignKey("users.id",ondelete="RESTRICT"),nullable=False),sa.Column("created_at",sa.DateTime(timezone=True),server_default=sa.text("now()"),nullable=False))
+    op.create_index("ix_payments_invoice_id","payments",["invoice_id"]);op.create_index("ix_payments_vendor_id","payments",["vendor_id"]);op.create_index("ix_payments_reference_number","payments",["reference_number"],unique=True)
+def downgrade():
+    op.drop_table("payments");op.drop_table("invoices")

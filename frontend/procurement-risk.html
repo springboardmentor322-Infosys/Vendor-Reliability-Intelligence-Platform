@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Procurement & PO Risk | VendorIQ</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <style>
+    .risk-indicator-pill {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body data-module="procurementRisk">
+  <div class="app-shell d-lg-flex">
+    <aside id="appSidebar" class="app-sidebar"></aside>
+
+    <main class="app-content">
+      <header class="app-topbar d-flex align-items-center gap-3 px-3 px-md-4">
+        <button id="menuToggle" class="btn btn-light d-lg-none" aria-label="Open menu">☰</button>
+        <div class="me-auto">
+          <p id="topRole" class="top-role mb-0">Procurement Manager</p>
+          <h1 id="pageTitle" class="h4 mb-0">Procurement Risk Workspace</h1>
+        </div>
+        <div class="text-end d-none d-sm-block">
+          <strong id="topUser">Account User</strong>
+        </div>
+        <button id="logoutButton" class="btn btn-outline-secondary btn-sm">Log out</button>
+      </header>
+
+      <section class="p-3 p-md-4">
+        <!-- KPI Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <div class="dashboard-card">
+              <small class="text-muted font-weight-bold uppercase">At-Risk POs</small>
+              <h2 class="h3 font-weight-bold text-danger mt-1" id="atRiskPOCount">0</h2>
+              <small class="text-muted">Linked to High/Critical Vendors</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="dashboard-card">
+              <small class="text-muted font-weight-bold uppercase">Delayed Deliveries</small>
+              <h2 class="h3 font-weight-bold text-warning mt-1" id="delayedPOCount">0</h2>
+              <small class="text-muted">Expected delivery in the past</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="dashboard-card">
+              <small class="text-muted font-weight-bold uppercase">Total Exposed Value</small>
+              <h2 class="h3 font-weight-bold text-danger mt-1" id="totalExposureVal">₹0</h2>
+              <small class="text-muted">Active exposed POs</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="dashboard-card">
+              <small class="text-muted font-weight-bold uppercase">High-Value Risks (> ₹10L)</small>
+              <h2 class="h3 font-weight-bold text-dark mt-1" id="highValueRiskCount">0</h2>
+              <small class="text-muted">Requires immediate monitoring</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-toolbar">
+            <h2 class="h5 mb-0">Active Purchase Orders & Supplier Risks</h2>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>PO Number</th>
+                  <th>Vendor</th>
+                  <th>Value</th>
+                  <th>Expected Delivery</th>
+                  <th>Vendor Risk Level</th>
+                  <th>PO Status</th>
+                  <th>Potential Impact</th>
+                </tr>
+              </thead>
+              <tbody id="poRiskRows">
+                <tr><td colspan="7" class="text-center py-5 text-muted">Loading purchase order risk analysis…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    (() => {
+      const api = window.VendorIQApi;
+      const auth = window.VendorIQAuth;
+      const $ = (selector) => document.querySelector(selector);
+      const money = (value) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(Number(value || 0));
+      const dateText = (value) => value ? new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(`${value}T00:00:00`)) : "—";
+      
+      const state = { user: null, roles: [] };
+
+      async function loadData() {
+        try {
+          const [pos, vendors] = await Promise.all([
+            api.request("/purchase-orders", { token: auth.getAccessToken() }),
+            api.request("/vendors?page_size=100", { token: auth.getAccessToken() })
+          ]);
+          
+          const vendorMap = {};
+          (vendors.items || []).forEach(v => {
+            vendorMap[v.id] = v;
+          });
+
+          const activeStatuses = ["Created", "Sent", "Accepted", "In Progress", "Shipped"];
+          const activePOs = pos.filter(po => activeStatuses.includes(po.status));
+          
+          let atRiskCount = 0;
+          let delayedCount = 0;
+          let exposureTotal = 0;
+          let highValueCount = 0;
+          
+          const today = new Date();
+          
+          const rows = pos.map(po => {
+            const vendor = vendorMap[po.vendor_id] || {};
+            const riskLvl = (vendor.risk_level || vendor.risk_category || "LOW").toUpperCase();
+            const expDate = new Date(`${po.expected_delivery_date}T00:00:00`);
+            const isDelayed = expDate < today && activeStatuses.includes(po.status);
+            
+            if (activeStatuses.includes(po.status)) {
+              exposureTotal += Number(po.total_amount);
+              if (riskLvl.includes("HIGH") || riskLvl.includes("CRITICAL")) atRiskCount++;
+              if (isDelayed) delayedCount++;
+              if (Number(po.total_amount) > 1000000) highValueCount++;
+            }
+
+            // Potential Impact explanation
+            let impact = "None";
+            let impactClass = "text-muted";
+            if (isDelayed) {
+              impact = "Delivery Delay";
+              impactClass = "text-warning font-weight-bold";
+            }
+            if (riskLvl.includes("HIGH") || riskLvl.includes("CRITICAL")) {
+              impact = "Supply Interruption";
+              impactClass = "text-danger font-weight-bold";
+            }
+            if (isDelayed && (riskLvl.includes("HIGH") || riskLvl.includes("CRITICAL"))) {
+              impact = "Critical Production Stop";
+              impactClass = "text-dark font-weight-bold";
+            }
+
+            return `
+              <tr>
+                <td><strong>${po.po_number}</strong></td>
+                <td><a href="vendor-details.html?id=${vendor.id}">${esc(vendor.company_name)}</a></td>
+                <td>${money(po.total_amount)}</td>
+                <td>${dateText(po.expected_delivery_date)} ${isDelayed ? `<span class="badge bg-warning ms-1">Delayed</span>` : ""}</td>
+                <td><span class="status-badge status-${riskLvl.toLowerCase().replace(" risk", "").trim()}">${riskLvl}</span></td>
+                <td><span class="status-badge status-${po.status.toLowerCase().replaceAll(" ", "-")}">${po.status}</span></td>
+                <td><span class="${impactClass}">${impact}</span></td>
+              </tr>
+            `;
+          });
+          
+          $("#atRiskPOCount").textContent = atRiskCount;
+          $("#delayedPOCount").textContent = delayedCount;
+          $("#totalExposureVal").textContent = money(exposureTotal);
+          $("#highValueRiskCount").textContent = highValueCount;
+          
+          $("#poRiskRows").innerHTML = rows.join("");
+
+        } catch (e) {
+          $("#poRiskRows").innerHTML = `<tr><td colspan="7" class="text-center py-5 text-danger">Failed to load procurement risk analysis: ${e.message}</td></tr>`;
+        }
+      }
+
+      const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[character]));
+
+      async function init() {
+        if (!auth.requireAuthentication()) return;
+        state.user = auth.getUser() || auth.setUser(await api.request("/auth/me", { token: auth.getAccessToken() }));
+        const roles = auth.getRoleNames(state.user);
+        $("#topUser").textContent = `${state.user.first_name || "Account"} ${state.user.last_name || ""}`;
+        $("#topRole").textContent = roles.join(", ");
+        
+        await window.VendorIQNavigationReady;
+        window.VendorIQNavigation?.render("#appSidebar", state.user, roles);
+        await loadData();
+        
+        $("#logoutButton").addEventListener("click", () => {
+          auth.clearSession();
+          location.replace("login.html");
+        });
+      }
+      
+      init();
+    })();
+  </script>
+</body>
+</html>

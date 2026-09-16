@@ -1,0 +1,5 @@
+- [x] Update frontend/users.html to layout match other modules
+- [x] Update frontend/audit-logs.html to layout match other modules
+- [x] Update frontend/assets/js/modules.js to configure users and auditLogs modules and actions
+- [x] Update frontend/assets/js/dashboard.js to load reliability summary and ranks
+- [x] Verify functionality

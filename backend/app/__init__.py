@@ -1,0 +1,1 @@
+"""VendorIQ FastAPI application package."""

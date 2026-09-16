@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dependency & Blast Radius | VendorIQ</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body data-module="vendorDependency">
+  <div class="app-shell d-lg-flex">
+    <aside id="appSidebar" class="app-sidebar"></aside>
+
+    <main class="app-content">
+      <header class="app-topbar d-flex align-items-center gap-3 px-3 px-md-4">
+        <button id="menuToggle" class="btn btn-light d-lg-none" aria-label="Open menu">☰</button>
+        <div class="me-auto">
+          <p id="topRole" class="top-role mb-0">Supply Chain Manager</p>
+          <h1 id="pageTitle" class="h4 mb-0">Blast Radius Assessment</h1>
+        </div>
+        <div class="text-end d-none d-sm-block">
+          <strong id="topUser">Account User</strong>
+        </div>
+        <button id="logoutButton" class="btn btn-outline-secondary btn-sm">Log out</button>
+      </header>
+
+      <section class="p-3 p-md-4">
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <div class="dashboard-card">
+              <small class="text-muted font-weight-bold uppercase">Critical Supplier dependencies</small>
+              <h2 class="h3 font-weight-bold text-danger mt-1" id="criticalSupplierCount">0</h2>
+              <small class="text-muted">Tagged as critical suppliers</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="dashboard-card">
+              <small class="text-muted font-weight-bold uppercase">High Blast Radius suppliers</small>
+              <h2 class="h3 font-weight-bold text-danger mt-1" id="highBlastCount">0</h2>
+              <small class="text-muted">High/Critical blast radius level</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="dashboard-card">
+              <small class="text-muted font-weight-bold uppercase">Total Monitored Exposure</small>
+              <h2 class="h3 font-weight-bold text-primary mt-1" id="kpiTotalExposure">₹0</h2>
+              <small class="text-muted">Across all active contracts & POs</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-toolbar">
+            <h2 class="h5 mb-0">Vendor Dependency Matrix</h2>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Vendor</th>
+                  <th>Criticality</th>
+                  <th>Active POs</th>
+                  <th>Exposed Value</th>
+                  <th>Alternates</th>
+                  <th>Blast Radius Level</th>
+                  <th>Blast Radius Explanation</th>
+                </tr>
+              </thead>
+              <tbody id="dependencyRows">
+                <tr><td colspan="7" class="text-center py-5 text-muted">Loading dependency analysis…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/notifications.js"></script>
+  <script>
+    (() => {
+      const api = window.VendorIQApi;
+      const auth = window.VendorIQAuth;
+      const $ = (selector) => document.querySelector(selector);
+      const money = (value) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(Number(value || 0));
+      
+      const state = { user: null, roles: [] };
+
+      async function loadData() {
+        try {
+          const [vendorsData, purchaseOrders] = await Promise.all([
+            api.request("/vendors?page_size=100", { token: auth.getAccessToken() }),
+            api.request("/purchase-orders", { token: auth.getAccessToken() })
+          ]);
+          const vendors = vendorsData.items || [];
+          
+          let criticalCount = 0;
+          let highBlastCount = 0;
+          let totalExposure = 0;
+          
+          const rows = vendors.map(v => {
+            const exp = Number(v.outstanding_exposure || 0);
+            const isCrit = v.is_critical_supplier || false;
+            const blastLvl = v.blast_radius_level || "LOW";
+            
+            totalExposure += exp;
+            if (isCrit) criticalCount++;
+            if (blastLvl === "HIGH" || blastLvl === "CRITICAL") highBlastCount++;
+            
+            const activePoCount = purchaseOrders.filter((po) => po.vendor_id === v.id && !["Completed", "Cancelled", "Rejected"].includes(po.status)).length;
+            
+            return `
+              <tr>
+                <td><strong><a href="vendor-details.html?id=${v.id}">${esc(v.company_name)}</a></strong></td>
+                <td>${isCrit ? `<span class="badge bg-danger">Critical Supplier</span>` : `<span class="badge bg-secondary">Normal</span>`}</td>
+                <td>${activePoCount}</td>
+                <td>${money(exp)}</td>
+                <td>${v.alternative_vendors_count ?? 1}</td>
+                <td><span class="status-badge status-${blastLvl.toLowerCase()}">${blastLvl}</span></td>
+                <td><small class="text-muted">${esc(v.blast_radius_explanation || "No active operational dependencies.")}</small></td>
+              </tr>
+            `;
+          });
+          
+          $("#criticalSupplierCount").textContent = criticalCount;
+          $("#highBlastCount").textContent = highBlastCount;
+          $("#kpiTotalExposure").textContent = money(totalExposure);
+          $("#dependencyRows").innerHTML = rows.join("");
+
+        } catch (e) {
+          $("#dependencyRows").innerHTML = `<tr><td colspan="7" class="text-center py-5 text-danger">Failed to load dependency analysis: ${e.message}</td></tr>`;
+        }
+      }
+
+      const esc = (value) => String(value ?? "—").replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[character]));
+
+      async function init() {
+        if (!auth.requireAuthentication()) return;
+        state.user = auth.getUser() || auth.setUser(await api.request("/auth/me", { token: auth.getAccessToken() }));
+        const roles = auth.getRoleNames(state.user);
+        if (roles.includes("Vendor")) {
+          $("#criticalSupplierCount").textContent = "N/A";
+          $("#highBlastCount").textContent = "N/A";
+          $("#kpiTotalExposure").textContent = "N/A";
+          $("#dependencyRows").innerHTML = `<tr><td colspan="7" class="text-center py-5 text-warning fw-bold"><i class="bi bi-shield-lock fs-3 d-block mb-2"></i>Access Denied: External vendor accounts cannot view internal buyer vulnerability indicators.</td></tr>`;
+          return;
+        }
+        $("#topUser").textContent = `${state.user.first_name || "Account"} ${state.user.last_name || ""}`;
+        $("#topRole").textContent = roles.join(", ");
+        
+        await window.VendorIQNavigationReady;
+        window.VendorIQNavigation?.render("#appSidebar", state.user, roles);
+        await loadData();
+        
+        $("#logoutButton").addEventListener("click", () => {
+          auth.clearSession();
+          location.replace("login.html");
+        });
+      }
+      
+      init();
+    })();
+  </script>
+</body>
+</html>
