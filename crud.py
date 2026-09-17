@@ -43,9 +43,9 @@ def normalize_mobile( mobile: str, ) -> str:
 # TWILIO CONFIGURATION
 # ============================================================
 
-TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
-TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
+TWILIO_ACCOUNT_SID="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+TWILIO_AUTH_TOKEN="your_twilio_auth_token"
+TWILIO_PHONE_NUMBER=+914523740598
 
 
 if not TWILIO_ACCOUNT_SID:
