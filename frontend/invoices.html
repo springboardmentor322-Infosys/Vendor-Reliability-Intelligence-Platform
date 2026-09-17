@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VendorIQ | Invoices</title>
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    .invoice-page {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .invoice-header h1 {
+      margin: 0;
+    }
+
+    .invoice-header p {
+      margin: 6px 0 0;
+      color: #94a3b8;
+    }
+
+    .invoice-tools {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .invoice-tools input,
+    .invoice-tools select {
+      min-width: 190px;
+    }
+
+    .invoice-summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .invoice-card {
+      padding: 20px;
+      border-radius: 16px;
+    }
+
+    .invoice-card .label {
+      color: #94a3b8;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .invoice-card .value {
+      font-size: 25px;
+      font-weight: 700;
+    }
+
+    .invoice-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .invoice-actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .status-paid {
+      color: #4ade80;
+      font-weight: 600;
+    }
+
+    .status-unpaid {
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
+    .invoice-number {
+      font-weight: 700;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.75);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .modal-backdrop.hidden {
+      display: none;
+    }
+
+    .invoice-modal {
+      width: min(620px, 95vw);
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      border-radius: 20px;
+    }
+
+    .invoice-modal h2 {
+      margin-top: 0;
+    }
+
+    .invoice-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .detail-box {
+      padding: 15px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .detail-box small {
+      display: block;
+      color: #94a3b8;
+      margin-bottom: 5px;
+    }
+
+    .detail-box strong {
+      color: #f8fafc;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    @media (max-width: 900px) {
+      .invoice-summary {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .invoice-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .invoice-detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app-shell" id="app-shell"></div>
+
+<script src="js/api.js"></script>
+
+<script>
+
+requireAuth();
+
+renderShell(
+  "invoices.html",
+  "Invoice Management"
+);
+
+const user = getUser();
+
+const canUpdateInvoice = user && [
+  "Administrator",
+  "Procurement Manager",
+  "Finance Officer"
+].includes(user.role);
+
+let allInvoices = [];
+let vendorMap = {};
+
+
+/* -----------------------------
+   Load invoice data
+----------------------------- */
+
+async function loadInvoices() {
+
+  const rows = document.getElementById("invoice-rows");
+
+  if (!rows) return;
+
+  rows.innerHTML = `
+    <tr>
+      <td colspan="9" class="text-muted">
+        Loading invoices...
+      </td>
+    </tr>
+  `;
+
+  try {
+
+    const [purchaseOrders, vendors] = await Promise.all([
+      api("/procurement"),
+      api("/vendors")
+    ]);
+
+    vendorMap = {};
+
+    vendors.forEach(vendor => {
+      vendorMap[vendor.id] =
+        vendor.name ||
+        vendor.vendor_name ||
+        vendor.company_name ||
+        vendor.id;
+    });
+
+    /*
+     * Invoice data is currently stored on Purchase Orders.
+     * We only show POs that already have an invoice number.
+     */
+    allInvoices = (purchaseOrders || [])
+      .filter(po => po.invoice_number);
+
+    updateSummary();
+    applyFilters();
+
+  } catch (err) {
+
+    console.error("INVOICE LOAD ERROR:", err);
+
+    rows.innerHTML = `
+      <tr>
+        <td colspan="9" class="error-msg">
+          ${escapeHtml(err.message)}
+        </td>
+      </tr>
+    `;
+  }
+}
+
+
+/* -----------------------------
+   Summary cards
+----------------------------- */
+
+function updateSummary() {
+
+  const total =
+    allInvoices.length;
+
+  const paid =
+    allInvoices.filter(
+      invoice => invoice.invoice_paid
+    ).length;
+
+  const unpaid =
+    allInvoices.filter(
+      invoice => !invoice.invoice_paid
+    ).length;
+
+  const totalValue =
+    allInvoices.reduce(
+      (sum, invoice) =>
+        sum + Number(invoice.total_amount || 0),
+      0
+    );
+
+  document.getElementById("total-invoices").textContent =
+    total;
+
+  document.getElementById("paid-invoices").textContent =
+    paid;
+
+  document.getElementById("unpaid-invoices").textContent =
+    unpaid;
+
+  document.getElementById("invoice-value").textContent =
+    fmtMoney(totalValue);
+}
+
+
+/* -----------------------------
+   Search and filter
+----------------------------- */
+
+function applyFilters() {
+
+  const search =
+    document
+      .getElementById("invoice-search")
+      .value
+      .trim()
+      .toLowerCase();
+
+  const status =
+    document.getElementById("invoice-status").value;
+
+  let filtered =
+    allInvoices.filter(invoice => {
+
+      const vendorName =
+        vendorMap[invoice.vendor_id] || "";
+
+      const matchesSearch =
+        !search ||
+        String(invoice.invoice_number || "")
+          .toLowerCase()
+          .includes(search) ||
+        String(invoice.po_number || "")
+          .toLowerCase()
+          .includes(search) ||
+        String(vendorName)
+          .toLowerCase()
+          .includes(search) ||
+        String(invoice.item_description || "")
+          .toLowerCase()
+          .includes(search);
+
+      const matchesStatus =
+        !status ||
+        (status === "Paid" && invoice.invoice_paid) ||
+        (status === "Unpaid" && !invoice.invoice_paid);
+
+      return matchesSearch && matchesStatus;
+    });
+
+  renderInvoices(filtered);
+}
+
+
+/* -----------------------------
+   Render invoice table
+----------------------------- */
+
+function renderInvoices(invoices) {
+
+  const rows =
+    document.getElementById("invoice-rows");
+
+  if (!invoices.length) {
+
+    rows.innerHTML = `
+      <tr>
+        <td colspan="9" class="text-muted">
+          No invoices found.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  rows.innerHTML =
+    invoices.map(invoice => {
+
+      const vendorName =
+        vendorMap[invoice.vendor_id] ||
+        invoice.vendor_id ||
+        "-";
+
+      return `
+        <tr>
+
+          <td>
+            <strong class="invoice-number">
+              ${escapeHtml(invoice.invoice_number)}
+            </strong>
+          </td>
+
+          <td>
+            ${escapeHtml(invoice.po_number || "-")}
+          </td>
+
+          <td>
+            ${escapeHtml(vendorName)}
+          </td>
+
+          <td>
+            ${escapeHtml(invoice.item_description || "-")}
+          </td>
+
+          <td>
+            ${invoice.quantity || 0}
+          </td>
+
+          <td>
+            ${fmtMoney(invoice.total_amount)}
+          </td>
+
+          <td>
+            ${
+              invoice.invoice_paid
+                ? `<span class="status-paid">Paid</span>`
+                : `<span class="status-unpaid">Unpaid</span>`
+            }
+          </td>
+
+          <td>
+            ${fmtDate(invoice.order_date)}
+          </td>
+
+          <td>
+
+            <div class="invoice-actions">
+
+              <button
+                class="btn small"
+                onclick="viewInvoice(${invoice.id})">
+                View
+              </button>
+
+              ${
+                canUpdateInvoice
+                  ? `
+                    <button
+                      class="btn small"
+                      onclick="updateInvoice(${invoice.id})">
+                      Edit
+                    </button>
+                  `
+                  : ""
+              }
+
+              <button
+                class="btn small success"
+                onclick="downloadInvoice(${invoice.id})">
+                Download
+              </button>
+
+            </div>
+
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+}
+
+
+/* -----------------------------
+   Add invoice
+----------------------------- */
+
+async function addInvoice() {
+
+  if (!canUpdateInvoice) {
+    alert("You do not have permission to update invoices.");
+    return;
+  }
+
+  const purchaseOrders =
+    await api("/procurement");
+
+  const available =
+    purchaseOrders.filter(
+      po =>
+        !po.invoice_number &&
+        po.status !== "Cancelled"
+    );
+
+  if (!available.length) {
+    alert("No purchase orders are available for invoicing.");
+    return;
+  }
+
+  let message =
+    "Select Purchase Order by ID:\n\n";
+
+  available.forEach(po => {
+
+    const vendor =
+      vendorMap[po.vendor_id] ||
+      po.vendor_id;
+
+    message +=
+      `${po.id} - ${po.po_number} - ${vendor} - ${fmtMoney(po.total_amount)}\n`;
+  });
+
+  const selected =
+    prompt(message);
+
+  if (selected === null) return;
+
+  const id =
+    Number(selected);
+
+  const po =
+    available.find(
+      item => item.id === id
+    );
+
+  if (!po) {
+    alert("Invalid Purchase Order ID.");
+    return;
+  }
+
+  const invoiceNumber =
+    prompt("Enter invoice number:");
+
+  if (invoiceNumber === null) return;
+
+  const trimmed =
+    invoiceNumber.trim();
+
+  if (!trimmed) {
+    alert("Invoice number is required.");
+    return;
+  }
+
+  const paid =
+    confirm(
+      "Has this invoice been paid?\n\n" +
+      "OK = Paid\n" +
+      "Cancel = Unpaid"
+    );
+
+  try {
+
+    await api(
+      `/procurement/${id}`,
+      {
+        method: "PUT",
+        body: {
+          invoice_number: trimmed,
+          invoice_paid: paid
+        }
+      }
+    );
+
+    closeInvoiceModal();
+    await loadInvoices();
+
+    alert("Invoice created successfully.");
+
+  } catch (err) {
+
+    alert(err.message);
+  }
+}
+
+
+/* -----------------------------
+   Edit invoice
+----------------------------- */
+
+async function updateInvoice(id) {
+
+  if (!canUpdateInvoice) {
+    alert("You do not have permission to update invoices.");
+    return;
+  }
+
+  const invoice =
+    allInvoices.find(
+      item => item.id === id
+    );
+
+  if (!invoice) {
+    alert("Invoice not found.");
+    return;
+  }
+
+  const invoiceNumber =
+    prompt(
+      "Enter invoice number:",
+      invoice.invoice_number || ""
+    );
+
+  if (invoiceNumber === null) return;
+
+  const trimmed =
+    invoiceNumber.trim();
+
+  if (!trimmed) {
+    alert("Invoice number cannot be empty.");
+    return;
+  }
+
+  const paid =
+    confirm(
+      "Has this invoice been paid?\n\n" +
+      "OK = Paid\n" +
+      "Cancel = Unpaid"
+    );
+
+  try {
+
+    await api(
+      `/procurement/${id}`,
+      {
+        method: "PUT",
+        body: {
+          invoice_number: trimmed,
+          invoice_paid: paid
+        }
+      }
+    );
+
+    await loadInvoices();
+
+    alert("Invoice updated successfully.");
+
+  } catch (err) {
+
+    alert(err.message);
+  }
+}
+
+
+/* -----------------------------
+   View invoice
+----------------------------- */
+
+function viewInvoice(id) {
+
+  const invoice =
+    allInvoices.find(
+      item => item.id === id
+    );
+
+  if (!invoice) {
+    alert("Invoice not found.");
+    return;
+  }
+
+  const vendorName =
+    vendorMap[invoice.vendor_id] ||
+    invoice.vendor_id ||
+    "-";
+
+  document.getElementById("invoice-view").innerHTML = `
+
+    <h2>Invoice Details</h2>
+
+    <div class="invoice-detail-grid">
+
+      <div class="detail-box">
+        <small>Invoice Number</small>
+        <strong>${escapeHtml(invoice.invoice_number)}</strong>
+      </div>
+
+      <div class="detail-box">
+        <small>Purchase Order</small>
+        <strong>${escapeHtml(invoice.po_number || "-")}</strong>
+      </div>
+
+      <div class="detail-box">
+        <small>Vendor</small>
+        <strong>${escapeHtml(vendorName)}</strong>
+      </div>
+
+      <div class="detail-box">
+        <small>Status</small>
+        <strong>
+          ${invoice.invoice_paid ? "Paid" : "Unpaid"}
+        </strong>
+      </div>
+
+      <div class="detail-box">
+        <small>Item</small>
+        <strong>${escapeHtml(invoice.item_description || "-")}</strong>
+      </div>
+
+      <div class="detail-box">
+        <small>Quantity</small>
+        <strong>${invoice.quantity || 0}</strong>
+      </div>
+
+      <div class="detail-box">
+        <small>Unit Price</small>
+        <strong>${fmtMoney(invoice.unit_price)}</strong>
+      </div>
+
+      <div class="detail-box">
+        <small>Total Amount</small>
+        <strong>${fmtMoney(invoice.total_amount)}</strong>
+      </div>
+
+      <div class="detail-box">
+        <small>Order Date</small>
+        <strong>${fmtDate(invoice.order_date)}</strong>
+      </div>
+
+      <div class="detail-box">
+        <small>Expected Delivery</small>
+        <strong>${fmtDate(invoice.expected_delivery)}</strong>
+      </div>
+
+    </div>
+
+    <div class="modal-actions">
+
+      <button
+        class="btn secondary"
+        onclick="closeInvoiceModal()">
+        Close
+      </button>
+
+      <button
+        class="btn success"
+        onclick="downloadInvoice(${invoice.id})">
+        Download Invoice
+      </button>
+
+    </div>
+  `;
+
+  document
+    .getElementById("invoice-modal")
+    .classList.remove("hidden");
+}
+
+
+/* -----------------------------
+   Download invoice
+----------------------------- */
+
+function downloadInvoice(id) {
+
+  const invoice =
+    allInvoices.find(
+      item => item.id === id
+    );
+
+  if (!invoice) {
+    alert("Invoice not found.");
+    return;
+  }
+
+  const vendorName =
+    vendorMap[invoice.vendor_id] ||
+    invoice.vendor_id ||
+    "-";
+
+  const status =
+    invoice.invoice_paid
+      ? "PAID"
+      : "UNPAID";
+
+  /*
+   * Creates a professional standalone invoice file
+   * using the existing Purchase Order invoice data.
+   *
+   * No duplicate invoice record is created.
+   */
+  const invoiceHtml = `
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Invoice ${escapeHtml(invoice.invoice_number)}</title>
+
+<style>
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f7fb;
+  color: #172033;
+  padding: 40px;
+}
+
+.invoice {
+  max-width: 850px;
+  margin: auto;
+  background: white;
+  padding: 45px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid #2563eb;
+  padding-bottom: 25px;
+  margin-bottom: 30px;
+}
+
+.brand {
+  font-size: 28px;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+.invoice-title {
+  text-align: right;
+}
+
+.invoice-title h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.info-box {
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.info-box strong {
+  display: block;
+  margin-top: 6px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 25px;
+}
+
+th, td {
+  padding: 14px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+th {
+  background: #eff6ff;
+}
+
+.total {
+  text-align: right;
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 25px;
+}
+
+.status {
+  display: inline-block;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.paid {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.unpaid {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.footer {
+  margin-top: 45px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+  color: #64748b;
+  text-align: center;
+}
+
+@media print {
+  body {
+    background: white;
+    padding: 0;
+  }
+
+  .invoice {
+    box-shadow: none;
+  }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="invoice">
+
+  <div class="header">
+
+    <div>
+      <div class="brand">VendorIQ</div>
+      <div>Vendor Reliability Intelligence Platform</div>
+    </div>
+
+    <div class="invoice-title">
+      <h1>INVOICE</h1>
+      <div>${escapeHtml(invoice.invoice_number)}</div>
+    </div>
+
+  </div>
+
+  <div class="info">
+
+    <div class="info-box">
+      <strong>Vendor</strong>
+      ${escapeHtml(vendorName)}
+    </div>
+
+    <div class="info-box">
+      <strong>Purchase Order</strong>
+      ${escapeHtml(invoice.po_number || "-")}
+    </div>
+
+    <div class="info-box">
+      <strong>Order Date</strong>
+      ${fmtDate(invoice.order_date)}
+    </div>
+
+    <div class="info-box">
+      <strong>Payment Status</strong>
+      <span class="status ${invoice.invoice_paid ? "paid" : "unpaid"}">
+        ${status}
+      </span>
+    </div>
+
+  </div>
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Quantity</th>
+        <th>Unit Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      <tr>
+        <td>${escapeHtml(invoice.item_description || "-")}</td>
+        <td>${invoice.quantity || 0}</td>
+        <td>${fmtMoney(invoice.unit_price)}</td>
+        <td>${fmtMoney(invoice.total_amount)}</td>
+      </tr>
+
+    </tbody>
+
+  </table>
+
+  <div class="total">
+    Total Amount: ${fmtMoney(invoice.total_amount)}
+  </div>
+
+  <div class="footer">
+    Generated by VendorIQ
+    <br>
+    Vendor Reliability Intelligence & Procurement Risk Management Platform
+  </div>
+
+</div>
+
+</body>
+
+</html>
+`;
+
+  const blob =
+    new Blob(
+      [invoiceHtml],
+      { type: "text/html;charset=utf-8" }
+    );
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const link =
+    document.createElement("a");
+
+  link.href = url;
+
+  link.download =
+    `Invoice-${invoice.invoice_number}.html`;
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+}
+
+
+/* -----------------------------
+   Modal
+----------------------------- */
+
+function closeInvoiceModal() {
+
+  document
+    .getElementById("invoice-modal")
+    .classList.add("hidden");
+}
+
+
+/* -----------------------------
+   Utility functions
+----------------------------- */
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/* -----------------------------
+   Page content
+----------------------------- */
+
+document.getElementById("page-content").innerHTML = `
+
+<div class="invoice-page">
+
+  <div class="invoice-header">
+
+    <div>
+      <h1>Invoices</h1>
+      <p>
+        Manage purchase order invoices and payment status
+      </p>
+    </div>
+
+    ${
+      canUpdateInvoice
+        ? `
+          <button
+            class="btn"
+            onclick="addInvoice()">
+            + Add Invoice
+          </button>
+        `
+        : ""
+    }
+
+  </div>
+
+
+  <div class="invoice-summary">
+
+    <div class="card invoice-card">
+      <div class="label">Total Invoices</div>
+      <div
+        class="value"
+        id="total-invoices">
+        0
+      </div>
+    </div>
+
+    <div class="card invoice-card">
+      <div class="label">Paid</div>
+      <div
+        class="value"
+        id="paid-invoices">
+        0
+      </div>
+    </div>
+
+    <div class="card invoice-card">
+      <div class="label">Unpaid</div>
+      <div
+        class="value"
+        id="unpaid-invoices">
+        0
+      </div>
+    </div>
+
+    <div class="card invoice-card">
+      <div class="label">Invoice Value</div>
+      <div
+        class="value"
+        id="invoice-value">
+        ₹0
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="invoice-tools">
+
+      <input
+        id="invoice-search"
+        type="text"
+        placeholder="Search invoice, PO or vendor..."
+        oninput="applyFilters()">
+
+      <select
+        id="invoice-status"
+        onchange="applyFilters()">
+
+        <option value="">
+          All Payment Status
+        </option>
+
+        <option value="Paid">
+          Paid
+        </option>
+
+        <option value="Unpaid">
+          Unpaid
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+
+  <div class="card invoice-table-wrapper">
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>Invoice Number</th>
+          <th>PO Number</th>
+          <th>Vendor</th>
+          <th>Item</th>
+          <th>Qty</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Order Date</th>
+          <th>Actions</th>
+        </tr>
+
+      </thead>
+
+      <tbody id="invoice-rows">
+
+        <tr>
+          <td
+            colspan="9"
+            class="text-muted">
+            Loading invoices...
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+
+<div
+  id="invoice-modal"
+  class="modal-backdrop hidden">
+
+  <div
+    id="invoice-view"
+    class="invoice-modal card">
+  </div>
+
+</div>
+
+`;
+
+loadInvoices();
+
+</script>
+
+</body>
+</html>

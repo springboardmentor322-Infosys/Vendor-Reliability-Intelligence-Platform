@@ -100,13 +100,46 @@ const DASHBOARD_VARIANTS = ["dashboard.html", "vendor-dashboard.html", "admin-da
 
 function getNavItems(role) {
   return [
-    { href: getDashboardHref(role), label: "Dashboard", isActive: (activeHref) => DASHBOARD_VARIANTS.includes(activeHref) },
-    { href: "vendors.html", label: "Vendor Management" },
-    { href: "procurement.html", label: "Procurement & POs" },
-    { href: "performance.html", label: "Performance & Reliability" },
-    { href: "contracts.html", label: "Contracts & Compliance" },
-    { href: "messages.html", label: "Communication" },
-    { href: "reports.html", label: "Reports & Notifications" },
+    { 
+      href: getDashboardHref(role), 
+      label: "Dashboard", 
+      isActive: (activeHref) => DASHBOARD_VARIANTS.includes(activeHref) 
+    },
+
+    { 
+      href: "vendors.html", 
+      label: "Vendor Management" 
+    },
+
+    { 
+      href: "procurement.html", 
+      label: "Procurement & POs" 
+    },
+
+    {
+      href: "invoices.html",
+      label: "Invoices"
+    },
+
+    { 
+      href: "performance.html", 
+      label: "Performance & Reliability" 
+    },
+
+    { 
+      href: "contracts.html", 
+      label: "Contracts & Compliance" 
+    },
+
+    { 
+      href: "messages.html", 
+      label: "Communication" 
+    },
+
+    { 
+      href: "reports.html", 
+      label: "Reports & Notifications" 
+    }
   ];
 }
 

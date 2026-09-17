@@ -1,9 +1,399 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>VendorIQ | Communication</title>
-<link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendorIQ | Communication</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* =========================================
+           COMMUNICATION PAGE
+           WhatsApp-style vendor messaging layout
+        ========================================= */
+
+        .communication-page {
+            display: grid;
+            grid-template-columns: 320px minmax(0, 1fr);
+            height: calc(100vh - 130px);
+            min-height: 560px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* =========================================
+           LEFT - CONVERSATION LIST
+        ========================================= */
+
+        .conversation-sidebar {
+            border-right: 1px solid var(--border);
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .conversation-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .conversation-header h2 {
+            margin: 0 0 4px;
+            font-size: 20px;
+            color: var(--text);
+        }
+
+        .conversation-header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .search-box {
+            margin-top: 16px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 14px 11px 38px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+            background: #f8fafc;
+            color: var(--text);
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent);
+            background: #ffffff;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        .vendor-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .vendor-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.15s ease;
+        }
+
+        .vendor-item:hover {
+            background: #f8fbff;
+        }
+
+        .vendor-item.active {
+            background: #eff6ff;
+            border-left: 3px solid var(--accent);
+            padding-left: 13px;
+        }
+
+        .vendor-avatar {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
+            border-radius: 50%;
+            background: #e8f0fe;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .vendor-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .vendor-name-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .vendor-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .vendor-time {
+            font-size: 11px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .vendor-preview {
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .empty-vendors {
+            padding: 30px 20px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* =========================================
+           RIGHT - CHAT AREA
+        ========================================= */
+
+        .chat-panel {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc;
+        }
+
+        .chat-header {
+            height: 70px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chat-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #e8f0fe;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .chat-vendor-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .chat-status {
+            margin-top: 3px;
+            font-size: 12px;
+            color: #16a34a;
+        }
+
+        /* =========================================
+           MESSAGE THREAD
+        ========================================= */
+
+        .message-thread {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message-empty {
+            margin: auto;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .message-empty-icon {
+            width: 54px;
+            height: 54px;
+            margin: 0 auto 12px;
+            border-radius: 50%;
+            background: #e8f0fe;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .message-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .message-row.received {
+            justify-content: flex-start;
+        }
+
+        .message-row.sent {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: min(70%, 600px);
+            padding: 10px 13px;
+            border-radius: 10px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+        }
+
+        .message-row.received .message-bubble {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-top-left-radius: 4px;
+        }
+
+        .message-row.sent .message-bubble {
+            background: #dbeafe;
+            border: 1px solid #bfdbfe;
+            border-top-right-radius: 4px;
+        }
+
+        .message-sender {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .message-content {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text);
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .message-meta {
+            margin-top: 5px;
+            text-align: right;
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        /* =========================================
+           MESSAGE COMPOSER
+        ========================================= */
+
+        .message-composer {
+            padding: 14px 18px;
+            background: #ffffff;
+            border-top: 1px solid var(--border);
+        }
+
+        .composer-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .composer-row input {
+            flex: 1;
+            min-width: 0;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            outline: none;
+            font-size: 14px;
+            color: var(--text);
+            background: #f8fafc;
+        }
+
+        .composer-row input:focus {
+            border-color: var(--accent);
+            background: #ffffff;
+        }
+
+        .send-button {
+            border: none;
+            border-radius: 9px;
+            padding: 12px 20px;
+            background: var(--accent);
+            color: #ffffff;
+            font-weight: 700;
+            cursor: pointer;
+            min-width: 76px;
+        }
+
+        .send-button:hover {
+            opacity: 0.92;
+        }
+
+        .send-button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .view-only {
+            padding: 12px 14px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media (max-width: 900px) {
+            .communication-page {
+                grid-template-columns: 260px minmax(0, 1fr);
+            }
+
+            .message-bubble {
+                max-width: 82%;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .communication-page {
+                grid-template-columns: 1fr;
+                height: auto;
+                min-height: 650px;
+            }
+
+            .conversation-sidebar {
+                height: 300px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .chat-panel {
+                min-height: 450px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -13,322 +403,736 @@
 <script src="js/api.js"></script>
 
 <script>
-requireAuth();
-renderShell("messages.html", "Communication");
+    requireAuth();
+    renderShell("messages.html", "Communication");
 
-let vendors = [];
-let selectedVendorId = null;
+    let vendors = [];
+    let selectedVendorId = null;
+    let currentUser = null;
+    let canSendMessages = false;
+    let messageCache = {};
 
+    /* =========================================
+       HELPERS
+    ========================================= */
 
-/* =========================================
-   LOAD COMMUNICATION PAGE
-========================================= */
+    function escapeMessageHtml(value) {
+        if (value === null || value === undefined) {
+            return "";
+        }
 
-async function load() {
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
-  const content = document.getElementById("page-content");
+    function getInitials(name) {
+        if (!name) {
+            return "V";
+        }
 
-  vendors = await api("/vendors");
+        const words = String(name)
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
 
-  if (!selectedVendorId && vendors.length) {
-    selectedVendorId = vendors[0].id;
-  }
+        if (words.length === 1) {
+            return words[0].substring(0, 2).toUpperCase();
+        }
 
-  const user = getUser();
+        return (
+            words[0][0] +
+            words[words.length - 1][0]
+        ).toUpperCase();
+    }
 
-  /*
-    Roles allowed to SEND messages:
-    - Administrator
-    - Procurement Manager
-    - Supply Chain Manager
-    - Vendor
+    function formatMessageTime(dateValue) {
+        if (!dateValue) {
+            return "";
+        }
 
-    Finance Officer and Auditor are VIEW ONLY.
-  */
+        try {
+            const date = new Date(dateValue);
 
-  const canSendMessages = [
-    "Administrator",
-    "Procurement Manager",
-    "Supply Chain Manager",
-    "Vendor"
-  ].includes(user.role);
+            if (Number.isNaN(date.getTime())) {
+                return "";
+            }
 
+            return date.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        } catch {
+            return "";
+        }
+    }
 
-  content.innerHTML = `
-    <div class="panel">
+    function getLastMessage(vendorId) {
+        const messages = messageCache[vendorId];
 
-      <div class="flex-between mb-16">
+        if (!messages || !messages.length) {
+            return {
+                text: "No messages yet.",
+                time: ""
+            };
+        }
 
-        <h3 style="margin:0;">
-          Vendor Messaging
-        </h3>
+        const last = messages[messages.length - 1];
 
-        <select
-          id="vendor-select"
-          onchange="selectVendor(this.value)"
-        >
-          ${vendors.map(v => `
-            <option
-              value="${v.id}"
-              ${v.id === selectedVendorId ? "selected" : ""}
-            >
-              ${v.name}
-            </option>
-          `).join("")}
-        </select>
+        return {
+            text: last.content || "Message",
+            time: formatMessageTime(last.sent_at)
+        };
+    }
 
-      </div>
+    /* =========================================
+       LOAD PAGE
+    ========================================= */
 
+    async function load() {
+        currentUser = getUser();
 
-      <!-- MESSAGE THREAD -->
+        canSendMessages = [
+            "Administrator",
+            "Procurement Manager",
+            "Supply Chain Manager",
+            "Vendor"
+        ].includes(currentUser.role);
 
-      <div
-        id="thread"
-        style="
-          max-height:360px;
-          overflow-y:auto;
-          border:1px solid var(--border);
-          border-radius:8px;
-          padding:14px;
-          margin-bottom:14px;
-          background:#fafcff;
-        "
-      ></div>
+        try {
+            vendors = await api("/vendors");
 
-
-      <!-- MESSAGE INPUT -->
-
-      ${
-        canSendMessages
-          ? `
-            <div style="display:flex; gap:10px;">
-
-              <input
-                id="msg-input"
-                placeholder="Type a message..."
-                style="
-                  flex:1;
-                  padding:10px 12px;
-                  border:1px solid var(--border);
-                  border-radius:6px;
-                "
-              >
-
-              <button
-                class="btn"
-                onclick="sendMsg()"
-              >
-                Send
-              </button>
-
-            </div>
-          `
-          : `
-            <div
-              style="
-                padding:10px 12px;
-                color:var(--muted);
-              "
-            >
-              View only — you do not have permission to send messages.
-            </div>
-          `
-      }
-
-    </div>
-  `;
-
-
-  await loadThread();
+if (!Array.isArray(vendors)) {
+    vendors = [];
 }
 
+// Vendor users can only communicate through their own vendor account.
+if (currentUser.role === "Vendor") {
+    const ownVendorId = Number(currentUser.vendor_id);
 
-/* =========================================
-   SELECT VENDOR
-========================================= */
+    if (ownVendorId) {
+        vendors = vendors.filter(
+            vendor => Number(vendor.id) === ownVendorId
+        );
 
-function selectVendor(id) {
-
-  selectedVendorId = Number(id);
-
-  loadThread();
+        selectedVendorId = ownVendorId;
+    } else {
+        vendors = [];
+        selectedVendorId = null;
+    }
+} else {
+    if (!selectedVendorId && vendors.length) {
+        selectedVendorId = Number(vendors[0].id);
+    }
 }
 
+            renderCommunicationPage();
 
-/* =========================================
-   LOAD MESSAGE THREAD
-========================================= */
+            if (selectedVendorId) {
+                await loadThread();
+            }
 
-async function loadThread() {
+        } catch (err) {
+            console.error(err);
 
-  const thread = document.getElementById("thread");
+            const content = document.getElementById("page-content");
 
-  if (!selectedVendorId) {
+            if (content) {
+                content.innerHTML = `
+                    <div class="panel">
+                        <p class="text-muted">
+                            Unable to load vendors.
+                        </p>
+                    </div>
+                `;
+            }
+        }
+    }
 
-    thread.innerHTML = `
-      <p class="text-muted">
-        No vendor selected.
-      </p>
-    `;
+    /* =========================================
+       RENDER COMMUNICATION PAGE
+    ========================================= */
 
-    return;
-  }
+    function renderCommunicationPage() {
+        const content = document.getElementById("page-content");
 
+        if (!content) {
+            return;
+        }
 
-  try {
+        content.innerHTML = `
+            <div class="communication-page">
 
-    const messages = await api(
-      `/messages/vendor/${selectedVendorId}`
-    );
+                <!-- LEFT: CONVERSATIONS -->
 
+                <aside class="conversation-sidebar">
 
-    thread.innerHTML = messages.length
-      ? messages.map(m => `
-          <div style="margin-bottom:12px;">
+                    <div class="conversation-header">
 
-            <div
-              style="
-                font-size:12px;
-                font-weight:700;
-                color:var(--primary);
-              "
-            >
-              ${m.sender}
+                        <h2>Communication</h2>
 
-              <span
-                class="text-muted"
-                style="font-weight:400;"
-              >
-                · ${fmtDate(m.sent_at)}
-              </span>
+                        <p>
+                            Vendor conversations
+                        </p>
+
+                        <div class="search-box">
+
+                            <span class="search-icon">
+                                🔍
+                            </span>
+
+                            <input
+                                type="text"
+                                id="vendor-search"
+                                placeholder="Search vendors..."
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="vendor-list"
+                        id="vendor-list"
+                    ></div>
+
+                </aside>
+
+                <!-- RIGHT: CHAT -->
+
+                <section class="chat-panel">
+
+                    <div
+                        class="chat-header"
+                        id="chat-header"
+                    >
+                        <div class="chat-avatar">
+                            V
+                        </div>
+
+                        <div>
+                            <div class="chat-vendor-name">
+                                Select a vendor
+                            </div>
+
+                            <div class="chat-status">
+                                Ready to chat
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="message-thread"
+                        id="thread"
+                    ></div>
+
+                    <div class="message-composer">
+
+                        ${
+                            canSendMessages
+                            ? `
+                                <div class="composer-row">
+
+                                    <input
+                                        type="text"
+                                        id="msg-input"
+                                        placeholder="Type a message..."
+                                        autocomplete="off"
+                                    >
+
+                                    <button
+                                        class="send-button"
+                                        id="send-button"
+                                        type="button"
+                                        onclick="sendMsg()"
+                                    >
+                                        Send
+                                    </button>
+
+                                </div>
+                            `
+                            : `
+                                <div class="view-only">
+                                    View only — you do not have permission to send messages.
+                                </div>
+                            `
+                        }
+
+                    </div>
+
+                </section>
 
             </div>
-
-            <div style="font-size:14px;">
-              ${m.content}
-            </div>
-
-          </div>
-        `).join("")
-      : `
-          <p class="text-muted">
-            No messages yet.
-          </p>
         `;
 
+        renderVendorList();
 
-    thread.scrollTop = thread.scrollHeight;
+        const searchInput =
+            document.getElementById("vendor-search");
 
-  } catch (err) {
+        if (searchInput) {
+            searchInput.addEventListener(
+                "input",
+                renderVendorList
+            );
+        }
 
-    thread.innerHTML = `
-      <p class="text-muted">
-        Unable to load messages.
-      </p>
-    `;
+        const messageInput =
+            document.getElementById("msg-input");
 
-    console.error(err);
-  }
+        if (messageInput) {
+            messageInput.addEventListener(
+                "keydown",
+                function(event) {
+
+                    if (
+                        event.key === "Enter" &&
+                        !event.shiftKey
+                    ) {
+                        event.preventDefault();
+                        sendMsg();
+                    }
+
+                }
+            );
+        }
+    }
+
+    /* =========================================
+       RENDER VENDOR LIST
+    ========================================= */
+
+    function renderVendorList() {
+        const list =
+            document.getElementById("vendor-list");
+
+        if (!list) {
+            return;
+        }
+
+        const searchInput =
+            document.getElementById("vendor-search");
+
+        const searchTerm =
+            searchInput
+                ? searchInput.value.trim().toLowerCase()
+                : "";
+
+        const filteredVendors =
+            vendors.filter(vendor => {
+
+                const name =
+                    String(vendor.name || "")
+                        .toLowerCase();
+
+                return name.includes(searchTerm);
+            });
+
+        if (!filteredVendors.length) {
+
+            list.innerHTML = `
+                <div class="empty-vendors">
+                    No vendors found.
+                </div>
+            `;
+
+            return;
+        }
+
+        list.innerHTML =
+            filteredVendors.map(vendor => {
+
+                const lastMessage =
+                    getLastMessage(vendor.id);
+
+                const active =
+                    Number(vendor.id) ===
+                    Number(selectedVendorId);
+
+                return `
+                    <div
+                        class="vendor-item ${active ? "active" : ""}"
+                        onclick="selectVendor(${Number(vendor.id)})"
+                    >
+
+                        <div class="vendor-avatar">
+                            ${escapeMessageHtml(
+                                getInitials(vendor.name)
+                            )}
+                        </div>
+
+                        <div class="vendor-info">
+
+                            <div class="vendor-name-row">
+
+                                <div class="vendor-name">
+                                    ${escapeMessageHtml(
+                                        vendor.name
+                                    )}
+                                </div>
+
+                                <div class="vendor-time">
+                                    ${escapeMessageHtml(
+                                        lastMessage.time
+                                    )}
+                                </div>
+
+                            </div>
+
+                            <div class="vendor-preview">
+                                ${escapeMessageHtml(
+                                    lastMessage.text
+                                )}
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
+
+            }).join("");
+    }
+
+    /* =========================================
+       SELECT VENDOR
+    ========================================= */
+
+    async function selectVendor(id) {
+
+        selectedVendorId = Number(id);
+
+        renderVendorList();
+
+        updateChatHeader();
+
+        await loadThread();
+    }
+
+    /* =========================================
+       UPDATE CHAT HEADER
+    ========================================= */
+
+    function updateChatHeader() {
+
+        const header =
+            document.getElementById("chat-header");
+
+        if (!header) {
+            return;
+        }
+
+        const vendor =
+            vendors.find(
+                v => Number(v.id) ===
+                Number(selectedVendorId)
+            );
+
+        if (!vendor) {
+
+            header.innerHTML = `
+                <div class="chat-avatar">
+                    V
+                </div>
+
+                <div>
+                    <div class="chat-vendor-name">
+                        Select a vendor
+                    </div>
+
+                    <div class="chat-status">
+                        Ready to chat
+                    </div>
+                </div>
+            `;
+
+            return;
+        }
+
+        header.innerHTML = `
+            <div class="chat-avatar">
+                ${escapeMessageHtml(
+                    getInitials(vendor.name)
+                )}
+            </div>
+
+            <div>
+
+                <div class="chat-vendor-name">
+                    ${escapeMessageHtml(
+                        vendor.name
+                    )}
+                </div>
+
+                <div class="chat-status">
+                    Vendor conversation
+                </div>
+
+            </div>
+        `;
+    }
+
+    /* =========================================
+       LOAD MESSAGE THREAD
+    ========================================= */
+
+    async function loadThread() {
+
+        const thread =
+            document.getElementById("thread");
+
+        if (!thread) {
+            return;
+        }
+
+        if (!selectedVendorId) {
+
+            thread.innerHTML = `
+                <div class="message-empty">
+
+                    <div class="message-empty-icon">
+                        💬
+                    </div>
+
+                    <div>
+                        Select a vendor to start a conversation.
+                    </div>
+
+                </div>
+            `;
+
+            return;
+        }
+
+        thread.innerHTML = `
+            <div class="message-empty">
+                Loading messages...
+            </div>
+        `;
+
+        try {
+
+            const messages = await api(
+                `/messages/vendor/${selectedVendorId}`
+            );
+
+            messageCache[selectedVendorId] =
+                Array.isArray(messages)
+                    ? messages
+                    : [];
+
+            renderMessages();
+
+            renderVendorList();
+
+        } catch (err) {
+
+            console.error(err);
+
+            thread.innerHTML = `
+                <div class="message-empty">
+
+                    <div class="message-empty-icon">
+                        !
+                    </div>
+
+                    <div>
+                        Unable to load messages.
+                    </div>
+
+                </div>
+            `;
+        }
+    }
+
+    /* =========================================
+       RENDER MESSAGES
+    ========================================= */
+
+    function renderMessages() {
+
+        const thread =
+            document.getElementById("thread");
+
+        if (!thread) {
+            return;
+        }
+
+        const messages =
+            messageCache[selectedVendorId] || [];
+
+        if (!messages.length) {
+
+            const vendor =
+                vendors.find(
+                    v => Number(v.id) ===
+                    Number(selectedVendorId)
+                );
+
+            thread.innerHTML = `
+                <div class="message-empty">
+
+                    <div class="message-empty-icon">
+                        💬
+                    </div>
+
+                    <strong>
+                        Start a conversation
+                    </strong>
+
+                    <div style="margin-top:6px;">
+                        No messages with
+                        ${
+                            escapeMessageHtml(
+                                vendor
+                                    ? vendor.name
+                                    : "this vendor"
+                            )
+                        }
+                        yet.
+                    </div>
+
+                </div>
+            `;
+
+            return;
+        }
+
+        thread.innerHTML =
+            messages.map(message => {
+
+                const sender =
+                    String(message.sender || "");
+
+                const isCurrentUser =
+                    currentUser &&
+                    (
+                        sender === currentUser.full_name ||
+                        sender === currentUser.email
+                    );
+
+                const messageClass =
+                    isCurrentUser
+                        ? "sent"
+                        : "received";
+
+                return `
+                    <div class="message-row ${messageClass}">
+
+                        <div class="message-bubble">
+
+                            ${
+                                !isCurrentUser
+                                ? `
+                                    <div class="message-sender">
+                                        ${escapeMessageHtml(
+                                            sender || "Vendor"
+                                        )}
+                                    </div>
+                                `
+                                : ""
+                            }
+
+                            <div class="message-content">
+                                ${escapeMessageHtml(
+                                    message.content
+                                )}
+                            </div>
+
+                            <div class="message-meta">
+                                ${escapeMessageHtml(
+                                    formatMessageTime(
+                                        message.sent_at
+                                    )
+                                )}
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
+
+            }).join("");
+
+        thread.scrollTop =
+            thread.scrollHeight;
+    }
+
+    /* =========================================
+       SEND MESSAGE
+    ========================================= */
+
+    async function sendMsg() {
+    const input = document.getElementById("msg-input");
+    const sendButton = document.getElementById("send-button");
+
+    if (!input || !selectedVendorId || !currentUser) {
+        return;
+    }
+
+    const message = input.value.trim();
+
+    if (!message) {
+        return;
+    }
+
+    if (!canSendMessages) {
+        alert("You do not have permission to send messages.");
+        return;
+    }
+
+    // A Vendor can only send messages for their own vendor account.
+    if (
+        currentUser.role === "Vendor" &&
+        Number(selectedVendorId) !== Number(currentUser.vendor_id)
+    ) {
+        alert("You can only send messages for your own vendor account.");
+        return;
+    }
+
+    try {
+        if (sendButton) {
+            sendButton.disabled = true;
+            sendButton.textContent = "Sending...";
+        }
+
+        await api("/messages", {
+            method: "POST",
+            body: {
+                vendor_id: Number(selectedVendorId),
+                sender: currentUser.full_name,
+                content: message
+            }
+        });
+
+        input.value = "";
+
+        await loadThread();
+
+        input.focus();
+
+    } catch (err) {
+        console.error("Message send error:", err);
+
+        alert(
+            err.message || "Unable to send message."
+        );
+
+    } finally {
+        if (sendButton) {
+            sendButton.disabled = false;
+            sendButton.textContent = "Send";
+        }
+    }
 }
+    /* =========================================
+       START
+    ========================================= */
 
-
-/* =========================================
-   SEND MESSAGE
-========================================= */
-
-async function sendMsg() {
-
-  const input = document.getElementById("msg-input");
-
-  if (!input) {
-    return;
-  }
-
-
-  if (!input.value.trim()) {
-    return;
-  }
-
-
-  const user = getUser();
-
-
-  /*
-    Vendor is allowed to send messages.
-    Finance Officer and Auditor are view-only.
-  */
-
-  const canSendMessages = [
-    "Administrator",
-    "Procurement Manager",
-    "Supply Chain Manager",
-    "Vendor"
-  ].includes(user.role);
-
-
-  if (!canSendMessages) {
-
-    alert(
-      "You do not have permission to send messages."
-    );
-
-    return;
-  }
-
-
-  try {
-
-    await api("/messages", {
-
-      method: "POST",
-
-      body: {
-        vendor_id: selectedVendorId,
-        sender: user.full_name,
-        content: input.value.trim()
-      },
-
-    });
-
-
-    input.value = "";
-
-    await loadThread();
-
-
-  } catch (err) {
-
-    alert(err.message);
-
-  }
-}
-
-
-/* =========================================
-   ENTER KEY TO SEND MESSAGE
-========================================= */
-
-document.addEventListener("keydown", (e) => {
-
-  if (
-    e.key === "Enter" &&
-    document.activeElement &&
-    document.activeElement.id === "msg-input"
-  ) {
-
-    sendMsg();
-
-  }
-
-});
-
-
-/* =========================================
-   START PAGE
-========================================= */
-
-load();
-
+    load();
 </script>
 
 </body>

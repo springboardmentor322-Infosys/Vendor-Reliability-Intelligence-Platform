@@ -68,12 +68,6 @@ const canMarkDelivered = user && [
   "Supply Chain Manager"
 ].includes(user.role);
 
-const canUpdateInvoice = user && [
-  "Administrator",
-  "Procurement Manager",
-  "Finance Officer"
-].includes(user.role);
-
 const canCancelPO = user && [
   "Administrator",
   "Procurement Manager"
@@ -218,7 +212,6 @@ const canCancelPO = user && [
                 <th>Total</th>
                 <th>Status</th>
                 <th>Expected Delivery</th>
-                <th>Invoice</th>
                 <th>Actions</th>
 
               </tr>
@@ -1172,191 +1165,124 @@ const canCancelPO = user && [
 
 
     // Load purchase orders from the backend.
-    async function loadPurchaseOrders() {
+async function loadPurchaseOrders() {
 
-      const rows =
-        document.getElementById("po-rows");
+  const rows = document.getElementById("po-rows");
 
-      if (!rows) {
-        return;
-      }
-
-      // Read the selected status filter.
-      const filterElement =
-        document.getElementById(
-          "filter-status"
-        );
-
-      const status =
-        filterElement
-          ? filterElement.value
-          : "";
-
-      try {
-
-        const pos =
-          await api(
-            `/procurement${
-              status
-                ? `?status=${encodeURIComponent(status)}`
-                : ""
-            }`
-          );
-
-        // Get all vendors so their names can be displayed.
-        const vendors =
-          await api("/vendors");
-
-        // Create a quick lookup from vendor ID to vendor name.
-        const vendorMap = {};
-
-        vendors.forEach(vendor => {
-
-          vendorMap[vendor.id] =
-            vendor.name;
-
-        });
-
-        // Show a message when no purchase orders are found.
-        if (!pos || !pos.length) {
-
-          rows.innerHTML = `
-
-            <tr>
-
-              <td
-                colspan="8"
-                class="text-muted">
-
-                No purchase orders found.
-
-              </td>
-
-            </tr>
-
-          `;
-
-          return;
-
-        }
-
-        // Display each purchase order in the table.
-        rows.innerHTML =
-          pos
-            .map(po => `
-
-              <tr>
-
-                <td>
-
-                  <strong>
-                    ${po.po_number}
-                  </strong>
-
-                </td>
-
-                <td>
-
-                  ${
-                    vendorMap[po.vendor_id]
-                      || po.vendor_id
-                  }
-
-                </td>
-
-                <td>
-                  ${po.item_description}
-                </td>
-
-                <td>
-                  ${po.quantity}
-                </td>
-
-                <td>
-                  ${fmtMoney(po.total_amount)}
-                </td>
-
-                <td>
-                  ${statusBadge(po.status)}
-                </td>
-
-               <td>
-  ${fmtDate(po.expected_delivery)}
-</td>
-
-<td>
-
-  ${
-    po.invoice_number
-      ? `
-        <div>
-          <strong>${po.invoice_number}</strong>
-          <br>
-          <span class="text-muted">
-            ${po.invoice_paid ? "Paid" : "Unpaid"}
-          </span>
-        </div>
-      `
-      : `
-        <span class="text-muted">
-          No Invoice
-        </span>
-      `
+  if (!rows) {
+    return;
   }
 
-  ${
- canUpdateInvoice && po.status !== "Cancelled"
-    ? `
-      <br>
-      <button
-        class="btn small"
-        onclick="updateInvoice(${po.id})">
+  // Read the selected status filter.
+  const filterElement =
+    document.getElementById("filter-status");
 
-        ${po.invoice_number ? "Update Invoice" : "Add Invoice"}
+  const status =
+    filterElement
+      ? filterElement.value
+      : "";
 
-      </button>
-    `
-    : ""
-}
+  try {
 
-</td>
+    const pos =
+      await api(
+        `/procurement${
+          status
+            ? `?status=${encodeURIComponent(status)}`
+            : ""
+        }`
+      );
 
-<td>
-  ${renderActions(po)}
-</td>
+    // Get all vendors so their names can be displayed.
+    const vendors =
+      await api("/vendors");
 
-              </tr>
+    // Create a quick lookup from vendor ID to vendor name.
+    const vendorMap = {};
 
-            `)
-            .join("");
+    vendors.forEach(vendor => {
+      vendorMap[vendor.id] = vendor.name;
+    });
 
-      } catch (err) {
+    // Show a message when no purchase orders are found.
+    if (!pos || !pos.length) {
 
-        // Show an error if purchase orders cannot be loaded.
-        console.error(
-          "PROCUREMENT LOAD ERROR:",
-          err
-        );
+      rows.innerHTML = `
+        <tr>
+          <td colspan="8" class="text-muted">
+            No purchase orders found.
+          </td>
+        </tr>
+      `;
 
-        rows.innerHTML = `
+      return;
+    }
+
+    // Display each purchase order.
+    rows.innerHTML =
+      pos
+        .map(po => `
 
           <tr>
 
-            <td
-              colspan="8"
-              class="error-msg">
+            <td>
+              <strong>
+                ${po.po_number}
+              </strong>
+            </td>
 
-              ${err.message}
+            <td>
+              ${
+                vendorMap[po.vendor_id]
+                  || po.vendor_id
+              }
+            </td>
 
+            <td>
+              ${po.item_description}
+            </td>
+
+            <td>
+              ${po.quantity}
+            </td>
+
+            <td>
+              ${fmtMoney(po.total_amount)}
+            </td>
+
+            <td>
+              ${statusBadge(po.status)}
+            </td>
+
+            <td>
+              ${fmtDate(po.expected_delivery)}
+            </td>
+
+            <td>
+              ${renderActions(po)}
             </td>
 
           </tr>
 
-        `;
+        `)
+        .join("");
 
-      }
+  } catch (err) {
 
-    }
+    console.error(
+      "PROCUREMENT LOAD ERROR:",
+      err
+    );
+
+    rows.innerHTML = `
+      <tr>
+        <td colspan="8" class="error-msg">
+          ${err.message}
+        </td>
+      </tr>
+    `;
+  }
+}
 
 
     // Show the actions available for this purchase order.
@@ -1529,60 +1455,6 @@ async function advance(id, status) {
         body: {
           status: status
         }
-      }
-    );
-
-    await loadPurchaseOrders();
-
-  } catch (err) {
-
-    alert(err.message);
-
-  }
-
-}
-    // Update invoice details for a purchase order.
-    async function updateInvoice(id) {
-
-  if (!canUpdateInvoice) {
-
-    alert(
-      "You do not have permission to update invoices."
-    );
-
-    return;
-
-  }
-
-  const invoiceNumber = prompt(
-    "Enter invoice number:"
-  );
-
-  if (invoiceNumber === null) {
-    return;
-  }
-
-  const paid = confirm(
-    "Has this invoice been paid?\n\n" +
-    "OK = Paid\n" +
-    "Cancel = Unpaid"
-  );
-
-  try {
-
-    await api(
-      `/procurement/${id}`,
-      {
-        method: "PUT",
-
-        body: {
-          invoice_number:
-            invoiceNumber.trim() || null,
-
-          invoice_paid:
-            paid
-        }
-
       }
     );
 
