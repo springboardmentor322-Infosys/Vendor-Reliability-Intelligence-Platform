@@ -148,7 +148,7 @@ export default function VendorSidebar() {
         </li>
 
         <li>
-          <NavLink to="/reports">
+          <NavLink to="/analytics">
             <FaFileAlt />
             <span>Reports</span>
           </NavLink>

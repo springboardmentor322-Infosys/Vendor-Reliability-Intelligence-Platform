@@ -2,7 +2,7 @@
 
 import Home from "./pages/home";
 import Login from "./pages/login";
-import Register from "./pages/Register";
+import Register from "./pages/register";
 import ForgotPassword from "./pages/forgotPassword";
 import ResetPassword from "./pages/resetPassword";
 import Profile from "./pages/profile";

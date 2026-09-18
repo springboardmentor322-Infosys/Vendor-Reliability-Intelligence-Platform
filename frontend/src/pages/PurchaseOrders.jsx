@@ -1,4 +1,4 @@
- import { useEffect, useState } from "react";
+  import { useEffect, useState } from "react";
 import AdminSidebar from "../components/AdminSidebar";
 import ProcurementSidebar from "../components/ProcurementSidebar";
 import SupplyChainSidebar from "../components/SupplyChainSidebar";
@@ -109,6 +109,9 @@ function PurchaseOrders() {
 
       case "Vendor":
         return <VendorSidebar />;
+
+      case "Auditor":
+        return <AuditorSidebar />;
 
       default:
         return null;
@@ -657,7 +660,7 @@ function PurchaseOrders() {
 
   return (
     <div className="purchase-orders-layout">
-      <AuditorSidebar />
+      {getRoleSidebar()}
 
       <main className="purchase-orders-main">
         <div className="purchase-orders-header">

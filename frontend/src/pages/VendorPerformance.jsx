@@ -1258,12 +1258,16 @@ function VendorPerformance() {
                             )}
                           </span>
                         </td>
-
+ 
                         <td>
-                          <span className="performance-score performance-neutral">
-                            N/A
-                          </span>
-                        </td>
+  <span
+    className={`performance-score ${getScoreClass(
+      vendor.reliability_score
+    )}`}
+  >
+    {formatScore(vendor.reliability_score)}
+  </span>
+</td>
 
                         <td>
                           <span
@@ -1358,16 +1362,22 @@ function VendorPerformance() {
                   </div>
 
                   <div className="performance-modal-summary-card">
-                    <span>Reliability</span>
+  <span>Reliability</span>
 
-                    <strong className="performance-neutral">
-                      N/A
-                    </strong>
+  <strong
+    className={getScoreClass(
+      selectedVendor.reliability_score
+    )}
+  >
+    {formatScore(
+      selectedVendor.reliability_score
+    )}
+  </strong>
 
-                    <small>
-                      Separate Reliability Scoring module
-                    </small>
-                  </div>
+  <small>
+    Based on delivery, fulfillment, quality and compliance
+  </small>
+</div>
 
                   <div className="performance-modal-summary-card">
                     <span>Vendor Rank</span>

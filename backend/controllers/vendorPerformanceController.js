@@ -364,14 +364,22 @@ const getVendorPerformance = async (req, res) => {
           : 0;
 
       const fulfillmentRate =
-        totalOrders > 0
-          ? (Number(row.fulfilled_orders) / totalOrders) * 100
-          : 0;
+  totalOrders > 0
+    ? (Number(row.fulfilled_orders) / totalOrders) * 100
+    : 0;
 
-      const qualityPassRate =
-        totalInspections > 0
-          ? (passedInspections / totalInspections) * 100
-          : 0;
+const reliabilityScore =
+  totalOrders > 0
+    ? deliveryScore * 0.5 +
+      fulfillmentRate * 0.2 +
+      qualityScore * 0.2 +
+      complianceScore * 0.1
+    : 0;
+
+const qualityPassRate =
+  totalInspections > 0
+    ? (passedInspections / totalInspections) * 100
+    : 0;
 
       let riskStatus = "Insufficient Data";
 
@@ -492,10 +500,13 @@ const getVendorPerformance = async (req, res) => {
         quality_pass_rate:
           Number(qualityPassRate.toFixed(2)),
 
-        performance_score:
-          Number(performanceScore.toFixed(2)),
+         performance_score:
+  Number(performanceScore.toFixed(2)),
 
-        risk_status: riskStatus,
+reliability_score:
+  Number(reliabilityScore.toFixed(2)),
+
+risk_status: riskStatus,
 
         latest_evaluation_date:
           row.latest_evaluation_date,
