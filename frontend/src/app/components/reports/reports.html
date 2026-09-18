@@ -1,0 +1,636 @@
+
+<div class="reports-page">
+
+  <!-- ================= HEADER ================= -->
+  <div class="reports-header">
+
+    <div class="header-content">
+      <span class="eyebrow">BUSINESS INTELLIGENCE</span>
+
+      <h1>Reports & Analytics</h1>
+
+      <p>
+        Monitor vendor reliability, procurement activity and purchase order performance.
+      </p>
+    </div>
+
+    <div class="header-actions">
+
+      <button
+        class="refresh-button"
+        type="button"
+        (click)="loadReports()">
+
+        <span class="refresh-icon">↻</span>
+
+        Refresh Data
+
+      </button>
+
+      <button
+        class="export-button excel-button"
+        type="button"
+        (click)="downloadExcelReport()">
+
+        <span class="export-icon">
+          ↓
+        </span>
+
+        Download Excel
+
+      </button>
+
+      <button
+        class="export-button pdf-button"
+        type="button"
+        (click)="downloadPdfReport()">
+
+        <span class="export-icon">
+          ↓
+        </span>
+
+        Download PDF
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= SUMMARY ================= -->
+  <div class="summary-grid">
+
+    <!-- VENDORS -->
+    <div class="summary-card">
+
+      <div class="summary-top">
+
+        <div class="summary-icon vendor-icon">
+          V
+        </div>
+
+        <span class="summary-title">
+          VENDORS
+        </span>
+
+      </div>
+
+      <div class="summary-value">
+        {{ totalVendors }}
+      </div>
+
+      <div class="summary-footer">
+        <span>Registered vendors</span>
+        <span class="summary-arrow">→</span>
+      </div>
+
+    </div>
+
+
+    <!-- PROCUREMENT -->
+    <div class="summary-card">
+
+      <div class="summary-top">
+
+        <div class="summary-icon procurement-icon">
+          P
+        </div>
+
+        <span class="summary-title">
+          PROCUREMENT
+        </span>
+
+      </div>
+
+      <div class="summary-value">
+        {{ totalProcurements }}
+      </div>
+
+      <div class="summary-footer">
+        <span>Procurement requests</span>
+        <span class="summary-arrow">→</span>
+      </div>
+
+    </div>
+
+
+    <!-- PURCHASE ORDERS -->
+    <div class="summary-card">
+
+      <div class="summary-top">
+
+        <div class="summary-icon order-icon">
+          O
+        </div>
+
+        <span class="summary-title">
+          PURCHASE ORDERS
+        </span>
+
+      </div>
+
+      <div class="summary-value">
+        {{ totalPurchaseOrders }}
+      </div>
+
+      <div class="summary-footer">
+        <span>Orders generated</span>
+        <span class="summary-arrow">→</span>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= LOADING ================= -->
+  <div
+    class="loading-card"
+    *ngIf="loading">
+
+    <div class="spinner"></div>
+
+    <div>
+      <strong>Loading reports</strong>
+      <p>Fetching the latest platform data...</p>
+    </div>
+
+  </div>
+
+
+  <!-- ================= REPORT CONTENT ================= -->
+  <div
+    class="reports-content"
+    *ngIf="!loading">
+
+
+    <!-- ================================================= -->
+    <!-- VENDOR REPORT -->
+    <!-- ================================================= -->
+
+    <section class="report-card">
+
+      <div class="report-card-header">
+
+        <div class="report-title-area">
+
+          <span class="section-label">
+            VENDOR ANALYSIS
+          </span>
+
+          <h2>
+            Vendor Reliability
+          </h2>
+
+          <p>
+            Current vendor performance, reliability scores and risk assessment.
+          </p>
+
+        </div>
+
+        <div class="record-count">
+          {{ totalVendors }}
+          <span>Vendors</span>
+        </div>
+
+      </div>
+
+
+      <div class="table-container">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>VENDOR</th>
+              <th>CATEGORY</th>
+              <th>RELIABILITY</th>
+              <th>RISK LEVEL</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="let vendor of vendors">
+
+              <td>
+                <span class="id-badge">
+                  #{{ vendor.id }}
+                </span>
+              </td>
+
+              <td>
+
+                <div class="vendor-cell">
+
+                  <div class="vendor-avatar">
+                    {{ getVendorName(vendor).charAt(0).toUpperCase() }}
+                  </div>
+
+                  <div class="vendor-info">
+
+                    <strong>
+                      {{ getVendorName(vendor) }}
+                    </strong>
+
+                    <small>
+                      {{ vendor.email || 'No email available' }}
+                    </small>
+
+                  </div>
+
+                </div>
+
+              </td>
+
+              <td>
+
+                <span class="category-badge">
+                  {{ vendor.category || 'General' }}
+                </span>
+
+              </td>
+
+              <td>
+
+                <div class="score-cell">
+
+                  <div class="score-value">
+
+                    <strong>
+                      {{ vendor.reliability_score ?? 0 }}
+                    </strong>
+
+                    <span>/100</span>
+
+                  </div>
+
+                  <div class="score-bar">
+
+                    <span
+                      [style.width.%]="vendor.reliability_score || 0">
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </td>
+
+              <td>
+
+                <span
+                  class="risk-badge"
+                  [ngClass]="getRiskClass(vendor.risk_level)">
+
+                  {{ vendor.risk_level || 'Pending' }}
+
+                </span>
+
+              </td>
+
+              <td>
+
+                <span
+                  class="status-badge"
+                  [class.approved]="vendor.status === 'Approved'"
+                  [class.pending]="vendor.status !== 'Approved'">
+
+                  <span></span>
+
+                  {{ vendor.status || 'Pending' }}
+
+                </span>
+
+              </td>
+
+            </tr>
+
+
+            <tr
+              *ngIf="vendors.length === 0">
+
+              <td
+                colspan="6"
+                class="empty-row">
+
+                <div class="empty-content">
+                  <strong>No vendor data</strong>
+                  <span>No vendors are currently available.</span>
+                </div>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================================= -->
+    <!-- PROCUREMENT REPORT -->
+    <!-- ================================================= -->
+
+    <section class="report-card">
+
+      <div class="report-card-header">
+
+        <div class="report-title-area">
+
+          <span class="section-label">
+            PROCUREMENT ANALYSIS
+          </span>
+
+          <h2>
+            Procurement Activity
+          </h2>
+
+          <p>
+            Overview of procurement requests submitted through the platform.
+          </p>
+
+        </div>
+
+        <div class="record-count">
+          {{ totalProcurements }}
+          <span>Requests</span>
+        </div>
+
+      </div>
+
+
+      <div class="table-container">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>ID</th>
+              <th>ITEM</th>
+              <th>VENDOR</th>
+              <th>QUANTITY</th>
+              <th>BUDGET</th>
+              <th>STATUS</th>
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            <tr
+              *ngFor="let procurement of procurements">
+
+              <td>
+
+                <span class="id-badge">
+                  #{{ procurement.id }}
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <div class="item-cell">
+
+                  <strong>
+                    {{ procurement.item_name || 'Procurement Item' }}
+                  </strong>
+
+                  <small>
+                    Procurement request
+                  </small>
+
+                </div>
+
+              </td>
+
+
+              <td>
+
+                <strong>
+                  {{ getProcurementVendorName(procurement) }}
+                </strong>
+
+              </td>
+
+
+              <td>
+
+                <span class="quantity-value">
+                  {{ procurement.quantity }}
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <strong class="amount">
+                  ₹{{ procurement.budget | number }}
+                </strong>
+
+              </td>
+
+
+              <td>
+
+                <span class="status-badge pending">
+
+                  <span></span>
+
+                  {{ procurement.status || 'Pending' }}
+
+                </span>
+
+              </td>
+
+            </tr>
+
+
+            <tr
+              *ngIf="procurements.length === 0">
+
+              <td
+                colspan="6"
+                class="empty-row">
+
+                <div class="empty-content">
+                  <strong>No procurement data</strong>
+                  <span>No procurement requests are currently available.</span>
+                </div>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================================= -->
+    <!-- PURCHASE ORDER REPORT -->
+    <!-- ================================================= -->
+
+    <section class="report-card">
+
+      <div class="report-card-header">
+
+        <div class="report-title-area">
+
+          <span class="section-label">
+            ORDER ANALYSIS
+          </span>
+
+          <h2>
+            Purchase Order Activity
+          </h2>
+
+          <p>
+            Track purchase orders generated from procurement requests.
+          </p>
+
+        </div>
+
+        <div class="record-count">
+          {{ totalPurchaseOrders }}
+          <span>Orders</span>
+        </div>
+
+      </div>
+
+
+      <div class="table-container">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>ID</th>
+              <th>ORDER NUMBER</th>
+              <th>VENDOR</th>
+              <th>PROCUREMENT ID</th>
+              <th>AMOUNT</th>
+              <th>STATUS</th>
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            <tr
+              *ngFor="let order of purchaseOrders">
+
+              <td>
+
+                <span class="id-badge">
+                  #{{ order.id }}
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <div class="order-number">
+
+                  <strong>
+                    {{ order.order_number || 'N/A' }}
+                  </strong>
+
+                  <small>
+                    Purchase order
+                  </small>
+
+                </div>
+
+              </td>
+
+
+              <td>
+
+                <strong>
+                  {{ getPurchaseOrderVendorName(order) }}
+                </strong>
+
+              </td>
+
+
+              <td>
+
+                <span class="entity-id">
+                  #{{ order.procurement_id }}
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <strong class="amount">
+                  ₹{{ order.amount | number }}
+                </strong>
+
+              </td>
+
+
+              <td>
+
+                <span class="status-badge pending">
+
+                  <span></span>
+
+                  {{ order.status || 'Pending' }}
+
+                </span>
+
+              </td>
+
+            </tr>
+
+
+            <tr
+              *ngIf="purchaseOrders.length === 0">
+
+              <td
+                colspan="6"
+                class="empty-row">
+
+                <div class="empty-content">
+                  <strong>No purchase orders</strong>
+                  <span>No purchase orders are currently available.</span>
+                </div>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</div>

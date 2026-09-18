@@ -1,0 +1,627 @@
+
+<div class="procurement-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+
+    <div class="page-title-section">
+
+      <div class="title-icon">
+        <span>▣</span>
+      </div>
+
+      <div>
+        <h1>Procurement</h1>
+        <p>Create and manage procurement requests and vendor assignments.</p>
+      </div>
+
+    </div>
+
+    <div class="page-status">
+      <span class="status-dot"></span>
+      Procurement Active
+    </div>
+
+  </div>
+
+  <!-- SUMMARY CARDS -->
+  <div class="summary-grid">
+
+    <div class="summary-card">
+      <div class="summary-icon vendors-icon">
+        <span>▦</span>
+      </div>
+
+      <div>
+        <div class="summary-label">Available Vendors</div>
+        <div class="summary-value">
+          {{ vendors.length }}
+        </div>
+        <div class="summary-description">
+          Registered vendors
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon request-icon">
+        <span>▤</span>
+      </div>
+
+      <div>
+        <div class="summary-label">Request Status</div>
+        <div class="summary-value active-text">
+          Active
+        </div>
+        <div class="summary-description">
+          Ready for request creation
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-icon process-icon">
+        <span>✓</span>
+      </div>
+
+      <div>
+        <div class="summary-label">Process</div>
+        <div class="summary-value">
+          Standard
+        </div>
+        <div class="summary-description">
+          Controlled procurement workflow
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MAIN AREA -->
+  <div class="main-grid">
+
+    <!-- CREATE REQUEST -->
+    <section class="request-card">
+
+      <div class="card-header">
+
+        <div class="card-title">
+
+          <div class="header-icon">
+            <span>+</span>
+          </div>
+
+          <div>
+            <h2>Create Procurement Request</h2>
+            <p>Enter the required procurement information below.</p>
+          </div>
+
+        </div>
+
+        <span class="required-text">
+          * Required
+        </span>
+
+      </div>
+
+      <form
+        class="request-form"
+        (ngSubmit)="createProcurement()"
+      >
+
+        <!-- VENDOR INFORMATION -->
+        <div class="section-block">
+
+          <div class="section-heading">
+
+            <div class="section-icon">
+              <span>01</span>
+            </div>
+
+            <div>
+              <h3>Vendor Information</h3>
+              <p>Select the vendor associated with this request.</p>
+            </div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="vendor">
+              Vendor
+              <span class="required">*</span>
+            </label>
+
+            <select
+              id="vendor"
+              name="vendor"
+              [(ngModel)]="procurementData.vendor_id"
+              [disabled]="loadingVendors || submitting"
+              required
+            >
+
+              <option [ngValue]="''">
+                {{
+                  loadingVendors
+                    ? 'Loading vendors...'
+                    : 'Select vendor'
+                }}
+              </option>
+
+              <option
+                *ngFor="let vendor of vendors"
+                [ngValue]="vendor.id"
+              >
+                {{ vendor.vendor_name || vendor.name }}
+              </option>
+
+            </select>
+
+            <span class="field-info">
+              {{ vendors.length }} registered vendors available
+            </span>
+
+          </div>
+
+        </div>
+
+        <!-- PROCUREMENT DETAILS -->
+        <div class="section-block">
+
+          <div class="section-heading">
+
+            <div class="section-icon">
+              <span>02</span>
+            </div>
+
+            <div>
+              <h3>Procurement Details</h3>
+              <p>Specify the item, quantity, budget, and request date.</p>
+            </div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="product">
+              Product / Service
+              <span class="required">*</span>
+            </label>
+
+            <input
+              id="product"
+              name="product"
+              type="text"
+              [(ngModel)]="procurementData.product_name"
+              placeholder="Enter product or service"
+              [disabled]="submitting"
+              required
+            />
+
+          </div>
+
+          <div class="two-column">
+
+            <div class="form-group">
+
+              <label for="quantity">
+                Quantity
+                <span class="required">*</span>
+              </label>
+
+              <input
+                id="quantity"
+                name="quantity"
+                type="number"
+                min="1"
+                [(ngModel)]="procurementData.quantity"
+                [disabled]="submitting"
+                required
+              />
+
+            </div>
+
+            <div class="form-group">
+
+              <label for="price">
+                Unit Price
+              </label>
+
+              <div class="price-field">
+
+                <span class="currency-symbol">
+                  ₹
+                </span>
+
+                <input
+                  id="price"
+                  name="price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  [(ngModel)]="procurementData.unit_price"
+                  placeholder="0.00"
+                  [disabled]="submitting"
+                />
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="requestDate">
+              Request Date
+              <span class="required">*</span>
+            </label>
+
+            <input
+              id="requestDate"
+              name="requestDate"
+              type="date"
+              [(ngModel)]="procurementData.request_date"
+              [disabled]="submitting"
+              required
+            />
+
+          </div>
+
+        </div>
+
+        <!-- INFORMATION NOTE -->
+        <div class="information-box">
+
+          <div class="information-icon">
+            i
+          </div>
+
+          <div>
+            <strong>Budget Calculation</strong>
+
+            <p>
+              Total procurement budget is calculated automatically
+              from quantity × unit price.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- SUCCESS MESSAGE -->
+        <div
+          *ngIf="successMessage"
+          class="message success-message"
+        >
+
+          <span class="message-symbol">
+            ✓
+          </span>
+
+          <div>
+            <strong>Request Created</strong>
+            <p>{{ successMessage }}</p>
+          </div>
+
+        </div>
+
+        <!-- ERROR MESSAGE -->
+        <div
+          *ngIf="errorMessage"
+          class="message error-message"
+        >
+
+          <span class="message-symbol">
+            !
+          </span>
+
+          <div>
+            <strong>Unable to Create Request</strong>
+            <p>{{ errorMessage }}</p>
+          </div>
+
+        </div>
+
+        <!-- FORM FOOTER -->
+        <div class="form-footer">
+
+          <div class="footer-description">
+            Procurement records are linked with vendor records
+            for reliability and risk monitoring.
+          </div>
+
+          <button
+            type="submit"
+            class="create-button"
+            [disabled]="submitting || loadingVendors"
+          >
+
+            <span *ngIf="!submitting">
+              Create Procurement
+            </span>
+
+            <span *ngIf="submitting">
+              Creating...
+            </span>
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+    <!-- RIGHT SIDE -->
+    <aside class="side-panel">
+
+      <!-- VENDOR AVAILABILITY -->
+      <div class="side-card">
+
+        <div class="side-card-header">
+
+          <div class="side-icon">
+            <span>▦</span>
+          </div>
+
+          <div>
+            <h3>Vendor Availability</h3>
+            <p>Registered vendor overview</p>
+          </div>
+
+        </div>
+
+        <div class="vendor-count">
+
+          <div class="count-number">
+            {{ vendors.length }}
+          </div>
+
+          <div class="count-text">
+            <strong>Registered Vendors</strong>
+
+            <span>
+              Available for procurement
+            </span>
+          </div>
+
+        </div>
+
+        <div class="vendor-preview">
+
+          <div
+            class="vendor-preview-row"
+            *ngFor="let vendor of vendors | slice:0:5"
+          >
+
+            <div class="vendor-avatar">
+
+              {{
+                (vendor.vendor_name || vendor.name || 'V')
+                  .charAt(0)
+                  .toUpperCase()
+              }}
+
+            </div>
+
+            <div class="vendor-info">
+
+              <strong>
+                {{ vendor.vendor_name || vendor.name }}
+              </strong>
+
+              <span>
+                {{ vendor.category || 'Registered Vendor' }}
+              </span>
+
+            </div>
+
+          </div>
+
+          <div
+            class="more-vendors"
+            *ngIf="vendors.length > 5"
+          >
+            +{{ vendors.length - 5 }} more vendors
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- WORKFLOW -->
+      <div class="side-card">
+
+        <div class="side-card-header">
+
+          <div class="side-icon">
+            <span>↗</span>
+          </div>
+
+          <div>
+            <h3>Procurement Workflow</h3>
+            <p>Standard process</p>
+          </div>
+
+        </div>
+
+        <div class="workflow">
+
+          <div class="workflow-step current">
+
+            <div class="step-number">
+              1
+            </div>
+
+            <div>
+              <strong>Create Request</strong>
+              <span>Enter procurement details</span>
+            </div>
+
+          </div>
+
+          <div class="workflow-connector"></div>
+
+          <div class="workflow-step">
+
+            <div class="step-number">
+              2
+            </div>
+
+            <div>
+              <strong>Vendor Assignment</strong>
+              <span>Select a registered vendor</span>
+            </div>
+
+          </div>
+
+          <div class="workflow-connector"></div>
+
+          <div class="workflow-step">
+
+            <div class="step-number">
+              3
+            </div>
+
+            <div>
+              <strong>Review</strong>
+              <span>Validate request information</span>
+            </div>
+
+          </div>
+
+          <div class="workflow-connector"></div>
+
+          <div class="workflow-step">
+
+            <div class="step-number">
+              4
+            </div>
+
+            <div>
+              <strong>Purchase Order</strong>
+              <span>Continue purchasing process</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- PROCUREMENT RECORDS -->
+  <section class="procurement-records">
+
+    <div class="records-header">
+
+      <div>
+        <h2>Procurement Records</h2>
+
+        <p>
+          View all procurement requests created in the system.
+        </p>
+      </div>
+
+      <span class="record-count">
+        {{ procurements.length }} Records
+      </span>
+
+    </div>
+
+    <!-- LOADING -->
+    <div
+      *ngIf="loadingProcurements"
+      class="loading-message"
+    >
+      Loading procurement records...
+    </div>
+
+    <!-- RECORDS TABLE -->
+    <div
+      *ngIf="!loadingProcurements && procurements.length > 0"
+      class="records-table-container"
+    >
+
+      <table class="records-table">
+
+        <thead>
+
+          <tr>
+            <th>ID</th>
+            <th>Vendor</th>
+            <th>Product / Service</th>
+            <th>Quantity</th>
+            <th>Budget</th>
+            <th>Request Date</th>
+            <th>Status</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr
+            *ngFor="let procurement of procurements"
+          >
+
+            <td>
+              #{{ procurement.id }}
+            </td>
+
+            <td>
+              {{
+                procurement.vendor?.vendor_name ||
+                procurement.vendor_name ||
+                getVendorName(procurement.vendor_id)
+              }}
+            </td>
+
+            <td>
+              <strong>
+                {{ procurement.item_name }}
+              </strong>
+            </td>
+
+            <td>
+              {{ procurement.quantity }}
+            </td>
+
+            <td>
+              ₹{{ procurement.budget | number:'1.2-2' }}
+            </td>
+
+            <td>
+              {{ procurement.request_date | date:'dd-MM-yyyy' }}
+            </td>
+
+            <td>
+
+              <span class="status-badge">
+                {{ procurement.status || 'Pending' }}
+              </span>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div
+      *ngIf="!loadingProcurements && procurements.length === 0"
+      class="empty-records"
+    >
+      No procurement records found.
+    </div>
+
+  </section>
+
+</div>

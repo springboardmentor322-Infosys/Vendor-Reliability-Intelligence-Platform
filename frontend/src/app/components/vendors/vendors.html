@@ -1,0 +1,293 @@
+
+<div class="vendors-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+
+    <div>
+      <h1>Vendor List</h1>
+      <p>Manage and monitor your registered vendors.</p>
+    </div>
+
+    <button
+      type="button"
+      class="add-vendor-button"
+      (click)="isEditMode = false; editingVendorId = null; resetForm()">
+
+      Add Vendor
+
+    </button>
+
+  </div>
+
+
+  <!-- SEARCH -->
+  <div class="search-section">
+
+    <input
+      type="text"
+      [(ngModel)]="searchText"
+      placeholder="Search vendors..."
+      class="search-input"
+    />
+
+  </div>
+
+
+  <!-- VENDOR FORM -->
+  <div class="vendor-form">
+
+    <h2>
+      {{ isEditMode ? 'Edit Vendor' : 'Add Vendor' }}
+    </h2>
+
+
+    <div class="form-grid">
+
+      <!-- Vendor Name -->
+      <input
+        type="text"
+        [(ngModel)]="vendor.vendor_name"
+        placeholder="Vendor Name"
+      />
+
+
+      <!-- Category -->
+      <input
+        type="text"
+        [(ngModel)]="vendor.category"
+        placeholder="Category"
+      />
+
+
+      <!-- Contact Person -->
+      <input
+        type="text"
+        [(ngModel)]="vendor.contact_person"
+        placeholder="Contact Person"
+      />
+
+
+      <!-- Email -->
+      <input
+        type="email"
+        [(ngModel)]="vendor.email"
+        placeholder="Email"
+      />
+
+
+      <!-- Phone -->
+      <input
+        type="text"
+        [(ngModel)]="vendor.phone"
+        placeholder="Phone"
+      />
+
+
+      <!-- Address -->
+      <input
+        type="text"
+        [(ngModel)]="vendor.address"
+        placeholder="Address"
+      />
+
+
+      <!-- Delivery Score -->
+      <input
+        type="number"
+        min="0"
+        max="100"
+        [(ngModel)]="vendor.delivery_score"
+        placeholder="Delivery Score"
+      />
+
+
+      <!-- Quality Score -->
+      <input
+        type="number"
+        min="0"
+        max="100"
+        [(ngModel)]="vendor.quality_score"
+        placeholder="Quality Score"
+      />
+
+
+      <!-- Payment Score -->
+      <input
+        type="number"
+        min="0"
+        max="100"
+        [(ngModel)]="vendor.payment_score"
+        placeholder="Payment Score"
+      />
+
+
+      <!-- Compliance Score -->
+      <input
+        type="number"
+        min="0"
+        max="100"
+        [(ngModel)]="vendor.compliance_score"
+        placeholder="Compliance Score"
+      />
+
+    </div>
+
+
+    <!-- FORM BUTTONS -->
+    <div class="form-actions">
+
+      <button
+        type="button"
+        (click)="isEditMode ? updateVendor() : addVendor()">
+
+        {{ isEditMode ? 'Update Vendor' : 'Add Vendor' }}
+
+      </button>
+
+
+      <button
+        *ngIf="isEditMode"
+        type="button"
+        (click)="cancelEdit()">
+
+        Cancel
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- VENDOR TABLE -->
+  <div class="vendor-table-section">
+
+    <div class="section-header">
+
+      <h2>Vendors</h2>
+
+      <span>
+        {{ filteredVendors.length }} Records
+      </span>
+
+    </div>
+
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>ID</th>
+
+            <th>Vendor Name</th>
+
+            <th>Category</th>
+
+            <th>Email</th>
+
+            <th>Reliability Score</th>
+
+            <th>Risk Level</th>
+
+            <th>Status</th>
+
+            <th>Actions</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <!-- VENDOR ROWS -->
+          <tr *ngFor="let v of filteredVendors">
+
+            <td>
+              {{ v.id }}
+            </td>
+
+
+            <td>
+              <strong>
+                {{ v.vendor_name }}
+              </strong>
+            </td>
+
+
+            <td>
+              {{ v.category }}
+            </td>
+
+
+            <td>
+              {{ v.email }}
+            </td>
+
+
+            <td>
+              {{ v.reliability_score }}
+            </td>
+
+
+            <td>
+              {{ v.risk_level }}
+            </td>
+
+
+            <td>
+              {{ v.status }}
+            </td>
+
+
+            <td class="actions">
+
+              <button
+                type="button"
+                (click)="editVendor(v)">
+
+                Edit
+
+              </button>
+
+
+              <button
+                type="button"
+                (click)="deleteVendor(v.id)">
+
+                Delete
+
+              </button>
+
+            </td>
+
+          </tr>
+
+
+          <!-- EMPTY STATE -->
+          <tr *ngIf="filteredVendors.length === 0">
+
+            <td
+              colspan="8"
+              class="empty-state">
+
+              No vendors found.
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

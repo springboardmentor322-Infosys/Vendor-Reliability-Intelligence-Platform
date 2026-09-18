@@ -1,0 +1,162 @@
+<div class="audit-page">
+
+  <!-- HEADER -->
+  <div class="audit-header">
+    <div>
+      <span class="eyebrow">SYSTEM ACTIVITY</span>
+      <h1>Audit Logs</h1>
+      <p>
+        Track vendor, procurement and purchase order activities.
+      </p>
+    </div>
+
+    <button class="refresh-button" (click)="loadAuditLogs()">
+      ↻ Refresh
+    </button>
+  </div>
+
+
+  <!-- SUMMARY -->
+  <div class="audit-summary">
+
+    <div class="summary-card">
+      <span class="summary-label">TOTAL ACTIVITIES</span>
+      <strong>{{ totalLogs }}</strong>
+    </div>
+
+    <div class="summary-card">
+      <span class="summary-label">VENDOR ACTIVITIES</span>
+      <strong>{{ vendorLogs }}</strong>
+    </div>
+
+    <div class="summary-card">
+      <span class="summary-label">PURCHASE ORDERS</span>
+      <strong>{{ purchaseOrderLogs }}</strong>
+    </div>
+
+    <div class="summary-card">
+      <span class="summary-label">LATEST ACTIVITY</span>
+      <strong>{{ latestActivity || 'No activity' }}</strong>
+    </div>
+
+  </div>
+
+
+  <!-- AUDIT TABLE -->
+  <div class="audit-card">
+
+    <div class="audit-card-header">
+      <div>
+        <span class="section-label">ACTIVITY HISTORY</span>
+        <h2>Recent Audit Activity</h2>
+        <p>Latest system activities recorded by the platform.</p>
+      </div>
+
+      <span class="live-status">
+        <span></span>
+        Live data
+      </span>
+    </div>
+
+
+    <!-- LOADING -->
+    <div
+      class="loading"
+      *ngIf="loading"
+    >
+      Loading audit logs...
+    </div>
+
+
+    <!-- TABLE -->
+    <div
+      class="table-wrapper"
+      *ngIf="!loading"
+    >
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Activity</th>
+            <th>Entity</th>
+            <th>Entity ID</th>
+            <th>Date</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr
+            *ngFor="let log of auditLogs"
+          >
+
+            <!-- ID -->
+            <td>
+              <span class="log-id">
+                #{{ log.id }}
+              </span>
+            </td>
+
+
+            <!-- ACTIVITY -->
+            <td>
+              <span class="activity-badge">
+                {{ getAction(log) }}
+              </span>
+            </td>
+
+
+            <!-- ENTITY -->
+            <td>
+              <span class="entity-name">
+                {{ getEntityType(log) }}
+              </span>
+            </td>
+
+
+            <!-- ENTITY ID -->
+            <td>
+              {{ getEntityId(log) }}
+            </td>
+
+
+            <!-- DATE -->
+            <td>
+              {{ getDate(log) }}
+            </td>
+
+
+            <!-- DESCRIPTION -->
+            <td>
+              <span class="description">
+                {{ getDescription(log) }}
+              </span>
+            </td>
+
+          </tr>
+
+
+          <!-- EMPTY -->
+          <tr *ngIf="auditLogs.length === 0">
+
+            <td
+              colspan="6"
+              class="empty"
+            >
+              No audit logs available.
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

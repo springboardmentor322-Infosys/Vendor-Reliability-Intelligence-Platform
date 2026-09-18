@@ -1,0 +1,458 @@
+
+<div class="purchase-order-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+
+    <div class="page-title-section">
+
+      <div class="title-icon">
+        <span>▥</span>
+      </div>
+
+      <div>
+        <span class="page-label">PROCUREMENT OPERATIONS</span>
+        <h1>Purchase Orders</h1>
+        <p>
+          Create, track, and manage purchase orders linked to procurement requests.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="page-status">
+      <span class="status-dot"></span>
+      Purchase Order System Active
+    </div>
+
+  </div>
+
+
+  <!-- SUMMARY -->
+  <div class="summary-grid">
+
+    <div class="summary-card">
+
+      <div class="summary-icon blue">
+        <span>▥</span>
+      </div>
+
+      <div>
+        <div class="summary-label">Total Orders</div>
+        <div class="summary-value">
+          {{ purchaseOrders.length }}
+        </div>
+        <div class="summary-text">
+          Purchase orders
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-icon green">
+        <span>✓</span>
+      </div>
+
+      <div>
+        <div class="summary-label">Available Vendors</div>
+        <div class="summary-value">
+          {{ vendors.length }}
+        </div>
+        <div class="summary-text">
+          Registered vendors
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-icon amber">
+        <span>▤</span>
+      </div>
+
+      <div>
+        <div class="summary-label">Procurement Records</div>
+        <div class="summary-value">
+          {{ procurements.length }}
+        </div>
+        <div class="summary-text">
+          Available requests
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- CREATE PURCHASE ORDER -->
+  <section class="card create-card">
+
+    <div class="card-header">
+
+      <div>
+        <h2>Create Purchase Order</h2>
+        <p>
+          Link a purchase order to an existing vendor and procurement request.
+        </p>
+      </div>
+
+      <span class="required-label">
+        * Required
+      </span>
+
+    </div>
+
+
+    <form
+      class="purchase-order-form"
+      (ngSubmit)="addPurchaseOrder()"
+    >
+
+      <!-- ORDER NUMBER -->
+      <div class="form-group">
+
+        <label for="order_number">
+          Order Number
+          <span class="required">*</span>
+        </label>
+
+        <input
+          id="order_number"
+          type="text"
+          [(ngModel)]="purchaseOrder.order_number"
+          name="order_number"
+          placeholder="e.g. PO-2026-001"
+          [disabled]="submitting"
+          required
+        />
+
+      </div>
+
+
+      <!-- VENDOR -->
+      <div class="form-group">
+
+        <label for="vendor_id">
+          Vendor
+          <span class="required">*</span>
+        </label>
+
+        <select
+          id="vendor_id"
+          [(ngModel)]="purchaseOrder.vendor_id"
+          name="vendor_id"
+          [disabled]="submitting"
+          required
+        >
+
+          <option [ngValue]="''">
+            Select a vendor
+          </option>
+
+          <option
+            *ngFor="let vendor of vendors"
+            [ngValue]="vendor.id"
+          >
+            {{ vendor.vendor_name || vendor.name }}
+          </option>
+
+        </select>
+
+        <small>
+          {{ vendors.length }} registered vendors available
+        </small>
+
+      </div>
+
+
+      <!-- PROCUREMENT -->
+      <div class="form-group">
+
+        <label for="procurement_id">
+          Procurement Request
+          <span class="required">*</span>
+        </label>
+
+        <select
+          id="procurement_id"
+          [(ngModel)]="purchaseOrder.procurement_id"
+          name="procurement_id"
+          [disabled]="submitting"
+          required
+        >
+
+          <option [ngValue]="''">
+            Select a procurement request
+          </option>
+
+          <option
+            *ngFor="let procurement of procurements"
+            [ngValue]="procurement.id"
+          >
+            #{{ procurement.id }}
+            -
+            {{ procurement.item_name }}
+          </option>
+
+        </select>
+
+        <small>
+          {{ procurements.length }} procurement records available
+        </small>
+
+      </div>
+
+
+      <!-- TWO COLUMN -->
+      <div class="two-column">
+
+        <div class="form-group">
+
+          <label for="order_date">
+            Order Date
+            <span class="required">*</span>
+          </label>
+
+          <input
+            id="order_date"
+            type="date"
+            [(ngModel)]="purchaseOrder.order_date"
+            name="order_date"
+            [disabled]="submitting"
+            required
+          />
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="amount">
+            Order Amount
+            <span class="required">*</span>
+          </label>
+
+          <div class="price-field">
+
+            <span>₹</span>
+
+            <input
+              id="amount"
+              type="number"
+              min="0"
+              step="0.01"
+              [(ngModel)]="purchaseOrder.amount"
+              name="amount"
+              placeholder="0.00"
+              [disabled]="submitting"
+              required
+            />
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- MESSAGES -->
+      <div
+        *ngIf="successMessage"
+        class="message success-message"
+      >
+
+        <span>✓</span>
+
+        <div>
+          <strong>Purchase Order Created</strong>
+          <p>{{ successMessage }}</p>
+        </div>
+
+      </div>
+
+
+      <div
+        *ngIf="errorMessage"
+        class="message error-message"
+      >
+
+        <span>!</span>
+
+        <div>
+          <strong>Unable to Create Purchase Order</strong>
+          <p>{{ errorMessage }}</p>
+        </div>
+
+      </div>
+
+
+      <!-- ACTIONS -->
+      <div class="form-actions">
+
+        <span class="form-note">
+          Purchase orders are linked to vendors and procurement records.
+        </span>
+
+        <button
+          type="submit"
+          class="primary-btn"
+          [disabled]="submitting"
+        >
+          {{ submitting ? 'Creating...' : '+ Create Purchase Order' }}
+        </button>
+
+      </div>
+
+    </form>
+
+  </section>
+
+
+  <!-- PURCHASE ORDER TABLE -->
+  <section class="card">
+
+    <div class="table-header">
+
+      <div>
+        <h2>Purchase Orders</h2>
+        <p>
+          View and monitor purchase orders submitted to the system.
+        </p>
+      </div>
+
+      <span class="record-count">
+        {{ purchaseOrders.length }} Records
+      </span>
+
+    </div>
+
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>ID</th>
+            <th>Order Number</th>
+            <th>Vendor</th>
+            <th>Procurement</th>
+            <th>Order Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr
+            *ngFor="let po of purchaseOrders"
+          >
+
+            <!-- ID -->
+            <td class="id-cell">
+              #{{ po.id }}
+            </td>
+
+
+            <!-- ORDER NUMBER -->
+            <td class="order-cell">
+              {{ po.order_number }}
+            </td>
+
+
+            <!-- VENDOR NAME -->
+            <td class="vendor-cell">
+
+              <div class="table-main-text">
+                {{ po.vendor_name || ('Vendor #' + po.vendor_id) }}
+              </div>
+
+              <div class="table-sub-text">
+                ID: {{ po.vendor_id }}
+              </div>
+
+            </td>
+
+
+            <!-- PROCUREMENT ITEM -->
+            <td class="procurement-cell">
+
+              <div class="table-main-text">
+                {{ po.procurement_name || ('Procurement #' + po.procurement_id) }}
+              </div>
+
+              <div class="table-sub-text">
+                ID: {{ po.procurement_id }}
+              </div>
+
+            </td>
+
+
+            <!-- ORDER DATE -->
+            <td>
+              {{ po.order_date }}
+            </td>
+
+
+            <!-- AMOUNT -->
+            <td class="amount-cell">
+              ₹{{ po.amount | number:'1.2-2' }}
+            </td>
+
+
+            <!-- STATUS -->
+            <td>
+
+              <span
+                class="status-badge"
+                [ngClass]="getStatusClass(po.status)"
+              >
+                {{ po.status || 'Pending' }}
+              </span>
+
+            </td>
+
+          </tr>
+
+
+          <!-- EMPTY STATE -->
+          <tr
+            *ngIf="purchaseOrders.length === 0"
+          >
+
+            <td
+              colspan="7"
+              class="empty-state"
+            >
+
+              <div *ngIf="loading">
+                Loading purchase orders...
+              </div>
+
+              <div *ngIf="!loading">
+                No purchase orders found.
+              </div>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+</div>

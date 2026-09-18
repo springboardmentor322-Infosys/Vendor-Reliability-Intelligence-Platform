@@ -1,0 +1,576 @@
+
+    <!-- =========================
+         SUPPLY CHAIN ANALYTICS
+    ========================== -->
+
+    <section class="analytics-card full-width-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <span class="card-eyebrow">
+            SUPPLY CHAIN MANAGEMENT
+          </span>
+
+          <h2>Supply Chain Analytics</h2>
+
+          <p>
+            Monitor orders, suppliers, quantities, quality and compliance
+            across the supply chain.
+          </p>
+
+        </div>
+
+        <span
+          class="live-badge"
+          *ngIf="supplyChainLoaded">
+          LIVE DATA
+        </span>
+
+      </div>
+
+
+      <!-- Supply Chain KPI -->
+
+      <div class="supply-chain-kpi-grid">
+
+        <div class="supply-kpi">
+
+          <span class="supply-kpi-label">
+            Total Orders
+          </span>
+
+          <strong>
+            {{ totalSupplyChainOrders }}
+          </strong>
+
+          <small>
+            Orders monitored
+          </small>
+
+        </div>
+
+
+        <div class="supply-kpi">
+
+          <span class="supply-kpi-label">
+            Suppliers
+          </span>
+
+          <strong>
+            {{ totalSuppliers }}
+          </strong>
+
+          <small>
+            Active suppliers
+          </small>
+
+        </div>
+
+
+        <div class="supply-kpi">
+
+          <span class="supply-kpi-label">
+            Total Quantity
+          </span>
+
+          <strong>
+            {{ totalQuantity | number:'1.0-0' }}
+          </strong>
+
+          <small>
+            Units ordered
+          </small>
+
+        </div>
+
+
+        <div class="supply-kpi">
+
+          <span class="supply-kpi-label">
+            Defective Units
+          </span>
+
+          <strong>
+            {{ totalDefectiveUnits | number:'1.0-0' }}
+          </strong>
+
+          <small>
+            {{ getDefectivePercentage() }}% defect rate
+          </small>
+
+        </div>
+
+
+        <div class="supply-kpi">
+
+          <span class="supply-kpi-label">
+            Purchase Value
+          </span>
+
+          <strong>
+            ₹{{ totalPurchaseValue | number:'1.0-0' }}
+          </strong>
+
+          <small>
+            Total supply chain value
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <!-- Supply Chain Analysis Grid -->
+
+      <div class="supply-analysis-grid">
+
+
+        <!-- Order Status -->
+
+        <div class="supply-analysis-card">
+
+          <div class="supply-analysis-header">
+
+            <div>
+
+              <span class="card-eyebrow">
+                ORDER MANAGEMENT
+              </span>
+
+              <h3>Order Status</h3>
+
+            </div>
+
+            <span class="analysis-count">
+              {{ totalSupplyChainOrders }}
+            </span>
+
+          </div>
+
+
+          <div
+            class="supply-list"
+            *ngIf="orderStatusEntries.length > 0">
+
+            <div
+              class="supply-list-row"
+              *ngFor="let item of orderStatusEntries">
+
+              <div class="supply-list-name">
+
+                <span class="supply-dot status-dot"></span>
+
+                <span>
+                  {{ item.name }}
+                </span>
+
+              </div>
+
+              <div class="supply-list-value">
+
+                <strong>
+                  {{ item.value }}
+                </strong>
+
+                <span>
+                  {{ getSupplyChainPercentage(item.value) }}%
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div
+            class="supply-empty"
+            *ngIf="orderStatusEntries.length === 0">
+
+            No order status data available.
+
+          </div>
+
+        </div>
+
+
+        <!-- Supplier Orders -->
+
+        <div class="supply-analysis-card">
+
+          <div class="supply-analysis-header">
+
+            <div>
+
+              <span class="card-eyebrow">
+                SUPPLIER PERFORMANCE
+              </span>
+
+              <h3>Orders by Supplier</h3>
+
+            </div>
+
+            <span class="analysis-count">
+              {{ totalSuppliers }}
+            </span>
+
+          </div>
+
+
+          <div
+            class="supply-list"
+            *ngIf="supplierOrderEntries.length > 0">
+
+            <div
+              class="supply-list-row"
+              *ngFor="let item of supplierOrderEntries">
+
+              <div class="supply-list-name">
+
+                <span class="supply-dot supplier-dot"></span>
+
+                <span>
+                  {{ item.name }}
+                </span>
+
+              </div>
+
+              <div class="supply-list-value">
+
+                <strong>
+                  {{ item.value }}
+                </strong>
+
+                <span>
+                  orders
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div
+            class="supply-empty"
+            *ngIf="supplierOrderEntries.length === 0">
+
+            No supplier order data available.
+
+          </div>
+
+        </div>
+
+
+        <!-- Category -->
+
+        <div class="supply-analysis-card">
+
+          <div class="supply-analysis-header">
+
+            <div>
+
+              <span class="card-eyebrow">
+                CATEGORY ANALYSIS
+              </span>
+
+              <h3>Orders by Category</h3>
+
+            </div>
+
+          </div>
+
+
+          <div
+            class="supply-list"
+            *ngIf="categoryOrderEntries.length > 0">
+
+            <div
+              class="supply-list-row"
+              *ngFor="let item of categoryOrderEntries">
+
+              <div class="supply-list-name">
+
+                <span class="supply-dot category-dot"></span>
+
+                <span>
+                  {{ item.name }}
+                </span>
+
+              </div>
+
+              <div class="supply-list-value">
+
+                <strong>
+                  {{ item.value }}
+                </strong>
+
+                <span>
+                  orders
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div
+            class="supply-empty"
+            *ngIf="categoryOrderEntries.length === 0">
+
+            No category data available.
+
+          </div>
+
+        </div>
+
+
+        <!-- Compliance -->
+
+        <div class="supply-analysis-card">
+
+          <div class="supply-analysis-header">
+
+            <div>
+
+              <span class="card-eyebrow">
+                COMPLIANCE
+              </span>
+
+              <h3>Compliance Status</h3>
+
+            </div>
+
+          </div>
+
+
+          <div
+            class="supply-list"
+            *ngIf="complianceEntries.length > 0">
+
+            <div
+              class="supply-list-row"
+              *ngFor="let item of complianceEntries">
+
+              <div class="supply-list-name">
+
+                <span class="supply-dot compliance-dot"></span>
+
+                <span>
+                  {{ item.name }}
+                </span>
+
+              </div>
+
+              <div class="supply-list-value">
+
+                <strong>
+                  {{ item.value }}
+                </strong>
+
+                <span>
+                  {{ getCompliancePercentage(item.value) }}%
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div
+            class="supply-empty"
+            *ngIf="complianceEntries.length === 0">
+
+            No compliance data available.
+
+          </div>
+
+        </div>
+
+
+        <!-- Defective Units -->
+
+        <div class="supply-analysis-card">
+
+          <div class="supply-analysis-header">
+
+            <div>
+
+              <span class="card-eyebrow">
+                QUALITY MANAGEMENT
+              </span>
+
+              <h3>Defective Units by Supplier</h3>
+
+            </div>
+
+          </div>
+
+
+          <div
+            class="supply-list"
+            *ngIf="defectiveSupplierEntries.length > 0">
+
+            <div
+              class="supply-list-row"
+              *ngFor="let item of defectiveSupplierEntries">
+
+              <div class="supply-list-name">
+
+                <span class="supply-dot defect-dot"></span>
+
+                <span>
+                  {{ item.name }}
+                </span>
+
+              </div>
+
+              <div class="supply-list-value">
+
+                <strong>
+                  {{ item.value }}
+                </strong>
+
+                <span>
+                  units
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div
+            class="supply-empty"
+            *ngIf="defectiveSupplierEntries.length === 0">
+
+            No defective-unit data available.
+
+          </div>
+
+        </div>
+
+
+        <!-- Supply Chain Insights -->
+
+        <div class="supply-analysis-card supply-insight-card">
+
+          <div class="supply-analysis-header">
+
+            <div>
+
+              <span class="card-eyebrow">
+                MANAGEMENT INSIGHT
+              </span>
+
+              <h3>Supply Chain Overview</h3>
+
+            </div>
+
+          </div>
+
+
+          <div class="supply-insights">
+
+            <div class="supply-insight">
+
+              <span class="insight-small-label">
+                Top Supplier
+              </span>
+
+              <strong>
+                {{ getTopSupplier() }}
+              </strong>
+
+              <span>
+                {{ getTopSupplierOrders() }} orders
+              </span>
+
+            </div>
+
+
+            <div class="supply-insight">
+
+              <span class="insight-small-label">
+                Leading Category
+              </span>
+
+              <strong>
+                {{ getTopCategory() }}
+              </strong>
+
+              <span>
+                Highest order volume
+              </span>
+
+            </div>
+
+
+            <div class="supply-insight">
+
+              <span class="insight-small-label">
+                Non-Compliant Orders
+              </span>
+
+              <strong>
+                {{ getNonCompliantOrders() }}
+              </strong>
+
+              <span>
+                Require attention
+              </span>
+
+            </div>
+
+
+            <div class="supply-insight">
+
+              <span class="insight-small-label">
+                Quality Rate
+              </span>
+
+              <strong>
+                {{ getDefectivePercentage() }}%
+              </strong>
+
+              <span>
+                Defective unit rate
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- Supply Chain Summary -->
+
+      <div class="supply-chain-summary">
+
+        <div class="summary-icon">
+          SC
+        </div>
+
+        <div>
+
+          <strong>
+            Supply Chain Monitoring
+          </strong>
+
+          <p>
+            {{ getSupplyChainSummary() }}
+            {{ getQualitySummary() }}
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
