@@ -8,7 +8,7 @@
    HTML IDs used:
    vendorCompany
    vendorIdDisplay
-
+ 
    procurementCount
    adminCount
    supplyCount
