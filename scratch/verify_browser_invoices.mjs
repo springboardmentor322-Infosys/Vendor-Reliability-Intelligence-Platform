@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import fs from 'fs';
+import 'dotenv/config';
 
 const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const userDataDir = 'C:\\Users\\Dell\\.gemini\\antigravity\\brain\\989c9f60-c2ba-46ab-af5d-4118660db288\\scratch\\chrome_profile_inv';
