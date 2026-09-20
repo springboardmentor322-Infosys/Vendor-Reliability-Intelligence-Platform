@@ -9,17 +9,19 @@ async function getTokens() {
   const finRes = await fetch('http://127.0.0.1:8000/login', {
     method: 'POST',
     body: new URLSearchParams({
-  email: process.env.FINANCE_TEST_EMAIL,
-  password: process.env.FINANCE_TEST_PASSWORD
-})
+      email: process.env.FINANCE_TEST_EMAIL,
+      password: process.env.FINANCE_TEST_PASSWORD
+    })
+  });
   const finData = await finRes.json();
 
   const procRes = await fetch('http://127.0.0.1:8000/login', {
     method: 'POST',
     body: new URLSearchParams({
-  email: process.env.PROCUREMENT_TEST_EMAIL,
-  password: process.env.PROCUREMENT_TEST_PASSWORD
-})
+      email: process.env.PROCUREMENT_TEST_EMAIL,
+      password: process.env.PROCUREMENT_TEST_PASSWORD
+    })
+  });
   const procData = await procRes.json();
 
   return {
