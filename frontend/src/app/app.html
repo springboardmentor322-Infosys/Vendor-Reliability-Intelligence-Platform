@@ -1,0 +1,413 @@
+<div class="app-container">
+
+  <!-- HEADER -->
+  <header class="top-header">
+    <div class="brand">
+      <div class="brand-icon">VR</div>
+      <div>
+        <h1>Vendor Reliability</h1>
+        <span>Intelligence Platform</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <span class="system-status">
+        <span class="status-dot"></span>
+        System Online
+      </span>
+      <div class="profile">
+        <div class="profile-avatar">A</div>
+        <span>Admin</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main-layout">
+
+   <!-- SIDEBAR -->
+<aside class="sidebar">
+
+  <div class="sidebar-title">MAIN MENU</div>
+
+  <nav>
+    <a class="menu-item" routerLink="/">
+      <span class="menu-icon">▦</span>
+      <span>Dashboard</span>
+    </a>
+
+    <a class="menu-item" routerLink="/vendors">
+      <span class="menu-icon">♙</span>
+      <span>Vendor Management</span>
+    </a>
+
+    <a class="menu-item" routerLink="/purchase-orders">
+  <span class="menu-icon">▤</span>
+  <span>Purchase Orders</span>
+</a>
+
+    <a class="menu-item" routerLink="/contracts">
+  <span class="menu-icon">▣</span>
+  <span>Contracts</span>
+</a>
+<a class="menu-item" routerLink="/communications">
+  <span class="menu-icon">☏</span>
+  <span>Communications</span>
+</a>
+    
+  </nav>
+
+  <div class="sidebar-title">ANALYTICS</div>
+
+  <nav>
+    <a class="menu-item" routerLink="/vendor-performance">
+      <span class="menu-icon">◈</span>
+      <span>Vendor Performance</span>
+    </a>
+    
+
+    <a class="menu-item" routerLink="/risk-analysis">
+      <span class="menu-icon">⚠</span>
+      <span>Risk Analysis</span>
+    </a>
+
+    <a class="menu-item" routerLink="/procurement-analytics">
+  <span class="menu-icon">◔</span>
+  <span>Procurement Analytics</span>
+</a>
+
+    <a class="menu-item" routerLink="/notifications">
+  <span class="menu-icon">♢</span>
+  <span>Notifications</span>
+</a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="sidebar-version">
+      <strong>Vendor Reliability</strong>
+      <span>Platform v1.0</span>
+    </div>
+  </div>
+
+</aside>
+
+    <!-- CONTENT -->
+<main class="content" *ngIf="!isVendorPage && !isPurchaseOrderPage && !isContractsPage && !isCommunicationsPage && !isVendorPerformancePage && !isRiskAnalysisPage && !isProcurementAnalyticsPage && !isNotificationsPage">
+      <!-- PAGE TITLE -->
+      <div class="page-heading">
+        <div>
+          <h2>Dashboard</h2>
+          <p>Monitor vendor reliability and procurement performance</p>
+        </div>
+
+        <button class="refresh-btn">
+          ↻ Refresh Data
+        </button>
+      </div>
+
+      <!-- SUMMARY CARDS -->
+      <section class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div>
+              <p>Total Vendors</p>
+              <h3>{{ dashboard.total_vendors }}</h3>
+            </div>
+            <div class="stat-icon vendor-icon">♙</div>
+          </div>
+         <span class="stat-footer positive">Current vendor count</span>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div>
+              <p>Average Performance</p>
+              <h3>{{ dashboard.average_performance }}<span>/100</span></h3>
+            </div>
+            <div class="stat-icon performance-icon">★</div>
+          </div>
+          <span class="stat-footer positive">Current performance score</span>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div>
+              <p>Purchase Orders</p>
+             <h3>{{ procurement.total_purchase_orders }}</h3>
+            </div>
+            <div class="stat-icon order-icon">▤</div>
+          </div>
+         <span class="stat-footer neutral">{{ procurement.pending_orders }} pending orders</span>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div>
+              <p>Notifications</p>
+              <h3>{{ dashboard.total_notifications }}</h3>
+            </div>
+            <div class="stat-icon notification-icon">♢</div>
+          </div>
+          <span class="stat-footer warning">{{ dashboard.unread_notifications }} require attention</span>
+        </div>
+
+      </section>
+
+     <!-- DASHBOARD GRID -->
+<section class="dashboard-grid">
+
+  <div class="dashboard-card performance-card">
+
+    <div class="card-header">
+      <div>
+        <h3>Vendor Performance</h3>
+        <p>Overall reliability scores</p>
+      </div>
+
+      <button class="view-btn">View All →</button>
+    </div>
+
+    <div class="vendor-list">
+
+      <div class="vendor-row" *ngFor="let vendor of vendors">
+
+        <div class="vendor-info">
+
+          <div class="vendor-avatar">
+            {{ vendor.vendor_name.substring(0, 2).toUpperCase() }}
+          </div>
+
+          <div>
+            <strong>{{ vendor.vendor_name }}</strong>
+            <span>{{ vendor.category }}</span>
+          </div>
+
+        </div>
+
+        <div class="score-area">
+
+          <div class="score-bar">
+            <div
+              class="score-fill high"
+              [style.width.%]="vendor.delivery_score">
+            </div>
+          </div>
+
+          <strong>{{ vendor.delivery_score }}</strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="dashboard-card risk-card">
+
+    <div class="card-header">
+      <div>
+        <h3>Risk Summary</h3>
+        <p>Current vendor risk levels</p>
+      </div>
+
+      <span class="risk-status">Live</span>
+    </div>
+
+    <div class="risk-content">
+
+      <div class="risk-circle">
+        <div>
+          <strong>82%</strong>
+          <span>Healthy</span>
+        </div>
+      </div>
+
+      <div class="risk-items">
+
+        <div class="risk-item">
+  <span class="risk-dot low"></span>
+  <div>
+    <strong>Low Risk</strong>
+    <span>{{ risk.low_risk_vendors }} Vendors</span>
+  </div>
+</div>
+
+<div class="risk-item">
+  <span class="risk-dot medium-risk"></span>
+  <div>
+    <strong>Medium Risk</strong>
+    <span>{{ risk.medium_risk_vendors }} Vendors</span>
+  </div>
+</div>
+
+<div class="risk-item">
+  <span class="risk-dot high-risk"></span>
+  <div>
+    <strong>High Risk</strong>
+    <span>{{ risk.high_risk_vendors }} Vendors</span>
+  </div>
+</div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+      <!-- PROCUREMENT OVERVIEW -->
+      <section class="dashboard-card procurement-card">
+
+        <div class="card-header">
+          <div>
+            <h3>Procurement Overview</h3>
+            <p>Purchase order and spending summary</p>
+          </div>
+
+          <button class="view-btn">Analytics →</button>
+        </div>
+
+        <div class="procurement-grid">
+
+          <div class="procurement-item">
+            <span>Total Orders</span>
+            <strong>{{ procurement.total_purchase_orders }}</strong>
+            <small>Purchase orders</small>
+          </div>
+
+          <div class="procurement-item">
+            <span>Delivered</span>
+            <strong>{{ procurement.delivered_orders }}</strong>
+            <small>{{ procurement.order_completion_rate }}% completed</small>
+          </div>
+
+          <div class="procurement-item">
+            <span>Pending</span>
+            <strong>{{ procurement.pending_orders }}</strong>
+            <small>Awaiting delivery</small>
+          </div>
+
+          <div class="procurement-item">
+            <span>Total Procurement</span>
+            <strong>₹{{ procurement.total_procurement_cost }}</strong>
+            <small>This financial year</small>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- NOTIFICATIONS -->
+      <section class="dashboard-card notifications-card">
+
+        <div class="card-header">
+          <div>
+            <h3>Recent Notifications</h3>
+            <p>Latest procurement and vendor alerts</p>
+          </div>
+
+          <button class="view-btn">View All →</button>
+        </div>
+
+        <div class="notification-list">
+
+  <div class="notification-row" *ngFor="let notification of notifications">
+
+    <div class="notification-icon-box warning-box">
+      !
+    </div>
+
+    <div class="notification-text">
+      <strong>{{ notification.notification_type }}</strong>
+      <span>{{ notification.message }}</span>
+    </div>
+
+    <span class="notification-time">
+      {{ notification.status }}
+    </span>
+
+  </div>
+
+</div>
+
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="footer">
+        <span>© 2026 Vendor Reliability Intelligence Platform</span>
+        <span>Procurement Risk Management System</span>
+      </footer>
+
+   </main>
+   <div class="vendor-page" *ngIf="isVendorPage">
+
+  <div class="page-heading">
+    <div>
+      <h2>Vendor Management</h2>
+      <p>Manage and monitor your vendors.</p>
+    </div>
+
+    <button class="refresh-btn">
+      + Add Vendor
+    </button>
+  </div>
+
+  <section class="dashboard-card">
+
+    <div class="card-header">
+      <div>
+        <h3>All Vendors</h3>
+        <p>Vendor reliability and performance overview</p>
+      </div>
+    </div>
+
+    <div class="vendor-list">
+
+      <div class="vendor-row" *ngFor="let vendor of vendors">
+
+        <div class="vendor-info">
+          <div class="vendor-avatar">
+            {{ vendor.vendor_name.substring(0, 2).toUpperCase() }}
+          </div>
+
+          <div>
+            <strong>{{ vendor.vendor_name }}</strong>
+            <span>{{ vendor.category }}</span>
+          </div>
+        </div>
+
+        <div class="score-area">
+          <div class="score-bar">
+            <div
+              class="score-fill high"
+              [style.width.%]="vendor.delivery_score">
+            </div>
+          </div>
+
+          <strong>{{ vendor.delivery_score }}/100</strong>
+        </div>
+
+        <span class="risk-status">
+          {{ vendor.status }}
+        </span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
+
+   <router-outlet></router-outlet>
+
+  </div>
+
+</div>
+
+ 
