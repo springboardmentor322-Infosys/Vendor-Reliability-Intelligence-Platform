@@ -30,12 +30,18 @@ PROD_METADATA_PATH = os.path.join(CURRENT_DIR, "model_metadata.json")
 os.makedirs(VERSIONS_DIR, exist_ok=True)
 os.makedirs(CANDIDATES_DIR, exist_ok=True)
 
+from dotenv import load_dotenv
+
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+load_dotenv(os.path.join(ROOT_DIR, ".env"))
+load_dotenv()
+
 DB_CONFIG = {
-    'dbname': 'vendor_platform',
-    'user': 'postgres',
-    'password': 'Amruta@9279',
-    'host': 'localhost',
-    'port': 5432
+    'dbname': os.getenv('DB_NAME', 'vendor_platform'),
+    'user': os.getenv('DB_USER', 'postgres'),
+    'password': os.getenv('DB_PASSWORD'),
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'port': int(os.getenv('DB_PORT', 5432))
 }
 
 def validate_retraining_data() -> dict:

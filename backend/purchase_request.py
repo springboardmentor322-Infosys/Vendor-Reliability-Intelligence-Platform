@@ -7,6 +7,23 @@ from auth import get_current_user, check_role
 router = APIRouter()
 
 
+def ensure_purchase_request_schema():
+    try:
+        conn.rollback()
+        with conn.cursor() as cur:
+            cur.execute("""
+                ALTER TABLE purchase_requests
+                ADD COLUMN IF NOT EXISTS product_category VARCHAR(100);
+            """)
+            conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print("Schema check purchase_requests warning:", e)
+
+
+ensure_purchase_request_schema()
+
+
 # ==================================================
 # ADD PURCHASE REQUEST
 # ==================================================
@@ -16,6 +33,7 @@ def add_purchase_request(
     quantity: int = Form(...),
     unit_price: float = Form(...),
     request_date: str = Form(...),
+    product_category: Optional[str] = Form(None),
     total_amount: Optional[float] = Form(None),
     vendor_id: Optional[str] = Form(None),
     requested_by: Optional[str] = Form(None),
@@ -23,6 +41,11 @@ def add_purchase_request(
     current_user: dict = Depends(check_role(["Admin", "Procurement Manager"]))
 ):
     try:
+        # Backend validation: product_category is required
+        if not product_category or not str(product_category).strip():
+            raise HTTPException(status_code=400, detail="Product Category is required.")
+        clean_category = str(product_category).strip()
+
         # Backend validation: reject non-positive quantity or unit_price
         if quantity <= 0:
             raise HTTPException(status_code=400, detail="Quantity must be greater than zero.")
@@ -48,11 +71,17 @@ def add_purchase_request(
                 except ValueError:
                     v_id = None
 
-            # Verify vendor exists if provided
+            # Verify vendor exists and is Active if provided
             if v_id:
-                cursor.execute("SELECT id FROM vendors WHERE id = %s", (v_id,))
-                if not cursor.fetchone():
-                    v_id = None
+                cursor.execute("SELECT id, status, vendor_name FROM vendors WHERE id = %s", (v_id,))
+                v_check = cursor.fetchone()
+                if not v_check:
+                    raise HTTPException(status_code=400, detail=f"Vendor #{v_id} not found.")
+                if (v_check[1] or "").lower() != "active":
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Vendor #{v_id} ('{v_check[2]}') is not Active (Current status: '{v_check[1]}'). Only Active vendors can be assigned to requisitions."
+                    )
 
             cursor.execute(
                 """
@@ -60,6 +89,7 @@ def add_purchase_request(
                 (
                     vendor_id,
                     product_name,
+                    product_category,
                     quantity,
                     unit_price,
                     total_amount,
@@ -68,12 +98,13 @@ def add_purchase_request(
                     status
                 )
                 VALUES
-                (%s, %s, %s, %s, %s, %s, %s, %s)
+                (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING id
                 """,
                 (
                     v_id,
                     product_name.strip(),
+                    clean_category,
                     quantity,
                     unit_price,
                     authoritative_total,
@@ -94,7 +125,7 @@ def add_purchase_request(
                     action="PURCHASE_REQUEST_CREATED",
                     entity_type="PURCHASE_REQUEST",
                     entity_id=str(new_id),
-                    details=f"Created Purchase Request #{new_id} for '{product_name.strip()}' (Qty: {quantity}, Amount: ₹{authoritative_total})"
+                    details=f"Created Purchase Request #{new_id} for '{product_name.strip()}' [Category: {clean_category}] (Qty: {quantity}, Amount: ₹{authoritative_total})"
                 )
             except Exception as le:
                 print("Audit log PR creation error:", le)
@@ -103,6 +134,8 @@ def add_purchase_request(
             "message": "Purchase Request Created Successfully",
             "id": new_id,
             "status": "Pending",
+            "product_category": clean_category,
+            "category_name": clean_category,
             "requested_by": auth_user_name,
             "unit_price": float(unit_price),
             "total_amount": authoritative_total
@@ -143,7 +176,8 @@ def get_purchase_requests(current_user: dict = Depends(get_current_user)):
                         pr.purchase_order_id,
                         COALESCE(v.reliability_score, 0) AS reliability_score,
                         COALESCE(pr.unit_price, 0.00) AS unit_price,
-                        COALESCE(pr.total_amount, 0.00) AS total_amount
+                        COALESCE(pr.total_amount, 0.00) AS total_amount,
+                        COALESCE(pr.product_category, 'General Goods') AS product_category
                     FROM purchase_requests pr
                     LEFT JOIN vendors v ON pr.vendor_id = v.id
                     WHERE pr.vendor_id = %s
@@ -166,7 +200,8 @@ def get_purchase_requests(current_user: dict = Depends(get_current_user)):
                         pr.purchase_order_id,
                         COALESCE(v.reliability_score, 0) AS reliability_score,
                         COALESCE(pr.unit_price, 0.00) AS unit_price,
-                        COALESCE(pr.total_amount, 0.00) AS total_amount
+                        COALESCE(pr.total_amount, 0.00) AS total_amount,
+                        COALESCE(pr.product_category, 'General Goods') AS product_category
                     FROM purchase_requests pr
                     LEFT JOIN vendors v ON pr.vendor_id = v.id
                     ORDER BY pr.id DESC
@@ -194,7 +229,9 @@ def get_purchase_requests(current_user: dict = Depends(get_current_user)):
                 "purchase_order_id": row[8],
                 "vendor_reliability": float(row[9] or 0),
                 "unit_price": float(row[10] or 0),
-                "total_amount": float(row[11] or 0)
+                "total_amount": float(row[11] or 0),
+                "product_category": row[12] or "General Goods",
+                "category_name": row[12] or "General Goods"
             })
 
         return requests
@@ -216,6 +253,7 @@ def update_purchase_request(
     product_name: str = Form(...),
     quantity: int = Form(...),
     request_date: str = Form(...),
+    product_category: Optional[str] = Form(None),
     unit_price: Optional[float] = Form(None),
     total_amount: Optional[float] = Form(None),
     vendor_id: Optional[str] = Form(None),
@@ -263,6 +301,7 @@ def update_purchase_request(
 
             final_price = unit_price if unit_price is not None else existing_price
             authoritative_total = round(float(quantity) * float(final_price), 2)
+            clean_category = str(product_category).strip() if product_category and str(product_category).strip() else None
 
             cursor.execute(
                 """
@@ -270,6 +309,7 @@ def update_purchase_request(
                 SET
                     vendor_id = %s,
                     product_name = %s,
+                    product_category = COALESCE(%s, product_category),
                     quantity = %s,
                     unit_price = %s,
                     total_amount = %s,
@@ -280,6 +320,7 @@ def update_purchase_request(
                 (
                     v_id,
                     product_name.strip(),
+                    clean_category,
                     quantity,
                     final_price,
                     authoritative_total,
@@ -518,7 +559,8 @@ def create_po_from_request(
                     pr.status,
                     pr.purchase_order_id,
                     COALESCE(pr.unit_price, 0.00),
-                    COALESCE(pr.total_amount, 0.00)
+                    COALESCE(pr.total_amount, 0.00),
+                    COALESCE(pr.product_category, 'Procurement Supplies')
                 FROM purchase_requests pr
                 WHERE pr.id = %s
                 """,
@@ -529,7 +571,7 @@ def create_po_from_request(
             if not request:
                 raise HTTPException(status_code=404, detail="Requisition Not Found")
 
-            req_id, vendor_id, product_name, quantity, status, existing_po_id, pr_unit_price, pr_total_amount = request
+            req_id, vendor_id, product_name, quantity, status, existing_po_id, pr_unit_price, pr_total_amount, pr_category = request
 
             # 1. Prevent duplicate PO creation
             if existing_po_id:
@@ -570,11 +612,12 @@ def create_po_from_request(
 
             # Look up or create product in products catalog
             cursor.execute(
-                "SELECT id FROM products WHERE LOWER(product_name) = LOWER(%s) LIMIT 1",
+                "SELECT id, category_name FROM products WHERE LOWER(product_name) = LOWER(%s) LIMIT 1",
                 (product_name.strip(),)
             )
             prod_row = cursor.fetchone()
             product_id = prod_row[0] if prod_row else None
+            cat_name = (pr_category or "").strip() or (prod_row[1] if prod_row and prod_row[1] else "Procurement Supplies")
 
             # If product doesn't exist, create catalog item
             if not product_id:
@@ -586,16 +629,103 @@ def create_po_from_request(
                     VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP)
                     RETURNING id
                     """,
-                    (next_card_id, product_name, "Procurement Supplies", unit_price)
+                    (next_card_id, product_name, cat_name, unit_price)
                 )
                 product_id = cursor.fetchone()[0]
-            elif unit_price > 0:
+            else:
                 cursor.execute(
-                    "UPDATE products SET product_price = %s WHERE id = %s",
-                    (unit_price, product_id)
+                    "UPDATE products SET category_name = %s, product_price = CASE WHEN %s > 0 THEN %s ELSE product_price END WHERE id = %s",
+                    (cat_name, unit_price, unit_price, product_id)
                 )
 
-            # Create the Purchase Order with clean PO number
+            # 5. DEDUPLICATION CORE: Check if an order was already created for this requisition
+            cursor.execute(
+                """
+                SELECT id, po_number, status, total_amount, unit_price
+                FROM purchase_orders
+                WHERE purchase_request_id = %s
+                  AND LOWER(status) NOT IN ('cancelled', 'canceled')
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (req_id,)
+            )
+            existing_order = cursor.fetchone()
+
+            if not existing_order:
+                # Fallback: match by vendor, product name, quantity where purchase_request_id is NULL or matches
+                cursor.execute(
+                    """
+                    SELECT id, po_number, status, total_amount, unit_price
+                    FROM purchase_orders
+                    WHERE vendor_id = %s
+                      AND LOWER(TRIM(product_name)) = LOWER(TRIM(%s))
+                      AND quantity = %s
+                      AND (purchase_request_id IS NULL OR purchase_request_id = %s)
+                      AND LOWER(status) NOT IN ('cancelled', 'canceled')
+                    ORDER BY id DESC
+                    LIMIT 1
+                    """,
+                    (vendor_id, product_name.strip(), quantity, req_id)
+                )
+                existing_order = cursor.fetchone()
+
+            if existing_order:
+                # Promote/finalize the existing order: NO NEW ROW CREATED!
+                po_id = existing_order[0]
+                created_po_num = existing_order[1] or f"PO-2026-{po_id:05d}"
+                po_total = float(existing_order[3] or total_amount)
+                po_price = float(existing_order[4] or unit_price)
+
+                cursor.execute(
+                    """
+                    UPDATE purchase_orders
+                    SET
+                        purchase_request_id = %s,
+                        status = 'Approved',
+                        po_number = COALESCE(NULLIF(po_number, ''), %s),
+                        unit_price = CASE WHEN COALESCE(unit_price, 0) > 0 THEN unit_price ELSE %s END,
+                        total_amount = CASE WHEN COALESCE(total_amount, 0) > 0 THEN total_amount ELSE %s END,
+                        remaining_amount = CASE WHEN COALESCE(remaining_amount, 0) > 0 THEN remaining_amount ELSE %s END,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE id = %s
+                    """,
+                    (req_id, created_po_num, unit_price, total_amount, total_amount, po_id)
+                )
+
+                # Link the PO to the requisition to prevent duplicates and sync final pricing
+                cursor.execute(
+                    """
+                    UPDATE purchase_requests
+                    SET purchase_order_id = %s, unit_price = %s, total_amount = %s
+                    WHERE id = %s
+                    """,
+                    (po_id, po_price, po_total, req_id)
+                )
+                conn.commit()
+
+                try:
+                    from audit_logs import log_action
+                    log_action(
+                        user_id=current_user.get("id"),
+                        user_name=current_user.get("name"),
+                        user_email=current_user.get("email"),
+                        action="PURCHASE_ORDER_CREATED",
+                        entity_type="PURCHASE_ORDER",
+                        entity_id=str(po_id),
+                        details=f"Issued official Purchase Order {created_po_num} (ID #{po_id}) from Requisition #{req_id} for '{product_name.strip()}' (Amount: ₹{po_total})"
+                    )
+                except Exception as le:
+                    print("Audit log PO create from PR error:", le)
+
+                return {
+                    "message": "Official Purchase Order generated successfully.",
+                    "purchase_order_id": po_id,
+                    "po_number": created_po_num,
+                    "requisition_id": req_id
+                }
+
+            # Create the Purchase Order with clean PO number if none existed
             cursor.execute("SELECT COALESCE(MAX(id), 0) + 1 FROM purchase_orders")
             next_po_id = cursor.fetchone()[0]
             po_number = f"PO-2026-{next_po_id:05d}"
@@ -608,6 +738,9 @@ def create_po_from_request(
                     vendor_id,
                     product_id,
                     product_name,
+                    category_name,
+                    currency,
+                    payment_method,
                     quantity,
                     unit_price,
                     total_amount,
@@ -615,16 +748,18 @@ def create_po_from_request(
                     expected_delivery,
                     status,
                     po_number,
+                    purchase_request_id,
                     created_by,
                     created_at,
                     updated_at
                 )
                 VALUES
                 (
-                    %s, %s, %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s, 'INR', 'Bank Transfer', %s, %s, %s,
                     CURRENT_DATE,
                     CURRENT_DATE + INTERVAL '14 day',
                     'Approved',
+                    %s,
                     %s,
                     %s,
                     CURRENT_TIMESTAMP,
@@ -637,10 +772,12 @@ def create_po_from_request(
                     vendor_id,
                     product_id,
                     product_name,
+                    cat_name,
                     quantity,
                     unit_price,
                     total_amount,
                     po_number,
+                    req_id,
                     current_user.get("id")
                 )
             )

@@ -20,7 +20,7 @@ def get_vendor_reliability(current_user: dict = Depends(get_current_user)):
         if user_role == "Vendor":
             if not user_vendor_id:
                 return []
-            
+
             cur.execute("""
                 SELECT
                     v.vendor_name,
@@ -171,42 +171,26 @@ def get_vendor_reliability_summary(current_user: dict = Depends(get_current_user
             }
         else:
             cur.execute("""
-                SELECT COUNT(*)
+                SELECT
+                    COUNT(*),
+                    COALESCE(AVG(reliability_score), 0),
+                    (SELECT vendor_name FROM vendors ORDER BY reliability_score DESC NULLS LAST LIMIT 1),
+                    (SELECT reliability_score FROM vendors ORDER BY reliability_score DESC NULLS LAST LIMIT 1),
+                    (SELECT COUNT(*) FROM vendors v JOIN vendor_reliability_data vrd ON v.id = vrd.id WHERE vrd.reliability_status = 'Poor')
                 FROM vendors
             """)
-
-            total_vendors = int(cur.fetchone()[0] or 0)
-
-            cur.execute("""
-                SELECT COALESCE(AVG(reliability_score), 0)
-                FROM vendors
-            """)
-
-            average_reliability = float(cur.fetchone()[0] or 0)
-
-            cur.execute("""
-                SELECT vendor_name, reliability_score
-                FROM vendors
-                ORDER BY reliability_score DESC
-                LIMIT 1
-            """)
-
-            best_vendor = cur.fetchone()
-
-            cur.execute("""
-                SELECT COUNT(*)
-                FROM vendors v
-                JOIN vendor_reliability_data vrd ON v.id = vrd.id
-                WHERE vrd.reliability_status = 'Poor'
-            """)
-
-            poor_vendors = int(cur.fetchone()[0] or 0)
+            s_row = cur.fetchone()
+            total_vendors = int(s_row[0] or 0)
+            average_reliability = float(s_row[1] or 0)
+            best_vendor_name = s_row[2]
+            best_score = float(s_row[3] or 0)
+            poor_vendors = int(s_row[4] or 0)
 
             return {
                 "total_vendors": total_vendors,
                 "average_reliability": round(average_reliability, 2),
-                "best_vendor": best_vendor[0] if best_vendor else None,
-                "best_score": round(float(best_vendor[1]), 2) if best_vendor else 0,
+                "best_vendor": best_vendor_name,
+                "best_score": round(best_score, 2),
                 "poor_vendors": poor_vendors
             }
 
@@ -224,4 +208,4 @@ def get_vendor_reliability_summary(current_user: dict = Depends(get_current_user
         }
 
     finally:
-        cur.close()
+        cur.close()

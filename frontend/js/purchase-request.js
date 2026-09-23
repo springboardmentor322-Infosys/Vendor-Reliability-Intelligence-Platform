@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     loadVendors();
+    loadProductCategories();
     loadPurchaseRequests();
     calculateEstimatedTotal();
 });
@@ -39,6 +40,32 @@ function calculateEstimatedTotal() {
     const totalField = document.getElementById("total_amount");
     if (totalField) {
         totalField.value = (qty * price).toFixed(2);
+    }
+}
+
+async function loadProductCategories() {
+    const catSelect = document.getElementById("product_category");
+    if (!catSelect) return;
+    try {
+        const token = getToken();
+        const res = await fetch(`${API_BASE_URL}/products/categories`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+            const apiCategories = await res.json();
+            if (Array.isArray(apiCategories)) {
+                const existingValues = new Set(Array.from(catSelect.options).map(opt => opt.value.trim().toLowerCase()));
+                apiCategories.forEach(cat => {
+                    const clean = (cat || "").trim();
+                    if (clean && !existingValues.has(clean.toLowerCase())) {
+                        catSelect.innerHTML += `<option value="${escapeHTML(clean)}">${escapeHTML(clean)}</option>`;
+                        existingValues.add(clean.toLowerCase());
+                    }
+                });
+            }
+        }
+    } catch (e) {
+        console.error("Error loading extra product categories:", e);
     }
 }
 
@@ -71,10 +98,18 @@ async function addPurchaseRequest(event) {
 
     const vendorSelect = document.getElementById("vendor_id");
     const vendor_id = vendorSelect ? vendorSelect.value : "";
+    const categorySelect = document.getElementById("product_category");
+    const product_category = categorySelect ? categorySelect.value.trim() : "";
     const product_name = document.getElementById("product_name").value.trim();
     const quantity = parseInt(document.getElementById("quantity").value, 10);
     const unit_price = parseFloat(document.getElementById("unit_price").value);
     const request_date = document.getElementById("request_date").value;
+
+    if (!product_category) {
+        showToast("Product Category is required. Please select a category.", "warning");
+        if (categorySelect) categorySelect.focus();
+        return;
+    }
 
     if (!product_name || isNaN(quantity) || isNaN(unit_price) || !request_date) {
         showToast("Please fill in all required fields including Quantity and Unit Price.", "warning");
@@ -95,6 +130,7 @@ async function addPurchaseRequest(event) {
 
     const formData = new FormData();
     if (vendor_id) formData.append("vendor_id", vendor_id);
+    formData.append("product_category", product_category);
     formData.append("product_name", product_name);
     formData.append("quantity", quantity);
     formData.append("unit_price", unit_price);
@@ -113,6 +149,7 @@ async function addPurchaseRequest(event) {
         if (response.ok) {
             showToast("Requisition submitted successfully (Status: Pending review).", "success");
             document.getElementById("requestForm").reset();
+            if (categorySelect) categorySelect.value = "";
             calculateEstimatedTotal();
             
             // Reset date and user
@@ -227,7 +264,10 @@ async function loadPurchaseRequests() {
             <tr data-id="${request.id}">
                 <td>#${request.id}</td>
                 <td>${vendorDisplay}</td>
-                <td style="font-weight: 500;">${escapeHTML(request.product_name)}</td>
+                <td style="font-weight: 500;">
+                    <div style="font-weight: 600;">${escapeHTML(request.product_name)}</div>
+                    <small style="color: var(--text-secondary); font-size: 11px;">Category: ${escapeHTML(request.product_category || 'Procurement Supplies')}</small>
+                </td>
                 <td>${request.quantity}</td>
                 <td>₹${Number(request.unit_price || 0).toFixed(2)}</td>
                 <td style="font-weight: 600;">₹${Number(request.total_amount || 0).toFixed(2)}</td>
@@ -365,10 +405,19 @@ async function editPurchaseRequest(req) {
     const isResubmit = (req.status || "").toLowerCase() === "rejected";
     const promptPrefix = isResubmit ? "[Resubmission] " : "";
 
+    const category_val = prompt(`${promptPrefix}Product Category:`, req.product_category || "Industrial Equipment");
+    if (category_val === null) return;
+    if (!category_val.trim()) {
+        showToast("Product Category is required.", "warning");
+        return;
+    }
+
     const product_name = prompt(`${promptPrefix}Product Specification:`, req.product_name);
     if (product_name === null) return;
 
-    const quantity_val = parseInt(quantity, 10);
+    const quantity_input = prompt(`${promptPrefix}Quantity:`, req.quantity || 1);
+    if (quantity_input === null) return;
+    const quantity_val = parseInt(quantity_input, 10);
     if (isNaN(quantity_val) || quantity_val <= 0) {
         showToast("Quantity must be a positive number.", "warning");
         return;
@@ -391,6 +440,7 @@ async function editPurchaseRequest(req) {
     if (request_date === null) return;
 
     const formData = new FormData();
+    formData.append("product_category", category_val.trim());
     formData.append("product_name", product_name);
     formData.append("quantity", quantity_val);
     formData.append("unit_price", unit_price_val);

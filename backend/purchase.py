@@ -23,10 +23,23 @@ def ensure_purchase_order_payment_columns():
                     ADD COLUMN IF NOT EXISTS payment_status character varying(50) DEFAULT 'Unpaid',
                     ADD COLUMN IF NOT EXISTS final_payment_amount numeric(15, 2) DEFAULT 0.00,
                     ADD COLUMN IF NOT EXISTS advance_payment_date timestamp without time zone,
-                    ADD COLUMN IF NOT EXISTS final_payment_date timestamp without time zone;
+                    ADD COLUMN IF NOT EXISTS final_payment_date timestamp without time zone,
+                    ADD COLUMN IF NOT EXISTS category_name character varying(100),
+                    ADD COLUMN IF NOT EXISTS currency character varying(10) DEFAULT 'INR',
+                    ADD COLUMN IF NOT EXISTS payment_method character varying(100) DEFAULT 'Bank Transfer',
+                    ADD COLUMN IF NOT EXISTS purchase_request_id integer;
+
+                CREATE INDEX IF NOT EXISTS idx_purchase_orders_purchase_request_id ON purchase_orders(purchase_request_id);
 
                 ALTER TABLE payments ALTER COLUMN invoice_id DROP NOT NULL;
                 ALTER TABLE payments ADD COLUMN IF NOT EXISTS payment_type character varying(50) DEFAULT 'Standard';
+
+                -- Backfill category_name from products catalog for existing purchase orders
+                UPDATE purchase_orders po
+                SET category_name = pr.category_name
+                FROM products pr
+                WHERE po.product_id = pr.id
+                  AND (po.category_name IS NULL OR po.category_name = '');
             """)
             conn.commit()
     except Exception as e:
@@ -38,6 +51,66 @@ def ensure_purchase_order_payment_columns():
 ensure_purchase_order_payment_columns()
 
 
+# ==================================================
+# PRODUCT CATEGORIES & PRODUCTS ENDPOINTS
+# ==================================================
+@router.get("/products/categories")
+def get_product_categories(current_user: dict = Depends(get_current_user)):
+    """Fetch distinct real categories from the PostgreSQL products table."""
+    try:
+        conn.rollback()
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT DISTINCT category_name
+                FROM products
+                WHERE category_name IS NOT NULL AND TRIM(category_name) != ''
+                ORDER BY category_name ASC
+            """)
+            rows = cursor.fetchall()
+            categories = [r[0] for r in rows if r[0]]
+            return categories
+    except Exception as e:
+        conn.rollback()
+        print("GET PRODUCT CATEGORIES ERROR:", e)
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+@router.get("/products")
+def get_products(category: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """Fetch products, optionally filtered by category, from PostgreSQL."""
+    try:
+        conn.rollback()
+        with conn.cursor() as cursor:
+            if category and category.strip():
+                cursor.execute("""
+                    SELECT id, product_name, category_name, product_price
+                    FROM products
+                    WHERE LOWER(category_name) = LOWER(%s)
+                    ORDER BY product_name ASC
+                """, (category.strip(),))
+            else:
+                cursor.execute("""
+                    SELECT id, product_name, category_name, product_price
+                    FROM products
+                    ORDER BY category_name ASC, product_name ASC
+                    LIMIT 500
+                """)
+            rows = cursor.fetchall()
+            products = [
+                {
+                    "id": r[0],
+                    "product_name": r[1],
+                    "category_name": r[2] or "General Goods",
+                    "product_price": float(r[3] or 0.0)
+                }
+                for r in rows
+            ]
+            return products
+    except Exception as e:
+        conn.rollback()
+        print("GET PRODUCTS ERROR:", e)
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
 
 # ==================================================
 # ADD PURCHASE ORDER
@@ -45,13 +118,17 @@ ensure_purchase_order_payment_columns()
 @router.post("/purchase-orders")
 def add_purchase_order(
     vendor_id: int = Form(...),
+    product_category: Optional[str] = Form(None),
     product_name: str = Form(...),
     quantity: int = Form(...),
     unit_price: float = Form(...),
     total_amount: float = Form(...),
+    currency: Optional[str] = Form("INR"),
+    payment_method: Optional[str] = Form("Bank Transfer"),
     order_date: str = Form(...),
     expected_delivery: str = Form(...),
     status: str = Form(...),
+    requisition_id: Optional[int] = Form(None),
     current_user: dict = Depends(check_role(["Admin", "Procurement Manager"]))
 ):
     try:
@@ -62,17 +139,57 @@ def add_purchase_order(
         if unit_price <= 0:
             raise HTTPException(status_code=400, detail="Unit price must be greater than zero.")
 
+        # Standard Currency handling
+        curr = (currency or "INR").strip().upper()
+        if curr not in ("INR", "USD", "EUR", "GBP"):
+            curr = "INR"
+
+        # Payment Method handling
+        pay_method = (payment_method or "Bank Transfer").strip()
+        if not pay_method:
+            pay_method = "Bank Transfer"
+
         # Authoritative backend calculation
         total_amount = round(float(quantity) * float(unit_price), 2)
 
         with conn.cursor() as cursor:
-            # Look up product_id from products table
-            cursor.execute("SELECT id FROM products WHERE LOWER(product_name) = LOWER(%s) LIMIT 1", (product_name.strip(),))
+            # Verify vendor exists and is Active
+            cursor.execute("SELECT id, status, vendor_name FROM vendors WHERE id = %s", (vendor_id,))
+            v_check = cursor.fetchone()
+            if not v_check:
+                raise HTTPException(status_code=400, detail=f"Vendor #{vendor_id} not found.")
+            v_status = v_check[1]
+            if (v_status or "").lower() != "active":
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Vendor #{vendor_id} ('{v_check[2]}') is not Active (Current status: '{v_status}'). Only Active vendors can receive purchase orders."
+                )
+
+            # Look up product_id and category from products table
+            cursor.execute(
+                "SELECT id, category_name, product_price FROM products WHERE LOWER(product_name) = LOWER(%s) LIMIT 1",
+                (product_name.strip(),)
+            )
             prod_row = cursor.fetchone()
-            product_id = prod_row[0] if prod_row else None
             
-            # If product doesn't exist, create a new catalog entry
-            if not product_id:
+            cat_name = (product_category or "").strip()
+            product_id = None
+
+            if prod_row:
+                product_id = prod_row[0]
+                db_cat = (prod_row[1] or "").strip()
+                # Strict validation: If category is provided, verify product belongs to category
+                if cat_name and db_cat and db_cat.lower() != cat_name.lower():
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Selected product '{product_name}' does not belong to selected category '{cat_name}'."
+                    )
+                if not cat_name and db_cat:
+                    cat_name = db_cat
+            else:
+                # If product doesn't exist, create a new catalog entry with selected category
+                if not cat_name:
+                    cat_name = "General Goods"
                 cursor.execute("SELECT COALESCE(MAX(product_card_id), 0) + 1 FROM products")
                 new_card_id = cursor.fetchone()[0]
                 cursor.execute(
@@ -81,9 +198,107 @@ def add_purchase_order(
                     VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP)
                     RETURNING id
                     """,
-                    (new_card_id, product_name, "General Goods", unit_price)
+                    (new_card_id, product_name.strip(), cat_name, unit_price)
                 )
                 product_id = cursor.fetchone()[0]
+
+            # Link or match originating purchase requisition (if any)
+            matched_req_id = requisition_id
+            if not matched_req_id:
+                cursor.execute(
+                    """
+                    SELECT id FROM purchase_requests
+                    WHERE vendor_id = %s
+                      AND LOWER(TRIM(product_name)) = LOWER(TRIM(%s))
+                      AND quantity = %s
+                      AND purchase_order_id IS NULL
+                    ORDER BY id DESC
+                    LIMIT 1
+                    """,
+                    (vendor_id, product_name.strip(), quantity)
+                )
+                req_row = cursor.fetchone()
+                if req_row:
+                    matched_req_id = req_row[0]
+
+            # Duplicate Prevention: If an active PO already exists for this requisition, update it instead of inserting a duplicate row
+            if matched_req_id:
+                cursor.execute(
+                    """
+                    SELECT id, po_number FROM purchase_orders
+                    WHERE purchase_request_id = %s
+                      AND LOWER(status) NOT IN ('cancelled', 'canceled')
+                    ORDER BY id DESC
+                    LIMIT 1
+                    """,
+                    (matched_req_id,)
+                )
+                existing_po = cursor.fetchone()
+                if existing_po:
+                    existing_po_id, existing_po_num = existing_po[0], existing_po[1]
+                    cursor.execute(
+                        """
+                        UPDATE purchase_orders
+                        SET
+                            vendor_id = %s,
+                            product_id = %s,
+                            product_name = %s,
+                            category_name = %s,
+                            quantity = %s,
+                            unit_price = %s,
+                            currency = %s,
+                            payment_method = %s,
+                            total_amount = %s,
+                            order_date = %s,
+                            expected_delivery = %s,
+                            status = COALESCE(NULLIF(%s, ''), status),
+                            remaining_amount = %s,
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE id = %s
+                        """,
+                        (
+                            vendor_id,
+                            product_id,
+                            product_name.strip(),
+                            cat_name,
+                            quantity,
+                            unit_price,
+                            curr,
+                            pay_method,
+                            total_amount,
+                            order_date,
+                            expected_delivery,
+                            status or "Pending Approval",
+                            total_amount,
+                            existing_po_id
+                        )
+                    )
+                    conn.commit()
+
+                    try:
+                        from audit_logs import log_action
+                        curr_symbol = {"INR": "₹", "USD": "$", "EUR": "€", "GBP": "£"}.get(curr, curr)
+                        log_action(
+                            user_id=current_user.get("id"),
+                            user_name=current_user.get("name"),
+                            user_email=current_user.get("email"),
+                            action="PURCHASE_ORDER_UPDATED",
+                            entity_type="PURCHASE_ORDER",
+                            entity_id=str(existing_po_id),
+                            details=f"Updated existing PO {existing_po_num} for Requisition #{matched_req_id} ('{product_name}' [{cat_name}], Qty: {quantity}, Total: {curr_symbol}{total_amount})"
+                        )
+                    except Exception as le:
+                        print("Audit logging error:", le)
+
+                    return {
+                        "message": "Purchase Order Updated Successfully",
+                        "id": existing_po_id,
+                        "po_number": existing_po_num or f"PO-2026-{existing_po_id:05d}",
+                        "product_category": cat_name,
+                        "currency": curr,
+                        "payment_method": pay_method,
+                        "requisition_id": matched_req_id
+                    }
 
             cursor.execute("SELECT COALESCE(MAX(id), 0) + 1 FROM purchase_orders")
             next_po_id = cursor.fetchone()[0]
@@ -97,14 +312,18 @@ def add_purchase_order(
                     vendor_id,
                     product_id,
                     product_name,
+                    category_name,
                     quantity,
                     unit_price,
+                    currency,
+                    payment_method,
                     total_amount,
                     order_date,
                     expected_delivery,
                     status,
                     po_number,
                     created_by,
+                    purchase_request_id,
                     advance_percentage,
                     advance_amount,
                     paid_amount,
@@ -115,21 +334,25 @@ def add_purchase_order(
                     updated_at
                 )
                 VALUES
-                (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 0.00, 0.00, 0.00, %s, 'Unpaid', 0.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, 0.00, 0.00, 0.00, %s, 'Unpaid', 0.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 """,
                 (
                     next_po_id,
                     vendor_id,
                     product_id,
-                    product_name,
+                    product_name.strip(),
+                    cat_name,
                     quantity,
                     unit_price,
+                    curr,
+                    pay_method,
                     total_amount,
                     order_date,
                     expected_delivery,
                     status or "Pending Approval",
                     po_num,
                     current_user.get("id"),
+                    matched_req_id,
                     total_amount
                 )
             )
@@ -138,6 +361,7 @@ def add_purchase_order(
             # Log Audit Action
             try:
                 from audit_logs import log_action
+                curr_symbol = {"INR": "₹", "USD": "$", "EUR": "€", "GBP": "£"}.get(curr, curr)
                 log_action(
                     user_id=current_user.get("id"),
                     user_name=current_user.get("name"),
@@ -145,7 +369,7 @@ def add_purchase_order(
                     action="PURCHASE_ORDER_CREATED",
                     entity_type="PURCHASE_ORDER",
                     entity_id=str(next_po_id),
-                    details=f"Created PO {po_num} for '{product_name}' (Qty: {quantity}, Total: ₹{total_amount})"
+                    details=f"Created PO {po_num} for '{product_name}' [{cat_name}] (Qty: {quantity}, Total: {curr_symbol}{total_amount}, Method: {pay_method})"
                 )
             except Exception as le:
                 print("Audit logging error:", le)
@@ -153,15 +377,20 @@ def add_purchase_order(
         return {
             "message": "Purchase Order Added Successfully",
             "id": next_po_id,
-            "po_number": po_num
+            "po_number": po_num,
+            "product_category": cat_name,
+            "currency": curr,
+            "payment_method": pay_method,
+            "requisition_id": matched_req_id
         }
 
+    except HTTPException:
+        conn.rollback()
+        raise
     except Exception as e:
         conn.rollback()
         print("ADD PURCHASE ERROR:", e)
-        return {
-            "error": str(e)
-        }
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
 
@@ -245,7 +474,10 @@ def get_purchase_orders(
                     COALESCE(p.payment_status, 'Unpaid') AS po_payment_status,
                     COALESCE(p.final_payment_amount, 0.00) AS final_payment_amount,
                     p.advance_payment_date,
-                    p.final_payment_date
+                    p.final_payment_date,
+                    p.category_name,
+                    COALESCE(p.currency, 'INR') AS currency,
+                    COALESCE(p.payment_method, 'Bank Transfer') AS payment_method
                 FROM purchase_orders p
                 LEFT JOIN vendors v
                     ON p.vendor_id = v.id
@@ -304,7 +536,11 @@ def get_purchase_orders(
                     "po_payment_status": po_pay_status,
                     "final_payment_amount": float(row[21] or 0),
                     "advance_payment_date": str(row[22]) if row[22] else None,
-                    "final_payment_date": str(row[23]) if row[23] else None
+                    "final_payment_date": str(row[23]) if row[23] else None,
+                    "category_name": row[24],
+                    "product_category": row[24],
+                    "currency": row[25] or "INR",
+                    "payment_method": row[26] or "Bank Transfer"
                 })
 
             if page is not None:
@@ -408,7 +644,11 @@ def get_purchase_order_detail(id: int, current_user: dict = Depends(get_current_
                     COALESCE(p.payment_status, 'Unpaid'),
                     COALESCE(p.final_payment_amount, 0.00),
                     p.advance_payment_date,
-                    p.final_payment_date
+                    p.final_payment_date,
+                    p.category_name,
+                    COALESCE(p.currency, 'INR'),
+                    COALESCE(p.payment_method, 'Bank Transfer'),
+                    p.purchase_request_id
                 FROM purchase_orders p
                 LEFT JOIN vendors v ON p.vendor_id = v.id
                 WHERE p.id = %s
@@ -421,7 +661,8 @@ def get_purchase_order_detail(id: int, current_user: dict = Depends(get_current_
                 po_id, po_number, product_name, quantity, unit_price, total_amount,
                 order_date, expected_delivery, status, created_by, dataco_order_id,
                 vendor_id, vendor_name, v_rel, v_deliv, v_qual, v_risk, v_cat, v_email, v_phone,
-                adv_pct, adv_amt, paid_amt, rem_amt, pay_stat, fin_amt, adv_date, fin_date
+                adv_pct, adv_amt, paid_amt, rem_amt, pay_stat, fin_amt, adv_date, fin_date,
+                cat_name, po_curr, po_pay_method, req_origin_id
             ) = row
 
             # Cross-tenant check for Vendor role
@@ -507,8 +748,12 @@ def get_purchase_order_detail(id: int, current_user: dict = Depends(get_current_
                 "id": po_id,
                 "po_number": po_number or f"PO-{po_id:06d}",
                 "product_name": product_name or "Catalog Item",
+                "product_category": cat_name,
+                "category_name": cat_name,
                 "quantity": int(quantity or 1),
                 "unit_price": float(unit_price or 0),
+                "currency": po_curr or "INR",
+                "payment_method": po_pay_method or "Bank Transfer",
                 "total_amount": float(total_amount or 0),
                 "order_date": str(order_date) if order_date else "N/A",
                 "expected_delivery": str(expected_delivery) if expected_delivery else "N/A",
@@ -539,7 +784,9 @@ def get_purchase_order_detail(id: int, current_user: dict = Depends(get_current_
                 "payment_status": pay_stat or "Unpaid",
                 "final_payment_amount": float(fin_amt or 0),
                 "advance_payment_date": str(adv_date) if adv_date else None,
-                "final_payment_date": str(fin_date) if fin_date else None
+                "final_payment_date": str(fin_date) if fin_date else None,
+                "purchase_request_id": req_origin_id,
+                "requisition_id": req_origin_id
             }
 
     except HTTPException:
@@ -630,7 +877,10 @@ def download_purchase_order_slip(
                 COALESCE(p.payment_status, 'Unpaid'),
                 COALESCE(p.final_payment_amount, 0.00),
                 p.advance_payment_date,
-                p.final_payment_date
+                p.final_payment_date,
+                p.category_name,
+                COALESCE(p.currency, 'INR'),
+                COALESCE(p.payment_method, 'Bank Transfer')
             FROM purchase_orders p
             LEFT JOIN vendors v ON p.vendor_id = v.id
             LEFT JOIN users u ON p.created_by = u.id
@@ -731,6 +981,10 @@ def download_purchase_order_slip(
             "final_payment_amount": float(row[38] or 0),
             "advance_payment_date": str(row[39]) if row[39] else None,
             "final_payment_date": str(row[40]) if row[40] else None,
+            "category_name": row[41],
+            "product_category": row[41],
+            "currency": row[42] or "INR",
+            "payment_method": row[43] or "Bank Transfer",
             "audit_trail": audit_trail
         }
 
@@ -1290,10 +1544,13 @@ def purchase_order_summary(current_user: dict = Depends(get_current_user)):
 def update_purchase_order(
     id: int,
     vendor_id: int = Form(...),
+    product_category: Optional[str] = Form(None),
     product_name: str = Form(...),
     quantity: int = Form(...),
     unit_price: float = Form(...),
     total_amount: float = Form(...),
+    currency: Optional[str] = Form(None),
+    payment_method: Optional[str] = Form(None),
     order_date: str = Form(...),
     expected_delivery: str = Form(...),
     status: str = Form(...),
@@ -1340,9 +1597,10 @@ def update_purchase_order(
                 raise HTTPException(status_code=403, detail="Permission Denied: You can only edit your own purchase orders")
 
             # Look up product_id from products table
-            cursor.execute("SELECT id FROM products WHERE LOWER(product_name) = LOWER(%s) LIMIT 1", (product_name.strip(),))
+            cursor.execute("SELECT id, category_name FROM products WHERE LOWER(product_name) = LOWER(%s) LIMIT 1", (product_name.strip(),))
             prod_row = cursor.fetchone()
             product_id = prod_row[0] if prod_row else None
+            cat_name = (product_category or "").strip()
             
             # If product doesn't exist, create catalog entry
             if not product_id:
@@ -1354,14 +1612,17 @@ def update_purchase_order(
                     VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP)
                     RETURNING id
                     """,
-                    (new_card_id, product_name, "General Goods", unit_price)
+                    (new_card_id, product_name.strip(), cat_name or "General Goods", unit_price)
                 )
                 product_id = cursor.fetchone()[0]
-            elif unit_price > 0:
-                cursor.execute(
-                    "UPDATE products SET product_price = %s WHERE id = %s",
-                    (unit_price, product_id)
-                )
+            else:
+                if not cat_name and prod_row[1]:
+                    cat_name = prod_row[1]
+                if unit_price > 0:
+                    cursor.execute(
+                        "UPDATE products SET product_price = %s WHERE id = %s",
+                        (unit_price, product_id)
+                    )
 
             cursor.execute(
                 """
@@ -1370,6 +1631,9 @@ def update_purchase_order(
                     vendor_id=%s,
                     product_id=%s,
                     product_name=%s,
+                    category_name=COALESCE(NULLIF(%s, ''), category_name),
+                    currency=COALESCE(NULLIF(%s, ''), currency),
+                    payment_method=COALESCE(NULLIF(%s, ''), payment_method),
                     quantity=%s,
                     unit_price=%s,
                     total_amount=%s,
@@ -1382,7 +1646,10 @@ def update_purchase_order(
                 (
                     vendor_id,
                     product_id,
-                    product_name,
+                    product_name.strip(),
+                    cat_name,
+                    currency,
+                    payment_method,
                     quantity,
                     unit_price,
                     calculated_amount,

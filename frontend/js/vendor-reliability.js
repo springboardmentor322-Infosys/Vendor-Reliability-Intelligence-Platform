@@ -217,6 +217,8 @@ function filterAndRenderTable() {
         return;
     }
 
+    const rowsHtml = [];
+
     filtered.forEach(vendor => {
         const risk = vendor.risk_level || "Medium Risk";
         let riskClass = "badge-neutral";
@@ -230,7 +232,7 @@ function filterAndRenderTable() {
         else if (status.toLowerCase() === "poor") statusClass = "badge-poor";
         else if (status.toLowerCase() === "average") statusClass = "badge-pending";
 
-        tbody.innerHTML += `
+        rowsHtml.push(`
             <tr>
                 <td style="font-weight: 600;">${vendor.vendor_name}</td>
                 <td>${vendor.total_orders}</td>
@@ -245,8 +247,10 @@ function filterAndRenderTable() {
                 <td><span class="badge ${riskClass}">${risk}</span></td>
                 <td style="font-style: italic; color: var(--text-secondary);">${vendor.recommendation ?? "N/A"}</td>
             </tr>
-        `;
+        `);
     });
+
+    tbody.innerHTML = rowsHtml.join("");
 }
 
 function wireReliabilityKpiClicks() {

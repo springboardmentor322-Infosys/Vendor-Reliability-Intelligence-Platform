@@ -125,8 +125,23 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("purchaseForm").addEventListener("submit", addPurchaseOrder);
         document.getElementById("quantity").addEventListener("input", calculateTotal);
         document.getElementById("unit_price").addEventListener("input", calculateTotal);
+
+        const catSelect = document.getElementById("product_category");
+        if (catSelect) {
+            catSelect.addEventListener("change", handleCategoryChange);
+        }
+
+        const prodSelect = document.getElementById("product_name");
+        if (prodSelect) {
+            prodSelect.addEventListener("change", handleProductChange);
+        }
+
+        const currSelect = document.getElementById("currency");
+        if (currSelect) {
+            currSelect.addEventListener("change", handleCurrencyChange);
+        }
     }
-    
+
     // Bind search and filter
     document.getElementById("searchPOs").addEventListener("input", filterAndRenderTable);
     document.getElementById("filterPOStatus").addEventListener("change", filterAndRenderTable);
@@ -151,16 +166,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnHist) btnHist.addEventListener("click", () => setSourceFilter("historical"));
     if (btnAll) btnAll.addEventListener("click", () => setSourceFilter("all"));
     if (selSource) selSource.addEventListener("change", (e) => setSourceFilter(e.target.value));
-    
+
     // Bind table action click handler using event delegation
     const tbody = document.querySelector("#purchaseTable tbody");
     if (tbody) {
         tbody.addEventListener("click", handleTableClick);
     }
-    
+
     // Set default dates
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById("order_date").value = today;
+    const orderDateEl = document.getElementById("order_date");
+    if (orderDateEl) orderDateEl.value = today;
 
     // Check URL parameters for status filter
     const statusParam = urlParams.get("status");
@@ -195,29 +211,185 @@ document.addEventListener("DOMContentLoaded", () => {
             syncSourceFilterUI(currentSourceFilter);
         }
     }
-    
+
     loadPurchaseOrders();
     loadVendors();
+    loadProductCategories();
 });
 
+function getCurrencySymbol(code) {
+    const map = {
+        'INR': '₹',
+        'USD': '$',
+        'EUR': '€',
+        'GBP': '£'
+    };
+    return map[(code || '').toUpperCase()] || (code ? `${code} ` : '₹');
+}
+
+async function loadProductCategories() {
+    const catSelect = document.getElementById("product_category");
+    if (!catSelect) return;
+    try {
+        const token = getToken();
+        const res = await fetch(`${API_BASE_URL}/products/categories`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+            const categories = await res.json();
+            catSelect.innerHTML = `<option value="">Select Category</option>`;
+            categories.forEach(cat => {
+                catSelect.innerHTML += `<option value="${escapeHTML(cat)}">${escapeHTML(cat)}</option>`;
+            });
+        }
+    } catch (e) {
+        console.error("Error loading product categories:", e);
+    }
+}
+
+async function handleCategoryChange() {
+    const category = document.getElementById("product_category")?.value;
+    const prodSelect = document.getElementById("product_name");
+    const unitPriceInput = document.getElementById("unit_price");
+
+    // Clear product, unit price, and total amount
+    if (unitPriceInput) unitPriceInput.value = "0.00";
+    calculateTotal();
+
+    if (!prodSelect) return;
+
+    if (!category) {
+        prodSelect.disabled = true;
+        prodSelect.innerHTML = `<option value="">Select a category first</option>`;
+        return;
+    }
+
+    prodSelect.disabled = false;
+    prodSelect.innerHTML = `<option value="">Loading products...</option>`;
+
+    try {
+        const token = getToken();
+        const res = await fetch(`${API_BASE_URL}/products?category=${encodeURIComponent(category)}`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
+        if (res.ok) {
+            const products = await res.json();
+            if (Array.isArray(products) && products.length > 0) {
+                const sym = getCurrencySymbol(document.getElementById("currency")?.value || "INR");
+                prodSelect.innerHTML = `<option value="">Select Product</option>`;
+                products.forEach(p => {
+                    prodSelect.innerHTML += `<option value="${escapeHTML(p.product_name)}" data-price="${p.product_price}">${escapeHTML(p.product_name)} (${sym}${Number(p.product_price).toFixed(2)})</option>`;
+                });
+            } else {
+                prodSelect.innerHTML = `<option value="">No products found for this category</option>`;
+            }
+        } else {
+            prodSelect.innerHTML = `<option value="">Error loading products</option>`;
+        }
+    } catch (e) {
+        console.error("Error loading products by category:", e);
+        prodSelect.innerHTML = `<option value="">Failed to load products</option>`;
+    }
+}
+
+function handleProductChange() {
+    const prodSelect = document.getElementById("product_name");
+    const unitPriceInput = document.getElementById("unit_price");
+    if (!prodSelect || !unitPriceInput) return;
+
+    const selectedOption = prodSelect.options[prodSelect.selectedIndex];
+    if (selectedOption && selectedOption.dataset.price) {
+        const price = parseFloat(selectedOption.dataset.price) || 0;
+        unitPriceInput.value = price.toFixed(2);
+    }
+    calculateTotal();
+}
+
+function handleCurrencyChange() {
+    const currSelect = document.getElementById("currency");
+    const sym = getCurrencySymbol(currSelect ? currSelect.value : "INR");
+    const prodSelect = document.getElementById("product_name");
+    if (prodSelect) {
+        for (let opt of prodSelect.options) {
+            if (opt.dataset.price) {
+                const baseName = opt.value;
+                opt.textContent = `${baseName} (${sym}${Number(opt.dataset.price).toFixed(2)})`;
+            }
+        }
+    }
+}
+
 function calculateTotal() {
-    const qty = parseFloat(document.getElementById("quantity").value) || 0;
-    const price = parseFloat(document.getElementById("unit_price").value) || 0;
-    document.getElementById("total_amount").value = (qty * price).toFixed(2);
+    const qty = parseFloat(document.getElementById("quantity")?.value) || 0;
+    const price = parseFloat(document.getElementById("unit_price")?.value) || 0;
+    const totalEl = document.getElementById("total_amount");
+    if (totalEl) {
+        totalEl.value = (qty * price).toFixed(2);
+    }
 }
 
 async function addPurchaseOrder(event) {
     event.preventDefault();
 
+    const vendorId = document.getElementById("vendor_id")?.value;
+    const productCategory = document.getElementById("product_category")?.value;
+    const productName = document.getElementById("product_name")?.value;
+    const quantity = document.getElementById("quantity")?.value;
+    const unitPrice = document.getElementById("unit_price")?.value;
+    const currency = document.getElementById("currency")?.value;
+    const paymentMethod = document.getElementById("payment_method")?.value;
+    const orderDate = document.getElementById("order_date")?.value;
+    const expectedDelivery = document.getElementById("expected_delivery")?.value;
+    const status = document.getElementById("status")?.value || "Pending Approval";
+
+    // Strict validation
+    if (!vendorId) {
+        showToast("Please select a Supplier Partner.", "warning");
+        return;
+    }
+    if (!productCategory) {
+        showToast("Please select a Product Category.", "warning");
+        return;
+    }
+    if (!productName) {
+        showToast("Please select a Product.", "warning");
+        return;
+    }
+    const qtyNum = parseFloat(quantity);
+    if (isNaN(qtyNum) || qtyNum <= 0) {
+        showToast("Quantity must be greater than zero.", "warning");
+        return;
+    }
+    const priceNum = parseFloat(unitPrice);
+    if (isNaN(priceNum) || priceNum <= 0) {
+        showToast("Unit price must be greater than zero.", "warning");
+        return;
+    }
+    if (!currency) {
+        showToast("Please select a Currency.", "warning");
+        return;
+    }
+    if (!paymentMethod) {
+        showToast("Please select a Payment Method.", "warning");
+        return;
+    }
+
+    const calculatedTotal = (qtyNum * priceNum).toFixed(2);
+    const totalEl = document.getElementById("total_amount");
+    if (totalEl) totalEl.value = calculatedTotal;
+
     const formData = new FormData();
-    formData.append("vendor_id", document.getElementById("vendor_id").value);
-    formData.append("product_name", document.getElementById("product_name").value);
-    formData.append("quantity", document.getElementById("quantity").value);
-    formData.append("unit_price", document.getElementById("unit_price").value);
-    formData.append("total_amount", document.getElementById("total_amount").value);
-    formData.append("order_date", document.getElementById("order_date").value);
-    formData.append("expected_delivery", document.getElementById("expected_delivery").value);
-    formData.append("status", "Pending Approval");
+    formData.append("vendor_id", vendorId);
+    formData.append("product_category", productCategory);
+    formData.append("product_name", productName);
+    formData.append("quantity", quantity);
+    formData.append("unit_price", unitPrice);
+    formData.append("currency", currency);
+    formData.append("payment_method", paymentMethod);
+    formData.append("total_amount", calculatedTotal);
+    formData.append("order_date", orderDate);
+    formData.append("expected_delivery", expectedDelivery);
+    formData.append("status", status);
 
     try {
         const token = getToken();
@@ -229,10 +401,17 @@ async function addPurchaseOrder(event) {
 
         const result = await response.json();
         if (response.ok) {
-            showToast("Purchase order registered successfully.", "success");
+            showToast(`Purchase order ${result.po_number || ''} registered successfully.`, "success");
             document.getElementById("purchaseForm").reset();
+            const prodSelect = document.getElementById("product_name");
+            if (prodSelect) {
+                prodSelect.disabled = true;
+                prodSelect.innerHTML = `<option value="">Select a category first</option>`;
+            }
             calculateTotal();
             const today = new Date().toISOString().split('T')[0];
+            const orderDateEl = document.getElementById("order_date");
+            if (orderDateEl) orderDateEl.value = today;
             // Automatically show Application Purchase Orders so newly created workflow order is immediately visible
             setSourceFilter("application");
         } else {
@@ -250,13 +429,13 @@ const limit = 20;
 function setupPaginationDOM() {
     const tableCard = document.querySelector(".table-card");
     if (!tableCard) return;
-    
+
     if (document.getElementById("paginationContainer")) return;
-    
+
     const pagDiv = document.createElement("div");
     pagDiv.id = "paginationContainer";
     pagDiv.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding: 12px 16px; border-top: 1px solid var(--border-color); background-color: var(--card-bg);";
-    
+
     pagDiv.innerHTML = `
         <div id="paginationInfo" style="font-size: 13px; color: var(--text-secondary);">Showing 0-0 of 0 items</div>
         <div style="display: flex; gap: 8px;">
@@ -264,16 +443,16 @@ function setupPaginationDOM() {
             <button id="nextPageBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;">Next</button>
         </div>
     `;
-    
+
     tableCard.appendChild(pagDiv);
-    
+
     document.getElementById("prevPageBtn").addEventListener("click", () => {
         if (currentPage > 1) {
             currentPage--;
             loadPurchaseOrders();
         }
     });
-    
+
     document.getElementById("nextPageBtn").addEventListener("click", () => {
         currentPage++;
         loadPurchaseOrders();
@@ -282,13 +461,13 @@ function setupPaginationDOM() {
 
 function updatePaginationControls(totalCount) {
     setupPaginationDOM();
-    
+
     const prevBtn = document.getElementById("prevPageBtn");
     const nextBtn = document.getElementById("nextPageBtn");
     const info = document.getElementById("paginationInfo");
-    
+
     if (!prevBtn || !nextBtn || !info) return;
-    
+
     if (currentSourceFilter === "application") {
         info.textContent = `Showing ${allPurchaseOrders.length} of ${allPurchaseOrders.length} Application Purchase Orders (isolated from historical ledger)`;
         prevBtn.disabled = true;
@@ -302,13 +481,13 @@ function updatePaginationControls(totalCount) {
 
     const startIdx = totalCount === 0 ? 0 : (currentPage - 1) * limit + 1;
     const endIdx = Math.min(currentPage * limit, totalCount);
-    
+
     info.textContent = `Showing ${startIdx}-${endIdx} of ${totalCount} items`;
-    
+
     prevBtn.disabled = (currentPage === 1);
     prevBtn.style.opacity = prevBtn.disabled ? "0.5" : "1";
     prevBtn.style.cursor = prevBtn.disabled ? "not-allowed" : "pointer";
-    
+
     const hasNext = (currentPage * limit < totalCount);
     nextBtn.disabled = !hasNext;
     nextBtn.style.opacity = nextBtn.disabled ? "0.5" : "1";
@@ -319,7 +498,7 @@ async function loadPurchaseOrders() {
     try {
         const searchVal = document.getElementById("searchPOs").value;
         const statusFilter = document.getElementById("filterPOStatus").value;
-        
+
         let url = `${API_BASE_URL}/purchase-orders?page=${currentPage}&limit=${limit}`;
         if (currentSourceFilter === "application") {
             // Retrieve full application batch (backend orders by is_app_po DESC so app orders are on page 1)
@@ -358,7 +537,7 @@ async function loadPurchaseOrders() {
                 return b.id - a.id;
             });
         }
-        
+
         // Update KPIs
         calculateKPIs(data);
 
@@ -367,7 +546,7 @@ async function loadPurchaseOrders() {
 
         // Render chart
         renderStatusChart(data.status_counts);
-        
+
         // Render pagination controls
         const totalItemsCount = (currentSourceFilter === "application") ? allPurchaseOrders.length : data.total_count;
         updatePaginationControls(totalItemsCount);
@@ -467,7 +646,7 @@ function renderTableRows() {
         let statusClass = "badge-neutral";
         const statusClean = (po.status || "").trim();
         const statusLower = statusClean.toLowerCase();
-        
+
         if (statusLower === "pending" || statusLower === "pending approval") statusClass = "badge-pending";
         else if (statusLower === "approved") statusClass = "badge-active";
         else if (statusLower === "ordered" || statusLower === "processing") statusClass = "badge-info";
@@ -478,6 +657,8 @@ function renderTableRows() {
 
         const poBadge = po.po_number || `PO-${po.id}`;
         const vDisplay = (po.vendor_name || `Vendor-${po.vendor_id}`).replace(/^Derived Vendor Proxy\s+/i, "Vendor-");
+
+        const sym = getCurrencySymbol(po.currency || 'INR');
 
         if (isFinanceOfficer) {
             const totVal = Number(po.total_amount || 0);
@@ -491,12 +672,12 @@ function renderTableRows() {
 
             const advAmtVal = Number(po.advance_amount || 0);
             const advAmtDisplay = advAmtVal > 0
-                ? `<span style="color: #059669; font-weight: 600;">₹${advAmtVal.toFixed(2)}</span>`
+                ? `<span style="color: #059669; font-weight: 600;">${sym}${advAmtVal.toFixed(2)}</span>`
                 : `<span style="color: var(--text-secondary);">-</span>`;
 
             const remAmtDisplay = remVal > 0
-                ? `<span style="color: #d97706; font-weight: 700;">₹${remVal.toFixed(2)}</span>`
-                : `<span style="color: #059669; font-weight: 600;">₹0.00</span>`;
+                ? `<span style="color: #d97706; font-weight: 700;">${sym}${remVal.toFixed(2)}</span>`
+                : `<span style="color: #059669; font-weight: 600;">${sym}0.00</span>`;
 
             const payStatus = po.payment_status || "Unpaid";
             const payBadgeClass = getPaymentBadgeClass(payStatus);
@@ -504,7 +685,10 @@ function renderTableRows() {
             const advDateDisplay = po.advance_payment_date ? po.advance_payment_date.split('T')[0] : "-";
             const finDateDisplay = po.final_payment_date ? po.final_payment_date.split('T')[0] : "-";
 
-            let actionHtml = `<button class="btn btn-secondary" data-action="slip" style="padding: 4px 8px; font-size: 11px; white-space: nowrap;" title="Download Official Order Slip">📄 Slip</button>`;
+            let actionHtml = `
+                <button class="btn btn-secondary" data-action="inspect" style="padding: 4px 8px; font-size: 11px; white-space: nowrap;" title="Inspect Purchase Order Details">🔍 Details</button>
+                <button class="btn btn-secondary" data-action="slip" style="padding: 4px 8px; font-size: 11px; white-space: nowrap;" title="Download Official Order Slip">📄 Slip</button>
+            `;
 
             const isPayUnpaid = (payStatus.toLowerCase() === "unpaid" || (advAmtVal === 0 && paidVal === 0));
             const isPayPartial = (payStatus.toLowerCase() === "partially paid" || (paidVal > 0 && remVal > 0));
@@ -536,10 +720,10 @@ function renderTableRows() {
 
             tbody.innerHTML += `
             <tr data-id="${po.id}">
-                <td style="font-weight: 600;">${escapeHTML(poBadge)}</td>
+                <td style="font-weight: 600; cursor: pointer; color: var(--primary-color);" onclick="inspectPO(${po.id})" title="Click to view purchase order details">${escapeHTML(poBadge)}</td>
                 <td style="font-weight: 600;" title="Vendor ID #${po.vendor_id}">${escapeHTML(vDisplay)}</td>
                 <td>${escapeHTML(po.product_name || 'N/A')}</td>
-                <td style="font-weight: 600;">₹${totVal.toFixed(2)}</td>
+                <td style="font-weight: 600;">${sym}${totVal.toFixed(2)}</td>
                 <td>${advPctDisplay}</td>
                 <td>${advAmtDisplay}</td>
                 <td>${remAmtDisplay}</td>
@@ -554,17 +738,17 @@ function renderTableRows() {
         }
 
         const isApp = isApplicationPO(po);
-        const sourceBadge = isApp 
-            ? `<span class="badge badge-info" style="font-size: 10px; font-weight: 600; padding: 2px 6px; white-space: nowrap;" title="Created via Application Procurement Workflow">Application PO</span>` 
+        const sourceBadge = isApp
+            ? `<span class="badge badge-info" style="font-size: 10px; font-weight: 600; padding: 2px 6px; white-space: nowrap;" title="Created via Application Procurement Workflow">Application PO</span>`
             : `<span class="badge badge-neutral" style="font-size: 10px; padding: 2px 6px; white-space: nowrap;" title="Historical DataCo Dataset Record">Historical DataCo</span>`;
 
         const isPricingIncomplete = isApp && (Number(po.unit_price || 0) <= 0 || Number(po.total_amount || 0) <= 0);
         const priceDisplay = isPricingIncomplete
-            ? `<span style="color: var(--danger-color); font-weight: 600;">₹0.00</span> <span class="badge badge-poor" style="font-size: 9px; padding: 1px 4px;" title="Pricing Incomplete">Incomplete</span>`
-            : `₹${Number(po.unit_price || 0).toFixed(2)}`;
+            ? `<span style="color: var(--danger-color); font-weight: 600;">${sym}0.00</span> <span class="badge badge-poor" style="font-size: 9px; padding: 1px 4px;" title="Pricing Incomplete">Incomplete</span>`
+            : `${sym}${Number(po.unit_price || 0).toFixed(2)}`;
         const totalDisplay = isPricingIncomplete
-            ? `<span style="color: var(--danger-color); font-weight: 600;">₹0.00</span>`
-            : `₹${Number(po.total_amount || 0).toFixed(2)}`;
+            ? `<span style="color: var(--danger-color); font-weight: 600;">${sym}0.00</span>`
+            : `${sym}${Number(po.total_amount || 0).toFixed(2)}`;
 
         let actionTdHtml = "";
         if (!isVendor) {
@@ -600,6 +784,7 @@ function renderTableRows() {
                     ${workflowBtn}
                     ${editBtnHtml}
                     ${deleteBtnHtml}
+                    <button class="btn btn-secondary" data-action="inspect" style="padding: 5px 8px; font-size: 11px;" title="Inspect Purchase Order Details">🔍 Details</button>
                     <button class="btn btn-secondary" data-action="slip" style="padding: 5px 8px; font-size: 11px;" title="Download Official Order Slip">📄 Slip</button>
                 </div>
             </td>`;
@@ -607,6 +792,7 @@ function renderTableRows() {
             actionTdHtml = `
             <td>
                 <div style="display: flex; gap: 4px; align-items: center;">
+                    <button class="btn btn-secondary" data-action="inspect" style="padding: 5px 8px; font-size: 11px;" title="Inspect Purchase Order Details">🔍 Details</button>
                     <button class="btn btn-secondary" data-action="slip" style="padding: 5px 8px; font-size: 11px;" title="Download Official Order Slip">📄 Slip</button>
                 </div>
             </td>`;
@@ -614,7 +800,7 @@ function renderTableRows() {
 
         tbody.innerHTML += `
         <tr data-id="${po.id}">
-            <td style="font-weight: 600;">${escapeHTML(poBadge)}</td>
+            <td style="font-weight: 600; cursor: pointer; color: var(--primary-color);" onclick="inspectPO(${po.id})" title="Click to view purchase order details">${escapeHTML(poBadge)}</td>
             <td>${sourceBadge}</td>
             <td style="font-weight: 600;" title="Vendor ID #${po.vendor_id}">${escapeHTML(vDisplay)}</td>
             <td>${escapeHTML(po.product_name)}</td>
@@ -646,6 +832,11 @@ function handleTableClick(event) {
     const po = allPurchaseOrders.find(o => o.id === id);
 
     if (!po) return;
+
+    if (action === "inspect") {
+        inspectPO(id);
+        return;
+    }
 
     if (action === "slip") {
         downloadOrderSlip(id);
@@ -686,6 +877,110 @@ function handleTableClick(event) {
     } else if (action === "delete") {
         deletePurchase(id);
     }
+}
+
+async function inspectPO(poId) {
+    const modal = document.getElementById("poDetailModal");
+    const body = document.getElementById("modalPoBody");
+    const title = document.getElementById("modalPoTitle");
+    const stBadge = document.getElementById("modalPoStatusBadge");
+
+    if (!modal) return;
+    modal.style.display = "flex";
+    if (body) body.innerHTML = `<div class="spinner" style="margin: 40px auto;"></div>`;
+
+    try {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/purchase-orders/${poId}`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        });
+
+        if (!response.ok) {
+            if (body) body.innerHTML = `<div style="color: var(--danger-color); padding: 20px; text-align: center;">Error loading purchase order details (Status: ${response.status}).</div>`;
+            return;
+        }
+
+        const po = await response.json();
+        if (title) title.textContent = `Purchase Order ${po.po_number || 'PO-' + po.id}`;
+
+        const sLower = (po.status || "").toLowerCase();
+        let sClass = "badge-warning";
+        if (sLower === "completed" || sLower === "delivered" || sLower === "approved" || sLower === "ordered" || sLower === "in-transit") sClass = "badge-active";
+        else if (sLower === "cancelled" || sLower === "canceled") sClass = "badge-poor";
+
+        if (stBadge) {
+            stBadge.className = `badge ${sClass}`;
+            stBadge.textContent = po.status || "Pending";
+        }
+
+        const sym = getCurrencySymbol(po.currency || 'INR');
+        const v = po.vendor || {};
+        const vName = (v.name || po.vendor_name || `Vendor #${po.vendor_id}`).replace(/^Derived Vendor Proxy\s+/i, "Vendor-");
+        const categoryDisplay = po.product_category || po.category_name || "General Goods";
+        const currencyDisplay = po.currency || "INR";
+        const paymentMethodDisplay = po.payment_method || "Bank Transfer";
+        const unitPriceNum = Number(po.unit_price || 0);
+        const totalAmountNum = Number(po.total_amount || 0);
+
+        if (body) {
+            body.innerHTML = `
+                <!-- Key Details Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px;">
+                    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Product Category</div>
+                        <div style="font-size: 14px; font-weight: 700; color: var(--text-color); margin-top: 4px;" id="inspectCategory">${escapeHTML(categoryDisplay)}</div>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Product</div>
+                        <div style="font-size: 14px; font-weight: 700; color: var(--text-color); margin-top: 4px;" id="inspectProduct">${escapeHTML(po.product_name)}</div>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Quantity & Unit Price</div>
+                        <div style="font-size: 14px; font-weight: 700; color: var(--text-color); margin-top: 4px;">
+                            <span id="inspectQuantity">${Number(po.quantity || 1).toLocaleString()}</span> units &times; <span id="inspectUnitPrice">${sym}${unitPriceNum.toFixed(2)}</span>
+                        </div>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Currency</div>
+                        <div style="font-size: 14px; font-weight: 700; color: var(--text-color); margin-top: 4px;" id="inspectCurrency">${escapeHTML(currencyDisplay)} (${sym.trim()})</div>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Payment Method</div>
+                        <div style="font-size: 14px; font-weight: 700; color: var(--text-color); margin-top: 4px;" id="inspectPaymentMethod">${escapeHTML(paymentMethodDisplay)}</div>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Total Amount</div>
+                        <div style="font-size: 18px; font-weight: 800; color: var(--primary-color); margin-top: 2px;" id="inspectTotalAmount">${sym}${totalAmountNum.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                    </div>
+                </div>
+
+                <!-- Additional PO Context -->
+                <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 600;">🏢 Supplier & Order Timeline</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; font-size: 12px;">
+                        <div><span style="color: var(--text-muted);">Supplier Partner:</span> <strong>${escapeHTML(vName)}</strong></div>
+                        <div><span style="color: var(--text-muted);">Order Date:</span> <strong>${po.order_date || 'N/A'}</strong></div>
+                        <div><span style="color: var(--text-muted);">Expected Delivery:</span> <strong>${po.expected_delivery || 'N/A'}</strong></div>
+                        <div><span style="color: var(--text-muted);">Workflow Status:</span> <span class="badge ${sClass}">${escapeHTML(po.status || 'Pending')}</span></div>
+                        <div><span style="color: var(--text-muted);">Payment Status:</span> <strong>${escapeHTML(po.payment_status || 'Unpaid')}</strong></div>
+                    </div>
+                </div>
+            `;
+        }
+    } catch (err) {
+        console.error("Inspect PO error:", err);
+        if (body) body.innerHTML = `<div style="color: var(--danger-color); padding: 20px; text-align: center;">Network error while retrieving purchase order details.</div>`;
+    }
+}
+
+function closePoModal() {
+    const modal = document.getElementById("poDetailModal");
+    if (modal) modal.style.display = "none";
 }
 
 async function createInvoiceFromPO(poId, po) {
@@ -902,7 +1197,7 @@ function renderStatusChart(counts) {
 
 function escapeHTML(str) {
     if (!str) return "";
-    return String(str).replace(/[&<>'"]/g, 
+    return String(str).replace(/[&<>'"]/g,
         tag => ({
             '&': '&amp;',
             '<': '&lt;',

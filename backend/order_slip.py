@@ -27,15 +27,16 @@ from reportlab.platypus import (
 )
 
 
-def format_currency(amount: Optional[float]) -> str:
-    """Format numerical value safely as INR without unencodable glyphs."""
+def format_currency(amount: Optional[float], currency: str = "INR") -> str:
+    """Format numerical value safely with currency code (INR, USD, EUR, GBP) without unencodable glyphs."""
+    c = (currency or "INR").strip().upper()
     if amount is None:
-        return "INR 0.00"
+        return f"{c} 0.00"
     try:
         val = float(amount)
-        return f"INR {val:,.2f}"
+        return f"{c} {val:,.2f}"
     except (ValueError, TypeError):
-        return f"INR {amount}"
+        return f"{c} {amount}"
 
 
 def get_status_colors(status: str):
@@ -361,10 +362,15 @@ def build_order_slip_pdf(order: Dict[str, Any]) -> bytes:
     quantity = int(order.get("quantity") or 1)
     unit_price = float(order.get("unit_price") or 0.0)
     total_amount = float(order.get("total_amount") or (quantity * unit_price))
+    po_currency = (order.get("currency") or "INR").strip().upper()
+    po_category = order.get("category_name") or order.get("product_category") or ""
+    po_payment_method = order.get("payment_method") or "Bank Transfer"
 
     prod_desc = product_name
+    if po_category:
+        prod_desc += f"<br/><font size='7.5' color='#64748b'><b>Category:</b> {po_category}</font>"
     if product_id:
-        prod_desc += f" (Item Card ID: #{product_id})"
+        prod_desc += f"<br/><font size='7' color='#94a3b8'>Item Card ID: #{product_id}</font>"
 
     items_data = [
         [
@@ -378,8 +384,8 @@ def build_order_slip_pdf(order: Dict[str, Any]) -> bytes:
             Paragraph("1", style_table_cell),
             Paragraph(prod_desc, style_table_cell_bold),
             Paragraph(f"{quantity:,}", style_table_cell_right),
-            Paragraph(format_currency(unit_price), style_table_cell_right),
-            Paragraph(format_currency(total_amount), style_table_cell_right_bold)
+            Paragraph(format_currency(unit_price, po_currency), style_table_cell_right),
+            Paragraph(format_currency(total_amount, po_currency), style_table_cell_right_bold)
         ]
     ]
 
@@ -391,17 +397,17 @@ def build_order_slip_pdf(order: Dict[str, Any]) -> bytes:
     items_data.append([
         "", "", "",
         Paragraph("<b>Subtotal:</b>", style_table_cell_right),
-        Paragraph(format_currency(total_amount), style_table_cell_right)
+        Paragraph(format_currency(total_amount, po_currency), style_table_cell_right)
     ])
     items_data.append([
         "", "", "",
         Paragraph("<b>Applicable GST/Tax:</b>", style_table_cell_right),
-        Paragraph(format_currency(tax_amount), style_table_cell_right)
+        Paragraph(format_currency(tax_amount, po_currency), style_table_cell_right)
     ])
     items_data.append([
         "", "", "",
         Paragraph("<b>GRAND TOTAL:</b>", style_table_cell_right_bold),
-        Paragraph(f"<b>{format_currency(grand_total)}</b>", style_table_cell_right_bold)
+        Paragraph(f"<b>{format_currency(grand_total, po_currency)}</b>", style_table_cell_right_bold)
     ])
 
     # Payment workflow details (Advance, Final, Remaining)
@@ -416,19 +422,31 @@ def build_order_slip_pdf(order: Dict[str, Any]) -> bytes:
         items_data.append([
             "", "", "",
             Paragraph(f"<b>Advance Paid ({adv_pct:.1f}%):</b>", style_table_cell_right),
-            Paragraph(f"<font color='#059669'><b>-{format_currency(adv_amount)}</b></font>", style_table_cell_right)
+            Paragraph(f"<font color='#059669'><b>-{format_currency(adv_amount, po_currency)}</b></font>", style_table_cell_right)
         ])
     if fin_amt > 0:
         items_data.append([
             "", "", "",
             Paragraph("<b>Final Settlement Paid:</b>", style_table_cell_right),
-            Paragraph(f"<font color='#059669'><b>-{format_currency(fin_amt)}</b></font>", style_table_cell_right)
+            Paragraph(f"<font color='#059669'><b>-{format_currency(fin_amt, po_currency)}</b></font>", style_table_cell_right)
         ])
 
     items_data.append([
         "", "", "",
         Paragraph("<b>Remaining Balance:</b>", style_table_cell_right_bold),
-        Paragraph(f"<b>{format_currency(rem_amt)}</b>", style_table_cell_right_bold)
+        Paragraph(f"<b>{format_currency(rem_amt, po_currency)}</b>", style_table_cell_right_bold)
+    ])
+
+    items_data.append([
+        "", "", "",
+        Paragraph("<b>Payment Method:</b>", style_table_cell_right),
+        Paragraph(f"<b>{po_payment_method}</b>", style_table_cell_right)
+    ])
+
+    items_data.append([
+        "", "", "",
+        Paragraph("<b>Billing Currency:</b>", style_table_cell_right),
+        Paragraph(f"<b>{po_currency}</b>", style_table_cell_right)
     ])
 
     status_color = "#059669" if pay_status.lower() in ("fully paid", "paid") else ("#d97706" if pay_status.lower() in ("partially paid", "partial") else "#64748b")

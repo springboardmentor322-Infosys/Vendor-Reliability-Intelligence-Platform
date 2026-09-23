@@ -119,6 +119,7 @@ function renderPerformanceTable(data) {
     if (!table) return;
 
     table.innerHTML = "";
+    const fragment = document.createDocumentFragment();
 
     data.forEach((vendor, index) => {
         const row = document.createElement("tr");
@@ -144,8 +145,10 @@ function renderPerformanceTable(data) {
             <td>${vendor.recommendation || "-"}</td>
         `;
 
-        table.appendChild(row);
+        fragment.appendChild(row);
     });
+
+    table.appendChild(fragment);
 }
 
 function renderVendorSelect(data) {
@@ -616,15 +619,18 @@ async function loadVendorHistory(vendorId) {
     }
 }
 
-// Initial load
-document.addEventListener("DOMContentLoaded", () => {
+// Initial load guard to prevent duplicate API requests
+function initVendorPerformancePage() {
+    if (initVendorPerformancePage._loaded) return;
+    initVendorPerformancePage._loaded = true;
     if (typeof checkPageProtection === "function") {
         checkPageProtection();
     }
     loadVendorPerformance();
-});
+}
 
-// Fallback execution if DOM is already ready
-if (document.readyState === "complete" || document.readyState === "interactive") {
-    loadVendorPerformance();
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initVendorPerformancePage);
+} else {
+    initVendorPerformancePage();
 }

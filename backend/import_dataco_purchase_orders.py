@@ -1,15 +1,21 @@
 import csv
+import os
 from collections import defaultdict
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
 import psycopg2
 
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(ROOT_DIR, ".env"))
+load_dotenv()
+
 DB_CONFIG = {
-    "host": "localhost",
-    "database": "vendor_platform",
-    "user": "postgres",
-    "password": "Amruta@9279",
-    "port": "5432",
+    "host": os.getenv("DB_HOST", "localhost"),
+    "database": os.getenv("DB_NAME", "vendor_platform"),
+    "user": os.getenv("DB_USER", "postgres"),
+    "password": os.getenv("DB_PASSWORD"),
+    "port": os.getenv("DB_PORT", "5432"),
 }
 
 CSV_PATH = r".\data\DataCoSupplyChainDataset.csv"

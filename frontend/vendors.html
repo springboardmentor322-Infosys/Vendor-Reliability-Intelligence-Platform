@@ -5,14 +5,153 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vendor Management - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Modal Overlay & Dialog Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-dialog {
+            background: #ffffff;
+            border-radius: var(--card-radius);
+            max-width: 840px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border-color);
+            animation: modalFadeIn 0.25s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-header-bar {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border-top-left-radius: var(--card-radius);
+            border-top-right-radius: var(--card-radius);
+        }
+        .modal-body-content {
+            padding: 24px;
+        }
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            font-size: 22px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-close-btn:hover {
+            color: var(--text-color);
+        }
+        .review-section {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .review-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .review-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .review-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .review-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .review-item {
+            font-size: 13px;
+        }
+        .review-item-label {
+            color: var(--text-secondary);
+            font-size: 11.5px;
+            margin-bottom: 2px;
+        }
+        .review-item-value {
+            font-weight: 600;
+            color: var(--text-color);
+            word-break: break-word;
+        }
+        .doc-badge-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #eef2ff;
+            color: var(--primary-color);
+            border: 1px solid #c7d2fe;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .doc-badge-link:hover {
+            background: #e0e7ff;
+            border-color: #a5b4fc;
+        }
+        .verification-action-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div style="margin-bottom: 24px;">
-        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Vendor Directory</h1>
-        <p style="color: var(--text-secondary);">Manage supplier records, contact specifications, quality parameters, and performance ratings. <span style="font-size: 11px; color: var(--text-secondary); opacity: 0.8; display: block; margin-top: 4px;">* Note: Vendor names are derived proxies based on Product Card Id because the source CSV does not contain actual supplier/vendor names.</span></p>
+    <!-- Page Header -->
+    <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+            <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Vendor Directory</h1>
+            <p style="color: var(--text-secondary);">Manage supplier records, contact specifications, statutory credentials, quality scorecards, and onboarding verification.
+                <span style="font-size: 11px; color: var(--text-secondary); opacity: 0.8; display: block; margin-top: 4px;">* Note: Historical baseline vendors were initialized from dataset proxies; new registrations follow real-world verification.</span>
+            </p>
+        </div>
+        <div>
+            <a href="add-vendor.html" class="btn btn-primary" id="btnRegisterVendorLink" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 9px 16px;">
+                <span>➕</span>
+                <span>Register New Vendor</span>
+            </a>
+        </div>
     </div>
 
-    <!-- Data Table -->
+    <!-- Data Table Card -->
     <div class="table-card">
         <div class="table-header-bar">
             <div class="table-header-title">
@@ -20,7 +159,7 @@
             </div>
             <div class="table-header-actions">
                 <div class="search-input-wrapper">
-                    <input type="text" id="searchVendors" placeholder="Search vendor name or company...">
+                    <input type="text" id="searchVendors" placeholder="Search vendor name, code, company, or PAN...">
                 </div>
                 <select id="filterCategory" class="filter-select">
                     <option value="">All Categories</option>
@@ -28,22 +167,24 @@
                 </select>
                 <select id="filterStatus" class="filter-select">
                     <option value="">All Statuses</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Pending">Pending</option>
+                    <option value="Active">Active</option>
+                    <option value="Pending Verification">Pending Verification</option>
+                    <option value="Correction Requested">Correction Requested</option>
+                    <option value="Rejected">Rejected</option>
                     <option value="Inactive">Inactive</option>
                 </select>
             </div>
         </div>
+
         <div class="table-container">
             <table id="vendorTable">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Vendor ID</th>
                         <th>Vendor Name</th>
-                        <th>Company</th>
+                        <th>Company Entity</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Address</th>
                         <th>Category</th>
                         <th>Status</th>
                         <th>Quality</th>
@@ -55,13 +196,180 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="13" class="loading-spinner-wrapper">
+                        <td colspan="12" class="loading-spinner-wrapper">
                             <div class="spinner"></div>
                             <p>Loading suppliers...</p>
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- VENDOR REVIEW & VERIFICATION MODAL -->
+    <div class="modal-overlay" id="vendorReviewModal">
+        <div class="modal-dialog">
+            <div class="modal-header-bar">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">🛡️</span>
+                    <div>
+                        <h3 style="font-size: 16px; font-weight: 700; margin: 0;" id="modalVendorTitle">Vendor Onboarding Review</h3>
+                        <p style="font-size: 11.5px; color: var(--text-secondary); margin: 2px 0 0 0;" id="modalVendorSubtitle">Application Credentials & Document Inspection</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeReviewModal()">&times;</button>
+            </div>
+
+            <div class="modal-body-content">
+                <!-- Status Banner -->
+                <div id="modalStatusBanner" style="padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span id="modalStatusBadge" class="badge">Status</span>
+                        <span id="modalVendorCodeBadge" style="margin-left: 8px; font-weight: 700; font-size: 13px;"></span>
+                    </div>
+                    <div id="modalApprovalMeta" style="font-size: 12px; color: var(--text-secondary);"></div>
+                </div>
+
+                <!-- 1. Company Information -->
+                <div class="review-section">
+                    <div class="review-section-title">🏢 Company Information</div>
+                    <div class="review-grid-3">
+                        <div class="review-item">
+                            <div class="review-item-label">Company / Firm Name</div>
+                            <div class="review-item-value" id="revVendorName">--</div>
+                        </div>
+                        <div class="review-item">
+                            <div class="review-item-label">Entity Type</div>
+                            <div class="review-item-value" id="revCompanyType">--</div>
+                        </div>
+                        <div class="review-item">
+                            <div class="review-item-label">PAN Number</div>
+                            <div class="review-item-value" id="revPan">--</div>
+                        </div>
+                    </div>
+                    <div class="review-grid-3" style="margin-top: 10px;">
+                        <div class="review-item">
+                            <div class="review-item-label">GSTIN</div>
+                            <div class="review-item-value" id="revGstin">--</div>
+                        </div>
+                        <div class="review-item">
+                            <div class="review-item-label">CIN / Reg Number</div>
+                            <div class="review-item-value" id="revCin">--</div>
+                        </div>
+                        <div class="review-item">
+                            <div class="review-item-label">MSME / Udyam Number</div>
+                            <div class="review-item-value" id="revMsme">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Contact Coordinates -->
+                <div class="review-section">
+                    <div class="review-section-title">📍 Contact & Address Coordinates</div>
+                    <div class="review-grid-2">
+                        <div class="review-item">
+                            <div class="review-item-label">Registered Corporate Address</div>
+                            <div class="review-item-value" id="revAddress">--</div>
+                        </div>
+                        <div class="review-item">
+                            <div class="review-item-label">City, State, PIN</div>
+                            <div class="review-item-value" id="revLocation">--</div>
+                        </div>
+                    </div>
+                    <div class="review-grid-3" style="margin-top: 10px;">
+                        <div class="review-item">
+                            <div class="review-item-label">Contact Person</div>
+                            <div class="review-item-value" id="revContactPerson">--</div>
+                        </div>
+                        <div class="review-item">
+                            <div class="review-item-label">Official Email</div>
+                            <div class="review-item-value" id="revEmail">--</div>
+                        </div>
+                        <div class="review-item">
+                            <div class="review-item-label">Mobile Number</div>
+                            <div class="review-item-value" id="revPhone">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Business Capabilities -->
+                <div class="review-section">
+                    <div class="review-section-title">📦 Business & Product Capabilities</div>
+                    <div class="review-grid-2">
+                        <div class="review-item">
+                            <div class="review-item-label">Procurement Category</div>
+                            <div class="review-item-value" id="revCategory">--</div>
+                        </div>
+                        <div class="review-item">
+                            <div class="review-item-label">Products / Services Offered</div>
+                            <div class="review-item-value" id="revProductsServices">--</div>
+                        </div>
+                    </div>
+                    <div class="review-item" style="margin-top: 10px;">
+                        <div class="review-item-label">Operational Profile & Description</div>
+                        <div class="review-item-value" id="revDescription" style="font-weight: normal; color: var(--text-secondary);">--</div>
+                    </div>
+                </div>
+
+                <!-- 4. Bank Coordinates -->
+                <div class="review-section">
+                    <div class="review-section-title">💳 Bank Coordinates</div>
+                    <div class="review-grid-3">
+                        <div class="review-item">
+                            <div class="review-item-label">Beneficiary Name</div>
+                            <div class="review-item-value" id="revBankAccName">--</div>
+                        </div>
+                        <div class="review-item">
+                            <div class="review-item-label">Bank Name</div>
+                            <div class="review-item-value" id="revBankName">--</div>
+                        </div>
+                        <div class="review-item">
+                            <div class="review-item-label">Account Number</div>
+                            <div class="review-item-value" id="revBankAccNum">--</div>
+                        </div>
+                    </div>
+                    <div class="review-grid-2" style="margin-top: 10px;">
+                        <div class="review-item">
+                            <div class="review-item-label">IFSC Code</div>
+                            <div class="review-item-value" id="revBankIfsc">--</div>
+                        </div>
+                        <div class="review-item">
+                            <div class="review-item-label">Branch Location</div>
+                            <div class="review-item-value" id="revBankBranch">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Uploaded Documents -->
+                <div class="review-section">
+                    <div class="review-section-title">📎 Submitted Verification Documents</div>
+                    <div id="revDocList" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- 6. Review / Approval Action Controls (For Admin / Procurement Manager) -->
+                <div class="verification-action-box" id="reviewActionBox">
+                    <div style="font-weight: 700; font-size: 14px; margin-bottom: 8px; color: var(--text-color);">
+                        Review Decision & Verification Action
+                    </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label for="reviewNotesInput" style="font-size: 12px;">Notes / Reason for Decision <small style="color: var(--text-secondary);">(Mandatory for Rejection & Correction Request)</small></label>
+                        <textarea id="reviewNotesInput" rows="2" placeholder="Enter review remarks, correction instructions, or rejection justification..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-secondary" onclick="closeReviewModal()">Close</button>
+                        <button type="button" class="btn btn-danger" id="btnRejectVendor" style="padding: 8px 16px;">Reject Application</button>
+                        <button type="button" class="btn btn-warning" id="btnRequestCorrection" style="background: #f59e0b; color: #ffffff; border: none; padding: 8px 16px;">Request Correction</button>
+                        <button type="button" class="btn btn-primary" id="btnApproveVendor" style="background: var(--success-color); border: none; padding: 8px 18px;">Approve & Activate Vendor</button>
+                    </div>
+                </div>
+
+                <!-- Resubmit link banner if in correction mode -->
+                <div id="correctionResubmitBanner" style="display: none; margin-top: 16px; background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 12px; text-align: center;">
+                    <a id="btnCorrectionResubmitLink" href="#" class="btn btn-secondary" style="font-size: 12px; text-decoration: none;">📝 Open Form to Edit & Resubmit Application</a>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -634,17 +634,18 @@ async function inspectPO(poId) {
         const inv = po.invoice || {};
         const hasInv = Boolean(inv.invoice_id);
 
+        const sym = (po.currency === 'USD' ? '$' : po.currency === 'EUR' ? '€' : po.currency === 'GBP' ? '£' : '₹');
         const isPricingIncomplete = Boolean(po.is_app_po && (Number(po.unit_price || 0) <= 0 || Number(po.total_amount || 0) <= 0));
         const priceSubtext = isPricingIncomplete
-            ? `Qty: ${po.quantity} &times; ₹0.00 <span class="badge badge-poor" style="font-size: 10px; margin-left: 4px;">⚠️ Pricing Incomplete</span>`
-            : `Qty: ${po.quantity} &times; ₹${Number(po.unit_price || 0).toFixed(2)}`;
+            ? `Qty: ${po.quantity} &times; ${sym}0.00 <span class="badge badge-poor" style="font-size: 10px; margin-left: 4px;">⚠️ Pricing Incomplete</span>`
+            : `Qty: ${po.quantity} &times; ${sym}${Number(po.unit_price || 0).toFixed(2)}`;
         const totalDisplay = isPricingIncomplete
-            ? `₹0.00 <span style="font-size: 11px; color: var(--danger-color); display: block; font-weight: 500;">Unit Price Required</span>`
-            : `₹${Number(po.total_amount || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            ? `${sym}0.00 <span style="font-size: 11px; color: var(--danger-color); display: block; font-weight: 500;">Unit Price Required</span>`
+            : `${sym}${Number(po.total_amount || 0).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 
         body.innerHTML = `
             <!-- Overview Grid -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px;">
                 <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
                     <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Product / Item</div>
                     <div style="font-size: 14px; font-weight: 700; color: var(--text-color); margin-top: 4px;">${escapeHTML(po.product_name)}</div>
@@ -652,7 +653,13 @@ async function inspectPO(poId) {
                 </div>
 
                 <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Total Purchase Value</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Category</div>
+                    <div style="font-size: 14px; font-weight: 700; color: var(--text-color); margin-top: 4px;">${escapeHTML(po.product_category || po.category_name || 'General Goods')}</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">Method: <strong>${escapeHTML(po.payment_method || 'Bank Transfer')}</strong></div>
+                </div>
+
+                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Total Value (${po.currency || 'INR'})</div>
                     <div style="font-size: 18px; font-weight: 700; color: ${isPricingIncomplete ? 'var(--danger-color)' : 'var(--primary-color)'}; margin-top: 4px;">${totalDisplay}</div>
                     <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">Order Date: ${po.order_date}</div>
                 </div>

@@ -22,7 +22,15 @@ def calculate_vendor_reliability(vendor_id):
                     COUNT(po.id) AS total_orders,
                     COUNT(CASE WHEN LOWER(po.status) IN ('canceled', 'cancelled') THEN 1 END) AS canceled_orders,
                     COUNT(CASE WHEN LOWER(po.status) = 'fraud' THEN 1 END) AS fraud_orders,
-                    COUNT(CASE WHEN d.late_delivery_risk = 0 THEN 1 END) AS on_time_orders,
+                    COUNT(
+                        CASE
+                            WHEN d.late_delivery_risk = 0 THEN 1
+                            WHEN po.order_item_id IS NULL
+                                 AND LOWER(po.status) IN ('completed', 'delivered')
+                                 AND COALESCE(po.actual_delivery_date, DATE(po.updated_at), po.order_date) <= COALESCE(po.expected_delivery, po.expected_delivery_date)
+                            THEN 1
+                        END
+                    ) AS on_time_orders,
                     COUNT(CASE WHEN LOWER(po.status) IN ('completed', 'delivered') THEN 1 END) AS completed_orders
                 FROM purchase_orders po
                 LEFT JOIN deliveries d ON po.order_item_id = d.dataco_order_item_id
@@ -50,7 +58,7 @@ def calculate_vendor_reliability(vendor_id):
                 delivery_rate = (on_time / total) * 100.0
                 completion_rate = (completed / total) * 100.0
                 reliability_score = (quality_score * 0.5) + (delivery_rate * 0.3) + (completion_rate * 0.2)
-                
+
                 # Centralized Thresholds (Consistent across entire platform)
                 # 80–100 = Low Risk
                 # 60–79 = Medium Risk
@@ -70,7 +78,7 @@ def calculate_vendor_reliability(vendor_id):
             cursor.execute(
                 """
                 UPDATE vendors
-                SET 
+                SET
                     quality_score = %s,
                     delivery_rate = %s,
                     total_orders = %s,
@@ -89,7 +97,7 @@ def calculate_vendor_reliability(vendor_id):
                     vendor_id
                 ),
             )
-            
+
             cursor.execute(
                 """
                 UPDATE vendor_reliability_data
@@ -269,51 +277,46 @@ def get_vendor_performance(current_user: dict = Depends(get_current_user)):
                     SELECT
                         v.id AS vendor_id,
                         v.vendor_name,
-
-                        COUNT(po.id) AS total_orders,
-
-                        COUNT(po.id) FILTER (
-                            WHERE LOWER(po.status) = 'completed'
-                        ) AS completed_orders,
-
-                        COUNT(po.id) FILTER (
-                            WHERE LOWER(po.status) IN ('pending', 'pending approval')
-                        ) AS pending_orders,
-
-                        COUNT(po.id) FILTER (
-                            WHERE LOWER(po.status) IN ('ordered', 'approved', 'in-transit', 'in transit')
-                        ) AS ordered_orders,
-
-                        COUNT(po.id) FILTER (
-                            WHERE LOWER(po.status) = 'delivered'
-                        ) AS delivered_orders,
-
-                        COUNT(po.id) FILTER (
-                            WHERE LOWER(po.status) IN ('canceled', 'cancelled', 'fraud')
-                        ) AS cancelled_orders,
-
+                        COALESCE(po_agg.total_orders, 0) AS total_orders,
+                        COALESCE(po_agg.completed_orders, 0) AS completed_orders,
+                        COALESCE(po_agg.pending_orders, 0) AS pending_orders,
+                        COALESCE(po_agg.ordered_orders, 0) AS ordered_orders,
+                        COALESCE(po_agg.delivered_orders, 0) AS delivered_orders,
+                        COALESCE(po_agg.cancelled_orders, 0) AS cancelled_orders,
                         COALESCE(v.quality_score, 0) AS quality_score,
                         COALESCE(v.delivery_rate, 0) AS delivery_rate,
                         COALESCE(v.reliability_score, 0) AS reliability_score
-
                     FROM vendors v
-
-                    LEFT JOIN purchase_orders po
-                        ON v.id = po.vendor_id
-
-                    GROUP BY
-                        v.id,
-                        v.vendor_name,
-                        v.quality_score,
-                        v.delivery_rate,
-                        v.reliability_score
-
+                    LEFT JOIN (
+                        SELECT
+                            vendor_id,
+                            COUNT(id) AS total_orders,
+                            COUNT(id) FILTER (
+                                WHERE LOWER(status) = 'completed'
+                            ) AS completed_orders,
+                            COUNT(id) FILTER (
+                                WHERE LOWER(status) IN ('pending', 'pending approval')
+                            ) AS pending_orders,
+                            COUNT(id) FILTER (
+                                WHERE LOWER(status) IN ('ordered', 'approved', 'in-transit', 'in transit')
+                            ) AS ordered_orders,
+                            COUNT(id) FILTER (
+                                WHERE LOWER(status) = 'delivered'
+                            ) AS delivered_orders,
+                            COUNT(id) FILTER (
+                                WHERE LOWER(status) IN ('canceled', 'cancelled', 'fraud')
+                            ) AS cancelled_orders
+                        FROM purchase_orders
+                        WHERE vendor_id IS NOT NULL
+                        GROUP BY vendor_id
+                    ) po_agg ON v.id = po_agg.vendor_id
                     ORDER BY
                         CASE
-                            WHEN COUNT(po.id) > 0 THEN 0
+                            WHEN COALESCE(po_agg.total_orders, 0) > 0 THEN 0
                             ELSE 1
                         END,
-                        v.reliability_score DESC
+                        v.reliability_score DESC,
+                        v.id ASC
                     """
                 )
             rows = cursor.fetchall()

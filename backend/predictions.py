@@ -8,14 +8,23 @@ from pydantic import BaseModel, Field
 
 from db import conn
 from auth import get_current_user, check_role, normalize_role
-from ml.predict import predict_delivery_risk, get_model_metadata, get_model
-from ml.explain import get_drift_baseline
-from ml.retrain import (
-    validate_retraining_data,
-    train_candidate_model,
-    promote_candidate,
-    list_all_versions
-)
+
+# Lazy ML helpers to prevent heavy scikit-learn & joblib packages from slowing FastAPI startup
+def predict_delivery_risk(features: dict) -> dict:
+    from ml.predict import predict_delivery_risk as _p
+    return _p(features)
+
+def get_model():
+    from ml.predict import get_model as _gm
+    return _gm()
+
+def get_model_metadata():
+    from ml.predict import get_model_metadata as _gmm
+    return _gmm()
+
+def get_drift_baseline():
+    from ml.explain import get_drift_baseline as _gdb
+    return _gdb()
 
 router = APIRouter(prefix="/predictions", tags=["ML Predictions & Governance"])
 
@@ -589,6 +598,7 @@ def evaluate_candidate_retraining(
     current_user: dict = Depends(check_role(["Administrator"]))
 ):
     try:
+        from ml.retrain import train_candidate_model
         tag = payload.candidate_tag if payload else None
         res = train_candidate_model(candidate_tag=tag)
         return {
@@ -618,6 +628,7 @@ def promote_candidate_to_production(
     current_user: dict = Depends(check_role(["Administrator"]))
 ):
     try:
+        from ml.retrain import promote_candidate
         admin_email = current_user.get("email", "admin@vendoriq.com")
         res = promote_candidate(payload.candidate_id, admin_email=admin_email)
         return {
@@ -644,6 +655,7 @@ def promote_candidate_to_production(
 @router.get("/retrain/versions")
 def get_model_versions_ledger(current_user: dict = Depends(check_role(["Administrator", "Auditor"]))):
     try:
+        from ml.retrain import list_all_versions
         return list_all_versions()
     except Exception as e:
         raise HTTPException(

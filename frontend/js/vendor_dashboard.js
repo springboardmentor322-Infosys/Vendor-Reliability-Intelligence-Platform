@@ -11,6 +11,13 @@ async function loadVendorDashboard() {
             return;
         }
 
+        const initialVendorId = user_vendor_id();
+        const prefetchRiskPromise = (initialVendorId && token)
+            ? fetch(`${API_BASE_URL}/predictions/vendor-risk/${initialVendorId}`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            })
+            : null;
+
         const response = await fetch(`${API_BASE_URL}/dashboard/vendor-stats`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
@@ -136,9 +143,9 @@ async function loadVendorDashboard() {
         renderRecommendations(data.recommendations || []);
 
         // 10. Load Real Machine Learning Predictive Delivery Risk
-        const vendorId = profile.id || user_vendor_id();
+        const vendorId = profile.id || initialVendorId;
         if (vendorId) {
-            await loadVendorPredictiveRisk(vendorId, token, hasData);
+            await loadVendorPredictiveRisk(vendorId, token, hasData, (vendorId === initialVendorId) ? prefetchRiskPromise : null);
         }
 
     } catch (err) {
@@ -477,7 +484,7 @@ function renderRecommendations(recommendations) {
     });
 }
 
-async function loadVendorPredictiveRisk(vendorId, token, hasData) {
+async function loadVendorPredictiveRisk(vendorId, token, hasData, prefetchPromise = null) {
     const wrapper = document.getElementById("vMlContentWrapper");
     if (!hasData) {
         if (wrapper) {
@@ -492,7 +499,7 @@ async function loadVendorPredictiveRisk(vendorId, token, hasData) {
     }
 
     try {
-        const res = await fetch(`${API_BASE_URL}/predictions/vendor-risk/${vendorId}`, {
+        const res = prefetchPromise ? await prefetchPromise : await fetch(`${API_BASE_URL}/predictions/vendor-risk/${vendorId}`, {
             headers: token ? { "Authorization": `Bearer ${token}` } : {}
         });
 

@@ -120,8 +120,8 @@ def purchase_order_report_excel(current_user: dict = Depends(get_current_user)):
 
     # Header columns
     ws.append([
-        "Purchase Order ID", "Vendor ID", "Vendor Name", "Product Name", 
-        "Quantity", "Unit Price", "Total Amount", "Order Date", 
+        "Purchase Order ID", "Vendor ID", "Vendor Name", "Product Name",
+        "Quantity", "Unit Price", "Total Amount", "Order Date",
         "Expected Delivery", "Status"
     ])
 
@@ -211,21 +211,25 @@ def vendor_reliability_report(current_user: dict = Depends(get_current_user)):
                     v.quality_score,
                     v.delivery_rate,
                     v.reliability_score,
-                    COUNT(po.id) AS total_orders,
-                    COUNT(CASE WHEN LOWER(po.status) IN ('completed', 'delivered') THEN po.id END) AS completed_orders,
-                    COUNT(CASE WHEN LOWER(po.status) = 'pending' THEN po.id END) AS pending_orders,
-                    COUNT(CASE WHEN LOWER(po.status) = 'delivered' THEN po.id END) AS delivered_orders
+                    COALESCE(po_agg.total_orders, 0) AS total_orders,
+                    COALESCE(po_agg.completed_orders, 0) AS completed_orders,
+                    COALESCE(po_agg.pending_orders, 0) AS pending_orders,
+                    COALESCE(po_agg.delivered_orders, 0) AS delivered_orders
                 FROM vendors v
-                LEFT JOIN purchase_orders po
-                    ON v.id = po.vendor_id
-                GROUP BY
-                    v.id,
-                    v.vendor_name,
-                    v.quality_score,
-                    v.delivery_rate,
-                    v.reliability_score
+                LEFT JOIN (
+                    SELECT
+                        vendor_id,
+                        COUNT(id) AS total_orders,
+                        COUNT(CASE WHEN LOWER(status) IN ('completed', 'delivered') THEN id END) AS completed_orders,
+                        COUNT(CASE WHEN LOWER(status) = 'pending' THEN id END) AS pending_orders,
+                        COUNT(CASE WHEN LOWER(status) = 'delivered' THEN id END) AS delivered_orders
+                    FROM purchase_orders
+                    WHERE vendor_id IS NOT NULL
+                    GROUP BY vendor_id
+                ) po_agg ON v.id = po_agg.vendor_id
                 ORDER BY
-                    v.reliability_score DESC
+                    v.reliability_score DESC,
+                    v.id ASC
             """)
 
         rows = cursor.fetchall()
@@ -292,9 +296,9 @@ def vendor_reliability_report_excel(current_user: dict = Depends(get_current_use
 
     # Header columns
     ws.append([
-        "Vendor ID", "Vendor Name", "Total Orders", "Completed Orders", 
-        "Pending Orders", "Delivered Orders", "Quality Score", 
-        "Delivery Rate", "Reliability Score", "Performance", 
+        "Vendor ID", "Vendor Name", "Total Orders", "Completed Orders",
+        "Pending Orders", "Delivered Orders", "Quality Score",
+        "Delivery Rate", "Reliability Score", "Performance",
         "Risk", "Recommendation"
     ])
 
@@ -706,10 +710,10 @@ def audit_findings_report(
         conn.rollback()
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT finding_code, audit_area, vendor_name, entity_type, entity_id, 
+                SELECT finding_code, audit_area, vendor_name, entity_type, entity_id,
                        risk_level, identified_date, audit_status, resolution_status, description
                 FROM audit_findings
-                ORDER BY 
+                ORDER BY
                     CASE WHEN LOWER(risk_level) = 'critical' THEN 1
                          WHEN LOWER(risk_level) = 'high' THEN 2
                          WHEN LOWER(risk_level) = 'medium' THEN 3
@@ -778,4 +782,4 @@ def audit_findings_report_excel(current_user: dict = Depends(check_role(["Admin"
         stream,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": "attachment; filename=audit_findings_report.xlsx"}
-    )
+    )

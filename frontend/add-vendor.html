@@ -3,62 +3,390 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register Supplier - VendorIQ</title>
+    <title>New Vendor Onboarding - VendorIQ</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .form-section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 24px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .form-section-header:first-of-type {
+            margin-top: 8px;
+        }
+        .required-star {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .file-upload-card {
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            background: #f8fafc;
+            transition: var(--transition);
+        }
+        .file-upload-card:hover {
+            border-color: var(--primary-color);
+            background: #f1f5f9;
+        }
+        .file-upload-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+            color: var(--text-color);
+        }
+        .doc-hint {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .status-callout {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+        .status-callout.success {
+            background: #d1fae5;
+            border-color: #10b981;
+        }
+        .status-callout.correction {
+            background: #ffedd5;
+            border-color: #f97316;
+        }
+        .status-callout-icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+        .status-callout-title {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: var(--text-color);
+        }
+        .status-callout-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        .confirmation-card {
+            background: #ffffff;
+            border-radius: var(--card-radius);
+            box-shadow: var(--card-shadow);
+            padding: 32px;
+            text-align: center;
+            max-width: 620px;
+            margin: 40px auto;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <div style="margin-bottom: 24px;">
-        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Register New Supplier</h1>
-        <p style="color: var(--text-secondary);">Onboard a new supplier account, category classification, and contact coordinates.</p>
+    <!-- Top Header -->
+    <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+            <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 4px;" id="pageTitle">Register New Vendor</h1>
+            <p style="color: var(--text-secondary);">Enterprise supplier onboarding, statutory tax credentials, banking coordinates, and document verification.</p>
+        </div>
+        <a href="vendors.html" class="btn btn-secondary" style="text-decoration: none;">&larr; Back to Vendor Directory</a>
     </div>
 
-    <div style="display: flex; justify-content: center; align-items: start; margin-top: 32px;">
-        <div class="form-container" style="max-width: 600px; width: 100%;">
-            <div class="form-title">Supplier Registration Credentials</div>
-            <form id="vendorForm">
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="vendor_name">Vendor Name</label>
-                    <input type="text" id="vendor_name" value="AKP Traders" required placeholder="Vendor name or trade identity">
+    <!-- Onboarding Flow Indicator Banner -->
+    <div class="status-callout" id="onboardingBanner">
+        <div class="status-callout-icon">📋</div>
+        <div>
+            <div class="status-callout-title">Vendor Verification Workflow</div>
+            <div class="status-callout-desc">
+                All new registrations enter the <strong>Pending Verification</strong> status. The authorized Procurement & Administration team will review your submitted tax identifiers, banking details, and uploaded certificates before activating your supplier account and generating a unique <strong>Vendor ID (e.g. VEN-xxxxx)</strong>.
+            </div>
+        </div>
+    </div>
+
+    <!-- Correction Alert (Hidden by default) -->
+    <div class="status-callout correction" id="correctionBanner" style="display: none;">
+        <div class="status-callout-icon">⚠️</div>
+        <div>
+            <div class="status-callout-title">Correction Requested by Procurement Reviewer</div>
+            <div class="status-callout-desc" id="correctionMessageText">
+                Please update the requested credentials or replacement documents below and click "Resubmit Registration".
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Form Container -->
+    <div style="display: flex; justify-content: center; align-items: start; margin-bottom: 40px;" id="formWrapper">
+        <div class="form-container" style="max-width: 900px; width: 100%;">
+            <div class="form-title" id="formHeaderTitle">Vendor Onboarding Credentials & Statutory Filing</div>
+
+            <form id="vendorRegistrationForm" enctype="multipart/form-data">
+                <input type="hidden" id="vendor_id_input" value="">
+
+                <!-- 1. COMPANY INFORMATION -->
+                <div class="form-section-header">
+                    <span>🏢</span> 1. Company Information
                 </div>
 
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="company">Company Name</label>
-                    <input type="text" id="company" value="AKP Pvt Ltd" required placeholder="Registered company entity name">
-                </div>
-
-                <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 16px;">
+                <div class="form-grid-2">
                     <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" value="akp@gmail.com" required placeholder="contact@company.com">
+                        <label for="vendor_name">Company / Firm Name <span class="required-star">*</span></label>
+                        <input type="text" id="vendor_name" name="vendor_name" required placeholder="e.g. Apex Industrial Solutions Ltd.">
                     </div>
                     <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="text" id="phone" value="9876543210" required placeholder="Contact phone number">
+                        <label for="company_type">Vendor / Company Type <span class="required-star">*</span></label>
+                        <select id="company_type" name="company_type" required>
+                            <option value="">Select Entity Structure</option>
+                            <option value="Private Limited Company">Private Limited Company</option>
+                            <option value="Public Limited Company">Public Limited Company</option>
+                            <option value="Sole Proprietorship">Sole Proprietorship</option>
+                            <option value="Partnership Firm">Partnership Firm</option>
+                            <option value="Limited Liability Partnership (LLP)">Limited Liability Partnership (LLP)</option>
+                            <option value="One Person Company (OPC)">One Person Company (OPC)</option>
+                            <option value="Trust / Society / NGO">Trust / Society / NGO</option>
+                            <option value="Other Enterprise">Other Enterprise</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="address">Address Location</label>
-                    <textarea id="address" rows="3" required placeholder="Complete corporate headquarters address">Nashik</textarea>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="pan">Permanent Account Number (PAN) <span class="required-star">*</span></label>
+                        <input type="text" id="pan" name="pan" required maxlength="10" placeholder="e.g. ABCDE1234F" style="text-transform: uppercase;" autocomplete="off">
+                        <small style="font-size: 11px; color: var(--text-secondary);">10-character alphanumeric PAN format.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="gstin">GSTIN (Goods & Services Tax ID)</label>
+                        <input type="text" id="gstin" name="gstin" maxlength="15" placeholder="e.g. 27ABCDE1234F1Z5" style="text-transform: uppercase;" autocomplete="off">
+                        <small style="font-size: 11px; color: var(--text-secondary);">15-character GSTIN (Optional if GST exempt).</small>
+                    </div>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 24px;">
-                    <label for="category">Supplier Procurement Category</label>
-                    <select id="category" required>
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="cin">CIN / Business Registration Number</label>
+                        <input type="text" id="cin" name="cin" placeholder="e.g. L12345MH2020PLC123456" style="text-transform: uppercase;">
+                        <small style="font-size: 11px; color: var(--text-secondary);">Corporate Identity Number for registered companies.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="msme_number">MSME / Udyam Registration Number</label>
+                        <input type="text" id="msme_number" name="msme_number" placeholder="e.g. UDYAM-MH-01-0012345" style="text-transform: uppercase;">
+                        <small style="font-size: 11px; color: var(--text-secondary);">For MSME preferential procurement classification.</small>
+                    </div>
+                </div>
+
+                <!-- 2. CONTACT INFORMATION -->
+                <div class="form-section-header">
+                    <span>📍</span> 2. Contact & Headquarters Coordinates
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="address">Registered Corporate Address <span class="required-star">*</span></label>
+                    <textarea id="address" name="address" rows="2" required placeholder="Complete official registered office address"></textarea>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label for="city">City <span class="required-star">*</span></label>
+                        <input type="text" id="city" name="city" required placeholder="e.g. Mumbai">
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State / UT <span class="required-star">*</span></label>
+                        <input type="text" id="state" name="state" required placeholder="e.g. Maharashtra">
+                    </div>
+                    <div class="form-group">
+                        <label for="pin_code">PIN / Postal Code <span class="required-star">*</span></label>
+                        <input type="text" id="pin_code" name="pin_code" required maxlength="6" placeholder="e.g. 400001">
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label for="contact_person">Key Contact Person <span class="required-star">*</span></label>
+                        <input type="text" id="contact_person" name="contact_person" required placeholder="e.g. Rajesh Sharma">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Official Email Address <span class="required-star">*</span></label>
+                        <input type="email" id="email" name="email" required placeholder="e.g. billing@apexindustrial.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Mobile Phone Number <span class="required-star">*</span></label>
+                        <input type="tel" id="phone" name="phone" required maxlength="13" placeholder="e.g. 9876543210">
+                    </div>
+                </div>
+
+                <!-- 3. BUSINESS INFORMATION -->
+                <div class="form-section-header">
+                    <span>📦</span> 3. Business & Supply Capabilities
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="category">Procurement Sourcing Category <span class="required-star">*</span></label>
+                    <select id="category" name="category" required>
+                        <option value="">Select Procurement Category</option>
                         <option value="Raw Material Supplier">Raw Material Supplier</option>
                         <option value="Equipment Vendor">Equipment Vendor</option>
                         <option value="IT Vendor">IT Vendor</option>
                         <option value="Service Provider">Service Provider</option>
                         <option value="Logistics Partner">Logistics Partner</option>
                         <option value="Maintenance Vendor">Maintenance Vendor</option>
+                        <option value="Packaging & Supplies">Packaging & Supplies</option>
+                        <option value="Industrial Consumables">Industrial Consumables</option>
+                        <option value="Facility Management">Facility Management</option>
                     </select>
                 </div>
 
-                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="products_services">Products / Services Offered <span class="required-star">*</span></label>
+                    <textarea id="products_services" name="products_services" rows="2" required placeholder="List the primary products, component specifications, or services provided"></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="business_description">Business Profile & Operational Scope</label>
+                    <textarea id="business_description" name="business_description" rows="2" placeholder="Brief summary of manufacturing units, annual capacity, or industry experience (optional)"></textarea>
+                </div>
+
+                <!-- 4. BANK DETAILS -->
+                <div class="form-section-header">
+                    <span>💳</span> 4. Bank Account Details (Disbursements & Payments)
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="bank_account_name">Account Beneficiary Name <span class="required-star">*</span></label>
+                        <input type="text" id="bank_account_name" name="bank_account_name" required placeholder="Exact name as in bank passbook / cheque">
+                    </div>
+                    <div class="form-group">
+                        <label for="bank_name">Bank Name <span class="required-star">*</span></label>
+                        <input type="text" id="bank_name" name="bank_name" required placeholder="e.g. State Bank of India">
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label for="bank_account_number">Bank Account Number <span class="required-star">*</span></label>
+                        <input type="text" id="bank_account_number" name="bank_account_number" required placeholder="e.g. 123456789012" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="bank_ifsc">Bank IFSC Code <span class="required-star">*</span></label>
+                        <input type="text" id="bank_ifsc" name="bank_ifsc" required maxlength="11" placeholder="e.g. SBIN0001234" style="text-transform: uppercase;" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="bank_branch">Bank Branch Location</label>
+                        <input type="text" id="bank_branch" name="bank_branch" placeholder="e.g. Nariman Point, Mumbai">
+                    </div>
+                </div>
+
+                <!-- 5. DOCUMENT UPLOADS -->
+                <div class="form-section-header">
+                    <span>📎</span> 5. Verification Documents
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="file-upload-card">
+                        <label class="file-upload-label" for="doc_pan">PAN Card Document <span class="required-star">*</span></label>
+                        <input type="file" id="doc_pan" name="doc_pan" accept=".pdf,.png,.jpg,.jpeg">
+                        <div class="doc-hint">Upload verified copy of Company PAN (PDF, JPG, PNG - Max 5MB).</div>
+                        <div id="existing_doc_pan_hint" style="margin-top: 4px; font-size: 11px; color: var(--primary-color); display: none;"></div>
+                    </div>
+
+                    <div class="file-upload-card">
+                        <label class="file-upload-label" for="doc_cancelled_cheque">Cancelled Cheque / Bank Letter <span class="required-star">*</span></label>
+                        <input type="file" id="doc_cancelled_cheque" name="doc_cancelled_cheque" accept=".pdf,.png,.jpg,.jpeg">
+                        <div class="doc-hint">Proof of bank account with printed entity name & IFSC (PDF, JPG, PNG).</div>
+                        <div id="existing_doc_cheque_hint" style="margin-top: 4px; font-size: 11px; color: var(--primary-color); display: none;"></div>
+                    </div>
+                </div>
+
+                <div class="form-grid-3" style="margin-top: 12px;">
+                    <div class="file-upload-card">
+                        <label class="file-upload-label" for="doc_gst">GST Registration Certificate</label>
+                        <input type="file" id="doc_gst" name="doc_gst" accept=".pdf,.png,.jpg,.jpeg">
+                        <div class="doc-hint">Form GST REG-06 (Optional).</div>
+                        <div id="existing_doc_gst_hint" style="margin-top: 4px; font-size: 11px; color: var(--primary-color); display: none;"></div>
+                    </div>
+
+                    <div class="file-upload-card">
+                        <label class="file-upload-label" for="doc_incorporation">Incorporation Certificate</label>
+                        <input type="file" id="doc_incorporation" name="doc_incorporation" accept=".pdf,.png,.jpg,.jpeg">
+                        <div class="doc-hint">COI / Partnership Deed / Shop Act.</div>
+                        <div id="existing_doc_incorp_hint" style="margin-top: 4px; font-size: 11px; color: var(--primary-color); display: none;"></div>
+                    </div>
+
+                    <div class="file-upload-card">
+                        <label class="file-upload-label" for="doc_msme">MSME / Udyam Certificate</label>
+                        <input type="file" id="doc_msme" name="doc_msme" accept=".pdf,.png,.jpg,.jpeg">
+                        <div class="doc-hint">Udyam Verification Certificate (Optional).</div>
+                        <div id="existing_doc_msme_hint" style="margin-top: 4px; font-size: 11px; color: var(--primary-color); display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Form Controls -->
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border-color);">
                     <button type="button" class="btn btn-secondary" onclick="window.location.href='vendors.html'">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Vendor</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmitForm" style="min-width: 180px;">
+                        <span>Submit Registration</span>
+                    </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Submission Confirmation Card (Rendered upon successful submission) -->
+    <div class="confirmation-card" id="confirmationCard">
+        <div style="font-size: 48px; margin-bottom: 16px;">⏳</div>
+        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px; color: var(--text-color);">Registration Submitted Successfully</h2>
+        <div style="margin-bottom: 20px;">
+            <span class="badge badge-pending" style="font-size: 13px; padding: 6px 14px;">Status: Pending Verification</span>
+        </div>
+        <p style="color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6;">
+            Your vendor registration for <strong id="confVendorName" style="color: var(--text-color);"></strong> has been submitted.
+            Your statutory tax identifiers, banking credentials, and verification certificates are under review by the Procurement Authority.
+        </p>
+
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: var(--text-secondary);">Application Ref ID:</span>
+                <strong id="confRefId">#--</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: var(--text-secondary);">Official Email:</span>
+                <span id="confEmail" style="font-weight: 500;">--</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="color: var(--text-secondary);">PAN Identifier:</span>
+                <span id="confPan" style="font-weight: 500; text-transform: uppercase;">--</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-secondary);">Next Step:</span>
+                <span style="color: var(--warning-color); font-weight: 600;">Procurement Review & Activation</span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button class="btn btn-secondary" onclick="window.location.reload()">Register Another Supplier</button>
+            <a href="vendors.html" class="btn btn-primary" style="text-decoration: none;">Go to Vendor Directory</a>
         </div>
     </div>
 

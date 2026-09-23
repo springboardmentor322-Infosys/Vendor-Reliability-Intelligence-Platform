@@ -1,7 +1,13 @@
 import { spawn } from 'child_process';
 import fs from 'fs';
-import 'dotenv/config';
-// Load test credentials from local .env
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
 const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const userDataDir = 'C:\\Users\\Dell\\.gemini\\antigravity\\brain\\989c9f60-c2ba-46ab-af5d-4118660db288\\scratch\\chrome_profile_inv';
 
@@ -9,8 +15,8 @@ async function getTokens() {
   const finRes = await fetch('http://127.0.0.1:8000/login', {
     method: 'POST',
     body: new URLSearchParams({
-      email: process.env.FINANCE_TEST_EMAIL,
-      password: process.env.FINANCE_TEST_PASSWORD
+      email: process.env.FINANCE_EMAIL || process.env.TEST_FINANCE_EMAIL,
+      password: process.env.FINANCE_PASSWORD || process.env.TEST_FINANCE_PASSWORD
     })
   });
   const finData = await finRes.json();
@@ -18,8 +24,8 @@ async function getTokens() {
   const procRes = await fetch('http://127.0.0.1:8000/login', {
     method: 'POST',
     body: new URLSearchParams({
-      email: process.env.PROCUREMENT_TEST_EMAIL,
-      password: process.env.PROCUREMENT_TEST_PASSWORD
+      email: process.env.PROCUREMENT_EMAIL || process.env.TEST_PROCUREMENT_EMAIL,
+      password: process.env.PROCUREMENT_PASSWORD || process.env.TEST_PROCUREMENT_PASSWORD
     })
   });
   const procData = await procRes.json();

@@ -67,7 +67,7 @@
         "audit_logs.html": ["Admin", "Administrator", "Auditor"],
         "purchase-request.html": ["Admin", "Administrator", "Procurement Manager", "Supply Chain Manager"],
         "add-contract.html": ["Admin", "Administrator", "Procurement Manager"],
-        "add-vendor.html": ["Admin", "Administrator", "Procurement Manager"]
+        "add-vendor.html": ["Admin", "Administrator", "Procurement Manager", "Vendor"]
     };
 
     const allowedRolesForPage = pageRoleRestrictions[pageName];

@@ -5,17 +5,21 @@ Maps 118 products to 28 vendors in a deterministic way
 Each product gets 1-3 vendors, each primary relationship is stable
 """
 
+import os
 import psycopg2
 import random
 from itertools import cycle
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Database connection
 conn = psycopg2.connect(
-    host="localhost",
-    database="vendor_platform",
-    user="postgres",
-    password="Amruta@9279",
-    port="5432"
+    host=os.getenv("DB_HOST", "localhost"),
+    database=os.getenv("DB_NAME", "vendor_platform"),
+    user=os.getenv("DB_USER", "postgres"),
+    password=os.getenv("DB_PASSWORD"),
+    port=os.getenv("DB_PORT", "5432")
 )
 cursor = conn.cursor()
 
