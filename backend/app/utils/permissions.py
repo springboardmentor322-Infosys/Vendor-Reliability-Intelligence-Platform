@@ -16,7 +16,7 @@ PROCUREMENT_MANAGER = "Procurement Manager"
 
 SUPPLY_CHAIN_MANAGER = "Supply Chain Manager"
 
-VENDOR = "Vendor"
+VENDOR = "Vendor Management"
 
 FINANCE_OFFICER = "Finance Officer"
 
@@ -76,6 +76,6 @@ def require_roles(*allowed_roles):
     return role_checker
 
 def ensure_vendor_access(current_user, vendor_id):
-    if current_user.role == VENDOR:
-        if not current_user.vendor_id or int(vendor_id) != int(current_user.vendor_id):
-            raise HTTPException(status_code=403, detail="Vendors may access only their own company data")
+    # Vendor Management is a directory-management role and may access any vendor.
+    # The old single-vendor restriction no longer applies to this role.
+    return True

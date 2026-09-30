@@ -113,5 +113,97 @@
     </section>
   </div>
 
+  <section class="analytics-section">
+    <div class="analytics-heading">
+      <div>
+        <span class="section-kicker">ANALYTICS</span>
+        <h2>{{ isAuditor ? 'Risk & Compliance Analytics' : isSupplyChainManager ? 'Supply Chain Analytics' : isVendor ? 'Vendor Performance Analytics' : isProcurementManager ? 'Procurement Analytics' : 'Platform Analytics' }}</h2>
+        <p>Database-backed visual summaries for your role.</p>
+      </div>
+    </div>
+
+    <div class="analytics-grid">
+      <section class="analytics-card analytics-wide">
+        <div class="analytics-card-head">
+          <div>
+            <h3>{{ isVendor ? 'Top Vendor Reliability' : isSupplyChainManager ? 'Supplier Reliability' : isAuditor ? 'Vendor Risk & Reliability' : 'Vendor Performance' }}</h3>
+            <p>Highest available reliability scores from vendor performance records.</p>
+          </div>
+          <span class="analytics-badge">{{ vendorReliability().length }} vendors</span>
+        </div>
+        <div class="horizontal-bars">
+          @for (vendor of vendorReliability().slice(0, 6); track vendor.vendor_id || $index) {
+            <div class="hbar-row">
+              <div class="hbar-label">
+                <span>{{ vendor.vendor_name }}</span>
+                <b>{{ vendor.reliability_score }}%</b>
+              </div>
+              <div class="hbar-track">
+                <span [style.width.%]="Math.min(100, Number(vendor.reliability_score || 0))" [class]="getReliabilityClass(vendor.reliability_score)"></span>
+              </div>
+            </div>
+          }
+          @if (vendorReliability().length === 0) {
+            <div class="analytics-empty">No vendor performance data available.</div>
+          }
+        </div>
+      </section>
+
+      <section class="analytics-card">
+        <div class="analytics-card-head">
+          <div>
+            <h3>{{ isAuditor ? 'Risk Distribution' : 'Order Status Distribution' }}</h3>
+            <p>{{ isAuditor ? 'Current vendor risk levels.' : 'Current purchase order status mix.' }}</p>
+          </div>
+        </div>
+        @if (!isAuditor) {
+          <div class="status-chart">
+            @for (item of orderStatusEntries(); track item.status) {
+              <div class="status-bar-row">
+                <div class="status-bar-label"><span>{{ item.status }}</span><b>{{ item.count }}</b></div>
+                <div class="status-bar-track"><span [style.width.%]="getStatusPercentage(item.count)" [class]="getStatusClass(item.status)"></span></div>
+              </div>
+            }
+            @if (orderStatusEntries().length === 0) {
+              <div class="analytics-empty">No order status data available.</div>
+            }
+          </div>
+        } @else {
+          <div class="risk-chart">
+            <div class="risk-row"><span><i class="risk-dot low"></i>Low Risk</span><b>{{ lowRiskVendors() }}</b></div>
+            <div class="risk-track"><span class="low" [style.width.%]="getRiskPercentage(lowRiskVendors())"></span></div>
+            <div class="risk-row"><span><i class="risk-dot medium"></i>Medium Risk</span><b>{{ mediumRiskVendors() }}</b></div>
+            <div class="risk-track"><span class="medium" [style.width.%]="getRiskPercentage(mediumRiskVendors())"></span></div>
+            <div class="risk-row"><span><i class="risk-dot high"></i>High / Critical</span><b>{{ highRiskVendors() }}</b></div>
+            <div class="risk-track"><span class="high" [style.width.%]="getRiskPercentage(highRiskVendors())"></span></div>
+          </div>
+        }
+      </section>
+
+      <section class="analytics-card">
+        <div class="analytics-card-head">
+          <div>
+            <h3>{{ isSupplyChainManager ? 'Procurement Value by Status' : isVendor ? 'Order Value by Status' : 'Procurement Cost Analysis' }}</h3>
+            <p>Total order value grouped by current status.</p>
+          </div>
+        </div>
+        <div class="value-chart">
+          @for (item of revenueAnalytics(); track item.status) {
+            <div class="value-bar-item">
+              <div class="value-bar-wrap">
+                <span class="value-bar" [style.height.%]="getRevenuePercentage(item.revenue)"></span>
+                <b>₹{{ item.revenue | number:'1.0-0' }}</b>
+              </div>
+              <small>{{ item.status }}</small>
+            </div>
+          }
+          @if (revenueAnalytics().length === 0) {
+            <div class="analytics-empty">No procurement value data available.</div>
+          }
+        </div>
+      </section>
+    </div>
+  </section>
+
   <div class="insight-banner">✨ <div><strong>Platform Insight</strong><span>Review high-risk vendors and upcoming contract expiries to keep procurement operations reliable.</span></div></div>
 </div>

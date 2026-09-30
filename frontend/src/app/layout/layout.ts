@@ -308,7 +308,7 @@ export class Layout implements OnInit, OnDestroy {
     // VENDOR
     // ==========================================
 
-    Vendor: [
+    "Vendor Management": [
 
       {
         label: 'Dashboard',
@@ -317,15 +317,15 @@ export class Layout implements OnInit, OnDestroy {
       },
 
       {
-        label: 'Profile & Company',
-        icon: '👤',
-        route: '/profile-company'
+        label: 'Vendors',
+        icon: '🏢',
+        route: '/vendors'
       },
 
       {
-        label: 'My Performance',
-        icon: '📈',
-        route: '/vendor-performance'
+        label: 'Procurement',
+        icon: '📝',
+        route: '/procurement'
       },
 
       {
@@ -335,43 +335,30 @@ export class Layout implements OnInit, OnDestroy {
       },
 
       {
-        label: 'Order & Delivery Tracking',
-        icon: '🚚',
-        route: '/deliveries'
+        label: 'Performance',
+        icon: '📈',
+        route: '/vendor-performance'
       },
 
       {
-        label: 'Invoices',
-        icon: '🧾',
-        route: '/invoices'
-      },
-
-      {
-        label: 'Contracts & Compliance',
+        label: 'Contracts',
         icon: '📄',
         route: '/contracts'
-      },
-
-      {
-        label: 'Communications',
-        icon: '💬',
-        route: '/communication'
-      },
-
-      {
-        label: 'Notifications',
-        icon: '🔔',
-        route: '/notifications'
       },
 
       {
         label: 'Reports',
         icon: '📊',
         route: '/reports'
+      },
+
+      {
+        label: 'Notifications',
+        icon: '🔔',
+        route: '/notifications'
       }
 
     ],
-
 
     // ==========================================
     // FINANCE OFFICER
@@ -675,14 +662,14 @@ export class Layout implements OnInit, OnDestroy {
 
   loadChat(): void {
     if (!this.selectedChatVendorId) return;
-    this.collaboration.getThread('Vendor', this.selectedChatVendorId).subscribe({
+    this.collaboration.getThread('Vendor Management', this.selectedChatVendorId).subscribe({
       next: thread => { this.chatThreadId = thread.id; this.chatMessages = thread.messages || []; },
       error: err => console.error('Chat load failed', err)
     });
     if (this.chatTimer) clearInterval(this.chatTimer);
     this.chatTimer = setInterval(() => {
       if (!this.showChat || !this.selectedChatVendorId) return;
-      this.collaboration.getThread('Vendor', this.selectedChatVendorId).subscribe({ next: t => this.chatMessages = t.messages || [] });
+      this.collaboration.getThread('Vendor Management', this.selectedChatVendorId).subscribe({ next: t => this.chatMessages = t.messages || [] });
     }, 3000);
   }
 
@@ -710,12 +697,12 @@ export class Layout implements OnInit, OnDestroy {
       this.auth.getCurrentUser();
 
     const role =
-      this.currentUser?.role || 'Vendor';
+      this.currentUser?.role || 'Vendor Management';
 
     this.navItems = [
 
       ...(this.menus[role] ||
-        this.menus['Vendor']),
+        this.menus['Vendor Management']),
 
       ...this.commonSettings
 

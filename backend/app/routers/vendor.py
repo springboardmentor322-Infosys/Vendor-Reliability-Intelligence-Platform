@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from app.models.vendor_performance import VendorPerformance
+from app.utils.reliability import calculate_reliability_score
 
 from app.database import get_db
 from app.models.vendor import Vendor
@@ -12,6 +14,8 @@ from app.schemas.vendor import (
     VENDOR_STATUSES,
     VENDOR_APPROVAL_STATUSES
 )
+
+from datetime import date
 
 from app.utils.permissions import (
     require_roles,
@@ -40,7 +44,7 @@ def create_vendor(
     current_user=Depends(
         require_roles(
             ADMINISTRATOR,
-            PROCUREMENT_MANAGER
+            VENDOR
         )
     )
 ):
@@ -102,7 +106,9 @@ def create_vendor(
 
         approval_status="Pending",
 
-        status="Active"
+        status="Active",
+
+        onboarded_date=date.today()
 
     )
 
@@ -149,7 +155,12 @@ def create_vendor(
                 new_vendor.approval_status,
 
             "status":
-                new_vendor.status
+                new_vendor.status,
+
+            "onboarded_date":
+                new_vendor.onboarded_date.isoformat()
+                if new_vendor.onboarded_date
+                else None
 
         }
 
@@ -176,12 +187,34 @@ def get_vendors(
     )
 ):
 
-    query = db.query(Vendor)
-    if current_user.role == VENDOR:
-        if not current_user.vendor_id:
-            return []
-        query = query.filter(Vendor.id == current_user.vendor_id)
-    return query.all()
+    # Shared organization-wide vendor directory. Attach the latest
+    # performance record so the Vendor Management table can display
+    # reliability without making a second request per vendor.
+    vendors = db.query(Vendor).all()
+    performance_by_vendor = {
+        row.vendor_id: row
+        for row in db.query(VendorPerformance).all()
+    }
+
+    result = []
+    for vendor in vendors:
+        performance = performance_by_vendor.get(vendor.id)
+        result.append({
+            "id": vendor.id,
+            "vendor_name": vendor.vendor_name,
+            "email": vendor.email,
+            "phone": vendor.phone,
+            "address": vendor.address,
+            "gst_number": vendor.gst_number,
+            "category": vendor.category,
+            "contact_person": vendor.contact_person,
+            "approval_status": vendor.approval_status,
+            "status": vendor.status,
+            "onboarded_date": vendor.onboarded_date.isoformat() if vendor.onboarded_date else None,
+            "reliability_score": calculate_reliability_score(performance) if performance else None
+        })
+
+    return result
 
 
 # ==========================================
@@ -383,8 +416,7 @@ def update_vendor_approval(
 
     current_user=Depends(
         require_roles(
-            ADMINISTRATOR,
-            PROCUREMENT_MANAGER
+            ADMINISTRATOR
         )
     )
 ):
@@ -447,8 +479,7 @@ def approve_vendor(
 
     current_user=Depends(
         require_roles(
-            ADMINISTRATOR,
-            PROCUREMENT_MANAGER
+            ADMINISTRATOR
         )
     )
 ):
@@ -500,8 +531,7 @@ def reject_vendor(
 
     current_user=Depends(
         require_roles(
-            ADMINISTRATOR,
-            PROCUREMENT_MANAGER
+            ADMINISTRATOR
         )
     )
 ):

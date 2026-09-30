@@ -43,6 +43,10 @@ class ProcurementRequest(Base):
         nullable=True
     )
 
+    requested_by = Column(String, nullable=True)
+    priority = Column(String, nullable=True, default="Medium")
+    justification = Column(String, nullable=True)
+
     status = Column(
         String,
         default="Pending",

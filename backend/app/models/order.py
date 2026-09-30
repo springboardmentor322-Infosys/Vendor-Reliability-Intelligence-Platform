@@ -44,6 +44,9 @@ class Order(Base):
         nullable=True
     )
 
+    payment_terms = Column(String, nullable=True)
+    line_items_json = Column(String, nullable=True)
+
     # DataCo source / logistics fields
     source_order_id = Column(String, nullable=True, index=True)
     order_date = Column(Date, nullable=True)

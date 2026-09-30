@@ -260,273 +260,6 @@
 
 
     <!-- ========================================= -->
-    <!-- EXPIRY ALERTS -->
-    <!-- ========================================= -->
-
-    <div class="section-card">
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    Contract Expiry Alerts
-                </h2>
-
-                <p>
-                    Contracts expiring within the next 30 days
-                </p>
-
-            </div>
-
-        </div>
-
-
-        @if (alertLoading()) {
-
-            <div class="loading">
-                Loading expiry alerts...
-            </div>
-
-        }
-
-
-        @if (
-            !alertLoading() &&
-            expiryAlerts().length === 0
-        ) {
-
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    ✓
-                </div>
-
-                <strong>
-                    No upcoming contract expiries
-                </strong>
-
-                <p>
-                    There are no active contracts expiring
-                    within the next 30 days.
-                </p>
-
-            </div>
-
-        }
-
-
-        @if (
-            !alertLoading() &&
-            expiryAlerts().length > 0
-        ) {
-
-            <div class="alert-list">
-
-                @for (
-                    alert of expiryAlerts();
-                    track alert.contract_id
-                ) {
-
-                    <div
-                        class="alert-item"
-                        [ngClass]="
-                            getExpiryClass(
-                                alert.days_remaining
-                            )
-                        ">
-
-                        <div class="alert-icon">
-                            ⚠️
-                        </div>
-
-
-                        <div class="alert-content">
-
-                            <strong>
-                                {{ alert.contract_name }}
-                            </strong>
-
-                            <span>
-
-                                {{ alert.vendor_name }}
-
-                                ·
-
-                                {{ alert.contract_number }}
-
-                            </span>
-
-                            <small>
-
-                                Expiry:
-
-                                {{
-                                    alert.expiry_date
-                                    | date:'dd MMM yyyy'
-                                }}
-
-                            </small>
-
-
-                            @if (alert.renewal_status) {
-
-                                <small>
-
-                                    Renewal:
-
-                                    {{ alert.renewal_status }}
-
-                                    @if (alert.renewal_date) {
-
-                                        -
-
-                                        {{
-                                            alert.renewal_date
-                                            | date:'dd MMM yyyy'
-                                        }}
-
-                                    }
-
-                                </small>
-
-                            }
-
-                        </div>
-
-
-                        <div class="alert-days">
-
-                            <strong>
-                                {{ alert.days_remaining }}
-                            </strong>
-
-                            <span>
-                                days remaining
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                }
-
-            </div>
-
-        }
-
-    </div>
-
-
-
-    <!-- ========================================= -->
-    <!-- COMPLIANCE ALERTS -->
-    <!-- ========================================= -->
-
-    @if (
-        contractSummary().non_compliant_contracts > 0
-        ||
-        contractSummary().pending_compliance > 0
-    ) {
-
-        <div class="section-card compliance-alert-card">
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2>
-                        Compliance Alerts
-                    </h2>
-
-                    <p>
-                        Contracts requiring compliance attention
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="compliance-alert-grid">
-
-
-                @if (
-                    contractSummary().non_compliant_contracts > 0
-                ) {
-
-                    <div class="compliance-alert danger">
-
-                        <div class="alert-icon">
-                            ❌
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                Non-Compliant Contracts
-                            </strong>
-
-                            <span>
-
-                                {{
-                                    contractSummary()
-                                        .non_compliant_contracts
-                                }}
-
-                                contract(s) require attention.
-
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                }
-
-
-                @if (
-                    contractSummary().pending_compliance > 0
-                ) {
-
-                    <div class="compliance-alert warning">
-
-                        <div class="alert-icon">
-                            ⏳
-                        </div>
-
-                        <div>
-
-                            <strong>
-                                Pending Compliance
-                            </strong>
-
-                            <span>
-
-                                {{
-                                    contractSummary()
-                                        .pending_compliance
-                                }}
-
-                                contract(s) are pending review.
-
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                }
-
-            </div>
-
-        </div>
-
-    }
-
-
-
-    <!-- ========================================= -->
     <!-- ADD / EDIT CONTRACT FORM -->
     <!-- ========================================= -->
 
@@ -842,6 +575,270 @@
                     }}
 
                 </button>
+
+            </div>
+
+        </div>
+
+    }
+
+    <!-- ========================================= -->
+    <!-- EXPIRY ALERTS -->
+    <!-- ========================================= -->
+
+    <div class="section-card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Contract Expiry Alerts
+                </h2>
+
+                <p>
+                    Contracts expiring within the next 30 days
+                </p>
+
+            </div>
+
+        </div>
+
+
+        @if (alertLoading()) {
+
+            <div class="loading">
+                Loading expiry alerts...
+            </div>
+
+        }
+
+
+        @if (
+            !alertLoading() &&
+            expiryAlerts().length === 0
+        ) {
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    ✓
+                </div>
+
+                <strong>
+                    No upcoming contract expiries
+                </strong>
+
+                <p>
+                    There are no active contracts expiring
+                    within the next 30 days.
+                </p>
+
+            </div>
+
+        }
+
+
+        @if (
+            !alertLoading() &&
+            expiryAlerts().length > 0
+        ) {
+
+            <div class="alert-list">
+
+                @for (
+                    alert of expiryAlerts();
+                    track alert.contract_id
+                ) {
+
+                    <div
+                        class="alert-item"
+                        [ngClass]="
+                            getExpiryClass(
+                                alert.days_remaining
+                            )
+                        ">
+
+                        <div class="alert-icon">
+                            ⚠️
+                        </div>
+
+
+                        <div class="alert-content">
+
+                            <strong>
+                                {{ alert.contract_name }}
+                            </strong>
+
+                            <span>
+
+                                {{ alert.vendor_name }}
+
+                                ·
+
+                                {{ alert.contract_number }}
+
+                            </span>
+
+                            <small>
+
+                                Expiry:
+
+                                {{
+                                    alert.expiry_date
+                                    | date:'dd MMM yyyy'
+                                }}
+
+                            </small>
+
+
+                            @if (alert.renewal_status) {
+
+                                <small>
+
+                                    Renewal:
+
+                                    {{ alert.renewal_status }}
+
+                                    @if (alert.renewal_date) {
+
+                                        -
+
+                                        {{
+                                            alert.renewal_date
+                                            | date:'dd MMM yyyy'
+                                        }}
+
+                                    }
+
+                                </small>
+
+                            }
+
+                        </div>
+
+
+                        <div class="alert-days">
+
+                            <strong>
+                                {{ alert.days_remaining }}
+                            </strong>
+
+                            <span>
+                                days remaining
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                }
+
+            </div>
+
+        }
+
+        </div>
+
+
+    <!-- ========================================= -->
+    <!-- COMPLIANCE ALERTS -->
+    <!-- ========================================= -->
+
+    @if (
+        contractSummary().non_compliant_contracts > 0
+        ||
+        contractSummary().pending_compliance > 0
+    ) {
+
+        <div class="section-card compliance-alert-card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Compliance Alerts
+                    </h2>
+
+                    <p>
+                        Contracts requiring compliance attention
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="compliance-alert-grid">
+
+
+                @if (
+                    contractSummary().non_compliant_contracts > 0
+                ) {
+
+                    <div class="compliance-alert danger">
+
+                        <div class="alert-icon">
+                            ❌
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Non-Compliant Contracts
+                            </strong>
+
+                            <span>
+
+                                {{
+                                    contractSummary()
+                                        .non_compliant_contracts
+                                }}
+
+                                contract(s) require attention.
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                }
+
+
+                @if (
+                    contractSummary().pending_compliance > 0
+                ) {
+
+                    <div class="compliance-alert warning">
+
+                        <div class="alert-icon">
+                            ⏳
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Pending Compliance
+                            </strong>
+
+                            <span>
+
+                                {{
+                                    contractSummary()
+                                        .pending_compliance
+                                }}
+
+                                contract(s) are pending review.
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                }
 
             </div>
 

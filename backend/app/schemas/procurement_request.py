@@ -26,3 +26,7 @@ class ProcurementRequestCreate(BaseModel):
     )
 
     expected_delivery_date: date
+
+    requested_by: str | None = None
+    priority: str = "Medium"
+    justification: str | None = None

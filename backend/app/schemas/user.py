@@ -5,7 +5,7 @@ ROLES = [
     "Administrator",
     "Procurement Manager",
     "Supply Chain Manager",
-    "Vendor",
+    "Vendor Management",
     "Finance Officer",
     "Auditor"
 ]
@@ -25,7 +25,7 @@ class UserCreate(BaseModel):
         max_length=128
     )
 
-    role: str = "Vendor"
+    role: str = "Vendor Management"
 
 
 class UserLogin(BaseModel):

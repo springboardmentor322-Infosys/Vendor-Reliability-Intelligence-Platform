@@ -8,7 +8,7 @@ ACCOUNTS = [
     ("Administrator", "admin@vendoriq.com", "Admin@123", "Administrator"),
     ("Procurement Manager", "procurement@vendoriq.com", "Procurement@123", "Procurement Manager"),
     ("Supply Chain Manager", "supplychain@vendoriq.com", "SupplyChain@123", "Supply Chain Manager"),
-    ("Vendor Test Account", "vendor@vendoriq.com", "Vendor@123", "Vendor"),
+    ("Vendor Management", "vendor@vendoriq.com", "Vendor@123", "Vendor Management"),
     ("Auditor", "auditor@vendoriq.com", "Auditor@123", "Auditor"),
     ("Finance Officer", "finance@vendoriq.com", "Finance@123", "Finance Officer"),
 ]
@@ -26,10 +26,8 @@ try:
             user.role = role
             user.password = hash_password(password)
     vendor_user = db.query(User).filter(User.email == "vendor@vendoriq.com").first()
-    vendor = db.query(Vendor).filter(Vendor.id == 1).first()
-    if vendor_user and vendor:
-        vendor_user.vendor_id = vendor.id
-        vendor.user_id = vendor_user.id
+    if vendor_user:
+        vendor_user.vendor_id = None
     db.commit()
     print("VendorIQ test accounts are ready.")
     for _, email, password, role in ACCOUNTS:

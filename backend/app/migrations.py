@@ -183,3 +183,81 @@ def ensure_schema():
                         """
                     )
                 )
+# ==========================================================
+# VENDOR ONBOARDING DATE
+# ==========================================================
+# Added for the Vendor Management directory. Existing demo vendors
+# receive deterministic demo onboarding dates; newly registered vendors
+# receive today's date from the create endpoint.
+
+
+def _ensure_vendor_onboarding_date():
+    inspector = inspect(engine)
+    if "vendors" not in inspector.get_table_names():
+        return
+
+    columns = {column["name"] for column in inspector.get_columns("vendors")}
+    if "onboarded_date" not in columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE vendors ADD COLUMN onboarded_date DATE"))
+
+    # Populate existing demo records only when the value is missing.
+    from datetime import date, timedelta
+    with engine.begin() as conn:
+        rows = conn.execute(
+            text("SELECT id FROM vendors WHERE onboarded_date IS NULL")
+        ).fetchall()
+        for row in rows:
+            onboarded = date(2025, 1, 1) + timedelta(days=(int(row[0]) - 1) * 7)
+            conn.execute(
+                text("UPDATE vendors SET onboarded_date = :onboarded WHERE id = :id"),
+                {"onboarded": onboarded, "id": row[0]}
+            )
+
+_ensure_vendor_onboarding_date()
+
+
+# ==========================================================
+# PROCUREMENT REQUEST DETAILS / PURCHASE ORDER DETAILS
+# ==========================================================
+
+def _ensure_procurement_and_order_detail_columns():
+    inspector = inspect(engine)
+    dialect = engine.dialect.name
+
+    if "procurement_requests" in inspector.get_table_names():
+        columns = {c["name"] for c in inspector.get_columns("procurement_requests")}
+        required = {
+            "requested_by": "VARCHAR",
+            "priority": "VARCHAR",
+            "justification": "VARCHAR",
+        }
+        for name, typ in required.items():
+            if name not in columns:
+                with engine.begin() as conn:
+                    conn.execute(text(f"ALTER TABLE procurement_requests ADD COLUMN {name} {typ}"))
+
+    if "orders" in inspector.get_table_names():
+        columns = {c["name"] for c in inspect(engine).get_columns("orders")}
+        required = {
+            "payment_terms": "VARCHAR",
+            "line_items_json": "VARCHAR",
+            "shipping_mode": "VARCHAR",
+        }
+        for name, typ in required.items():
+            if name not in columns:
+                with engine.begin() as conn:
+                    conn.execute(text(f"ALTER TABLE orders ADD COLUMN {name} {typ}"))
+
+        # Existing demo orders created before these fields were added should
+        # still display complete order details in the Procurement Manager view.
+        # Refresh the column set after ALTER TABLE operations so this works on
+        # older SQLite databases as well as newly created ones.
+        final_columns = {c["name"] for c in inspect(engine).get_columns("orders")}
+        with engine.begin() as conn:
+            if "payment_terms" in final_columns:
+                conn.execute(text("UPDATE orders SET payment_terms = 'Advance' WHERE payment_terms IS NULL OR payment_terms = ''"))
+            if "shipping_mode" in final_columns:
+                conn.execute(text("UPDATE orders SET shipping_mode = 'Standard' WHERE shipping_mode IS NULL OR shipping_mode = ''"))
+
+_ensure_procurement_and_order_detail_columns()

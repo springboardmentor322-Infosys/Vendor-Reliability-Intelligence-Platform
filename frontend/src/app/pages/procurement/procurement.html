@@ -1,513 +1,183 @@
 <div class="top-bar">
+  <div>
+    <h1>Procurement</h1>
+    <p>Raise requests, create purchase orders and track them through the process.</p>
+  </div>
 
-    <div>
-
-        <h1>Procurement</h1>
-
-        <p>
-            Manage procurement requests and purchase orders
-        </p>
-
+  @if (!isVendorManagement) {
+    <div class="top-actions">
+      <button class="secondary-action" type="button" (click)="openDirectOrderForm()">
+        + Purchase order
+      </button>
+      <button class="add-btn" type="button" (click)="openCreateForm()">
+        + New request
+      </button>
     </div>
-
-    <button
-        *appHasRole="['Administrator', 'Procurement Manager']"
-        class="add-btn"
-        (click)="openCreateForm()">
-
-        + New Request
-
-    </button>
-
+  }
 </div>
 
-
-<!-- STATUS FILTERS -->
-
-<div class="status-filters">
-
-    <button
-        [class.active]="selectedStatus === 'All'"
-        (click)="selectedStatus = 'All'">
-
-        All
-
-    </button>
-
-
-    <button
-        [class.active]="selectedStatus === 'Pending'"
-        (click)="selectedStatus = 'Pending'">
-
-        Pending
-
-    </button>
-
-
-    <button
-        [class.active]="selectedStatus === 'Approved'"
-        (click)="selectedStatus = 'Approved'">
-
-        Approved
-
-    </button>
-
-
-    <button
-        [class.active]="selectedStatus === 'Rejected'"
-        (click)="selectedStatus = 'Rejected'">
-
-        Rejected
-
-    </button>
-
-
-    <button
-        [class.active]="selectedStatus === 'Ordered'"
-        (click)="selectedStatus = 'Ordered'">
-
-        Ordered
-
-    </button>
-
+<div class="tabs">
+  <button type="button" [class.active]="activeTab === 'requests'" (click)="setTab('requests')">Requests</button>
+  <button type="button" [class.active]="activeTab === 'orders'" (click)="setTab('orders')">Purchase orders</button>
 </div>
 
+@if (activeTab === 'requests') {
+  <div class="filter-row">
+    <div class="status-filters">
+      @for (status of ['All','Pending','Approved','Rejected','Ordered']; track status) {
+        <button type="button" [class.active]="selectedStatus === status" (click)="selectedStatus = status">{{ status }}</button>
+      }
+    </div>
+    <div class="search-box">
+      <input type="text" placeholder="Search requests, products or vendors..." [(ngModel)]="searchText">
+    </div>
+  </div>
 
-<!-- SEARCH -->
-
-<div class="search-box">
-
-    <input
-        type="text"
-        placeholder="Search product or vendor..."
-        [(ngModel)]="searchText">
-
-</div>
-
-
-<!-- PROCUREMENT TABLE -->
-
-<div class="table-card">
-
+  <div class="table-card">
     <table>
-
-        <thead>
-
-            <tr>
-
-                <th>ID</th>
-
-                <th>Vendor</th>
-
-                <th>Product</th>
-
-                <th>Quantity</th>
-
-                <th>Estimated Amount</th>
-
-                <th>Status</th>
-
-                <th>Actions</th>
-
-            </tr>
-
-        </thead>
-
-
-        <tbody>
-
-            @for (
-                request of filteredRequests;
-                track request.id
-            ) {
-
-                <tr>
-
-                    <td>
-                        #{{ request.id }}
-                    </td>
-
-
-                    <td>
-                        {{ getVendorName(request.vendor_id) }}
-                    </td>
-
-
-                    <td>
-                        {{ request.product_name }}
-                    </td>
-
-
-                    <td>
-                        {{ request.quantity }}
-                    </td>
-
-
-                    <td>
-                        ₹{{ request.estimated_amount }}
-                    </td>
-
-
-                    <td>
-
-                        <span
-                            class="status"
-                            [class.pending]="request.status === 'Pending'"
-                            [class.approved]="request.status === 'Approved'"
-                            [class.rejected]="request.status === 'Rejected'"
-                            [class.ordered]="request.status === 'Ordered'">
-
-                            {{ request.status }}
-
-                        </span>
-
-                    </td>
-
-
-                    <td class="actions">
-
-
-                        <!-- PENDING -->
-
-                        @if (request.status === 'Pending') {
-
-                            <button
-                                *appHasRole="['Administrator', 'Procurement Manager']"
-                                class="approve"
-                                (click)="approveRequest(request)">
-
-                                Approve
-
-                            </button>
-
-
-                            <button
-                                *appHasRole="['Administrator', 'Procurement Manager']"
-                                class="reject"
-                                (click)="rejectRequest(request)">
-
-                                Reject
-
-                            </button>
-
-
-                            <button
-                                *appHasRole="['Administrator', 'Procurement Manager']"
-                                class="edit"
-                                (click)="editRequest(request)">
-
-                                Edit
-
-                            </button>
-
-
-                            <button
-                                *appHasRole="['Administrator']"
-                                class="delete"
-                                (click)="deleteRequest(request.id)">
-
-                                Delete
-
-                            </button>
-
-                        }
-
-
-                        <!-- APPROVED -->
-
-                        @if (request.status === 'Approved') {
-
-                            <button
-                                *appHasRole="['Administrator', 'Procurement Manager']"
-                                class="order-btn"
-                                (click)="createOrder(request)">
-
-                                Create Order
-
-                            </button>
-
-
-                            <button
-                                class="edit"
-                                (click)="editRequest(request)">
-
-                                Edit
-
-                            </button>
-
-                        }
-
-
-                        <!-- REJECTED -->
-
-                        @if (request.status === 'Rejected') {
-
-                            <button
-                                class="delete"
-                                (click)="deleteRequest(request.id)">
-
-                                Delete
-
-                            </button>
-
-                        }
-
-
-                        <!-- ORDERED -->
-
-                        @if (request.status === 'Ordered') {
-
-                            <span class="completed-label">
-
-                                Purchase Order Created
-
-                            </span>
-
-                        }
-
-                    </td>
-
-                </tr>
-
-            }
-
-
-            @if (filteredRequests.length === 0) {
-
-                <tr>
-
-                    <td
-                        colspan="7"
-                        class="empty">
-
-                        @if (loading) {
-
-                            Loading procurement requests...
-
-                        } @else {
-
-                            No procurement requests found.
-
-                        }
-
-                    </td>
-
-                </tr>
-
-            }
-
-        </tbody>
-
+      <thead><tr>
+        <th>ID</th><th>Vendor</th><th>Product</th><th>Quantity</th><th>Estimated Amount</th><th>Status</th><th>Actions</th>
+      </tr></thead>
+      <tbody>
+        @for (request of filteredRequests; track request.id) {
+          <tr>
+            <td><strong>PR-{{ request.id }}</strong></td>
+            <td>{{ getVendorName(request.vendor_id) }}</td>
+            <td>{{ request.product_name }}</td>
+            <td>{{ request.quantity }}</td>
+            <td>₹{{ request.estimated_amount | number:'1.0-2' }}</td>
+            <td><span class="status" [class.pending]="request.status === 'Pending'" [class.approved]="request.status === 'Approved'" [class.rejected]="request.status === 'Rejected'" [class.ordered]="request.status === 'Ordered'">{{ request.status }}</span></td>
+            <td class="actions">
+              @if (request.status === 'Pending') {
+                <button class="approve" (click)="approveRequest(request)">Approve</button>
+                <button class="reject" (click)="rejectRequest(request)">Reject</button>
+                <button class="edit" (click)="editRequest(request)">Edit</button>
+              }
+              @if (request.status === 'Approved') {
+                @if (!isVendorManagement) {
+                  <button class="order-btn" (click)="createOrder(request)">Create Order</button>
+                }
+                <button class="edit" (click)="editRequest(request)">Edit</button>
+              }
+              @if (request.status === 'Ordered') { <span class="completed-label">Purchase Order Created</span> }
+              @if (request.status === 'Rejected') { <button class="delete" (click)="deleteRequest(request.id)">Delete</button> }
+            </td>
+          </tr>
+        }
+        @if (filteredRequests.length === 0) {
+          <tr><td colspan="7" class="empty">{{ loading ? 'Loading procurement requests...' : 'No procurement requests found.' }}</td></tr>
+        }
+      </tbody>
     </table>
-
-</div>
-
-
-<!-- CREATE / EDIT FORM -->
-
-@if (showForm) {
-
-    <div
-        class="modal-backdrop"
-        (click)="closeForm()">
-
-
-        <div
-            class="modal"
-            (click)="$event.stopPropagation()">
-
-
-            <div class="modal-header">
-
-                <div>
-
-                    <h2>
-                        {{
-                            editingRequest
-                            ? 'Edit Procurement Request'
-                            : 'New Procurement Request'
-                        }}
-                    </h2>
-
-                    <p>
-                        Enter procurement details
-                    </p>
-
-                </div>
-
-
-                <button
-                    class="close-btn"
-                    (click)="closeForm()">
-
-                    ×
-
-                </button>
-
-            </div>
-
-
-            <div class="form-body">
-
-
-                <!-- VENDOR -->
-
-                <div class="form-group">
-
-                    <label>
-                        Vendor
-                    </label>
-
-
-                    <select
-                        [(ngModel)]="form.vendor_id">
-
-                        <option
-                            [ngValue]="null">
-
-                            Select Vendor
-
-                        </option>
-
-
-                        @for (
-                            vendor of vendors;
-                            track vendor.id
-                        ) {
-
-                            <option
-                                [ngValue]="vendor.id">
-
-                                {{ vendor.vendor_name }}
-
-                            </option>
-
-                        }
-
-                    </select>
-
-                </div>
-
-
-                <!-- PRODUCT -->
-
-                <div class="form-group">
-
-                    <label>
-                        Product Name
-                    </label>
-
-
-                    <input
-                        type="text"
-                        [(ngModel)]="form.product_name"
-                        placeholder="Enter product name">
-
-                </div>
-
-
-                <!-- QUANTITY -->
-
-                <div class="form-group">
-
-                    <label>
-                        Quantity
-                    </label>
-
-
-                    <input
-                        type="number"
-                        min="1"
-                        [(ngModel)]="form.quantity">
-
-                </div>
-
-
-                <!-- AMOUNT -->
-
-                <div class="form-group">
-
-                    <label>
-                        Estimated Amount
-                    </label>
-
-
-                    <input
-                        type="number"
-                        min="0"
-                        [(ngModel)]="form.estimated_amount">
-
-                </div>
-
-
-                <!-- DEPARTMENT -->
-
-                <div class="form-group">
-
-                    <label>
-                        Department
-                    </label>
-
-                    <select
-                        [(ngModel)]="form.department">
-
-                        <option value="General">General</option>
-                        <option value="IT">IT</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Procurement">Procurement</option>
-                        <option value="Operations">Operations</option>
-                        <option value="HR">HR</option>
-                        <option value="Sales">Sales</option>
-
-                    </select>
-
-                </div>
-
-
-                <!-- EXPECTED DELIVERY DATE -->
-
-                <div class="form-group">
-
-                    <label>
-                        Expected Delivery Date
-                    </label>
-
-                    <input
-                        type="date"
-                        [(ngModel)]="form.expected_delivery_date">
-
-                </div>
-
-
-            </div>
-
-
-            <div class="modal-footer">
-
-                <button
-                    class="cancel-btn"
-                    (click)="closeForm()">
-
-                    Cancel
-
-                </button>
-
-
-                <button
-                    class="save-btn"
-                    (click)="saveRequest()">
-
-                    {{
-                        editingRequest
-                        ? 'Update Request'
-                        : 'Create Request'
-                    }}
-
-                </button>
-
-            </div>
-
-        </div>
-
+  </div>
+}
+
+@if (activeTab === 'orders') {
+  <div class="filter-row">
+    <div class="status-filters">
+      @for (status of ['All','Pending','Approved','Ordered','Delivered','Completed','Cancelled']; track status) {
+        <button type="button" [class.active]="orderStatus === status" (click)="orderStatus = status; loadOrders()">{{ status }}</button>
+      }
     </div>
+    <div class="search-box">
+      <input type="text" placeholder="Search product or vendor..." [(ngModel)]="orderSearch" (ngModelChange)="loadOrders()">
+    </div>
+  </div>
+
+  <div class="table-card">
+    <table>
+      <thead><tr>
+        <th>Purchase order</th><th>Vendor</th><th>Items</th><th>Total</th><th>Status</th><th>Delivery date</th>
+      </tr></thead>
+      <tbody>
+        @for (order of filteredOrders; track order.id) {
+          <tr class="clickable-row" (click)="openOrderDetails(order)">
+            <td><strong>PO-{{ order.id }}</strong><small>{{ order.source_order_id || 'direct order' }}</small></td>
+            <td>{{ getVendorName(order.vendor_id) }}</td>
+            <td>{{ order.product_name }}</td>
+            <td>₹{{ order.amount | number:'1.0-2' }}</td>
+            <td><span class="status" [class.pending]="order.status === 'Pending'" [class.approved]="order.status === 'Approved'" [class.ordered]="order.status === 'Ordered'" [class.delivered]="order.status === 'Delivered'" [class.completed]="order.status === 'Completed'" [class.rejected]="order.status === 'Cancelled'">{{ order.status }}</span></td>
+            <td>{{ formatDate(order.expected_delivery_date) }}</td>
+          </tr>
+        }
+        @if (filteredOrders.length === 0) {
+          <tr><td colspan="6" class="empty">{{ ordersLoading ? 'Loading purchase orders...' : 'No purchase orders found.' }}</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+<!-- PROCUREMENT REQUEST MODAL -->
+@if (showForm) {
+  <div class="modal-backdrop" (click)="closeForm()">
+    <div class="modal request-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div><h2>{{ editingRequest ? 'Edit procurement request' : 'New procurement request' }}</h2><p>Requests enter as Draft until submitted for approval.</p></div>
+        <button class="close-btn" (click)="closeForm()">×</button>
+      </div>
+      <div class="form-body">
+        <div class="form-group full"><label>Item or service description</label><input [(ngModel)]="form.product_name" placeholder="e.g. 20 tonnes packaging film"></div>
+        <div class="form-grid two">
+          <div class="form-group"><label>Department</label><select [(ngModel)]="form.department"><option>Facilities</option><option>IT</option><option>Finance</option><option>Procurement</option><option>Operations</option><option>HR</option><option>Sales</option></select></div>
+          <div class="form-group"><label>Requested by</label><input [(ngModel)]="form.requested_by" placeholder="Full name"></div>
+          <div class="form-group"><label>Vendor</label><select [(ngModel)]="form.vendor_id"><option [ngValue]="null">Select Vendor</option>@for (vendor of vendors; track vendor.id) {<option [ngValue]="vendor.id">{{ vendor.vendor_name }}</option>}</select></div>
+          <div class="form-group"><label>Quantity</label><input type="number" min="1" [(ngModel)]="form.quantity"></div>
+          <div class="form-group"><label>Needed by</label><input type="date" [(ngModel)]="form.expected_delivery_date"></div>
+          <div class="form-group"><label>Estimated amount (₹)</label><input type="number" min="0" [(ngModel)]="form.estimated_amount"></div>
+        </div>
+        <div class="form-group"><label>Priority</label><div class="choice-row">@for (p of ['Low','Medium','High','Urgent']; track p) {<button type="button" [class.selected]="form.priority === p" (click)="form.priority = p">{{ p }}</button>}</div></div>
+        <div class="form-group"><label>Justification</label><textarea [(ngModel)]="form.justification" placeholder="Why this is needed"></textarea></div>
+      </div>
+      <div class="modal-footer"><button class="cancel-btn" (click)="closeForm()">Cancel</button><button class="save-btn" (click)="saveRequest()">{{ editingRequest ? 'Update Request' : 'Submit for approval' }}</button></div>
+    </div>
+  </div>
+}
+
+<!-- DIRECT PURCHASE ORDER MODAL -->
+@if (showOrderForm) {
+  <div class="modal-backdrop" (click)="closeOrderForm()">
+    <div class="modal order-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header"><div><h2>Create purchase order</h2><p>Assign an active vendor and add line items. New orders start as Pending.</p></div><button class="close-btn" (click)="closeOrderForm()">×</button></div>
+      <div class="form-body">
+        <div class="form-group"><label>Vendor</label><div class="vendor-chips">@for (vendor of vendors.slice(0, 8); track vendor.id) {<button type="button" [class.selected]="orderForm.vendor_id === vendor.id" (click)="selectOrderVendor(vendor.id)">{{ vendor.vendor_name }}</button>}</div></div>
+        <div class="line-items-title"><strong>Line items</strong><span>Unit price (₹)</span></div>
+        @for (item of lineItems; track $index; let i = $index) {
+          <div class="line-item">
+            <input [(ngModel)]="item.product_name" placeholder="Item name">
+            <input type="number" min="1" [(ngModel)]="item.quantity" placeholder="Qty">
+            <input type="number" min="0" [(ngModel)]="item.unit_price" placeholder="0">
+            @if (lineItems.length > 1) {<button class="remove-line" (click)="removeLineItem(i)">×</button>}
+          </div>
+        }
+        <button class="add-line" type="button" (click)="addLineItem()">+ Add line item</button>
+        <div class="total-row"><span>Total</span><strong>₹{{ orderTotal | number:'1.0-2' }}</strong></div>
+        <div class="form-grid two compact-grid">
+          <div class="form-group"><label>Expected delivery date</label><input type="date" [(ngModel)]="orderForm.expected_delivery_date"></div>
+          <div class="form-group"><label>Payment terms</label><select [(ngModel)]="orderForm.payment_terms"><option>Advance</option><option>Net 15</option><option>Net 30</option><option>Net 45</option><option>Net 60</option></select></div>
+          <div class="form-group"><label>Shipping mode</label><select [(ngModel)]="orderForm.shipping_mode"><option>Standard</option><option>Express</option><option>Air</option><option>Sea</option><option>Road</option></select></div>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="cancel-btn" (click)="closeOrderForm()">Cancel</button><button class="save-btn" (click)="saveDirectOrder()">Create order</button></div>
+    </div>
+  </div>
+}
+
+<!-- ORDER DETAIL DRAWER -->
+@if (showOrderDetails && selectedOrder) {
+  <div class="modal-backdrop" (click)="closeOrderDetails()">
+    <div class="detail-drawer" (click)="$event.stopPropagation()">
+      <div class="detail-header"><div><h2>PO-{{ selectedOrder.id }}</h2><span class="status" [class.pending]="selectedOrder.status === 'Pending'" [class.approved]="selectedOrder.status === 'Approved'" [class.ordered]="selectedOrder.status === 'Ordered'" [class.delivered]="selectedOrder.status === 'Delivered'">{{ selectedOrder.status }}</span><p>{{ getVendorName(selectedOrder.vendor_id) }}</p></div><button class="close-btn" (click)="closeOrderDetails()">×</button></div>
+      <div class="detail-tabs"><button [class.active]="orderDetailTab === 'overview'" (click)="orderDetailTab='overview'">Overview</button><button [class.active]="orderDetailTab === 'tracking'" (click)="orderDetailTab='tracking'">Tracking</button><button [class.active]="orderDetailTab === 'invoice'" (click)="orderDetailTab='invoice'">Invoice</button></div>
+      @if (orderDetailTab === 'overview') {
+        <div class="detail-body"><div class="detail-list"><div><span>Vendor</span><strong>{{ getVendorName(selectedOrder.vendor_id) }}</strong></div><div><span>Order date</span><strong>{{ formatDate(selectedOrder.order_date) }}</strong></div><div><span>Expected delivery</span><strong>{{ formatDate(selectedOrder.expected_delivery_date) }}</strong></div><div><span>Payment terms</span><strong>{{ selectedOrder.payment_terms || '—' }}</strong></div><div><span>Shipping mode</span><strong>{{ selectedOrder.shipping_mode || '—' }}</strong></div><div><span>Raised from</span><strong>{{ selectedOrder.source_order_id ? selectedOrder.source_order_id : 'Direct order' }}</strong></div></div><div class="detail-card">@for (item of getOrderLineItems(selectedOrder); track $index) {<div><strong>{{ item.product_name }}</strong><strong>₹{{ lineTotal(item) | number:'1.0-2' }}</strong></div><p>{{ item.quantity }} unit{{ item.quantity == 1 ? '' : 's' }} × ₹{{ item.unit_price | number:'1.0-2' }}</p>}<div class="order-total"><span>Order total</span><strong>₹{{ selectedOrder.amount | number:'1.0-2' }}</strong></div></div></div>
+      }
+      @if (orderDetailTab === 'tracking') {
+        <div class="detail-body"><div class="tracking-grid"><div><span>Delivery status</span><strong>{{ selectedOrder.delivery_status || selectedOrder.status || '—' }}</strong></div><div><span>Shipping date</span><strong>{{ formatDate(selectedOrder.shipping_date) }}</strong></div><div><span>Order region</span><strong>{{ selectedOrder.order_region || '—' }}</strong></div><div><span>Order state</span><strong>{{ selectedOrder.order_state || '—' }}</strong></div><div><span>Country</span><strong>{{ selectedOrder.order_country || '—' }}</strong></div><div><span>Late delivery risk</span><strong>{{ selectedOrder.late_delivery_risk ?? 0 }}</strong></div></div></div>
+      }
+      @if (orderDetailTab === 'invoice') {
+        <div class="detail-body"><div class="invoice-placeholder"><h3>Invoice</h3><p>Invoice details will appear here when an invoice is raised for this purchase order.</p><strong>Order total: ₹{{ selectedOrder.amount | number:'1.0-2' }}</strong></div></div>
+      }
+    </div>
+  </div>
 }

@@ -39,6 +39,19 @@ export class Order {
 
 
   // ================================
+  // GET SINGLE ORDER
+  // ================================
+
+  getOrder(id: number): Observable<any> {
+
+    return this.http.get<any>(
+      `${this.apiUrl}/orders/${id}`
+    );
+
+  }
+
+
+  // ================================
   // GET TOTAL ORDER COUNT
   // ================================
 

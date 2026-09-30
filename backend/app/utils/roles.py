@@ -8,7 +8,7 @@ PROCUREMENT_MANAGER = "Procurement Manager"
 
 SUPPLY_CHAIN_MANAGER = "Supply Chain Manager"
 
-VENDOR = "Vendor"
+VENDOR = "Vendor Management"
 
 FINANCE_OFFICER = "Finance Officer"
 

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 from datetime import date
+import json
 
 from app.schemas.order import OrderResponse
 from app.models.procurement_request import ProcurementRequest
@@ -183,9 +184,9 @@ def get_orders(
             ADMINISTRATOR,
             PROCUREMENT_MANAGER,
             SUPPLY_CHAIN_MANAGER,
+            VENDOR,
             FINANCE_OFFICER,
-            AUDITOR,
-            VENDOR
+            AUDITOR
         )
     )
 ):
@@ -199,11 +200,9 @@ def get_orders(
     limit = max(1, min(limit, 500))
     offset = max(0, offset)
 
+    # Vendor Management is an organization-wide management role, so it can
+    # view orders for every vendor.
     query = db.query(Order)
-    if current_user.role == VENDOR:
-        if not current_user.vendor_id:
-            return []
-        query = query.filter(Order.vendor_id == current_user.vendor_id)
 
     if status and status != "All":
         query = query.filter(Order.status == status)
@@ -241,17 +240,16 @@ def get_order_count(
             ADMINISTRATOR,
             PROCUREMENT_MANAGER,
             SUPPLY_CHAIN_MANAGER,
+            VENDOR,
             FINANCE_OFFICER,
             AUDITOR
         )
     )
 ):
 
+    # Vendor Management is an organization-wide management role, so its
+    # order count covers all vendors.
     query = db.query(Order)
-    if current_user.role == VENDOR:
-        if not current_user.vendor_id:
-            return {"count": 0}
-        query = query.filter(Order.vendor_id == current_user.vendor_id)
 
     if status and status != "All":
         query = query.filter(Order.status == status)
@@ -401,7 +399,8 @@ def create_order(
     current_user = Depends(
         require_roles(
             ADMINISTRATOR,
-            PROCUREMENT_MANAGER
+            PROCUREMENT_MANAGER,
+            VENDOR
         )
     )
 ):
@@ -504,7 +503,13 @@ def create_order(
         ),
 
         expected_delivery_date=
-            expected_delivery_date
+            expected_delivery_date,
+
+        payment_terms=data.get("payment_terms") or "Advance",
+        line_items_json=json.dumps(data.get("line_items")) if data.get("line_items") else None,
+        shipping_mode=data.get("shipping_mode") or "Standard",
+
+        order_date=date.today()
 
     )
 
@@ -603,7 +608,16 @@ def create_order_from_procurement(
 
         status="Ordered",
 
-        expected_delivery_date=request.expected_delivery_date
+        expected_delivery_date=request.expected_delivery_date,
+        payment_terms="Advance",
+        line_items_json=json.dumps([{
+            "product_name": request.product_name,
+            "quantity": request.quantity,
+            "unit_price": (request.estimated_amount / request.quantity) if request.quantity else 0
+        }]),
+        shipping_mode="Standard",
+        source_order_id=f"PR-{request.id}",
+        order_date=date.today()
 
     )
 
@@ -623,6 +637,42 @@ def create_order_from_procurement(
     db.refresh(order)
 
 
+    return order
+
+
+# ==========================================
+# GET SINGLE ORDER
+# ==========================================
+
+@router.get(
+    "/{order_id}",
+    response_model=OrderResponse
+)
+def get_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(
+        require_roles(
+            ADMINISTRATOR,
+            PROCUREMENT_MANAGER,
+            SUPPLY_CHAIN_MANAGER,
+            VENDOR,
+            FINANCE_OFFICER,
+            AUDITOR
+        )
+    )
+):
+
+    order = (
+        db.query(Order)
+        .filter(Order.id == order_id)
+        .first()
+    )
+
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    ensure_vendor_access(current_user, order.vendor_id)
     return order
 
 
@@ -855,6 +905,15 @@ def update_order(
         "status",
         order.status
     )
+
+    if "payment_terms" in data:
+        order.payment_terms = data.get("payment_terms")
+
+    if "shipping_mode" in data:
+        order.shipping_mode = data.get("shipping_mode")
+
+    if "line_items" in data:
+        order.line_items_json = json.dumps(data.get("line_items"))
 
 
     db.commit()

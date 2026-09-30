@@ -154,8 +154,8 @@ export const routes: Routes = [
         data: {
           roles: [
             'Administrator',
-            'Procurement Manager',
-            'Supply Chain Manager'
+            'Supply Chain Manager',
+            'Vendor Management'
           ]
         }
       },
@@ -193,7 +193,8 @@ export const routes: Routes = [
           roles: [
             'Administrator',
             'Procurement Manager',
-            'Supply Chain Manager'
+            'Supply Chain Manager',
+            'Vendor Management'
           ]
         }
       },
@@ -383,7 +384,7 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: {
           roles: [
-            'Vendor'
+            'Vendor Management'
           ]
         }
       },

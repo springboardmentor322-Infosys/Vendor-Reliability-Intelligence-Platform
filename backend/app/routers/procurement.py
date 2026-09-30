@@ -67,7 +67,10 @@ def create_procurement_request(
 
         estimated_amount=data.estimated_amount,
         department=data.department,
-        expected_delivery_date=data.expected_delivery_date
+        expected_delivery_date=data.expected_delivery_date,
+        requested_by=data.requested_by,
+        priority=data.priority,
+        justification=data.justification
 
     )
 
@@ -102,12 +105,9 @@ def get_procurement_requests(
     )
 ):
 
-    query = db.query(ProcurementRequest)
-    if current_user.role == VENDOR:
-        if not current_user.vendor_id:
-            return []
-        query = query.filter(ProcurementRequest.vendor_id == current_user.vendor_id)
-    return query.all()
+    # Vendor Management is an organization-wide management role, so it can
+    # view procurement requests for every vendor.
+    return db.query(ProcurementRequest).all()
 
 
 # ==========================================
@@ -204,6 +204,9 @@ def update_procurement_request(
     request.estimated_amount = data.estimated_amount
     request.department = data.department
     request.expected_delivery_date = data.expected_delivery_date
+    request.requested_by = data.requested_by
+    request.priority = data.priority
+    request.justification = data.justification
 
 
     db.commit()

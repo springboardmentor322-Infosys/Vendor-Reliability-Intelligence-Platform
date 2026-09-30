@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 
 import { Vendor } from '../../services/vendor';
 import { ToastService } from '../../services/toast';
+import { Auth } from '../../services/auth';
 
 
 @Component({
@@ -72,7 +73,8 @@ export class AddVendor implements OnInit {
   constructor(
     private vendorService: Vendor,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private auth: Auth
   ) {}
 
 
@@ -105,6 +107,17 @@ export class AddVendor implements OnInit {
 
       this.vendorId =
         vendor.id;
+
+      // Vendor Management can register new vendors, but cannot edit
+      // existing vendor records. Existing vendor edits remain restricted
+      // to Administrator / Procurement Manager / Supply Chain Manager.
+      if (this.auth.hasRole('Vendor Management')) {
+        this.vendorId = null;
+        localStorage.removeItem('editVendor');
+        this.router.navigate(['/vendors']);
+        this.toastService.show('Vendor Management can register new vendors only.', 'error');
+        return;
+      }
 
 
       // ==============================
@@ -263,6 +276,12 @@ export class AddVendor implements OnInit {
     // ================================
 
     if (this.vendorId !== null) {
+
+      if (this.auth.hasRole('Vendor Management')) {
+        this.loading = false;
+        this.toastService.show('Vendor Management can register new vendors only.', 'error');
+        return;
+      }
 
       this.vendorService
         .updateVendor(

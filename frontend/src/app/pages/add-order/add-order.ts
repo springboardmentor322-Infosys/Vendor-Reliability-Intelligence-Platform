@@ -39,6 +39,8 @@ export class AddOrder implements OnInit {
 
   quantity = 1;
 
+  unit_price = 0;
+
   amount = 0;
 
   status = 'Pending';
@@ -93,6 +95,16 @@ export class AddOrder implements OnInit {
 
         this.amount =
           order.amount || 0;
+
+
+        // Existing orders only store the total amount, so derive the
+        // unit price when opening an order for editing.
+        this.unit_price =
+          this.quantity > 0
+            ? this.amount / this.quantity
+            : 0;
+
+        this.calculateTotalAmount();
 
 
         this.status =
@@ -167,6 +179,20 @@ export class AddOrder implements OnInit {
 
 
   // ================================
+  // CALCULATE TOTAL AMOUNT
+  // ================================
+
+  calculateTotalAmount(): void {
+
+    const quantity = Number(this.quantity) || 0;
+    const unitPrice = Number(this.unit_price) || 0;
+
+    this.amount = Number((quantity * unitPrice).toFixed(2));
+
+  }
+
+
+  // ================================
   // SAVE / UPDATE ORDER
   // ================================
 
@@ -224,22 +250,27 @@ export class AddOrder implements OnInit {
 
 
     // ================================
-    // VALIDATE AMOUNT
+    // VALIDATE UNIT PRICE
     // ================================
 
     if (
-      this.amount < 0 ||
-      !Number.isFinite(this.amount)
+      this.unit_price < 0 ||
+      !Number.isFinite(this.unit_price)
     ) {
 
       this.toastService.show(
-        'Amount cannot be negative.',
+        'Unit price cannot be negative.',
         'error'
       );
 
       return;
 
     }
+
+
+    // Always calculate the total from quantity and unit price
+    // before sending the order to the backend.
+    this.calculateTotalAmount();
 
 
     // ================================

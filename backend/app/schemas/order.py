@@ -18,6 +18,8 @@ class OrderResponse(BaseModel):
     status: str
 
     expected_delivery_date: Optional[date] = None
+    payment_terms: Optional[str] = None
+    line_items_json: Optional[str] = None
     source_order_id: Optional[str] = None
     order_date: Optional[date] = None
     shipping_date: Optional[date] = None

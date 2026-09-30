@@ -32,7 +32,7 @@ class User(Base):
     role = Column(
         String,
         nullable=False,
-        default="Vendor"
+        default="Vendor Management"
     )
 
     vendor_id = Column(

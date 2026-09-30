@@ -1,293 +1,126 @@
-<div class="top-bar">
+<div class="vendor-management-page">
 
+  <div class="vendor-page-header">
     <div>
-
-        <h1>Vendor Management</h1>
-
-        <p>
-            Manage your vendors
-        </p>
-
+      <h1>Vendor Management</h1>
+      <p>Register, verify and monitor every supplier your organization works with.</p>
     </div>
 
+    <div class="header-actions">
+      <div class="search-box">
+        <span>⌕</span>
+        <input
+          type="text"
+          placeholder="Search vendors, contacts"
+          [(ngModel)]="searchText"
+          (input)="searchVendors()">
+      </div>
 
-    <button
-        *appHasRole="['Administrator', 'Procurement Manager']"
-        class="add-btn"
+      @if (canRegisterVendor()) {
+        <button
+          class="register-btn"
+          type="button"
+          (click)="addVendor()">
+          + Register vendor
+        </button>
+      }
+    </div>
+  </div>
+
+  <section class="filter-section">
+    <div class="filter-label">CATEGORY</div>
+    <div class="pill-row">
+      <button
         type="button"
-        (click)="addVendor()">
-
-        + Add Vendor
-
-    </button>
-
-</div>
-
-
-<div class="search-box">
-
-    <input
-        type="text"
-        placeholder="Search vendor..."
-        [(ngModel)]="searchText"
-        (input)="searchVendors()">
-
-</div>
-
-
-<p>
-    Total Vendors: {{ vendors.length }}
-</p>
-
-
-<div class="table-wrapper">
-
-    <table>
-
-        <thead>
-
-            <tr>
-
-                <th>Name</th>
-
-                <th>Email</th>
-
-                <th>Phone</th>
-
-                <th>GST</th>
-
-                <th>Category</th>
-
-                <th>Contact Person</th>
-
-                <th>Approval Status</th>
-
-                <th>Status</th>
-
-                <th>Actions</th>
-
-            </tr>
-
-        </thead>
-
-
-        <tbody>
-
-            @for (
-                vendor of filteredVendors;
-                track vendor.id
-            ) {
-
-                <tr>
-
-                    <td>
-                        {{ vendor.vendor_name }}
-                    </td>
-
-
-                    <td>
-                        {{ vendor.email }}
-                    </td>
-
-
-                    <td>
-                        {{ vendor.phone }}
-                    </td>
-
-
-                    <td>
-                        {{ vendor.gst_number }}
-                    </td>
-
-
-                    <td>
-                        {{ vendor.category || 'N/A' }}
-                    </td>
-
-
-                    <td>
-                        {{ vendor.contact_person || 'N/A' }}
-                    </td>
-
-
-                    <td>
-
-                        <span
-                            class="status-badge"
-                            [class.approved]="
-                                vendor.approval_status === 'Approved'
-                            "
-                            [class.pending]="
-                                vendor.approval_status === 'Pending'
-                            "
-                            [class.rejected]="
-                                vendor.approval_status === 'Rejected'
-                            ">
-
-                            {{
-                                vendor.approval_status ||
-                                'Pending'
-                            }}
-
-                        </span>
-
-                    </td>
-
-
-                    <td>
-
-                        <span
-                            class="status-badge"
-                            [class.active]="
-                                vendor.status === 'Active'
-                            "
-                            [class.inactive]="
-                                vendor.status === 'Inactive'
-                            "
-                            [class.suspended]="
-                                vendor.status === 'Suspended'
-                            ">
-
-                            {{
-                                vendor.status ||
-                                'Active'
-                            }}
-
-                        </span>
-
-                    </td>
-
-
-                    <td>
-
-                        <div class="action-buttons">
-
-
-                            <!-- EDIT -->
-
-                            <button
-                                *appHasRole="['Administrator', 'Procurement Manager', 'Supply Chain Manager']"
-                                class="edit"
-                                type="button"
-                                (click)="editVendor(vendor)">
-
-                                Edit
-
-                            </button>
-
-
-                            <!-- APPROVE -->
-
-                            @if (
-                                vendor.approval_status === 'Pending'
-                            ) {
-
-                                <button
-                                    *appHasRole="['Administrator', 'Procurement Manager']"
-                                    class="approve"
-                                    type="button"
-                                    (click)="approveVendor(vendor)">
-
-                                    Approve
-
-                                </button>
-
-
-                                <button
-                                    *appHasRole="['Administrator', 'Procurement Manager']"
-                                    class="reject"
-                                    type="button"
-                                    (click)="rejectVendor(vendor)">
-
-                                    Reject
-
-                                </button>
-
-                            }
-
-
-                            <!-- ACTIVATE -->
-
-                            @if (
-                                vendor.status === 'Inactive' ||
-                                vendor.status === 'Suspended'
-                            ) {
-
-                                <button
-                                    *appHasRole="['Administrator', 'Procurement Manager', 'Supply Chain Manager']"
-                                    class="activate"
-                                    type="button"
-                                    (click)="activateVendor(vendor)">
-
-                                    Activate
-
-                                </button>
-
-                            }
-
-
-                            <!-- SUSPEND -->
-
-                            @if (
-                                vendor.status === 'Active' &&
-                                vendor.approval_status === 'Approved'
-                            ) {
-
-                                <button
-                                    *appHasRole="['Administrator', 'Procurement Manager', 'Supply Chain Manager']"
-                                    class="suspend"
-                                    type="button"
-                                    (click)="suspendVendor(vendor)">
-
-                                    Suspend
-
-                                </button>
-
-                            }
-
-
-                            <!-- DELETE -->
-
-                            <button
-                                *appHasRole="['Administrator']"
-                                class="delete"
-                                type="button"
-                                (click)="deleteVendor(vendor)">
-
-                                Delete
-
-                            </button>
-
-
-                        </div>
-
-                    </td>
-
-                </tr>
-
+        class="filter-pill"
+        [class.active]="selectedCategory === ''"
+        (click)="selectCategory('')">
+        All
+      </button>
+
+      @for (category of categoryOptions; track category.value) {
+        <button
+          type="button"
+          class="filter-pill"
+          [class.active]="selectedCategory === category.value"
+          (click)="selectCategory(category.value)">
+          {{ category.label }}
+        </button>
+      }
+    </div>
+
+    <div class="filter-label status-label">STATUS</div>
+    <div class="pill-row">
+      @for (status of statusOptions; track status.value) {
+        <button
+          type="button"
+          class="filter-pill"
+          [class.active]="selectedStatus === status.value"
+          (click)="selectStatus(status.value)">
+          {{ status.label }}
+        </button>
+      }
+    </div>
+  </section>
+
+  <section class="vendor-table-card">
+    <div class="table-header">
+      <span>VENDOR</span>
+      <span>CATEGORY</span>
+      <span>PRIMARY CONTACT</span>
+      <span>STATUS</span>
+      <span>RELIABILITY</span>
+      <span>ONBOARDED</span>
+    </div>
+
+    <div class="vendor-rows">
+      @for (vendor of filteredVendors; track vendor.id) {
+        <div class="vendor-row">
+          <div class="vendor-cell vendor-name">
+            <strong>{{ vendor.vendor_name }}</strong>
+            <small>VN-{{ (vendor.id || 0).toString().padStart(4, '0') }}</small>
+          </div>
+
+          <div class="vendor-cell category-cell">
+            {{ getCategoryLabel(vendor.category) }}
+          </div>
+
+          <div class="vendor-cell">
+            {{ vendor.contact_person || vendor.email || '—' }}
+          </div>
+
+          <div class="vendor-cell">
+            <span class="status-badge" [class]="getVendorStatus(vendor).toLowerCase()">
+              <i></i>{{ getVendorStatus(vendor) }}
+            </span>
+          </div>
+
+          <div class="vendor-cell reliability-cell">
+            @if (getReliability(vendor) !== null) {
+              <div class="reliability-bar">
+                <span [style.width.%]="getReliability(vendor)"></span>
+              </div>
+              <strong>{{ getReliability(vendor) }}</strong>
+            } @else {
+              <span class="not-available">—</span>
             }
+          </div>
 
+          <div class="vendor-cell onboarded-cell">
+            {{ getOnboardedDate(vendor) }}
+          </div>
+        </div>
+      }
 
-            @if (
-                filteredVendors.length === 0
-            ) {
+      @if (!filteredVendors.length) {
+        <div class="empty-state">
+          No vendors match the selected filters.
+        </div>
+      }
+    </div>
+  </section>
 
-                <tr>
-
-                    <td
-                        colspan="9"
-                        class="empty">
-
-                        No vendors found.
-
-                    </td>
-
-                </tr>
-
-            }
-
-        </tbody>
-
-    </table>
-
+  <div class="result-count">
+    Showing {{ filteredVendors.length }} of {{ vendors.length }} vendors
+  </div>
 </div>

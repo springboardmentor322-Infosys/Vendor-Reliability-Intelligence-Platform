@@ -85,7 +85,7 @@ export class UserManagement implements OnInit {
 
 
   role =
-    'Vendor';
+    'Vendor Management';
 
 
   // ==========================================
@@ -100,7 +100,7 @@ export class UserManagement implements OnInit {
 
     'Supply Chain Manager',
 
-    'Vendor',
+    'Vendor Management',
 
     'Finance Officer',
 
@@ -265,7 +265,7 @@ export class UserManagement implements OnInit {
       '';
 
     this.role =
-      'Vendor';
+      'Vendor Management';
 
   }
 
@@ -566,7 +566,7 @@ export class UserManagement implements OnInit {
       case 'Supply Chain Manager':
         return 'role-supply';
 
-      case 'Vendor':
+      case 'Vendor Management':
         return 'role-vendor';
 
       case 'Finance Officer':

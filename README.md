@@ -1,182 +1,88 @@
-# Vendor Reliability Intelligence Platform
+# VendorIQ — Final Evaluation Package
 
-VendorIQ is a full-stack procurement and supplier-management system designed to help organizations monitor vendor reliability, manage purchasing operations, and coordinate compliance activities in one place.
+VendorIQ is a Vendor Reliability & Procurement Intelligence Platform with role-based dashboards and modules for vendor management, procurement, orders, deliveries, performance, contracts/compliance, invoices, communications, notifications, reports, quality inspection, certification, and administrator user management.
 
-## What the application provides
+## Roles
+- Administrator
+- Procurement Manager
+- Supply Chain Manager
+- Vendor
+- Finance Officer
+- Auditor
 
-- Vendor registration, profiles, performance scores, and reliability analysis
-- Procurement requests, purchase orders, deliveries, and order tracking
-- Contract documents, certifications, audit plans, findings, and evidence
-- Invoices, department budgets, finance approvals, and payment tracking
-- Quality inspections and supplier risk monitoring
-- Vendor communication threads and in-app notifications
-- PDF and Excel report exports
-- Role-based access control and administrator user management
+## Local run (Windows PowerShell)
 
-## User roles
-
-| Role | Primary responsibilities |
-| --- | --- |
-| Administrator | Full platform access and user management |
-| Procurement Manager | Requests, purchasing, vendors, contracts, and spend |
-| Supply Chain Manager | Deliveries, reliability, risk, and supplier operations |
-| Vendor | Assigned company profile, orders, deliveries, invoices, and communication |
-| Finance Officer | Budgets, invoices, approvals, and financial reporting |
-| Auditor | Compliance, controls, evidence, audits, and risk review |
-
-## Technology
-
-- **Frontend:** Angular 22 and TypeScript
-- **Backend:** FastAPI and Python
-- **Database:** SQLite for local evaluation; PostgreSQL supported through `DATABASE_URL`
-- **ORM and migrations:** SQLAlchemy and Alembic
-- **Deployment:** Docker and Docker Compose
-
-## Repository layout
-
-```text
-Vendor-Reliability-Intelligence-Platform/
-├── backend/       FastAPI service, models, routers, schemas, and seed scripts
-├── frontend/      Angular web application
-├── data/          DataCo CSV files and dataset documentation
-├── docs/          Data mapping and project documentation
-├── docker-compose.yml
-└── LICENSE
-```
-
-## Prerequisites
-
-For local development, install:
-
-- Python 3.11 or newer
-- Node.js 22 or newer
-- npm
-
-Docker Desktop is required only for the containerized setup.
-
-## Local installation
-
-### 1. Configure the backend
-
-From the repository root, open PowerShell and run:
-
+### 1. Backend
 ```powershell
-cd backend
+cd VendorIQ\backend
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+python create_test_accounts.py
+uvicorn app.main:app --reload
 ```
+Backend: http://127.0.0.1:8000
 
-If PowerShell prevents activation, run:
+### 2. Frontend (new terminal)
+```powershell
+cd VendorIQ\frontend
+npm install
+npm start
+```
+Frontend: http://localhost:4200
 
+If PowerShell blocks activation, use:
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\venv\Scripts\Activate.ps1
 ```
 
-### 2. Create demo data
-
-```powershell
-python create_test_accounts.py
-python seed_reference_features.py
-```
-
-### 3. Start the API
-
-```powershell
-uvicorn app.main:app --reload
-```
-
-Backend URL: `http://127.0.0.1:8000`
-
-Interactive API documentation: `http://127.0.0.1:8000/docs`
-
-### 4. Start the Angular frontend
-
-Open another PowerShell window:
-
-```powershell
-cd frontend
-npm install
-npm start
-```
-
-Frontend URL: `http://localhost:4200`
-
-## Docker setup
-
-To build and run both services from the repository root:
-
-```powershell
-docker compose up --build
-```
-
-Docker exposes the frontend on `http://localhost:4200` and the backend on `http://localhost:8000`.
-
-To stop the containers:
-
-```powershell
-docker compose down
-```
-
-The SQLite database is mounted from `backend/vendoriq.db`, allowing local data to persist across container restarts.
-
-## Demo login accounts
-
-The following accounts are created by `create_test_accounts.py`. They are intended for local demonstrations only.
+## Demo accounts
+All passwords below are for local/demo evaluation only. Change them before production use.
 
 | Role | Email | Password |
-| --- | --- | --- |
-| Administrator | `admin@vendoriq.com` | `Admin@123` |
-| Procurement Manager | `procurement@vendoriq.com` | `Procurement@123` |
-| Supply Chain Manager | `supplychain@vendoriq.com` | `SupplyChain@123` |
-| Vendor | `vendor@vendoriq.com` | `Vendor@123` |
-| Finance Officer | `finance@vendoriq.com` | `Finance@123` |
-| Auditor | `auditor@vendoriq.com` | `Auditor@123` |
+|---|---|---|
+| Administrator | admin@vendoriq.com | Admin@123 |
+| Procurement Manager | procurement@vendoriq.com | Procurement@123 |
+| Supply Chain Manager | supplychain@vendoriq.com | SupplyChain@123 |
+| Vendor | vendor@vendoriq.com | Vendor@123 |
+| Auditor | auditor@vendoriq.com | Auditor@123 |
+| Finance Officer | finance@vendoriq.com | Finance@123 |
 
-Change these passwords before using the system outside a local evaluation environment.
+## Important
+- The supplied project uses SQLite for local/offline evaluation (`backend/vendoriq.db`).
+- The source PDF specifies PostgreSQL for the target deployment architecture; PostgreSQL migration is therefore a deployment-level difference, not hidden as if SQLite were PostgreSQL.
+- The PDF also specifies PDF and Excel report export, email/SMS notifications, and a broader dashboard set. The project contains the corresponding report/notification modules and UI routes; external SMTP/SMS providers require real provider credentials.
 
-## DataCo dataset
+## Main application areas
+Administrator: dashboard, vendors, procurement, purchase orders, contracts/compliance, vendor performance, invoices, order tracking, reports, communications, notifications, and user management.
 
-The project includes the DataCo Smart Supply Chain Dataset in `data/`, together with its field-description CSV. The supplied database contains:
+Procurement Manager: dashboard, procurement requests, purchase orders, vendors, vendor performance, contracts/compliance, invoices, order tracking, reports/spend analysis, communications, and notifications.
 
-- 118 unique products
-- 65,752 unique orders
+Supply Chain Manager: dashboard, vendors, procurement, purchase orders, order tracking, supplier performance, risk/reliability, contracts/compliance, analytics/reports, communications, and alerts.
 
-To rebuild the operational data from the CSV files:
+Vendor: dashboard, company/profile, performance, purchase orders, delivery tracking, invoices, contracts/compliance, communications, notifications, and reports.
 
-```powershell
-cd backend
-python seed_database.py
-python create_test_accounts.py
-python seed_reference_features.py
-```
+Finance Officer: dashboard, purchase orders, invoices/payments, vendors, contracts/compliance, reports, communications, and notifications.
 
-The import preserves existing users while rebuilding business records. DataCo does not include vendor master data, contracts, invoices, communications, certifications, notifications, or quality inspections, so those VendorIQ-specific records are generated separately. More information is available in `data/README.md`.
+Auditor: dashboard, vendors, procurement, purchase orders, contracts/compliance, audit/risk/report areas, document review, communications, notifications, control/checklist/evidence areas.
 
-## Configuration
+## Dataset
+- Primary operational dataset: DataCo Smart Supply Chain Dataset.
+- The full CSV and its field-description CSV are included under `data/`.
+- The packaged SQLite database has been rebuilt from the supplied dataset: **118 unique products and 65,752 unique orders** are imported from DataCo.
+- Run `python seed_database.py` from `backend/` to clear existing business data and rebuild the database from the DataCo dataset. Existing user accounts are preserved when present.
+- If you create a completely new database, run `python create_test_accounts.py` after the import to create the six demo logins.
+- DataCo does not contain vendor master, contracts, invoices, communications, certifications, notifications, or quality-inspection tables, so those VendorIQ-only records are generated as supplemental business data and clearly documented in `data/README.md`.
 
-SQLite is used automatically for local development. To connect to PostgreSQL, set `DATABASE_URL` in the backend environment:
+## Reference-aligned enhancements
+The implementation also includes the strongest relevant features from the reference Vendor Reliability Intelligence Platform branch while preserving this project's Angular + FastAPI architecture:
+- Dedicated Finance Officer dashboard with database-backed department budgets, approval queue, invoices and procurement totals.
+- Finance approval can create an operational purchase order automatically, while budget limits are enforced.
+- Global in-app Communication Hub with threaded vendor conversations and automatic chat notifications.
+- Notification badge/popover with automatic refresh.
+- Vendor-account-to-company linkage and backend vendor data isolation so a Vendor account can access only its assigned vendor records.
+- Contract/dispute evidence URL support through the backend collaboration/compliance layer.
+- `DATABASE_URL` support for PostgreSQL while retaining SQLite as the local evaluation default.
 
-```text
-DATABASE_URL=postgresql+psycopg://username:password@localhost:5432/vendoriq
-```
-
-External email and SMS delivery requires valid provider credentials. In-app notifications work without external providers.
-
-## Important security note
-
-The demo credentials in this document are public evaluation credentials. Do not use them in production. Configure strong secrets, production database credentials, and external notification providers before deployment.
-
-
-## Project Demo
-
-Click below to watch the complete project demonstration:
-
-👉 [Watch Project Demo](https://drive.google.com/file/d/1vRl4FIlfsd2f8CBk1tJ30y35QYGwt_zY/view?usp=drive_link)
-
-
-
-## License
-
-See [LICENSE](LICENSE) for licensing information.
+After creating the six demo accounts, run `python seed_reference_features.py` from `backend/` to create the reference-aligned budget records and link the demo Vendor account to vendor #1.

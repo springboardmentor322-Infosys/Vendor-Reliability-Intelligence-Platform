@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Date
 
 from app.database import Base
 
@@ -89,4 +89,10 @@ class Vendor(Base):
     status = Column(
         String,
         default="Active"
+    )
+
+    # Demo/operational onboarding date
+    onboarded_date = Column(
+        Date,
+        nullable=True
     )

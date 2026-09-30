@@ -277,12 +277,9 @@ def get_performance(
     )
 ):
 
-    query = db.query(VendorPerformance)
-    if current_user.role == VENDOR:
-        if not current_user.vendor_id:
-            return []
-        query = query.filter(VendorPerformance.vendor_id == current_user.vendor_id)
-    return query.all()
+    # Vendor Management is an organization-wide management role, so it can
+    # view performance records for every vendor.
+    return db.query(VendorPerformance).all()
 
 
 # ==========================================
@@ -350,12 +347,8 @@ def get_vendor_reliability(
     )
 ):
 
-    query = db.query(VendorPerformance)
-    if current_user.role == VENDOR:
-        if not current_user.vendor_id:
-            return []
-        query = query.filter(VendorPerformance.vendor_id == current_user.vendor_id)
-    performances = query.all()
+    # Vendor Management can view reliability data across all vendors.
+    performances = db.query(VendorPerformance).all()
 
 
     result = []

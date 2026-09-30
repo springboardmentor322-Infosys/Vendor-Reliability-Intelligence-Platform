@@ -24,7 +24,7 @@ export class Register {
 
   confirmPassword = '';
 
-  role = 'Vendor';
+  role = 'Vendor Management';
 
   loading = false;
 

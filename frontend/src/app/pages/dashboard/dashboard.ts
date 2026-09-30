@@ -39,7 +39,7 @@ export class Dashboard implements OnInit {
 
   get isProcurementManager(): boolean { return this.role === 'Procurement Manager'; }
   get isSupplyChainManager(): boolean { return this.role === 'Supply Chain Manager'; }
-  get isVendor(): boolean { return this.role === 'Vendor'; }
+  get isVendor(): boolean { return this.role === 'Vendor Management'; }
   get isFinanceOfficer(): boolean { return this.role === 'Finance Officer'; }
   get isAuditor(): boolean { return this.role === 'Auditor'; }
   get isAdministrator(): boolean { return this.role === 'Administrator'; }
@@ -160,7 +160,7 @@ export class Dashboard implements OnInit {
   ngOnInit(): void {
 
     this.user = this.auth.getCurrentUser();
-    this.role = this.user?.role || 'Vendor';
+    this.role = this.user?.role || 'Vendor Management';
 
     this.loadDashboard();
 
@@ -674,6 +674,85 @@ export class Dashboard implements OnInit {
 
 
     return 'reliability-danger';
+
+  }
+
+
+  // ==========================================
+  // CHART HELPERS
+  // ==========================================
+
+  orderStatusEntries(): Array<{ status: string; count: number }> {
+
+    return Object.entries(this.orderStatusSummary()).map(
+      ([status, count]) => ({
+        status,
+        count: Number(count) || 0
+      })
+    );
+
+  }
+
+
+  getStatusPercentage(count: number): number {
+
+    const values = this.orderStatusEntries().map(
+      item => item.count
+    );
+
+    const total = values.reduce(
+      (sum, value) => sum + value,
+      0
+    );
+
+    if (total <= 0) {
+      return 0;
+    }
+
+    return Math.max(4, Math.round((count / total) * 100));
+
+  }
+
+
+  getStatusClass(status: string): string {
+
+    switch (status) {
+
+      case 'Completed':
+        return 'status-completed';
+
+      case 'Delivered':
+        return 'status-delivered';
+
+      case 'Ordered':
+        return 'status-ordered';
+
+      case 'Approved':
+        return 'status-approved';
+
+      case 'Cancelled':
+        return 'status-cancelled';
+
+      default:
+        return 'status-pending';
+
+    }
+
+  }
+
+
+  getRiskPercentage(value: number): number {
+
+    const total =
+      this.lowRiskVendors() +
+      this.mediumRiskVendors() +
+      this.highRiskVendors();
+
+    if (total <= 0) {
+      return 0;
+    }
+
+    return Math.max(4, Math.round((value / total) * 100));
 
   }
 
