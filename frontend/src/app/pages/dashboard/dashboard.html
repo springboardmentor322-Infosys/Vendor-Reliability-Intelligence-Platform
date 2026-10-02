@@ -1,5 +1,345 @@
 <div class="role-dashboard">
-  <div class="dashboard-header">
+
+  <!-- =====================================================
+       VENDOR MANAGEMENT DASHBOARD
+       ===================================================== -->
+  @if (isVendor) {
+    <div class="dashboard-header">
+      <div>
+        <span class="section-kicker">VENDOR MANAGEMENT</span>
+        <h1>Vendor Management Dashboard</h1>
+        <p class="subtitle">Manage suppliers, vendor registrations, orders and vendor performance.</p>
+      </div>
+      <div class="date-chip">📅 Today</div>
+    </div>
+
+    <div class="kpi-grid four">
+      <div class="kpi">
+        <span class="kpi-icon purple">👥</span>
+        <div><strong>{{ vendorCount() }}</strong><span>Total Vendors</span></div>
+      </div>
+      <div class="kpi">
+        <span class="kpi-icon blue">📦</span>
+        <div><strong>{{ totalOrders() }}</strong><span>Total Purchase Orders</span></div>
+      </div>
+      <div class="kpi">
+        <span class="kpi-icon orange">⏳</span>
+        <div><strong>{{ pendingOrders() }}</strong><span>Pending Orders</span></div>
+      </div>
+      <div class="kpi">
+        <span class="kpi-icon green">★</span>
+        <div><strong>{{ averageReliability() }}%</strong><span>Average Reliability</span></div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="primary-action" (click)="router.navigate(['/add-vendor'])">+ Register Vendor</button>
+      <button class="secondary-action" (click)="router.navigate(['/vendors'])">View Vendors</button>
+      <button class="secondary-action" (click)="viewAllOrders()">Purchase Orders</button>
+      <button class="secondary-action" (click)="router.navigate(['/vendor-performance'])">Performance</button>
+    </div>
+
+    <div class="dashboard-grid">
+      <section class="panel wide">
+        <div class="panel-head">
+          <div>
+            <h2>Vendor Performance</h2>
+            <p>Reliability scores for managed vendors</p>
+          </div>
+          <button (click)="router.navigate(['/vendor-performance'])">View All →</button>
+        </div>
+        <div class="horizontal-bars">
+          @for (vendor of vendorReliability().slice(0, 6); track vendor.vendor_id || $index) {
+            <div class="hbar-row">
+              <div class="hbar-label">
+                <span>{{ vendor.vendor_name || ('Vendor #' + vendor.vendor_id) }}</span>
+                <b>{{ vendor.reliability_score || 0 }}%</b>
+              </div>
+              <div class="hbar-track">
+                <span [style.width.%]="Math.min(100, Number(vendor.reliability_score || 0))" [class]="getReliabilityClass(vendor.reliability_score || 0)"></span>
+              </div>
+            </div>
+          }
+          @if (vendorReliability().length === 0) {
+            <div class="empty">No vendor performance data available.</div>
+          }
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Vendor Risk</h2>
+            <p>Current vendor risk distribution</p>
+          </div>
+        </div>
+        <div class="risk-chart">
+          <div class="risk-row"><span><i class="risk-dot low"></i>Low Risk</span><b>{{ lowRiskVendors() }}</b></div>
+          <div class="risk-track"><span class="low" [style.width.%]="getRiskPercentage(lowRiskVendors())"></span></div>
+          <div class="risk-row"><span><i class="risk-dot medium"></i>Medium Risk</span><b>{{ mediumRiskVendors() }}</b></div>
+          <div class="risk-track"><span class="medium" [style.width.%]="getRiskPercentage(mediumRiskVendors())"></span></div>
+          <div class="risk-row"><span><i class="risk-dot high"></i>High Risk</span><b>{{ highRiskVendors() }}</b></div>
+          <div class="risk-track"><span class="high" [style.width.%]="getRiskPercentage(highRiskVendors())"></span></div>
+        </div>
+      </section>
+
+      <section class="panel wide">
+        <div class="panel-head">
+          <div>
+            <h2>Recent Purchase Orders</h2>
+            <p>Latest orders involving managed vendors</p>
+          </div>
+          <button (click)="viewAllOrders()">View All →</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Order</th><th>Vendor</th><th>Status</th><th>Amount</th></tr></thead>
+            <tbody>
+              @for (order of recentOrders(); track order.id || $index) {
+                <tr>
+                  <td>{{ order.po_number || order.order_number || ('PO-' + order.id) }}</td>
+                  <td>{{ getVendorName(order.vendor_id) }}</td>
+                  <td><span class="status-pill">{{ order.status || 'Pending' }}</span></td>
+                  <td>₹{{ (order.amount || 0) | number:'1.0-0' }}</td>
+                </tr>
+              }
+              @if (recentOrders().length === 0) { <tr><td colspan="4" class="empty">No orders available.</td></tr> }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div><h2>Contract Alerts</h2><p>Items requiring attention</p></div>
+          <button (click)="viewContracts()">Contracts →</button>
+        </div>
+        <div class="list">
+          @for (alert of contractExpiryAlerts().slice(0, 5); track alert.id || $index) {
+            <div class="list-row">
+              <span class="alert-icon">⚠</span>
+              <div><strong>{{ alert.contract_name || alert.vendor_name || 'Contract alert' }}</strong><small>{{ alert.expiry_date || alert.message || 'Review required' }}</small></div>
+            </div>
+          }
+          @if (contractExpiryAlerts().length === 0) { <div class="empty">No urgent contract alerts.</div> }
+        </div>
+      </section>
+    </div>
+
+    <section class="role-graphs-section">
+      <div class="role-graphs-heading">
+        <div><span class="section-kicker">VENDOR ANALYTICS</span><h2>Vendor Performance Graphs</h2><p>Visual summaries using the existing vendor, order and procurement data.</p></div>
+      </div>
+      <div class="role-graphs-grid">
+        <section class="graph-card">
+          <div class="graph-card-head"><div><h3>Vendor Reliability</h3><p>Top managed vendors by reliability score</p></div></div>
+          <div class="graph-bars">
+            @for (vendor of vendorReliability().slice(0, 6); track vendor.vendor_id || $index) {
+              <div class="graph-bar-row"><span>{{ vendor.vendor_name || ('Vendor #' + vendor.vendor_id) }}</span><div class="graph-bar-track"><i [style.width.%]="Math.min(100, Number(vendor.reliability_score || 0))" [class]="getReliabilityClass(vendor.reliability_score || 0)"></i></div><b>{{ vendor.reliability_score || 0 }}%</b></div>
+            }
+            @if (vendorReliability().length === 0) { <div class="analytics-empty">No vendor reliability data available.</div> }
+          </div>
+        </section>
+        <section class="graph-card">
+          <div class="graph-card-head"><div><h3>Vendor Risk Distribution</h3><p>Current low, medium and high-risk vendors</p></div></div>
+          <div class="graph-bars">
+            <div class="graph-bar-row"><span>Low Risk</span><div class="graph-bar-track"><i class="risk-low" [style.width.%]="getRiskPercentage(lowRiskVendors())"></i></div><b>{{ lowRiskVendors() }}</b></div>
+            <div class="graph-bar-row"><span>Medium Risk</span><div class="graph-bar-track"><i class="risk-medium" [style.width.%]="getRiskPercentage(mediumRiskVendors())"></i></div><b>{{ mediumRiskVendors() }}</b></div>
+            <div class="graph-bar-row"><span>High Risk</span><div class="graph-bar-track"><i class="risk-high" [style.width.%]="getRiskPercentage(highRiskVendors())"></i></div><b>{{ highRiskVendors() }}</b></div>
+          </div>
+        </section>
+        <section class="graph-card">
+          <div class="graph-card-head"><div><h3>Purchase Order Status</h3><p>Current order workflow distribution</p></div></div>
+          <div class="graph-bars">
+            @for (item of orderStatusEntries(); track item.status) {
+              <div class="graph-bar-row"><span>{{ item.status }}</span><div class="graph-bar-track"><i [class]="getStatusClass(item.status)" [style.width.%]="getStatusPercentage(item.count)"></i></div><b>{{ item.count }}</b></div>
+            }
+            @if (orderStatusEntries().length === 0) { <div class="analytics-empty">No order status data available.</div> }
+          </div>
+        </section>
+        <section class="graph-card">
+          <div class="graph-card-head"><div><h3>Order Value by Status</h3><p>Procurement value grouped by order status</p></div></div>
+          <div class="mini-column-chart">
+            @for (item of revenueAnalytics(); track item.status) {
+              <div class="mini-column"><div class="mini-column-value">₹{{ item.revenue | number:'1.0-0' }}</div><div class="mini-column-track"><i [style.height.%]="getRevenuePercentage(item.revenue)"></i></div><span>{{ item.status }}</span></div>
+            }
+            @if (revenueAnalytics().length === 0) { <div class="analytics-empty">No procurement value data available.</div> }
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <div class="insight-banner">✨ <div><strong>Vendor Management Focus</strong><span>Keep vendor records updated, monitor reliability, and follow up on orders and contracts that need attention.</span></div></div>
+  }
+
+  <!-- =====================================================
+       PROCUREMENT MANAGER DASHBOARD
+       ===================================================== -->
+  @else if (isProcurementManager) {
+    <div class="dashboard-header">
+      <div>
+        <span class="section-kicker">PROCUREMENT MANAGER</span>
+        <h1>Procurement Manager Dashboard</h1>
+        <p class="subtitle">Monitor procurement requests, purchase orders, suppliers, spend and deliveries.</p>
+      </div>
+      <div class="date-chip">📅 Today</div>
+    </div>
+
+    <div class="kpi-grid four">
+      <div class="kpi">
+        <span class="kpi-icon purple">📝</span>
+        <div><strong>{{ pendingOrders() }}</strong><span>Pending Orders</span></div>
+      </div>
+      <div class="kpi">
+        <span class="kpi-icon blue">📦</span>
+        <div><strong>{{ totalOrders() }}</strong><span>Total Purchase Orders</span></div>
+      </div>
+      <div class="kpi">
+        <span class="kpi-icon green">👥</span>
+        <div><strong>{{ vendorCount() }}</strong><span>Suppliers</span></div>
+      </div>
+      <div class="kpi">
+        <span class="kpi-icon orange">₹</span>
+        <div><strong>₹{{ procurementValue() | number:'1.0-0' }}</strong><span>Total Procurement Value</span></div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="primary-action" (click)="router.navigate(['/procurement'])">View Procurement Requests</button>
+      <button class="secondary-action" (click)="router.navigate(['/add-order'])">+ Create Purchase Order</button>
+      <button class="secondary-action" (click)="router.navigate(['/vendors'])">Manage Vendors</button>
+      <button class="secondary-action" (click)="router.navigate(['/reports'])">Reports & Analytics</button>
+    </div>
+
+    <div class="dashboard-grid">
+      <section class="panel wide">
+        <div class="panel-head">
+          <div><h2>Purchase Order Status</h2><p>Current procurement workflow</p></div>
+          <button (click)="viewAllOrders()">Manage Orders →</button>
+        </div>
+        <div class="status-chart">
+          @for (item of orderStatusEntries(); track item.status) {
+            <div class="status-bar-row">
+              <div class="status-bar-label"><span>{{ item.status }}</span><b>{{ item.count }}</b></div>
+              <div class="status-bar-track"><span [style.width.%]="getStatusPercentage(item.count)" [class]="getStatusClass(item.status)"></span></div>
+            </div>
+          }
+          @if (orderStatusEntries().length === 0) { <div class="empty">No order status data available.</div> }
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div><h2>Procurement Summary</h2><p>Spend overview</p></div>
+        </div>
+        <div class="metric-list">
+          <div><span>Total Value</span><strong>₹{{ procurementValue() | number:'1.0-0' }}</strong></div>
+          <div><span>Average Order</span><strong>₹{{ averageOrderValue() | number:'1.0-0' }}</strong></div>
+          <div><span>Highest Order</span><strong>₹{{ highestOrderValue() | number:'1.0-0' }}</strong></div>
+          <div><span>Active Contracts</span><strong>{{ activeContracts() }}</strong></div>
+        </div>
+      </section>
+
+      <section class="panel wide">
+        <div class="panel-head">
+          <div><h2>Recent Purchase Orders</h2><p>Latest procurement activity</p></div>
+          <button (click)="viewAllOrders()">View All →</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Order</th><th>Vendor</th><th>Status</th><th>Amount</th></tr></thead>
+            <tbody>
+              @for (order of recentOrders(); track order.id || $index) {
+                <tr>
+                  <td>{{ order.po_number || order.order_number || ('PO-' + order.id) }}</td>
+                  <td>{{ getVendorName(order.vendor_id) }}</td>
+                  <td><span class="status-pill">{{ order.status || 'Pending' }}</span></td>
+                  <td>₹{{ (order.amount || 0) | number:'1.0-0' }}</td>
+                </tr>
+              }
+              @if (recentOrders().length === 0) { <tr><td colspan="4" class="empty">No orders available.</td></tr> }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div><h2>Supplier Performance</h2><p>Reliability for procurement decisions</p></div>
+          <button (click)="router.navigate(['/vendor-performance'])">View →</button>
+        </div>
+        <div class="horizontal-bars compact">
+          @for (vendor of vendorReliability().slice(0, 5); track vendor.vendor_id || $index) {
+            <div class="hbar-row">
+              <div class="hbar-label"><span>{{ vendor.vendor_name || ('Vendor #' + vendor.vendor_id) }}</span><b>{{ vendor.reliability_score || 0 }}%</b></div>
+              <div class="hbar-track"><span [style.width.%]="Math.min(100, Number(vendor.reliability_score || 0))" [class]="getReliabilityClass(vendor.reliability_score || 0)"></span></div>
+            </div>
+          }
+          @if (vendorReliability().length === 0) { <div class="empty">No supplier performance data.</div> }
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div><h2>Contracts & Alerts</h2><p>Procurement items needing review</p></div>
+          <button (click)="viewContracts()">Contracts →</button>
+        </div>
+        <div class="list">
+          @for (alert of contractExpiryAlerts().slice(0, 5); track alert.id || $index) {
+            <div class="list-row"><span class="alert-icon">⚠</span><div><strong>{{ alert.contract_name || alert.vendor_name || 'Contract alert' }}</strong><small>{{ alert.expiry_date || alert.message || 'Review required' }}</small></div></div>
+          }
+          @if (contractExpiryAlerts().length === 0) { <div class="empty">No urgent procurement alerts.</div> }
+        </div>
+      </section>
+    </div>
+
+    <section class="role-graphs-section">
+      <div class="role-graphs-heading">
+        <div><span class="section-kicker">PROCUREMENT ANALYTICS</span><h2>Procurement Manager Graphs</h2><p>Visual summaries for purchase orders, spend and supplier performance.</p></div>
+      </div>
+      <div class="role-graphs-grid">
+        <section class="graph-card">
+          <div class="graph-card-head"><div><h3>Purchase Order Status</h3><p>Current procurement workflow</p></div></div>
+          <div class="graph-bars">
+            @for (item of orderStatusEntries(); track item.status) {
+              <div class="graph-bar-row"><span>{{ item.status }}</span><div class="graph-bar-track"><i [class]="getStatusClass(item.status)" [style.width.%]="getStatusPercentage(item.count)"></i></div><b>{{ item.count }}</b></div>
+            }
+            @if (orderStatusEntries().length === 0) { <div class="analytics-empty">No order status data available.</div> }
+          </div>
+        </section>
+        <section class="graph-card">
+          <div class="graph-card-head"><div><h3>Spend by Order Status</h3><p>Total procurement value grouped by status</p></div></div>
+          <div class="mini-column-chart">
+            @for (item of revenueAnalytics(); track item.status) {
+              <div class="mini-column"><div class="mini-column-value">₹{{ item.revenue | number:'1.0-0' }}</div><div class="mini-column-track"><i [style.height.%]="getRevenuePercentage(item.revenue)"></i></div><span>{{ item.status }}</span></div>
+            }
+            @if (revenueAnalytics().length === 0) { <div class="analytics-empty">No procurement value data available.</div> }
+          </div>
+        </section>
+        <section class="graph-card">
+          <div class="graph-card-head"><div><h3>Supplier Reliability</h3><p>Reliability scores for procurement decisions</p></div></div>
+          <div class="graph-bars">
+            @for (vendor of vendorReliability().slice(0, 6); track vendor.vendor_id || $index) {
+              <div class="graph-bar-row"><span>{{ vendor.vendor_name || ('Vendor #' + vendor.vendor_id) }}</span><div class="graph-bar-track"><i [style.width.%]="Math.min(100, Number(vendor.reliability_score || 0))" [class]="getReliabilityClass(vendor.reliability_score || 0)"></i></div><b>{{ vendor.reliability_score || 0 }}%</b></div>
+            }
+            @if (vendorReliability().length === 0) { <div class="analytics-empty">No supplier reliability data available.</div> }
+          </div>
+        </section>
+        <section class="graph-card">
+          <div class="graph-card-head"><div><h3>Order Value Comparison</h3><p>Average and highest purchase order value</p></div></div>
+          <div class="mini-column-chart two-columns">
+            <div class="mini-column"><div class="mini-column-value">₹{{ averageOrderValue() | number:'1.0-0' }}</div><div class="mini-column-track"><i [style.height.%]="getOrderValueComparisonHeight(averageOrderValue())"></i></div><span>Average PO</span></div>
+            <div class="mini-column"><div class="mini-column-value">₹{{ highestOrderValue() | number:'1.0-0' }}</div><div class="mini-column-track"><i [style.height.%]="getOrderValueComparisonHeight(highestOrderValue())"></i></div><span>Highest PO</span></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <div class="insight-banner">✨ <div><strong>Procurement Focus</strong><span>Review pending procurement activity, supplier performance, purchase orders, contracts and spend before taking the next action.</span></div></div>
+  }
+
+  @else {
+<div class="dashboard-header">
     <div>
       <span class="section-kicker">{{ role | uppercase }}</span>
       <h1>Welcome back, {{ user?.full_name || 'User' }} 👋</h1>
@@ -206,4 +546,5 @@
   </section>
 
   <div class="insight-banner">✨ <div><strong>Platform Insight</strong><span>Review high-risk vendors and upcoming contract expiries to keep procurement operations reliable.</span></div></div>
+  }
 </div>

@@ -149,7 +149,7 @@ export class Dashboard implements OnInit {
     private orderService: Order,
     private dashboardService: DashboardService,
     private communicationService: Communication,
-    private router: Router
+    public router: Router
   ) {}
 
 
@@ -804,6 +804,19 @@ export class Dashboard implements OnInit {
     return 'risk-high';
 
   }
+
+  getOrderValueComparisonHeight(value: number): number {
+
+    const highest = Number(this.highestOrderValue()) || 0;
+
+    if (highest <= 0) {
+      return 0;
+    }
+
+    return Math.max(8, Math.round((Number(value) / highest) * 100));
+
+  }
+
 
   // ==========================================
   // REVENUE ANALYTICS
